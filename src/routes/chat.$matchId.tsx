@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, Send } from "lucide-react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeft, Image as ImageIcon, Phone, Send, Smile, Video } from "lucide-react";
 import { conversations, matches, getProfile, type Message } from "@/data/profiles";
 
 export const Route = createFileRoute("/chat/$matchId")({
@@ -13,11 +14,26 @@ function ChatRoom() {
   const profile = match ? getProfile(match.profileId) : undefined;
   const [msgs, setMsgs] = useState<Message[]>(conversations[matchId] ?? []);
   const [text, setText] = useState("");
+  const [typing, setTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Autosize textarea
+  useLayoutEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "0px";
+    el.style.height = Math.min(el.scrollHeight, 120) + "px";
+  }, [text]);
+
+  // Scroll to bottom on new messages / typing
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [msgs.length]);
+    const el = scrollRef.current;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    });
+  }, [msgs.length, typing]);
 
   if (!profile) {
     return (
@@ -29,84 +45,317 @@ function ChatRoom() {
   }
 
   const send = () => {
-    if (!text.trim()) return;
+    const value = text.trim();
+    if (!value) return;
     setMsgs((m) => [
       ...m,
-      { id: String(Date.now()), text: text.trim(), fromMe: true, time: "agora" },
+      { id: String(Date.now()), text: value, fromMe: true, time: nowLabel() },
     ]);
     setText("");
+    setTyping(true);
     setTimeout(() => {
+      setTyping(false);
       setMsgs((m) => [
         ...m,
-        { id: String(Date.now() + 1), text: "Que legal! 😊", fromMe: false, time: "agora" },
+        {
+          id: String(Date.now() + 1),
+          text: pickReply(value),
+          fromMe: false,
+          time: nowLabel(),
+        },
       ]);
-    }, 900);
+    }, 1400);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-background" style={{ height: "100dvh" }}>
-      <header className="flex items-center gap-3 border-b border-border bg-background/90 px-3 py-3 backdrop-blur-xl">
-        <Link to="/chat" className="grid h-9 w-9 place-items-center rounded-full hover:bg-muted">
-          <ChevronLeft className="h-5 w-5" />
-        </Link>
-        <div className="h-10 w-10 overflow-hidden rounded-full ring-2 ring-flame/40">
-          <img src={profile.photo} alt={profile.name} className="h-full w-full object-cover" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold leading-tight">{profile.name}</p>
-          <p className="text-xs text-muted-foreground">online agora</p>
+    <div
+      className="fixed inset-0 z-50 flex flex-col bg-background"
+      style={{ height: "100dvh" }}
+    >
+      {/* Fixed header */}
+      <header className="relative z-10 shrink-0 border-b border-border/60 bg-background/85 backdrop-blur-xl">
+        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-sunset opacity-80" />
+        <div className="flex items-center gap-3 px-3 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2.5">
+          <Link
+            to="/chat"
+            aria-label="Voltar"
+            className="grid h-10 w-10 place-items-center rounded-full text-foreground/80 hover:bg-muted active:scale-95"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Link>
+
+          <Link to="/chat" className="flex min-w-0 flex-1 items-center gap-3">
+            <div className="relative shrink-0">
+              <div className="h-11 w-11 overflow-hidden rounded-full ring-2 ring-flame/50">
+                <img
+                  src={profile.photo}
+                  alt={profile.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <span className="absolute -bottom-0.5 -right-0.5 grid h-3.5 w-3.5 place-items-center rounded-full bg-background">
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+              </span>
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-[15px] font-semibold leading-tight">
+                {profile.name}
+              </p>
+              <p className="truncate text-xs text-emerald-600 dark:text-emerald-400">
+                online agora
+              </p>
+            </div>
+          </Link>
+
+          <button
+            aria-label="Chamada de voz"
+            className="grid h-10 w-10 place-items-center rounded-full text-foreground/70 hover:bg-muted active:scale-95"
+          >
+            <Phone className="h-5 w-5" />
+          </button>
+          <button
+            aria-label="Chamada de vídeo"
+            className="grid h-10 w-10 place-items-center rounded-full text-foreground/70 hover:bg-muted active:scale-95"
+          >
+            <Video className="h-5 w-5" />
+          </button>
         </div>
       </header>
 
-      <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto px-4 py-4">
-        <div className="mx-auto w-fit rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
-          Vocês deram match! 🔥
-        </div>
-        {msgs.map((m) => (
-          <div
-            key={m.id}
-            className={`flex ${m.fromMe ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`max-w-[78%] rounded-2xl px-4 py-2.5 text-sm leading-snug ${
-                m.fromMe
-                  ? "bg-gradient-flame text-flame-foreground rounded-br-md shadow-glow"
-                  : "bg-muted text-foreground rounded-bl-md"
-              }`}
-            >
-              {m.text}
+      {/* Messages */}
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto overscroll-contain px-4 py-5"
+      >
+        {/* Match intro */}
+        <div className="mb-6 flex flex-col items-center text-center">
+          <div className="relative h-20 w-20">
+            <div className="absolute inset-0 rounded-full bg-gradient-sunset blur-xl opacity-60" />
+            <div className="relative h-full w-full overflow-hidden rounded-full ring-4 ring-background">
+              <img
+                src={profile.photo}
+                alt={profile.name}
+                className="h-full w-full object-cover"
+              />
             </div>
           </div>
-        ))}
+          <p className="mt-3 text-sm font-semibold">
+            Vocês deram match <span className="text-base">🔥</span>
+          </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Diga olá pra {profile.name}
+          </p>
+        </div>
+
+        <DateSeparator label="Hoje" />
+
+        <ul className="space-y-1.5">
+          <AnimatePresence initial={false}>
+            {msgs.map((m, i) => {
+              const prev = msgs[i - 1];
+              const next = msgs[i + 1];
+              const isFirstOfGroup = !prev || prev.fromMe !== m.fromMe;
+              const isLastOfGroup = !next || next.fromMe !== m.fromMe;
+              return (
+                <MessageBubble
+                  key={m.id}
+                  msg={m}
+                  isFirstOfGroup={isFirstOfGroup}
+                  isLastOfGroup={isLastOfGroup}
+                  avatar={profile.photo}
+                  name={profile.name}
+                />
+              );
+            })}
+            {typing && (
+              <motion.li
+                key="typing"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="flex items-end gap-2"
+              >
+                <img
+                  src={profile.photo}
+                  alt=""
+                  className="h-7 w-7 shrink-0 rounded-full object-cover"
+                />
+                <div className="rounded-2xl rounded-bl-md bg-muted px-4 py-3">
+                  <TypingDots />
+                </div>
+              </motion.li>
+            )}
+          </AnimatePresence>
+        </ul>
       </div>
 
+      {/* Composer */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           send();
         }}
-        className="flex items-center gap-2 border-t border-border bg-background/95 px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl"
+        className="shrink-0 border-t border-border/60 bg-background/95 px-3 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl"
       >
-        <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onFocus={() => {
-            setTimeout(() => {
-              scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
-            }, 300);
-          }}
-          placeholder="Mensagem"
-          className="flex-1 rounded-full bg-muted px-4 py-2.5 text-base outline-none ring-flame focus:ring-2"
-        />
+        <div className="flex items-end gap-2">
+          <button
+            type="button"
+            aria-label="Anexar foto"
+            className="mb-1 grid h-10 w-10 shrink-0 place-items-center rounded-full text-foreground/60 hover:bg-muted active:scale-95"
+          >
+            <ImageIcon className="h-5 w-5" />
+          </button>
 
-        <button
-          type="submit"
-          disabled={!text.trim()}
-          className="grid h-11 w-11 place-items-center rounded-full bg-gradient-flame text-flame-foreground shadow-glow transition-opacity disabled:opacity-40"
-        >
-          <Send className="h-5 w-5" />
-        </button>
+          <div className="flex flex-1 items-end gap-1 rounded-3xl bg-muted px-3 py-1.5 focus-within:ring-2 focus-within:ring-flame">
+            <textarea
+              ref={textareaRef}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  send();
+                }
+              }}
+              onFocus={() =>
+                setTimeout(() => {
+                  scrollRef.current?.scrollTo({
+                    top: scrollRef.current.scrollHeight,
+                  });
+                }, 300)
+              }
+              rows={1}
+              placeholder={`Mensagem para ${profile.name}…`}
+              className="flex-1 resize-none bg-transparent px-1 py-2 text-base leading-snug outline-none placeholder:text-muted-foreground"
+            />
+            <button
+              type="button"
+              aria-label="Emoji"
+              className="mb-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full text-foreground/50 hover:text-foreground active:scale-95"
+            >
+              <Smile className="h-5 w-5" />
+            </button>
+          </div>
+
+          <motion.button
+            type="submit"
+            disabled={!text.trim()}
+            whileTap={{ scale: 0.9 }}
+            aria-label="Enviar"
+            className="mb-1 grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-flame text-flame-foreground shadow-glow transition-opacity disabled:opacity-40 disabled:shadow-none"
+          >
+            <Send className="h-5 w-5 translate-x-[1px]" />
+          </motion.button>
+        </div>
       </form>
     </div>
   );
+}
+
+function MessageBubble({
+  msg,
+  isFirstOfGroup,
+  isLastOfGroup,
+  avatar,
+  name,
+}: {
+  msg: Message;
+  isFirstOfGroup: boolean;
+  isLastOfGroup: boolean;
+  avatar: string;
+  name: string;
+}) {
+  const me = msg.fromMe;
+  return (
+    <motion.li
+      initial={{ opacity: 0, y: 8, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: "spring", stiffness: 420, damping: 32 }}
+      className={`flex items-end gap-2 ${me ? "justify-end" : "justify-start"} ${
+        isFirstOfGroup ? "mt-3" : "mt-0.5"
+      }`}
+    >
+      {!me &&
+        (isLastOfGroup ? (
+          <img
+            src={avatar}
+            alt={name}
+            className="h-7 w-7 shrink-0 rounded-full object-cover"
+          />
+        ) : (
+          <div className="h-7 w-7 shrink-0" />
+        ))}
+
+      <div className={`flex max-w-[78%] flex-col ${me ? "items-end" : "items-start"}`}>
+        <div
+          className={[
+            "px-4 py-2.5 text-[15px] leading-snug break-words whitespace-pre-wrap",
+            me
+              ? "bg-gradient-flame text-flame-foreground shadow-rose"
+              : "bg-muted text-foreground",
+            // bubble corners — tighter when grouped
+            "rounded-2xl",
+            me
+              ? `${isFirstOfGroup ? "rounded-tr-2xl" : "rounded-tr-md"} ${
+                  isLastOfGroup ? "rounded-br-md" : "rounded-br-2xl"
+                }`
+              : `${isFirstOfGroup ? "rounded-tl-2xl" : "rounded-tl-md"} ${
+                  isLastOfGroup ? "rounded-bl-md" : "rounded-bl-2xl"
+                }`,
+          ].join(" ")}
+        >
+          {msg.text}
+        </div>
+        {isLastOfGroup && (
+          <span className="mt-1 px-1 text-[10px] text-muted-foreground">{msg.time}</span>
+        )}
+      </div>
+    </motion.li>
+  );
+}
+
+function DateSeparator({ label }: { label: string }) {
+  return (
+    <div className="my-2 flex items-center gap-3 text-[11px] uppercase tracking-wider text-muted-foreground">
+      <div className="h-px flex-1 bg-border" />
+      <span className="font-semibold">{label}</span>
+      <div className="h-px flex-1 bg-border" />
+    </div>
+  );
+}
+
+function TypingDots() {
+  return (
+    <div className="flex items-center gap-1">
+      {[0, 1, 2].map((i) => (
+        <motion.span
+          key={i}
+          className="block h-1.5 w-1.5 rounded-full bg-muted-foreground"
+          animate={{ y: [0, -3, 0], opacity: [0.4, 1, 0.4] }}
+          transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.15 }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function nowLabel() {
+  return new Date().toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function pickReply(input: string) {
+  const lower = input.toLowerCase();
+  if (lower.includes("?")) return "Boa pergunta 😄 me conta mais!";
+  if (lower.match(/oi|olá|hey|e ai|eai/)) return "Oi! Tudo bem com você? ✨";
+  const replies = [
+    "Que legal! 😊",
+    "Adorei isso 💖",
+    "Concordo demais!",
+    "Hahaha você é divertido 😂",
+    "Conta mais 👀",
+  ];
+  return replies[Math.floor(Math.random() * replies.length)];
 }
