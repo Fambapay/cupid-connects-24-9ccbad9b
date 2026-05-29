@@ -277,6 +277,7 @@ function ChatRoom() {
             <button
               type="button"
               aria-label="Emoji"
+              onMouseDown={(e) => e.preventDefault()}
               className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-foreground/50 hover:text-foreground active:scale-95"
             >
               <Smile className="h-5 w-5" />
@@ -287,6 +288,7 @@ function ChatRoom() {
             type="submit"
             disabled={!text.trim()}
             whileTap={{ scale: 0.9 }}
+            onMouseDown={(e) => e.preventDefault()}
             aria-label="Enviar"
             className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-flame text-flame-foreground shadow-glow transition-opacity disabled:opacity-40 disabled:shadow-none"
           >
