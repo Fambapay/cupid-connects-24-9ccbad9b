@@ -43,7 +43,9 @@ function ChatRoom() {
     const root = document.documentElement;
     const setVh = () => {
       const h = vv ? vv.height : window.innerHeight;
+      const top = vv ? vv.offsetTop : 0;
       root.style.setProperty("--chat-vh", `${h}px`);
+      root.style.setProperty("--chat-vv-top", `${top}px`);
     };
     setVh();
     vv?.addEventListener("resize", setVh);
@@ -58,17 +60,19 @@ function ChatRoom() {
       vv?.removeEventListener("resize", setVh);
       vv?.removeEventListener("scroll", setVh);
       root.style.removeProperty("--chat-vh");
+      root.style.removeProperty("--chat-vv-top");
       document.body.style.overflow = prevBodyOverflow;
       document.documentElement.style.overflow = prevHtmlOverflow;
     };
   }, []);
 
-
   if (!profile) {
     return (
       <div className="p-8 text-center">
         <p>Conversa não encontrada.</p>
-        <Link to="/chat" className="text-flame underline">Voltar</Link>
+        <Link to="/chat" className="text-flame underline">
+          Voltar
+        </Link>
       </div>
     );
   }
@@ -76,10 +80,7 @@ function ChatRoom() {
   const send = () => {
     const value = text.trim();
     if (!value) return;
-    setMsgs((m) => [
-      ...m,
-      { id: String(Date.now()), text: value, fromMe: true, time: nowLabel() },
-    ]);
+    setMsgs((m) => [...m, { id: String(Date.now()), text: value, fromMe: true, time: nowLabel() }]);
     setText("");
     // Re-focus instantly so the keyboard never closes
     textareaRef.current?.focus();
@@ -100,8 +101,11 @@ function ChatRoom() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col bg-background"
-      style={{ height: "var(--chat-vh, 100dvh)" }}
+      className="fixed inset-x-0 top-0 z-50 flex flex-col overflow-hidden bg-background transition-[transform,height] duration-150 ease-out"
+      style={{
+        height: "var(--chat-vh, 100dvh)",
+        transform: "translateY(var(--chat-vv-top, 0px))",
+      }}
     >
       {/* Fixed header */}
       <header className="relative z-10 shrink-0 border-b border-border/60 bg-background/85 backdrop-blur-xl">
@@ -129,9 +133,7 @@ function ChatRoom() {
               </span>
             </div>
             <div className="min-w-0">
-              <p className="truncate text-[15px] font-semibold leading-tight">
-                {profile.name}
-              </p>
+              <p className="truncate text-[15px] font-semibold leading-tight">{profile.name}</p>
               <p className="truncate text-xs text-emerald-600 dark:text-emerald-400">
                 online agora
               </p>
@@ -154,28 +156,19 @@ function ChatRoom() {
       </header>
 
       {/* Messages */}
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto overscroll-contain px-4 py-5"
-      >
+      <div ref={scrollRef} className="flex-1 overflow-y-auto overscroll-contain px-4 py-5">
         {/* Match intro */}
         <div className="mb-6 flex flex-col items-center text-center">
           <div className="relative h-20 w-20">
             <div className="absolute inset-0 rounded-full bg-gradient-sunset blur-xl opacity-60" />
             <div className="relative h-full w-full overflow-hidden rounded-full ring-4 ring-background">
-              <img
-                src={profile.photo}
-                alt={profile.name}
-                className="h-full w-full object-cover"
-              />
+              <img src={profile.photo} alt={profile.name} className="h-full w-full object-cover" />
             </div>
           </div>
           <p className="mt-3 text-sm font-semibold">
             Vocês deram match <span className="text-base">🔥</span>
           </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            Diga olá pra {profile.name}
-          </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">Diga olá pra {profile.name}</p>
         </div>
 
         <DateSeparator label="Hoje" />
@@ -304,11 +297,7 @@ function MessageBubble({
     >
       {!me &&
         (isLastOfGroup ? (
-          <img
-            src={avatar}
-            alt={name}
-            className="h-7 w-7 shrink-0 rounded-full object-cover"
-          />
+          <img src={avatar} alt={name} className="h-7 w-7 shrink-0 rounded-full object-cover" />
         ) : (
           <div className="h-7 w-7 shrink-0" />
         ))}
@@ -317,9 +306,7 @@ function MessageBubble({
         <div
           className={[
             "px-4 py-2.5 text-[15px] leading-snug break-words whitespace-pre-wrap",
-            me
-              ? "bg-gradient-flame text-flame-foreground shadow-rose"
-              : "bg-muted text-foreground",
+            me ? "bg-gradient-flame text-flame-foreground shadow-rose" : "bg-muted text-foreground",
             // bubble corners — tighter when grouped
             "rounded-2xl",
             me
