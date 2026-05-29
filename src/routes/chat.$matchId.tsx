@@ -60,7 +60,6 @@ function ChatRoom() {
       if (window.scrollY !== 0 || window.scrollX !== 0) {
         window.scrollTo(0, 0);
       }
-      scrollToLatest("auto");
     };
     setVh();
     vv?.addEventListener("resize", setVh);
@@ -81,7 +80,7 @@ function ChatRoom() {
       document.body.style.overflow = prevBodyOverflow;
       document.documentElement.style.overflow = prevHtmlOverflow;
     };
-  }, [scrollToLatest]);
+  }, []);
 
   if (!profile) {
     return (
