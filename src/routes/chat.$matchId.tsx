@@ -13,10 +13,10 @@ function ChatRoom() {
   const match = matches.find((m) => m.id === matchId);
   const profile = match ? getProfile(match.profileId) : undefined;
   const [msgs, setMsgs] = useState<Message[]>(conversations[matchId] ?? []);
-  const [text, setText] = useState("");
   const [typing, setTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const inputHasTextRef = useRef(false);
 
   const scrollToLatest = useCallback((behavior: ScrollBehavior = "auto") => {
     const el = scrollRef.current;
@@ -51,6 +51,7 @@ function ChatRoom() {
     const vv = window.visualViewport;
     const root = document.documentElement;
     const setVh = () => {
+      if (document.activeElement === inputRef.current && inputHasTextRef.current) return;
       const winH = window.innerHeight;
       const vH = vv ? vv.height : winH;
       const vTop = vv ? vv.offsetTop : 0;
@@ -94,10 +95,12 @@ function ChatRoom() {
   }
 
   const send = () => {
-    const value = text.trim();
+    const input = inputRef.current;
+    const value = input?.value.trim() ?? "";
     if (!value) return;
     setMsgs((m) => [...m, { id: String(Date.now()), text: value, fromMe: true, time: nowLabel() }]);
-    setText("");
+    if (input) input.value = "";
+    inputHasTextRef.current = false;
     // Re-focus instantly so the keyboard never closes
     inputRef.current?.focus();
     setTyping(true);
@@ -253,8 +256,12 @@ function ChatRoom() {
             <input
               ref={inputRef}
               type="text"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
+              onBeforeInput={() => {
+                inputHasTextRef.current = true;
+              }}
+              onInput={(e) => {
+                inputHasTextRef.current = e.currentTarget.value.length > 0;
+              }}
               onFocus={() => requestAnimationFrame(() => scrollToLatest("auto"))}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -281,11 +288,10 @@ function ChatRoom() {
 
           <motion.button
             type="submit"
-            disabled={!text.trim()}
             whileTap={{ scale: 0.9 }}
             onMouseDown={(e) => e.preventDefault()}
             aria-label="Enviar"
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-flame text-flame-foreground shadow-glow transition-opacity disabled:opacity-40 disabled:shadow-none"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-flame text-flame-foreground shadow-glow transition-opacity"
           >
             <Send className="h-5 w-5 translate-x-[1px]" />
           </motion.button>
