@@ -124,10 +124,10 @@ function ChatRoom() {
 
   return (
     <div
-      className="fixed inset-x-0 top-0 z-50 flex flex-col overflow-hidden bg-background transition-[transform,height] duration-150 ease-out"
+      className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none bg-background"
       style={{
-        height: "var(--chat-vh, 100dvh)",
-        transform: "translateY(var(--chat-vv-top, 0px))",
+        paddingBottom: "var(--chat-kb, 0px)",
+        touchAction: "none",
       }}
     >
       {/* Fixed header */}
