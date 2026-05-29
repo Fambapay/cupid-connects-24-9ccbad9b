@@ -35,6 +35,32 @@ function ChatRoom() {
     });
   }, [msgs.length, typing]);
 
+  // Track the visual viewport so header & composer stay pinned when the
+  // mobile keyboard opens (iOS/Android shrinks visualViewport, not layout vh).
+  useEffect(() => {
+    const vv = window.visualViewport;
+    const root = document.documentElement;
+    const setVh = () => {
+      const h = vv ? vv.height : window.innerHeight;
+      root.style.setProperty("--chat-vh", `${h}px`);
+      // iOS pushes the page up when the input is focused — undo it.
+      window.scrollTo(0, 0);
+    };
+    setVh();
+    vv?.addEventListener("resize", setVh);
+    vv?.addEventListener("scroll", setVh);
+    // Lock body scroll while chat is open
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      vv?.removeEventListener("resize", setVh);
+      vv?.removeEventListener("scroll", setVh);
+      root.style.removeProperty("--chat-vh");
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
+
+
   if (!profile) {
     return (
       <div className="p-8 text-center">
