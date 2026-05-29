@@ -164,12 +164,14 @@ function ChatRoom() {
 
           <button
             aria-label="Chamada de voz"
+            onMouseDown={(e) => e.preventDefault()}
             className="grid h-10 w-10 place-items-center rounded-full text-foreground/70 hover:bg-muted active:scale-95"
           >
             <Phone className="h-5 w-5" />
           </button>
           <button
             aria-label="Chamada de vídeo"
+            onMouseDown={(e) => e.preventDefault()}
             className="grid h-10 w-10 place-items-center rounded-full text-foreground/70 hover:bg-muted active:scale-95"
           >
             <Video className="h-5 w-5" />
