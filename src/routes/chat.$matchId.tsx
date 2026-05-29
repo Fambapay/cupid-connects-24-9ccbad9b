@@ -233,7 +233,7 @@ function ChatRoom() {
             <ImageIcon className="h-5 w-5" />
           </button>
 
-          <div className="flex flex-1 items-end gap-1 rounded-3xl bg-muted px-3 py-1.5 focus-within:ring-2 focus-within:ring-flame">
+          <div className="flex flex-1 items-center gap-1 rounded-3xl bg-muted px-3 py-1 focus-within:ring-2 focus-within:ring-flame">
             <textarea
               ref={textareaRef}
               value={text}
@@ -246,12 +246,16 @@ function ChatRoom() {
               }}
               rows={1}
               placeholder={`Mensagem para ${profile.name}…`}
-              className="flex-1 resize-none bg-transparent px-1 py-2 text-base leading-snug outline-none placeholder:text-muted-foreground"
+              autoCapitalize="sentences"
+              spellCheck={false}
+              enterKeyHint="send"
+              style={{ lineHeight: "1.35" }}
+              className="block flex-1 resize-none bg-transparent px-1 py-2 text-base align-middle outline-none placeholder:text-muted-foreground"
             />
             <button
               type="button"
               aria-label="Emoji"
-              className="mb-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full text-foreground/50 hover:text-foreground active:scale-95"
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-foreground/50 hover:text-foreground active:scale-95"
             >
               <Smile className="h-5 w-5" />
             </button>
