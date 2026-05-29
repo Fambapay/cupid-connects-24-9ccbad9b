@@ -127,9 +127,14 @@ function ChatRoom() {
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none bg-background"
-      style={{
-        paddingBottom: "var(--chat-kb, 0px)",
-        touchAction: "none",
+      style={{ paddingBottom: "var(--chat-kb, 0px)" }}
+      // Block focus theft on non-input elements so tapping the header,
+      // avatar, send button or scroll area never closes the keyboard.
+      onPointerDown={(e) => {
+        const target = e.target as HTMLElement;
+        if (!target.closest("textarea, input, [contenteditable='true']")) {
+          e.preventDefault();
+        }
       }}
     >
       {/* Fixed header */}
