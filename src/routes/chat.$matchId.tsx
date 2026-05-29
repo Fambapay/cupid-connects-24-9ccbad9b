@@ -256,8 +256,12 @@ function ChatRoom() {
             <input
               ref={inputRef}
               type="text"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
+              onBeforeInput={() => {
+                inputHasTextRef.current = true;
+              }}
+              onInput={(e) => {
+                inputHasTextRef.current = e.currentTarget.value.length > 0;
+              }}
               onFocus={() => requestAnimationFrame(() => scrollToLatest("auto"))}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -284,11 +288,10 @@ function ChatRoom() {
 
           <motion.button
             type="submit"
-            disabled={!text.trim()}
             whileTap={{ scale: 0.9 }}
             onMouseDown={(e) => e.preventDefault()}
             aria-label="Enviar"
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-flame text-flame-foreground shadow-glow transition-opacity disabled:opacity-40 disabled:shadow-none"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-flame text-flame-foreground shadow-glow transition-opacity"
           >
             <Send className="h-5 w-5 translate-x-[1px]" />
           </motion.button>
