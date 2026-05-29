@@ -249,6 +249,7 @@ function ChatRoom() {
           <button
             type="button"
             aria-label="Anexar foto"
+            onMouseDown={(e) => e.preventDefault()}
             className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-foreground/60 hover:bg-muted active:scale-95"
           >
             <ImageIcon className="h-5 w-5" />
