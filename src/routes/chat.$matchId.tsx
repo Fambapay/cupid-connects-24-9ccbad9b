@@ -31,7 +31,7 @@ function ChatRoom() {
     requestAnimationFrame(() => requestAnimationFrame(pinToBottom));
     window.setTimeout(pinToBottom, 90);
     window.setTimeout(pinToBottom, 220);
-  }, [scrollToLatest]);
+  }, []);
 
   // Autosize textarea — keep the first line locked so typing doesn't jump
   useLayoutEffect(() => {
@@ -83,7 +83,7 @@ function ChatRoom() {
       document.body.style.overflow = prevBodyOverflow;
       document.documentElement.style.overflow = prevHtmlOverflow;
     };
-  }, []);
+  }, [scrollToLatest]);
 
   if (!profile) {
     return (
