@@ -18,21 +18,20 @@ function ChatRoom() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Autosize textarea
+  // Autosize textarea — measure without flicker
   useLayoutEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
-    el.style.height = "0px";
-    el.style.height = Math.min(el.scrollHeight, 120) + "px";
+    el.style.height = "auto";
+    const next = Math.min(el.scrollHeight, 120);
+    el.style.height = next + "px";
   }, [text]);
 
-  // Scroll to bottom on new messages / typing
+  // Scroll to bottom on new messages / typing (instant — smooth jitters while typing)
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    requestAnimationFrame(() => {
-      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-    });
+    el.scrollTop = el.scrollHeight;
   }, [msgs.length, typing]);
 
   // Track the visual viewport so header & composer stay pinned when the
