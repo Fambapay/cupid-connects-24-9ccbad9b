@@ -54,21 +54,25 @@ function ChatRoom() {
     scrollToLatest("auto");
   }, [msgs.length, typing, scrollToLatest]);
 
-  // Track the visual viewport so header & composer stay pinned when the
-  // mobile keyboard opens (iOS/Android shrinks visualViewport, not layout vh).
+  // Track the visual viewport so the composer sits right on top of the
+  // mobile keyboard (iOS/Android shrinks visualViewport, not layout vh).
+  // We keep the container fullscreen and just pad the bottom by the
+  // keyboard inset so there's never an empty strip to tap on.
   useEffect(() => {
     const vv = window.visualViewport;
     const root = document.documentElement;
     const setVh = () => {
-      const h = vv ? vv.height : window.innerHeight;
-      const top = vv ? vv.offsetTop : 0;
-      root.style.setProperty("--chat-vh", `${h}px`);
-      root.style.setProperty("--chat-vv-top", `${top}px`);
+      const winH = window.innerHeight;
+      const vH = vv ? vv.height : winH;
+      const vTop = vv ? vv.offsetTop : 0;
+      const keyboardInset = Math.max(0, winH - vH - vTop);
+      root.style.setProperty("--chat-kb", `${keyboardInset}px`);
       scrollToLatest("auto");
     };
     setVh();
     vv?.addEventListener("resize", setVh);
     vv?.addEventListener("scroll", setVh);
+    window.addEventListener("resize", setVh);
     // Lock page scroll while chat is open — prevents iOS from scrolling
     // the fixed container and leaving the caret painted above the input.
     const prevBodyOverflow = document.body.style.overflow;
@@ -78,8 +82,8 @@ function ChatRoom() {
     return () => {
       vv?.removeEventListener("resize", setVh);
       vv?.removeEventListener("scroll", setVh);
-      root.style.removeProperty("--chat-vh");
-      root.style.removeProperty("--chat-vv-top");
+      window.removeEventListener("resize", setVh);
+      root.style.removeProperty("--chat-kb");
       document.body.style.overflow = prevBodyOverflow;
       document.documentElement.style.overflow = prevHtmlOverflow;
     };
@@ -120,10 +124,10 @@ function ChatRoom() {
 
   return (
     <div
-      className="fixed inset-x-0 top-0 z-50 flex flex-col overflow-hidden bg-background transition-[transform,height] duration-150 ease-out"
+      className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none bg-background"
       style={{
-        height: "var(--chat-vh, 100dvh)",
-        transform: "translateY(var(--chat-vv-top, 0px))",
+        paddingBottom: "var(--chat-kb, 0px)",
+        touchAction: "none",
       }}
     >
       {/* Fixed header */}
