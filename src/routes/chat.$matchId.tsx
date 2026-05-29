@@ -288,9 +288,9 @@ function MessageBubble({
   const me = msg.fromMe;
   return (
     <motion.li
-      initial={{ opacity: 0, y: 8, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ type: "spring", stiffness: 420, damping: 32 }}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.18, ease: "easeOut" }}
       className={`flex items-end gap-2 ${me ? "justify-end" : "justify-start"} ${
         isFirstOfGroup ? "mt-3" : "mt-0.5"
       }`}
