@@ -16,7 +16,9 @@ function ChatRoom() {
   const [text, setText] = useState("");
   const [typing, setTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const composerRef = useRef<HTMLFormElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const composerHeightRef = useRef(0);
 
   const scrollToLatest = useCallback((behavior: ScrollBehavior = "auto") => {
     const el = scrollRef.current;
@@ -33,17 +35,22 @@ function ChatRoom() {
     window.setTimeout(pinToBottom, 220);
   }, []);
 
-  // Autosize textarea — keep the first line locked so typing doesn't jump,
-  // and keep the last message anchored when the composer grows.
+  // Autosize textarea without forcing a chat scroll on every keypress.
+  // iOS paints the caret badly when we reset/scroll the textarea during the
+  // first character input, so only re-pin the list when the composer height changes.
   useLayoutEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
     const baseHeight = 40;
-    el.style.height = `${baseHeight}px`;
+    el.style.height = "auto";
     const next = Math.min(Math.max(el.scrollHeight, baseHeight), 120);
     el.style.height = `${next}px`;
     el.style.overflowY = next >= 120 ? "auto" : "hidden";
-    scrollToLatest("auto");
+    const composerHeight = composerRef.current?.offsetHeight ?? 0;
+    if (composerHeightRef.current && composerHeight !== composerHeightRef.current) {
+      scrollToLatest("auto");
+    }
+    composerHeightRef.current = composerHeight;
   }, [text, scrollToLatest]);
 
   // Jump to the latest message instantly when the chat opens
