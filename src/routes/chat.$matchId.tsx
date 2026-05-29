@@ -33,7 +33,8 @@ function ChatRoom() {
     window.setTimeout(pinToBottom, 220);
   }, []);
 
-  // Autosize textarea — keep the first line locked so typing doesn't jump
+  // Autosize textarea — keep the first line locked so typing doesn't jump,
+  // and keep the last message anchored when the composer grows.
   useLayoutEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
@@ -42,7 +43,8 @@ function ChatRoom() {
     const next = Math.min(Math.max(el.scrollHeight, baseHeight), 120);
     el.style.height = `${next}px`;
     el.style.overflowY = next >= 120 ? "auto" : "hidden";
-  }, [text]);
+    scrollToLatest("auto");
+  }, [text, scrollToLatest]);
 
   // Jump to the latest message instantly when the chat opens
   useLayoutEffect(() => {
@@ -125,10 +127,7 @@ function ChatRoom() {
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none bg-background"
-      style={{
-        paddingBottom: "var(--chat-kb, 0px)",
-        touchAction: "none",
-      }}
+      style={{ paddingBottom: "var(--chat-kb, 0px)" }}
     >
       {/* Fixed header */}
       <header className="relative z-10 shrink-0 border-b border-border/60 bg-background/85 backdrop-blur-xl">
@@ -165,12 +164,14 @@ function ChatRoom() {
 
           <button
             aria-label="Chamada de voz"
+            onMouseDown={(e) => e.preventDefault()}
             className="grid h-10 w-10 place-items-center rounded-full text-foreground/70 hover:bg-muted active:scale-95"
           >
             <Phone className="h-5 w-5" />
           </button>
           <button
             aria-label="Chamada de vídeo"
+            onMouseDown={(e) => e.preventDefault()}
             className="grid h-10 w-10 place-items-center rounded-full text-foreground/70 hover:bg-muted active:scale-95"
           >
             <Video className="h-5 w-5" />
@@ -248,6 +249,7 @@ function ChatRoom() {
           <button
             type="button"
             aria-label="Anexar foto"
+            onMouseDown={(e) => e.preventDefault()}
             className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-foreground/60 hover:bg-muted active:scale-95"
           >
             <ImageIcon className="h-5 w-5" />
@@ -275,6 +277,7 @@ function ChatRoom() {
             <button
               type="button"
               aria-label="Emoji"
+              onMouseDown={(e) => e.preventDefault()}
               className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-foreground/50 hover:text-foreground active:scale-95"
             >
               <Smile className="h-5 w-5" />
@@ -285,6 +288,7 @@ function ChatRoom() {
             type="submit"
             disabled={!text.trim()}
             whileTap={{ scale: 0.9 }}
+            onMouseDown={(e) => e.preventDefault()}
             aria-label="Enviar"
             className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-flame text-flame-foreground shadow-glow transition-opacity disabled:opacity-40 disabled:shadow-none"
           >
