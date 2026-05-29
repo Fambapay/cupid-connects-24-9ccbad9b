@@ -44,7 +44,7 @@ function ChatRoom() {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="fixed inset-0 z-50 flex flex-col bg-background" style={{ height: "100dvh" }}>
       <header className="flex items-center gap-3 border-b border-border bg-background/90 px-3 py-3 backdrop-blur-xl">
         <Link to="/chat" className="grid h-9 w-9 place-items-center rounded-full hover:bg-muted">
           <ChevronLeft className="h-5 w-5" />
@@ -90,9 +90,15 @@ function ChatRoom() {
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
+          onFocus={() => {
+            setTimeout(() => {
+              scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
+            }, 300);
+          }}
           placeholder="Mensagem"
-          className="flex-1 rounded-full bg-muted px-4 py-2.5 text-sm outline-none ring-flame focus:ring-2"
+          className="flex-1 rounded-full bg-muted px-4 py-2.5 text-base outline-none ring-flame focus:ring-2"
         />
+
         <button
           type="submit"
           disabled={!text.trim()}
