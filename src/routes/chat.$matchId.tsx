@@ -18,21 +18,20 @@ function ChatRoom() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Autosize textarea
+  // Autosize textarea — measure without flicker
   useLayoutEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
-    el.style.height = "0px";
-    el.style.height = Math.min(el.scrollHeight, 120) + "px";
+    el.style.height = "auto";
+    const next = Math.min(el.scrollHeight, 120);
+    el.style.height = next + "px";
   }, [text]);
 
-  // Scroll to bottom on new messages / typing
+  // Scroll to bottom on new messages / typing (instant — smooth jitters while typing)
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    requestAnimationFrame(() => {
-      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-    });
+    el.scrollTop = el.scrollHeight;
   }, [msgs.length, typing]);
 
   // Track the visual viewport so header & composer stay pinned when the
@@ -78,6 +77,8 @@ function ChatRoom() {
       { id: String(Date.now()), text: value, fromMe: true, time: nowLabel() },
     ]);
     setText("");
+    // Re-focus instantly so the keyboard never closes
+    textareaRef.current?.focus();
     setTyping(true);
     setTimeout(() => {
       setTyping(false);
@@ -90,7 +91,7 @@ function ChatRoom() {
           time: nowLabel(),
         },
       ]);
-    }, 1400);
+    }, 900);
   };
 
   return (
@@ -243,13 +244,6 @@ function ChatRoom() {
                   send();
                 }
               }}
-              onFocus={() =>
-                setTimeout(() => {
-                  scrollRef.current?.scrollTo({
-                    top: scrollRef.current.scrollHeight,
-                  });
-                }, 300)
-              }
               rows={1}
               placeholder={`Mensagem para ${profile.name}…`}
               className="flex-1 resize-none bg-transparent px-1 py-2 text-base leading-snug outline-none placeholder:text-muted-foreground"
@@ -294,9 +288,9 @@ function MessageBubble({
   const me = msg.fromMe;
   return (
     <motion.li
-      initial={{ opacity: 0, y: 8, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ type: "spring", stiffness: 420, damping: 32 }}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.18, ease: "easeOut" }}
       className={`flex items-end gap-2 ${me ? "justify-end" : "justify-start"} ${
         isFirstOfGroup ? "mt-3" : "mt-0.5"
       }`}
