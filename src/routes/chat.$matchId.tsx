@@ -254,6 +254,7 @@ function ChatRoom() {
 
       {/* Composer */}
       <form
+        ref={composerRef}
         onSubmit={(e) => {
           e.preventDefault();
           send();
@@ -287,7 +288,7 @@ function ChatRoom() {
               autoCapitalize="sentences"
               spellCheck={false}
               enterKeyHint="send"
-              className="block h-10 min-h-10 max-h-[120px] flex-1 resize-none overflow-hidden bg-transparent px-1 py-[9px] text-base leading-[22px] outline-none placeholder:text-muted-foreground"
+              className="block min-h-10 max-h-[120px] flex-1 resize-none overflow-hidden bg-transparent px-1 py-[9px] text-base leading-[22px] outline-none placeholder:text-muted-foreground"
             />
             <button
               type="button"
