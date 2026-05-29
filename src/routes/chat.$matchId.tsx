@@ -234,7 +234,6 @@ function ChatRoom() {
 
       {/* Composer */}
       <form
-        ref={composerRef}
         onSubmit={(e) => {
           e.preventDefault();
           send();
@@ -252,8 +251,9 @@ function ChatRoom() {
           </button>
 
           <div className="flex min-h-12 flex-1 items-center gap-1 rounded-3xl bg-muted px-3 py-1 focus-within:ring-2 focus-within:ring-flame">
-            <textarea
-              ref={textareaRef}
+            <input
+              ref={inputRef}
+              type="text"
               value={text}
               onChange={(e) => setText(e.target.value)}
               onFocus={() => scrollToLatest("smooth")}
@@ -263,12 +263,11 @@ function ChatRoom() {
                   send();
                 }
               }}
-              rows={1}
               placeholder={`Mensagem para ${profile.name}…`}
               autoCapitalize="sentences"
               spellCheck={false}
               enterKeyHint="send"
-              className="block min-h-10 max-h-[120px] flex-1 resize-none overflow-hidden bg-transparent px-1 py-[9px] text-base leading-[22px] outline-none placeholder:text-muted-foreground"
+              className="block h-10 min-w-0 flex-1 bg-transparent px-1 text-base leading-10 outline-none placeholder:text-muted-foreground"
             />
             <button
               type="button"
