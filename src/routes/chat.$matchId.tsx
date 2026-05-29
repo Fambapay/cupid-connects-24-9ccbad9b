@@ -43,7 +43,9 @@ function ChatRoom() {
     const root = document.documentElement;
     const setVh = () => {
       const h = vv ? vv.height : window.innerHeight;
+      const top = vv ? vv.offsetTop : 0;
       root.style.setProperty("--chat-vh", `${h}px`);
+      root.style.setProperty("--chat-vv-top", `${top}px`);
     };
     setVh();
     vv?.addEventListener("resize", setVh);
@@ -58,6 +60,7 @@ function ChatRoom() {
       vv?.removeEventListener("resize", setVh);
       vv?.removeEventListener("scroll", setVh);
       root.style.removeProperty("--chat-vh");
+      root.style.removeProperty("--chat-vv-top");
       document.body.style.overflow = prevBodyOverflow;
       document.documentElement.style.overflow = prevHtmlOverflow;
     };
@@ -100,8 +103,11 @@ function ChatRoom() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col bg-background"
-      style={{ height: "var(--chat-vh, 100dvh)" }}
+      className="fixed inset-x-0 top-0 z-50 flex flex-col overflow-hidden bg-background transition-[transform,height] duration-150 ease-out"
+      style={{
+        height: "var(--chat-vh, 100dvh)",
+        transform: "translateY(var(--chat-vv-top, 0px))",
+      }}
     >
       {/* Fixed header */}
       <header className="relative z-10 shrink-0 border-b border-border/60 bg-background/85 backdrop-blur-xl">
