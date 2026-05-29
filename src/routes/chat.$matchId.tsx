@@ -131,8 +131,11 @@ function ChatRoom() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none bg-background"
-      style={{ paddingBottom: "var(--chat-kb, 0px)" }}
+      className="fixed left-0 right-0 z-50 flex flex-col overflow-hidden overscroll-none bg-background"
+      style={{
+        top: "var(--chat-top, 0px)",
+        height: "var(--chat-vh, 100dvh)",
+      }}
     >
       {/* Fixed header */}
       <header className="relative z-10 shrink-0 border-b border-border/60 bg-background/85 backdrop-blur-xl">
