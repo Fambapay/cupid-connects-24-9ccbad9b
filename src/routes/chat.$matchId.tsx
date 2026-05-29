@@ -18,13 +18,15 @@ function ChatRoom() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Autosize textarea — measure without flicker
+  // Autosize textarea — keep the first line locked so typing doesn't jump
   useLayoutEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
-    el.style.height = "auto";
-    const next = Math.min(el.scrollHeight, 120);
-    el.style.height = next + "px";
+    const baseHeight = 40;
+    el.style.height = `${baseHeight}px`;
+    const next = Math.min(Math.max(el.scrollHeight, baseHeight), 120);
+    el.style.height = `${next}px`;
+    el.style.overflowY = next >= 120 ? "auto" : "hidden";
   }, [text]);
 
   // Scroll to bottom on new messages / typing (instant — smooth jitters while typing)
@@ -224,16 +226,16 @@ function ChatRoom() {
         }}
         className="shrink-0 border-t border-border/60 bg-background/95 px-3 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl"
       >
-        <div className="flex items-end gap-2">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             aria-label="Anexar foto"
-            className="mb-1 grid h-10 w-10 shrink-0 place-items-center rounded-full text-foreground/60 hover:bg-muted active:scale-95"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-foreground/60 hover:bg-muted active:scale-95"
           >
             <ImageIcon className="h-5 w-5" />
           </button>
 
-          <div className="flex flex-1 items-center gap-1 rounded-3xl bg-muted px-3 py-1 focus-within:ring-2 focus-within:ring-flame">
+          <div className="flex min-h-12 flex-1 items-center gap-1 rounded-3xl bg-muted px-3 py-1 focus-within:ring-2 focus-within:ring-flame">
             <textarea
               ref={textareaRef}
               value={text}
@@ -249,8 +251,7 @@ function ChatRoom() {
               autoCapitalize="sentences"
               spellCheck={false}
               enterKeyHint="send"
-              style={{ lineHeight: "1.35" }}
-              className="block flex-1 resize-none bg-transparent px-1 py-2 text-base align-middle outline-none placeholder:text-muted-foreground"
+              className="block h-10 min-h-10 max-h-[120px] flex-1 resize-none overflow-hidden bg-transparent px-1 py-[9px] text-base leading-[22px] outline-none placeholder:text-muted-foreground"
             />
             <button
               type="button"
@@ -266,7 +267,7 @@ function ChatRoom() {
             disabled={!text.trim()}
             whileTap={{ scale: 0.9 }}
             aria-label="Enviar"
-            className="mb-1 grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-flame text-flame-foreground shadow-glow transition-opacity disabled:opacity-40 disabled:shadow-none"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-flame text-flame-foreground shadow-glow transition-opacity disabled:opacity-40 disabled:shadow-none"
           >
             <Send className="h-5 w-5 translate-x-[1px]" />
           </motion.button>
