@@ -44,7 +44,7 @@ function ChatRoom() {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="fixed inset-0 z-50 flex flex-col bg-background" style={{ height: "100dvh" }}>
       <header className="flex items-center gap-3 border-b border-border bg-background/90 px-3 py-3 backdrop-blur-xl">
         <Link to="/chat" className="grid h-9 w-9 place-items-center rounded-full hover:bg-muted">
           <ChevronLeft className="h-5 w-5" />
