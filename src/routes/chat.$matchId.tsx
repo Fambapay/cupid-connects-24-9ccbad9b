@@ -33,7 +33,8 @@ function ChatRoom() {
     window.setTimeout(pinToBottom, 220);
   }, []);
 
-  // Autosize textarea — keep the first line locked so typing doesn't jump
+  // Autosize textarea — keep the first line locked so typing doesn't jump,
+  // and keep the last message anchored when the composer grows.
   useLayoutEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
@@ -42,7 +43,8 @@ function ChatRoom() {
     const next = Math.min(Math.max(el.scrollHeight, baseHeight), 120);
     el.style.height = `${next}px`;
     el.style.overflowY = next >= 120 ? "auto" : "hidden";
-  }, [text]);
+    scrollToLatest("auto");
+  }, [text, scrollToLatest]);
 
   // Jump to the latest message instantly when the chat opens
   useLayoutEffect(() => {
