@@ -308,7 +308,11 @@ function MessageBubble({
           <div className="h-7 w-7 shrink-0" />
         ))}
 
-      <div className={`flex max-w-[78%] flex-col ${me ? "items-end" : "items-start"}`}>
+      <div
+        className={`flex w-fit max-w-[78%] flex-col ${
+          me ? "ml-auto items-end" : "items-start"
+        }`}
+      >
         <div
           className={[
             "px-4 py-2.5 text-[15px] leading-snug break-words whitespace-pre-wrap",
