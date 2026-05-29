@@ -90,9 +90,15 @@ function ChatRoom() {
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
+          onFocus={() => {
+            setTimeout(() => {
+              scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
+            }, 300);
+          }}
           placeholder="Mensagem"
-          className="flex-1 rounded-full bg-muted px-4 py-2.5 text-sm outline-none ring-flame focus:ring-2"
+          className="flex-1 rounded-full bg-muted px-4 py-2.5 text-base outline-none ring-flame focus:ring-2"
         />
+
         <button
           type="submit"
           disabled={!text.trim()}
