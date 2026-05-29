@@ -30,10 +30,6 @@ function BubbleImpl({ msg, isFirstOfGroup, isLastOfGroup, avatar, name }: Props)
         willChange: "transform, opacity",
         contain: "layout paint",
       }}
-      onAnimationComplete={(_, info) => {
-        // free GPU memory once the bubble settles
-        if (info && typeof info === "object") return;
-      }}
       className={`flex items-end gap-2 ${me ? "justify-end" : "justify-start"} ${
         isFirstOfGroup ? "mt-3" : "mt-0.5"
       }`}
