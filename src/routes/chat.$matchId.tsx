@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, Image as ImageIcon, Phone, Send, Smile, Video } from "lucide-react";
 import { conversations, matches, getProfile, type Message } from "@/data/profiles";
@@ -18,6 +18,21 @@ function ChatRoom() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const scrollToLatest = useCallback((behavior: ScrollBehavior = "auto") => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const pinToBottom = () => {
+      el.scrollTo({ top: el.scrollHeight, behavior });
+    };
+
+    pinToBottom();
+    requestAnimationFrame(pinToBottom);
+    requestAnimationFrame(() => requestAnimationFrame(pinToBottom));
+    window.setTimeout(pinToBottom, 90);
+    window.setTimeout(pinToBottom, 220);
+  }, []);
+
   // Autosize textarea — keep the first line locked so typing doesn't jump
   useLayoutEffect(() => {
     const el = textareaRef.current;
@@ -31,18 +46,13 @@ function ChatRoom() {
 
   // Jump to the latest message instantly when the chat opens
   useLayoutEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    scrollToLatest("auto");
+  }, [matchId, scrollToLatest]);
 
   // Scroll to bottom on new messages / typing (instant — smooth jitters while typing)
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
-  }, [msgs.length, typing]);
+    scrollToLatest("auto");
+  }, [msgs.length, typing, scrollToLatest]);
 
   // Track the visual viewport so header & composer stay pinned when the
   // mobile keyboard opens (iOS/Android shrinks visualViewport, not layout vh).
@@ -54,6 +64,7 @@ function ChatRoom() {
       const top = vv ? vv.offsetTop : 0;
       root.style.setProperty("--chat-vh", `${h}px`);
       root.style.setProperty("--chat-vv-top", `${top}px`);
+      scrollToLatest("auto");
     };
     setVh();
     vv?.addEventListener("resize", setVh);
@@ -72,7 +83,7 @@ function ChatRoom() {
       document.body.style.overflow = prevBodyOverflow;
       document.documentElement.style.overflow = prevHtmlOverflow;
     };
-  }, []);
+  }, [scrollToLatest]);
 
   if (!profile) {
     return (
@@ -164,7 +175,7 @@ function ChatRoom() {
       </header>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto overscroll-contain px-4 py-5">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5">
         {/* Match intro */}
         <div className="mb-6 flex flex-col items-center text-center">
           <div className="relative h-20 w-20">
@@ -243,6 +254,7 @@ function ChatRoom() {
               ref={textareaRef}
               value={text}
               onChange={(e) => setText(e.target.value)}
+              onFocus={() => scrollToLatest("smooth")}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
