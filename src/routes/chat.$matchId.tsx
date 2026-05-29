@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, Image as ImageIcon, Phone, Send, Smile, Video } from "lucide-react";
+import { ChevronLeft, Send, Smile } from "lucide-react";
 import { conversations, matches, getProfile, type Message } from "@/data/profiles";
 
 export const Route = createFileRoute("/chat/$matchId")({
@@ -159,20 +159,6 @@ function ChatRoom() {
             </div>
           </Link>
 
-          <button
-            aria-label="Chamada de voz"
-            onMouseDown={(e) => e.preventDefault()}
-            className="grid h-10 w-10 place-items-center rounded-full text-foreground/70 hover:bg-muted active:scale-95"
-          >
-            <Phone className="h-5 w-5" />
-          </button>
-          <button
-            aria-label="Chamada de vídeo"
-            onMouseDown={(e) => e.preventDefault()}
-            className="grid h-10 w-10 place-items-center rounded-full text-foreground/70 hover:bg-muted active:scale-95"
-          >
-            <Video className="h-5 w-5" />
-          </button>
         </div>
       </header>
 
@@ -243,14 +229,6 @@ function ChatRoom() {
         className="shrink-0 border-t border-border/60 bg-background/95 px-3 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl"
       >
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            aria-label="Anexar foto"
-            onMouseDown={(e) => e.preventDefault()}
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-foreground/60 hover:bg-muted active:scale-95"
-          >
-            <ImageIcon className="h-5 w-5" />
-          </button>
 
           <div className="flex h-14 flex-1 items-center gap-1 rounded-3xl bg-muted px-3 py-0 focus-within:ring-2 focus-within:ring-flame">
             <input
