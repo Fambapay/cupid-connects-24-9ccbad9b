@@ -249,13 +249,13 @@ function ChatRoom() {
             <ImageIcon className="h-5 w-5" />
           </button>
 
-          <div className="flex min-h-12 flex-1 items-center gap-1 rounded-3xl bg-muted px-3 py-1 focus-within:ring-2 focus-within:ring-flame">
+          <div className="flex h-14 flex-1 items-center gap-1 rounded-3xl bg-muted px-3 py-0 focus-within:ring-2 focus-within:ring-flame">
             <input
               ref={inputRef}
               type="text"
               value={text}
               onChange={(e) => setText(e.target.value)}
-              onFocus={() => scrollToLatest("smooth")}
+              onFocus={() => requestAnimationFrame(() => scrollToLatest("auto"))}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -266,7 +266,8 @@ function ChatRoom() {
               autoCapitalize="sentences"
               spellCheck={false}
               enterKeyHint="send"
-              className="block h-10 min-w-0 flex-1 bg-transparent px-1 text-base leading-10 outline-none placeholder:text-muted-foreground"
+              className="block h-[52px] min-w-0 flex-1 appearance-none bg-transparent px-3 py-0 text-[18px] leading-[22px] outline-none placeholder:text-muted-foreground [-webkit-appearance:none]"
+              style={{ lineHeight: "22px" }}
             />
             <button
               type="button"
