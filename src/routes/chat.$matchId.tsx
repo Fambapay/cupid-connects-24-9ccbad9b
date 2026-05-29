@@ -226,11 +226,10 @@ function ChatRoom() {
           e.preventDefault();
           send();
         }}
-        className="shrink-0 border-t border-border/60 bg-background/95 px-3 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl"
+        className="shrink-0 overflow-hidden border-t border-border/60 bg-background/95 px-3 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl"
       >
-        <div className="flex items-center gap-2">
-
-          <div className="flex h-14 flex-1 items-center gap-1 rounded-3xl bg-muted px-3 py-0 focus-within:ring-2 focus-within:ring-flame">
+        <div className="flex w-full items-center gap-2">
+          <div className="flex h-12 min-w-0 flex-1 items-center gap-1 rounded-full bg-muted px-3 focus-within:ring-2 focus-within:ring-flame">
             <input
               ref={inputRef}
               type="text"
@@ -251,14 +250,14 @@ function ChatRoom() {
               autoCapitalize="sentences"
               spellCheck={false}
               enterKeyHint="send"
-              className="block h-11 min-w-0 flex-1 appearance-none bg-transparent px-3 py-0 text-[17px] outline-none placeholder:text-muted-foreground [-webkit-appearance:none]"
-              style={{ lineHeight: "44px", WebkitTextFillColor: "currentColor" }}
+              className="block h-10 min-w-0 flex-1 appearance-none bg-transparent px-2 py-0 text-[16px] outline-none placeholder:text-muted-foreground [-webkit-appearance:none]"
+              style={{ lineHeight: "40px", WebkitTextFillColor: "currentColor" }}
             />
             <button
               type="button"
               aria-label="Emoji"
               onMouseDown={(e) => e.preventDefault()}
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-foreground/50 hover:text-foreground active:scale-95"
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-foreground/50 hover:text-foreground active:scale-95"
             >
               <Smile className="h-5 w-5" />
             </button>
@@ -269,7 +268,7 @@ function ChatRoom() {
             whileTap={{ scale: 0.9 }}
             onMouseDown={(e) => e.preventDefault()}
             aria-label="Enviar"
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-flame text-flame-foreground shadow-glow transition-opacity"
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-gradient-flame text-flame-foreground shadow-glow transition-opacity"
           >
             <Send className="h-5 w-5 translate-x-[1px]" />
           </motion.button>
