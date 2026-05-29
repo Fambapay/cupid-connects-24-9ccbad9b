@@ -56,10 +56,10 @@ function ChatRoom() {
     scrollToLatest("auto");
   }, [msgs.length, typing, scrollToLatest]);
 
-  // Track the visual viewport so the composer sits right on top of the
-  // mobile keyboard (iOS/Android shrinks visualViewport, not layout vh).
-  // We keep the container fullscreen and just pad the bottom by the
-  // keyboard inset so there's never an empty strip to tap on.
+  // Pin the chat container to the real visible viewport (visualViewport).
+  // iOS Safari shifts the LAYOUT viewport up when the keyboard opens — a
+  // plain `fixed inset-0` would scroll the header off screen. We instead
+  // anchor `top` and `height` to the actual visible region every frame.
   useEffect(() => {
     const vv = window.visualViewport;
     const root = document.documentElement;
@@ -67,16 +67,19 @@ function ChatRoom() {
       const winH = window.innerHeight;
       const vH = vv ? vv.height : winH;
       const vTop = vv ? vv.offsetTop : 0;
-      const keyboardInset = Math.max(0, winH - vH - vTop);
-      root.style.setProperty("--chat-kb", `${keyboardInset}px`);
+      root.style.setProperty("--chat-top", `${vTop}px`);
+      root.style.setProperty("--chat-vh", `${vH}px`);
+      // Cancel any iOS layout-viewport shift so our `top` value is accurate.
+      if (window.scrollY !== 0 || window.scrollX !== 0) {
+        window.scrollTo(0, 0);
+      }
       scrollToLatest("auto");
     };
     setVh();
     vv?.addEventListener("resize", setVh);
     vv?.addEventListener("scroll", setVh);
     window.addEventListener("resize", setVh);
-    // Lock page scroll while chat is open — prevents iOS from scrolling
-    // the fixed container and leaving the caret painted above the input.
+    window.addEventListener("scroll", setVh, { passive: true });
     const prevBodyOverflow = document.body.style.overflow;
     const prevHtmlOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
@@ -85,7 +88,9 @@ function ChatRoom() {
       vv?.removeEventListener("resize", setVh);
       vv?.removeEventListener("scroll", setVh);
       window.removeEventListener("resize", setVh);
-      root.style.removeProperty("--chat-kb");
+      window.removeEventListener("scroll", setVh);
+      root.style.removeProperty("--chat-top");
+      root.style.removeProperty("--chat-vh");
       document.body.style.overflow = prevBodyOverflow;
       document.documentElement.style.overflow = prevHtmlOverflow;
     };
@@ -126,8 +131,11 @@ function ChatRoom() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none bg-background"
-      style={{ paddingBottom: "var(--chat-kb, 0px)" }}
+      className="fixed left-0 right-0 z-50 flex flex-col overflow-hidden overscroll-none bg-background"
+      style={{
+        top: "var(--chat-top, 0px)",
+        height: "var(--chat-vh, 100dvh)",
+      }}
     >
       {/* Fixed header */}
       <header className="relative z-10 shrink-0 border-b border-border/60 bg-background/85 backdrop-blur-xl">
