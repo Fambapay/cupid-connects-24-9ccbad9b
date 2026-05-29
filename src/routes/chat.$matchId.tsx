@@ -273,8 +273,8 @@ function ChatRoom() {
               autoCapitalize="sentences"
               spellCheck={false}
               enterKeyHint="send"
-              className="block h-[52px] min-w-0 flex-1 appearance-none bg-transparent px-3 py-0 text-[18px] leading-[22px] outline-none placeholder:text-muted-foreground [-webkit-appearance:none]"
-              style={{ lineHeight: "22px" }}
+              className="block h-11 min-w-0 flex-1 appearance-none bg-transparent px-3 py-0 text-[17px] outline-none placeholder:text-muted-foreground [-webkit-appearance:none]"
+              style={{ lineHeight: "44px", WebkitTextFillColor: "currentColor" }}
             />
             <button
               type="button"
