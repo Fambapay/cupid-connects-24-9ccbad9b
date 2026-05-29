@@ -77,6 +77,8 @@ function ChatRoom() {
       { id: String(Date.now()), text: value, fromMe: true, time: nowLabel() },
     ]);
     setText("");
+    // Re-focus instantly so the keyboard never closes
+    textareaRef.current?.focus();
     setTyping(true);
     setTimeout(() => {
       setTyping(false);
@@ -89,7 +91,7 @@ function ChatRoom() {
           time: nowLabel(),
         },
       ]);
-    }, 1400);
+    }, 900);
   };
 
   return (
