@@ -29,6 +29,14 @@ function ChatRoom() {
     el.style.overflowY = next >= 120 ? "auto" : "hidden";
   }, [text]);
 
+  // Jump to the latest message instantly when the chat opens
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Scroll to bottom on new messages / typing (instant — smooth jitters while typing)
   useEffect(() => {
     const el = scrollRef.current;
