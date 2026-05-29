@@ -96,7 +96,7 @@ function ChatRoom() {
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col bg-background"
-      style={{ height: "100dvh" }}
+      style={{ height: "var(--chat-vh, 100dvh)" }}
     >
       {/* Fixed header */}
       <header className="relative z-10 shrink-0 border-b border-border/60 bg-background/85 backdrop-blur-xl">
