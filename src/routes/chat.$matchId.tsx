@@ -244,13 +244,6 @@ function ChatRoom() {
                   send();
                 }
               }}
-              onFocus={() =>
-                setTimeout(() => {
-                  scrollRef.current?.scrollTo({
-                    top: scrollRef.current.scrollHeight,
-                  });
-                }, 300)
-              }
               rows={1}
               placeholder={`Mensagem para ${profile.name}…`}
               className="flex-1 resize-none bg-transparent px-1 py-2 text-base leading-snug outline-none placeholder:text-muted-foreground"
