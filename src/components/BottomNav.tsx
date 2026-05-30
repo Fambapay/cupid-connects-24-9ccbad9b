@@ -15,7 +15,7 @@ export function BottomNav() {
     <nav className="fixed bottom-0 inset-x-0 z-40 pb-[env(safe-area-inset-bottom)]">
       <div className="mx-auto max-w-md px-4 pb-3 pt-2">
         <div
-          className="relative rounded-[34px] px-3 py-2.5 backdrop-blur-2xl"
+          className="relative rounded-[28px] px-3 py-1.5 backdrop-blur-2xl"
           style={{
             background:
               "linear-gradient(180deg, oklch(0.22 0.02 270 / 0.78) 0%, oklch(0.16 0.02 270 / 0.88) 100%)",
@@ -25,6 +25,7 @@ export function BottomNav() {
           }}
         >
           <ul className="flex items-center justify-between">
+
             {items.map(({ to, label, icon: Icon, badge, fillWhenActive }) => {
               const active =
                 to === "/" ? pathname === "/" : pathname.startsWith(to);
