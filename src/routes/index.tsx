@@ -19,17 +19,15 @@ export const Route = createFileRoute("/")({
 
 function Discover() {
   const [index, setIndex] = useState(0);
-  const [lastAction, setLastAction] = useState<"like" | "nope" | null>(null);
 
-  const handleSwipe = (dir: "left" | "right") => {
-    setLastAction(dir === "right" ? "like" : "nope");
+  const handleSwipe = (_dir: "left" | "right") => {
     setTimeout(() => setIndex((i) => i + 1), 250);
   };
 
   const reset = () => {
     setIndex(0);
-    setLastAction(null);
   };
+
 
   const visible = profiles.slice(index, index + 3);
 
