@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Heart, Star, RotateCcw, Sparkles, Zap } from "lucide-react";
+import { X, Heart, Star, RotateCcw, Sparkles, Send } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { SwipeCard } from "@/components/SwipeCard";
@@ -76,24 +76,25 @@ function Discover() {
         </AnimatePresence>
       </div>
 
-      {/* Action row */}
-      <div className="mt-4 flex shrink-0 items-center justify-center gap-4 px-6">
-        <ActionButton onClick={reset} label="Voltar" size="sm" iconColor="text-sunset">
-          <RotateCcw className="h-5 w-5" strokeWidth={2.5} />
+      {/* Action row — 5 equal glass buttons with colored stroke icons */}
+      <div className="mt-4 flex shrink-0 items-center justify-between gap-3 px-6">
+        <ActionButton onClick={reset} label="Voltar" iconColor="text-white/55">
+          <RotateCcw className="h-[22px] w-[22px]" strokeWidth={2.4} />
         </ActionButton>
-        <ActionButton onClick={() => handleSwipe("left")} label="Passar" size="lg" iconColor="text-rose">
-          <X className="h-8 w-8" strokeWidth={3} />
+        <ActionButton onClick={() => handleSwipe("left")} label="Passar" iconColor="text-rose">
+          <X className="h-[28px] w-[28px]" strokeWidth={3} />
         </ActionButton>
-        <ActionButton onClick={() => handleSwipe("right")} label="Super like" size="md" iconColor="text-primary">
-          <Star className="h-6 w-6 fill-current" strokeWidth={0} />
+        <ActionButton onClick={() => handleSwipe("right")} label="Super like" iconColor="text-[oklch(0.72_0.16_240)]">
+          <Star className="h-[24px] w-[24px] fill-current" strokeWidth={0} />
         </ActionButton>
-        <ActionButton onClick={() => handleSwipe("right")} label="Curtir" size="lg" iconColor="text-mint">
-          <Heart className="h-8 w-8 fill-current" strokeWidth={0} />
+        <ActionButton onClick={() => handleSwipe("right")} label="Curtir" iconColor="text-mint">
+          <Heart className="h-[24px] w-[24px]" strokeWidth={2.6} />
         </ActionButton>
-        <ActionButton onClick={() => {}} label="Boost" size="sm" iconColor="text-grape">
-          <Zap className="h-5 w-5 fill-current" strokeWidth={0} />
+        <ActionButton onClick={() => {}} label="Mensagem" iconColor="text-[oklch(0.72_0.16_240)]">
+          <Send className="h-[22px] w-[22px] fill-current -rotate-12" strokeWidth={0} />
         </ActionButton>
       </div>
+
 
 
     </AppShell>
@@ -104,29 +105,24 @@ function ActionButton({
   children,
   onClick,
   label,
-  size = "md",
   iconColor,
 }: {
   children: React.ReactNode;
   onClick: () => void;
   label: string;
-  size?: "sm" | "md" | "lg";
   iconColor: string;
 }) {
-  const dim =
-    size === "lg" ? "h-[64px] w-[64px]" : size === "md" ? "h-[52px] w-[52px]" : "h-[44px] w-[44px]";
-
   return (
     <motion.button
       whileTap={{ scale: 0.86 }}
-      whileHover={{ y: -2, scale: 1.04 }}
+      whileHover={{ y: -2, scale: 1.05 }}
       transition={{ type: "spring", stiffness: 400, damping: 20 }}
       onClick={onClick}
       aria-label={label}
-      className={`glass-strong grid ${dim} ${iconColor} place-items-center rounded-full`}
-
+      className={`glass grid h-[58px] w-[58px] ${iconColor} place-items-center rounded-full`}
     >
       {children}
     </motion.button>
   );
 }
+
