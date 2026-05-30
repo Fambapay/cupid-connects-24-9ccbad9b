@@ -1,7 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Heart, Star, RotateCcw, Sparkles } from "lucide-react";
+import {
+  X,
+  Heart,
+  Star,
+  RotateCcw,
+  Sparkles,
+  Zap,
+  Flame,
+  MessageCircle,
+  User as UserIcon,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { SwipeCard } from "@/components/SwipeCard";
 import { profiles } from "@/data/profiles";
@@ -34,27 +44,37 @@ function Discover() {
 
   return (
     <AppShell>
-      {/* Minimal premium top bar */}
-      <header className="flex items-center justify-between px-5 pt-5 pb-3">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Descobrir
-          </p>
-          <h1 className="font-display text-2xl font-extrabold tracking-tight text-foreground">
-            Hoje
-          </h1>
+      {/* Top bar — Tinder-like, centered logo, side icons */}
+      <header className="flex items-center justify-between px-5 pt-4 pb-3">
+        <button
+          type="button"
+          aria-label="Perfil"
+          className="grid h-10 w-10 place-items-center rounded-full bg-card text-muted-foreground ring-1 ring-border shadow-soft transition active:scale-90"
+        >
+          <UserIcon className="h-5 w-5" strokeWidth={2} />
+        </button>
+        <div className="flex items-center gap-2">
+          <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-flame shadow-glow">
+            <Flame className="h-5 w-5 fill-white text-white" strokeWidth={0} />
+          </div>
+          <span className="font-display text-xl font-extrabold tracking-tight text-foreground">
+            flama
+          </span>
         </div>
         <button
           type="button"
-          aria-label="Boost"
-          className="grid h-11 w-11 place-items-center rounded-2xl bg-card text-primary ring-1 ring-border shadow-soft transition active:scale-90"
+          aria-label="Mensagens"
+          className="relative grid h-10 w-10 place-items-center rounded-full bg-card text-muted-foreground ring-1 ring-border shadow-soft transition active:scale-90"
         >
-          <Sparkles className="h-5 w-5 fill-current" strokeWidth={1.5} />
+          <MessageCircle className="h-5 w-5" strokeWidth={2} />
+          <span className="absolute -top-0.5 -right-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-rose px-1 text-[9px] font-bold text-white ring-2 ring-background">
+            3
+          </span>
         </button>
       </header>
 
-      {/* Imposing card */}
-      <div className="relative mx-4 mt-2 h-[calc(100svh-260px)] min-h-[520px]">
+      {/* Card stage */}
+      <div className="relative mx-4 mt-1 h-[calc(100svh-250px)] min-h-[480px]">
         <AnimatePresence>
           {visible.length > 0 ? (
             visible
@@ -72,7 +92,7 @@ function Discover() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="absolute inset-0 grid place-items-center rounded-[36px] border border-dashed border-border bg-card p-8 text-center shadow-soft"
+              className="absolute inset-0 grid place-items-center rounded-[28px] border border-dashed border-border bg-card p-8 text-center shadow-soft"
             >
               <div>
                 <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-primary/10 text-primary">
@@ -95,52 +115,46 @@ function Discover() {
         </AnimatePresence>
       </div>
 
-      {/* Action row — premium, soft, balanced */}
-      <div className="mt-5 flex items-center justify-center gap-3 px-6">
-        <ActionButton
-          onClick={reset}
-          label="Voltar"
-          size="md"
-          tone="ghost"
-        >
-          <RotateCcw className="h-5 w-5 text-sunset" strokeWidth={2.5} />
+      {/* Tinder-style action row — 5 circular buttons */}
+      <div className="mt-5 flex items-center justify-center gap-4 px-6">
+        <ActionButton onClick={reset} label="Voltar" size="sm" iconColor="text-sunset">
+          <RotateCcw className="h-5 w-5" strokeWidth={2.5} />
         </ActionButton>
 
         <ActionButton
           onClick={() => handleSwipe("left")}
           label="Passar"
           size="lg"
-          tone="rose"
+          iconColor="text-rose"
         >
-          <X className="h-8 w-8 text-rose" strokeWidth={3} />
+          <X className="h-8 w-8" strokeWidth={3} />
         </ActionButton>
 
-        <div className="relative">
-          <ActionButton
-            onClick={() => handleSwipe("right")}
-            label="Super like"
-            size="md"
-            tone="ghost"
-          >
-            <Star className="h-5 w-5 fill-grape text-grape" />
-          </ActionButton>
-          <span className="pointer-events-none absolute -top-1 -right-1 grid h-5 min-w-[20px] place-items-center rounded-full bg-grape px-1 text-[10px] font-bold text-white ring-2 ring-background">
-            11
-          </span>
-        </div>
+        <ActionButton
+          onClick={() => handleSwipe("right")}
+          label="Super like"
+          size="md"
+          iconColor="text-primary"
+        >
+          <Star className="h-6 w-6 fill-current" strokeWidth={0} />
+        </ActionButton>
 
         <ActionButton
           onClick={() => handleSwipe("right")}
           label="Curtir"
           size="lg"
-          tone="mint"
+          iconColor="text-mint"
         >
-          <Heart className="h-8 w-8 fill-mint text-mint" strokeWidth={0} />
+          <Heart className="h-8 w-8 fill-current" strokeWidth={0} />
+        </ActionButton>
+
+        <ActionButton onClick={() => {}} label="Boost" size="sm" iconColor="text-grape">
+          <Zap className="h-5 w-5 fill-current" strokeWidth={0} />
         </ActionButton>
       </div>
 
       {lastAction && (
-        <p className="mt-2 text-center text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+        <p className="mt-3 text-center text-[10.5px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           {lastAction === "like" ? "Curtido" : "Passou"}
         </p>
       )}
@@ -153,30 +167,25 @@ function ActionButton({
   onClick,
   label,
   size = "md",
-  tone = "ghost",
+  iconColor,
 }: {
   children: React.ReactNode;
   onClick: () => void;
   label: string;
-  size?: "md" | "lg";
-  tone?: "ghost" | "rose" | "mint";
+  size?: "sm" | "md" | "lg";
+  iconColor: string;
 }) {
-  const dim = size === "lg" ? "h-[72px] w-[72px]" : "h-12 w-12";
-  const toneCls =
-    tone === "rose"
-      ? "bg-card shadow-rose ring-1 ring-rose/20"
-      : tone === "mint"
-        ? "bg-card shadow-mint ring-1 ring-mint/20"
-        : "bg-card shadow-soft ring-1 ring-border";
+  const dim =
+    size === "lg" ? "h-[64px] w-[64px]" : size === "md" ? "h-[52px] w-[52px]" : "h-[44px] w-[44px]";
 
   return (
     <motion.button
-      whileTap={{ scale: 0.88 }}
-      whileHover={{ y: -2 }}
-      transition={{ type: "spring", stiffness: 400, damping: 22 }}
+      whileTap={{ scale: 0.86 }}
+      whileHover={{ y: -2, scale: 1.04 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
       onClick={onClick}
       aria-label={label}
-      className={`grid ${dim} place-items-center rounded-full ${toneCls}`}
+      className={`grid ${dim} ${iconColor} place-items-center rounded-full bg-card shadow-card ring-1 ring-border/70`}
     >
       {children}
     </motion.button>
