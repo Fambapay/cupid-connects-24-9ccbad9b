@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Heart, Star, RotateCcw, Zap } from "lucide-react";
-import { AppShell, TopBar } from "@/components/AppShell";
+import { AppShell } from "@/components/AppShell";
 import { SwipeCard } from "@/components/SwipeCard";
 import { profiles } from "@/data/profiles";
 
@@ -34,9 +34,7 @@ function Discover() {
 
   return (
     <AppShell>
-      <TopBar title="flama" />
-
-      <div className="relative mx-5 mt-2 h-[calc(100vh-260px)] min-h-[440px]">
+      <div className="relative mx-4 mt-3 h-[calc(100vh-200px)] min-h-[480px]">
         <AnimatePresence>
           {visible.length > 0 ? (
             visible
@@ -77,41 +75,46 @@ function Discover() {
         </AnimatePresence>
       </div>
 
-      <div className="mt-6 flex items-center justify-center gap-4">
+      <div className="mt-4 flex items-center justify-center gap-5">
         <ActionButton
           onClick={reset}
           label="Voltar"
           size="sm"
           className="bg-card text-sunset shadow-card"
         >
-          <RotateCcw className="h-5 w-5" />
+          <RotateCcw className="h-5 w-5" strokeWidth={2.5} />
         </ActionButton>
         <ActionButton
           onClick={() => handleSwipe("left")}
           label="Passar"
-          className="bg-card text-destructive shadow-card"
+          className="bg-destructive text-destructive-foreground shadow-card"
         >
-          <X className="h-8 w-8" strokeWidth={2.5} />
+          <X className="h-9 w-9" strokeWidth={3} />
         </ActionButton>
-        <ActionButton
-          onClick={() => handleSwipe("right")}
-          label="Super like"
-          size="sm"
-          className="bg-card text-grape shadow-card"
-        >
-          <Star className="h-5 w-5 fill-current" />
-        </ActionButton>
+        <div className="relative">
+          <ActionButton
+            onClick={() => handleSwipe("right")}
+            label="Super like"
+            size="sm"
+            className="bg-card text-grape shadow-card"
+          >
+            <Star className="h-5 w-5 fill-current" />
+          </ActionButton>
+          <span className="absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-grape px-1 text-[10px] font-bold text-white ring-2 ring-background">
+            11
+          </span>
+        </div>
         <ActionButton
           onClick={() => handleSwipe("right")}
           label="Curtir"
-          className="bg-gradient-flame text-flame-foreground shadow-glow"
+          className="border-2 border-emerald-400 bg-card text-emerald-400 shadow-card"
         >
-          <Heart className="h-8 w-8 fill-current" />
+          <Heart className="h-8 w-8" strokeWidth={2.5} />
         </ActionButton>
       </div>
 
       {lastAction && (
-        <p className="mt-3 text-center text-xs text-muted-foreground">
+        <p className="mt-2 text-center text-xs text-muted-foreground">
           {lastAction === "like" ? "💖 Curtido" : "👋 Passou"}
         </p>
       )}
