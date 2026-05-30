@@ -78,48 +78,25 @@ function Discover() {
         </AnimatePresence>
       </div>
 
-      {/* Tinder-style action row — 5 circular buttons */}
-      <div className="mt-5 flex items-center justify-center gap-4 px-6">
+      {/* Action row */}
+      <div className="mt-4 flex shrink-0 items-center justify-center gap-4 px-6">
         <ActionButton onClick={reset} label="Voltar" size="sm" iconColor="text-sunset">
           <RotateCcw className="h-5 w-5" strokeWidth={2.5} />
         </ActionButton>
-
-        <ActionButton
-          onClick={() => handleSwipe("left")}
-          label="Passar"
-          size="lg"
-          iconColor="text-rose"
-        >
+        <ActionButton onClick={() => handleSwipe("left")} label="Passar" size="lg" iconColor="text-rose">
           <X className="h-8 w-8" strokeWidth={3} />
         </ActionButton>
-
-        <ActionButton
-          onClick={() => handleSwipe("right")}
-          label="Super like"
-          size="md"
-          iconColor="text-primary"
-        >
+        <ActionButton onClick={() => handleSwipe("right")} label="Super like" size="md" iconColor="text-primary">
           <Star className="h-6 w-6 fill-current" strokeWidth={0} />
         </ActionButton>
-
-        <ActionButton
-          onClick={() => handleSwipe("right")}
-          label="Curtir"
-          size="lg"
-          iconColor="text-mint"
-        >
+        <ActionButton onClick={() => handleSwipe("right")} label="Curtir" size="lg" iconColor="text-mint">
           <Heart className="h-8 w-8 fill-current" strokeWidth={0} />
         </ActionButton>
-
         <ActionButton onClick={() => {}} label="Boost" size="sm" iconColor="text-grape">
           <Zap className="h-5 w-5 fill-current" strokeWidth={0} />
         </ActionButton>
       </div>
 
-      {lastAction && (
-        <p className="mt-3 text-center text-[10.5px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          {lastAction === "like" ? "Curtido" : "Passou"}
-        </p>
       )}
     </AppShell>
   );
