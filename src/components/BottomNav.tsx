@@ -45,7 +45,8 @@ export function BottomNav() {
                     >
                       <Icon
                         className={`transition-all ${
-                          active ? "h-[22px] w-[22px] text-white drop-shadow-[0_0_8px_oklch(1_0_0_/_0.35)]" : "h-[21px] w-[21px] text-white/70"
+                          active ? "h-[19px] w-[19px] text-white drop-shadow-[0_0_8px_oklch(1_0_0_/_0.35)]" : "h-[18px] w-[18px] text-white/70"
+
                         }`}
                         strokeWidth={active ? 2.2 : 1.9}
                         fill={active && fillWhenActive ? "currentColor" : "none"}
