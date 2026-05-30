@@ -1,17 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  X,
-  Heart,
-  Star,
-  RotateCcw,
-  Sparkles,
-  Zap,
-  Flame,
-  MessageCircle,
-  User as UserIcon,
-} from "lucide-react";
+import { X, Heart, Star, RotateCcw, Sparkles, Zap } from "lucide-react";
+
 import { AppShell } from "@/components/AppShell";
 import { SwipeCard } from "@/components/SwipeCard";
 import { profiles } from "@/data/profiles";
@@ -43,39 +34,10 @@ function Discover() {
   const visible = profiles.slice(index, index + 3);
 
   return (
-    <AppShell>
-      {/* Top bar — liquid glass */}
-      <header className="flex items-center justify-between px-5 pt-4 pb-3">
-        <button
-          type="button"
-          aria-label="Perfil"
-          className="glass grid h-11 w-11 place-items-center rounded-full text-white/85 transition active:scale-90"
-        >
-          <UserIcon className="h-5 w-5" strokeWidth={2} />
-        </button>
-        <div className="glass flex items-center gap-2 rounded-full px-4 py-2">
-          <div className="grid h-7 w-7 place-items-center rounded-full bg-gradient-flame shadow-glow">
-            <Flame className="h-4 w-4 fill-white text-white" strokeWidth={0} />
-          </div>
-          <span className="font-display text-base font-extrabold tracking-tight text-white">
-            flama
-          </span>
-        </div>
-        <button
-          type="button"
-          aria-label="Mensagens"
-          className="glass relative grid h-11 w-11 place-items-center rounded-full text-white/85 transition active:scale-90"
-        >
-          <MessageCircle className="h-5 w-5" strokeWidth={2} />
-          <span className="absolute -top-0.5 -right-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-rose px-1 text-[9px] font-bold text-white ring-2 ring-background">
-            3
-          </span>
-        </button>
-      </header>
+    <AppShell fullHeight>
+      {/* Card stage — fills available space, no scroll */}
+      <div className="relative mx-4 mt-4 flex-1 min-h-0">
 
-
-      {/* Card stage */}
-      <div className="relative mx-4 mt-1 h-[calc(100svh-250px)] min-h-[480px]">
         <AnimatePresence>
           {visible.length > 0 ? (
             visible
