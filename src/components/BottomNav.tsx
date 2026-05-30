@@ -15,7 +15,7 @@ export function BottomNav() {
     <nav className="fixed bottom-0 inset-x-0 z-40 pb-[env(safe-area-inset-bottom)]">
       <div className="mx-auto max-w-md px-4 pb-3 pt-2">
         <div
-          className="relative rounded-[28px] px-3 py-1.5 backdrop-blur-2xl"
+          className="relative rounded-[26px] px-3 py-1 backdrop-blur-2xl"
           style={{
             background:
               "linear-gradient(180deg, oklch(0.22 0.02 270 / 0.78) 0%, oklch(0.16 0.02 270 / 0.88) 100%)",
@@ -34,10 +34,11 @@ export function BottomNav() {
                   <Link
                     to={to}
                     aria-label={label}
-                    className="group relative flex flex-col items-center justify-center gap-0.5 py-0.5"
+                    className="group relative flex flex-col items-center justify-center gap-0 py-0"
                   >
                     <span
-                      className={`relative grid h-8 w-8 place-items-center rounded-full transition-all duration-300 ${
+                      className={`relative grid h-7 w-7 place-items-center rounded-full transition-all duration-300 ${
+
                         active
                           ? "bg-white/[0.06] ring-1 ring-white/15 shadow-[inset_0_1px_0_0_oklch(1_0_0_/_0.12),inset_0_-1px_0_0_oklch(0_0_0_/_0.35)]"
                           : ""
