@@ -15,7 +15,7 @@ export function BottomNav() {
     <nav className="fixed bottom-0 inset-x-0 z-40 pb-[env(safe-area-inset-bottom)]">
       <div className="mx-auto max-w-md px-4 pb-3 pt-2">
         <div
-          className="relative rounded-[34px] px-3 py-2.5 backdrop-blur-2xl"
+          className="relative rounded-[28px] px-3 py-1.5 backdrop-blur-2xl"
           style={{
             background:
               "linear-gradient(180deg, oklch(0.22 0.02 270 / 0.78) 0%, oklch(0.16 0.02 270 / 0.88) 100%)",
@@ -25,6 +25,7 @@ export function BottomNav() {
           }}
         >
           <ul className="flex items-center justify-between">
+
             {items.map(({ to, label, icon: Icon, badge, fillWhenActive }) => {
               const active =
                 to === "/" ? pathname === "/" : pathname.startsWith(to);
@@ -33,10 +34,10 @@ export function BottomNav() {
                   <Link
                     to={to}
                     aria-label={label}
-                    className="group relative flex flex-col items-center justify-center gap-1 py-1"
+                    className="group relative flex flex-col items-center justify-center gap-0.5 py-0.5"
                   >
                     <span
-                      className={`relative grid h-10 w-10 place-items-center rounded-full transition-all duration-300 ${
+                      className={`relative grid h-8 w-8 place-items-center rounded-full transition-all duration-300 ${
                         active
                           ? "bg-white/[0.06] ring-1 ring-white/15 shadow-[inset_0_1px_0_0_oklch(1_0_0_/_0.12),inset_0_-1px_0_0_oklch(0_0_0_/_0.35)]"
                           : ""
@@ -44,7 +45,8 @@ export function BottomNav() {
                     >
                       <Icon
                         className={`transition-all ${
-                          active ? "h-[22px] w-[22px] text-white drop-shadow-[0_0_8px_oklch(1_0_0_/_0.35)]" : "h-[21px] w-[21px] text-white/70"
+                          active ? "h-[19px] w-[19px] text-white drop-shadow-[0_0_8px_oklch(1_0_0_/_0.35)]" : "h-[18px] w-[18px] text-white/70"
+
                         }`}
                         strokeWidth={active ? 2.2 : 1.9}
                         fill={active && fillWhenActive ? "currentColor" : "none"}
