@@ -44,27 +44,27 @@ function Discover() {
 
   return (
     <AppShell>
-      {/* Top bar — Tinder-like, centered logo, side icons */}
+      {/* Top bar — liquid glass */}
       <header className="flex items-center justify-between px-5 pt-4 pb-3">
         <button
           type="button"
           aria-label="Perfil"
-          className="grid h-10 w-10 place-items-center rounded-full bg-card text-muted-foreground ring-1 ring-border shadow-soft transition active:scale-90"
+          className="glass grid h-11 w-11 place-items-center rounded-full text-white/85 transition active:scale-90"
         >
           <UserIcon className="h-5 w-5" strokeWidth={2} />
         </button>
-        <div className="flex items-center gap-2">
-          <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-flame shadow-glow">
-            <Flame className="h-5 w-5 fill-white text-white" strokeWidth={0} />
+        <div className="glass flex items-center gap-2 rounded-full px-4 py-2">
+          <div className="grid h-7 w-7 place-items-center rounded-full bg-gradient-flame shadow-glow">
+            <Flame className="h-4 w-4 fill-white text-white" strokeWidth={0} />
           </div>
-          <span className="font-display text-xl font-extrabold tracking-tight text-foreground">
+          <span className="font-display text-base font-extrabold tracking-tight text-white">
             flama
           </span>
         </div>
         <button
           type="button"
           aria-label="Mensagens"
-          className="relative grid h-10 w-10 place-items-center rounded-full bg-card text-muted-foreground ring-1 ring-border shadow-soft transition active:scale-90"
+          className="glass relative grid h-11 w-11 place-items-center rounded-full text-white/85 transition active:scale-90"
         >
           <MessageCircle className="h-5 w-5" strokeWidth={2} />
           <span className="absolute -top-0.5 -right-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-rose px-1 text-[9px] font-bold text-white ring-2 ring-background">
@@ -72,6 +72,7 @@ function Discover() {
           </span>
         </button>
       </header>
+
 
       {/* Card stage */}
       <div className="relative mx-4 mt-1 h-[calc(100svh-250px)] min-h-[480px]">
@@ -185,7 +186,8 @@ function ActionButton({
       transition={{ type: "spring", stiffness: 400, damping: 20 }}
       onClick={onClick}
       aria-label={label}
-      className={`grid ${dim} ${iconColor} place-items-center rounded-full bg-card shadow-card ring-1 ring-border/70`}
+      className={`glass-strong grid ${dim} ${iconColor} place-items-center rounded-full`}
+
     >
       {children}
     </motion.button>
