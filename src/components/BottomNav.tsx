@@ -34,10 +34,11 @@ export function BottomNav() {
                   <Link
                     to={to}
                     aria-label={label}
-                    className="group relative flex flex-col items-center justify-center gap-1 py-1"
+                    className="group relative flex flex-col items-center justify-center gap-0.5 py-0.5"
                   >
                     <span
-                      className={`relative grid h-10 w-10 place-items-center rounded-full transition-all duration-300 ${
+                      className={`relative grid h-8 w-8 place-items-center rounded-full transition-all duration-300 ${
+
                         active
                           ? "bg-white/[0.06] ring-1 ring-white/15 shadow-[inset_0_1px_0_0_oklch(1_0_0_/_0.12),inset_0_-1px_0_0_oklch(0_0_0_/_0.35)]"
                           : ""
