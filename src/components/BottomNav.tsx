@@ -13,8 +13,17 @@ export function BottomNav() {
   const { pathname } = useLocation();
   return (
     <nav className="fixed bottom-0 inset-x-0 z-40 pb-[env(safe-area-inset-bottom)]">
-      <div className="mx-auto max-w-md px-3 pb-3 pt-2">
-        <div className="glass-strong rounded-[28px] px-2 py-2">
+      <div className="mx-auto max-w-md px-4 pb-3 pt-2">
+        <div
+          className="relative rounded-[34px] px-3 py-2.5 backdrop-blur-2xl"
+          style={{
+            background:
+              "linear-gradient(180deg, oklch(0.22 0.02 270 / 0.78) 0%, oklch(0.16 0.02 270 / 0.88) 100%)",
+            boxShadow:
+              "0 18px 50px -18px oklch(0 0 0 / 0.7), 0 1px 0 0 oklch(1 0 0 / 0.06) inset, 0 -1px 0 0 oklch(0 0 0 / 0.3) inset",
+            border: "1px solid oklch(1 0 0 / 0.07)",
+          }}
+        >
           <ul className="flex items-center justify-between">
             {items.map(({ to, label, icon: Icon, badge, fillWhenActive }) => {
               const active =
@@ -24,29 +33,38 @@ export function BottomNav() {
                   <Link
                     to={to}
                     aria-label={label}
-                    className="group relative flex flex-col items-center justify-center gap-0.5 py-1.5"
+                    className="group relative flex flex-col items-center justify-center gap-1 py-1"
                   >
                     <span
-                      className={`relative grid h-9 w-9 place-items-center rounded-full transition-all ${
+                      className={`relative grid h-10 w-10 place-items-center rounded-full transition-all duration-300 ${
                         active
-                          ? "bg-white/12 text-white ring-1 ring-white/20 shadow-inner-glass"
-                          : "text-white/55"
+                          ? "bg-white/[0.06] ring-1 ring-white/15 shadow-[inset_0_1px_0_0_oklch(1_0_0_/_0.12),inset_0_-1px_0_0_oklch(0_0_0_/_0.35)]"
+                          : ""
                       }`}
                     >
                       <Icon
-                        className="h-[19px] w-[19px]"
-                        strokeWidth={active ? 2.4 : 2}
+                        className={`transition-all ${
+                          active ? "h-[22px] w-[22px] text-white drop-shadow-[0_0_8px_oklch(1_0_0_/_0.35)]" : "h-[21px] w-[21px] text-white/70"
+                        }`}
+                        strokeWidth={active ? 2.2 : 1.9}
                         fill={active && fillWhenActive ? "currentColor" : "none"}
                       />
                       {badge > 0 && (
-                        <span className="absolute -top-1 -right-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-sunset px-1 text-[9px] font-bold text-black/85 ring-2 ring-[oklch(0.18_0.02_270)]">
+                        <span
+                          className="absolute -top-0.5 -right-1 grid h-[18px] min-w-[18px] place-items-center rounded-full px-1 text-[10px] font-bold text-black ring-2"
+                          style={{
+                            background: "linear-gradient(180deg, oklch(0.92 0.16 90) 0%, oklch(0.82 0.18 75) 100%)",
+                            boxShadow: "0 2px 6px -1px oklch(0.82 0.18 75 / 0.55)",
+                            ["--tw-ring-color" as never]: "oklch(0.16 0.02 270)",
+                          }}
+                        >
                           {badge}
                         </span>
                       )}
                     </span>
                     <span
-                      className={`text-[10px] font-semibold tracking-tight ${
-                        active ? "text-white" : "text-white/55"
+                      className={`text-[11px] tracking-tight transition-colors ${
+                        active ? "text-white font-semibold" : "text-white/65 font-medium"
                       }`}
                     >
                       {label}
