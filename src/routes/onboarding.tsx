@@ -727,88 +727,153 @@ function ScrollPickerSheet<T extends number>({
   selected: T | null;
   onSelect: (v: T) => void;
 }) {
+  const ITEM_H = 44;
+  const VISIBLE = 5;
   const listRef = useRef<HTMLDivElement>(null);
+  const [activeIdx, setActiveIdx] = useState<number>(() => {
+    const i = items.findIndex((it) => it.value === selected);
+    return i >= 0 ? i : Math.floor(items.length / 2);
+  });
+  const scrollRaf = useRef<number | null>(null);
+  const snapTimer = useRef<number | null>(null);
 
   useEffect(() => {
     if (!open) return;
+    const i = items.findIndex((it) => it.value === selected);
+    const idx = i >= 0 ? i : Math.floor(items.length / 2);
+    setActiveIdx(idx);
     const id = requestAnimationFrame(() => {
-      const el = listRef.current?.querySelector<HTMLButtonElement>("[data-active='true']");
-      el?.scrollIntoView({ block: "center" });
+      if (listRef.current) listRef.current.scrollTop = idx * ITEM_H;
     });
     return () => cancelAnimationFrame(id);
-  }, [open]);
+  }, [open, items, selected]);
+
+  const handleScroll = () => {
+    if (scrollRaf.current) cancelAnimationFrame(scrollRaf.current);
+    scrollRaf.current = requestAnimationFrame(() => {
+      if (!listRef.current) return;
+      const idx = Math.round(listRef.current.scrollTop / ITEM_H);
+      setActiveIdx(Math.max(0, Math.min(items.length - 1, idx)));
+    });
+    if (snapTimer.current) window.clearTimeout(snapTimer.current);
+    snapTimer.current = window.setTimeout(() => {
+      if (!listRef.current) return;
+      const idx = Math.round(listRef.current.scrollTop / ITEM_H);
+      const clamped = Math.max(0, Math.min(items.length - 1, idx));
+      listRef.current.scrollTo({ top: clamped * ITEM_H, behavior: "smooth" });
+    }, 120);
+  };
+
+  const handleConfirm = () => {
+    const it = items[activeIdx];
+    if (it) onSelect(it.value);
+  };
+
+  const containerH = ITEM_H * VISIBLE;
+  const padding = (containerH - ITEM_H) / 2;
 
   return (
     <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
       <DrawerContent className="border-t border-white/10 bg-card">
-        <DrawerHeader className="pb-2 pt-3">
-          <DrawerTitle className="text-center text-sm font-semibold tracking-tight text-foreground">
+        <DrawerHeader className="pb-1 pt-3">
+          <DrawerTitle className="text-center text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
             {title}
           </DrawerTitle>
         </DrawerHeader>
-        <div
-          ref={listRef}
-          className="relative max-h-[60vh] overflow-y-auto px-3 pb-2"
-          style={{
-            maskImage:
-              "linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%)",
-            WebkitMaskImage:
-              "linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%)",
-          }}
-        >
-          {items.map((it) => {
-            const active = selected === it.value;
-            return (
-              <button
-                key={it.value}
-                data-active={active}
-                onClick={() => onSelect(it.value)}
-                className={cn(
-                  "relative flex w-full items-center justify-between rounded-xl px-4 py-3 text-left transition-colors",
-                  active
-                    ? "bg-white/[0.06]"
-                    : "text-muted-foreground hover:bg-white/[0.03] active:bg-white/[0.05]",
-                )}
-              >
-                {active && (
-                  <span
-                    aria-hidden
-                    className="absolute left-1 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-full"
-                    style={{
-                      background:
-                        "linear-gradient(180deg, var(--brand-pink), var(--brand-purple))",
+
+        <div className="relative px-6 pb-2 pt-1">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute left-6 right-6 top-1/2 -translate-y-1/2 rounded-2xl border border-white/10"
+            style={{
+              height: ITEM_H,
+              background:
+                "linear-gradient(180deg, color-mix(in oklab, var(--brand-pink) 10%, transparent), color-mix(in oklab, var(--brand-purple) 10%, transparent))",
+              boxShadow:
+                "inset 0 1px 0 color-mix(in oklab, white 6%, transparent), 0 0 24px -8px color-mix(in oklab, var(--brand-pink) 40%, transparent)",
+            }}
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute left-7 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full"
+            style={{ background: "var(--brand-pink)" }}
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute right-7 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full"
+            style={{ background: "var(--brand-purple)" }}
+          />
+
+          <div
+            ref={listRef}
+            onScroll={handleScroll}
+            className="relative overflow-y-auto [&::-webkit-scrollbar]:hidden"
+            style={{
+              height: containerH,
+              scrollSnapType: "y mandatory",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+              maskImage:
+                "linear-gradient(to bottom, transparent 0, #000 30%, #000 70%, transparent 100%)",
+              WebkitMaskImage:
+                "linear-gradient(to bottom, transparent 0, #000 30%, #000 70%, transparent 100%)",
+            }}
+          >
+            <div style={{ paddingTop: padding, paddingBottom: padding }}>
+              {items.map((it, i) => {
+                const dist = Math.abs(i - activeIdx);
+                const active = dist === 0;
+                const opacity = active ? 1 : Math.max(0.25, 1 - dist * 0.28);
+                const scale = active ? 1 : Math.max(0.82, 1 - dist * 0.06);
+                return (
+                  <button
+                    key={it.value}
+                    type="button"
+                    onClick={() => {
+                      if (listRef.current)
+                        listRef.current.scrollTo({ top: i * ITEM_H, behavior: "smooth" });
                     }}
-                  />
-                )}
-                <span
-                  className={cn(
-                    "text-base transition-all",
-                    active
-                      ? "translate-x-2 font-semibold text-foreground"
-                      : "translate-x-0 font-normal",
-                  )}
-                >
-                  {it.label}
-                </span>
-                {active && (
-                  <Check
-                    className="h-4 w-4"
-                    style={{ color: "var(--brand-pink)" }}
-                  />
-                )}
-              </button>
-            );
-          })}
+                    className="flex w-full items-center justify-center text-center transition-[transform,opacity,color] duration-150 will-change-transform"
+                    style={{
+                      height: ITEM_H,
+                      scrollSnapAlign: "center",
+                      opacity,
+                      transform: `scale(${scale})`,
+                      color: active ? "var(--foreground)" : "var(--muted-foreground)",
+                      fontWeight: active ? 600 : 400,
+                      fontSize: active ? "1.375rem" : "1.125rem",
+                      letterSpacing: active ? "-0.01em" : "0",
+                    }}
+                  >
+                    {it.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
-        <DrawerFooter className="pt-2">
+
+        <DrawerFooter className="grid grid-cols-2 gap-2 px-4 pb-4 pt-2">
           <DrawerClose asChild>
             <Button
               variant="ghost"
-              className="h-12 w-full rounded-xl text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground"
+              className="h-12 rounded-xl text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground"
             >
               Cancelar
             </Button>
           </DrawerClose>
+          <Button
+            onClick={handleConfirm}
+            className="h-12 rounded-xl text-sm font-semibold text-white"
+            style={{
+              background:
+                "linear-gradient(135deg, var(--brand-pink), var(--brand-purple))",
+              boxShadow:
+                "0 8px 24px -8px color-mix(in oklab, var(--brand-pink) 60%, transparent)",
+            }}
+          >
+            Confirmar
+          </Button>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
