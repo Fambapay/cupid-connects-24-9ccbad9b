@@ -5,6 +5,7 @@ import { ProfileView, type ProfileViewData } from '@/components/ProfileView';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
 import { VerificationModal } from '@/components/VerificationModal';
 import { BottomNav } from '@/components/BottomNav';
+import { useProfile } from '@/hooks/useProfile';
 
 import { requireAuthAndOnboarding } from '@/lib/authGuard';
 
