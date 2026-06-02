@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { signPhoto } from "@/lib/photos";
+import { AppleToast } from "@/components/notifications/AppleToast";
 
 type PeerInfo = { name: string; photo: string };
 
@@ -80,15 +81,26 @@ export function useNewMessageNotifier() {
           const peer = await resolvePeer(m.match_id);
           if (!peer) return;
 
-          toast(peer.name, {
-            description:
-              m.content.length > 80 ? `${m.content.slice(0, 80)}…` : m.content,
-            action: {
-              label: "Abrir",
-              onClick: () =>
-                navigate({ to: "/chat/$matchId", params: { matchId: m.match_id } }),
-            },
-          });
+          const body =
+            m.content.length > 120 ? `${m.content.slice(0, 120)}…` : m.content;
+          toast.custom(
+            (t) => (
+              <AppleToast
+                toastId={t}
+                title={peer.name}
+                body={body}
+                avatar={peer.photo}
+                appName="Hunie · Mensagem"
+                timeLabel="agora"
+                onClick={() => {
+                  toast.dismiss(t);
+                  navigate({ to: "/chat/$matchId", params: { matchId: m.match_id } });
+                }}
+                onDismiss={() => toast.dismiss(t)}
+              />
+            ),
+            { duration: 5000 },
+          );
         },
       )
       .subscribe();
