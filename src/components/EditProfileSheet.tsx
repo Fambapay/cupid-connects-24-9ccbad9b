@@ -95,6 +95,9 @@ export function EditProfileSheet({ open, profile, onClose, onSave }: Props) {
             />
 
             {/* Handle */}
+            <div className="relative shrink-0 flex flex-col items-center pb-1 pt-3" style={{ display: 'flex' }}>
+            </div>
+            {/* HANDLE_MARK */}
             <div className="relative flex flex-col items-center pb-1 pt-3">
               <div
                 className="h-1 w-10 rounded-full"
