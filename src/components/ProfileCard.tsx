@@ -850,14 +850,12 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       className="absolute left-0 right-0 top-0 flex items-start justify-center swipe-card-container card-stack"
       style={{
         background: 'transparent',
-        bottom: 0,
+        bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 18px) + 54px + 10px)',
         contain: 'strict' as any,
         isolation: 'isolate',
         transform: 'translateZ(0)',
         backfaceVisibility: 'hidden',
         WebkitBackfaceVisibility: 'hidden',
-        // Harmonia vertical: nav (62px) + gap (10) + actions (64) + gap (12) ≈ 148px
-        ['--card-nav-offset' as any]: '128px',
       }}
     >
       {nextProfiles[1] && (
@@ -1318,7 +1316,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             className="absolute left-0 right-0 z-10"
             style={{
               // Sit above the action buttons row (clears swipe buttons + nav)
-              bottom: `calc(var(--card-nav-offset, 66px) - 63px + 92px + 16px - 20px)`,
+              bottom: `calc(var(--card-nav-offset, 66px) - 63px + 92px + 16px)`,
               paddingLeft: 16,
               paddingRight: 16,
             }}
