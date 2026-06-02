@@ -30,7 +30,7 @@ export const Route = createFileRoute("/discover")({
 
 function Discover() {
   const navigate = useNavigate();
-  const { items, loading, swipe, rewind } = useDiscovery();
+  const { items, loading, swipe, rewind, reload } = useDiscovery();
   const { credits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
   const boost = useBoost(goShop);
