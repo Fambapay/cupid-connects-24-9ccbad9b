@@ -148,24 +148,16 @@ function Discover() {
         )}
       </div>
 
-      {matchedName && (
-        <div
-          className="fixed inset-0 z-50 grid place-items-center bg-black/80 backdrop-blur-xl px-6"
-          onClick={() => setMatchedName(null)}
-        >
-          <div className="rounded-3xl bg-gradient-flame p-8 text-center shadow-glow">
-            <div className="text-6xl">🔥</div>
-            <h3 className="mt-4 text-3xl font-black text-white">É um match!</h3>
-            <p className="mt-2 text-white/90">Tu e {matchedName} curtiram-se mutuamente.</p>
-            <button
-              className="mt-6 rounded-full bg-white px-6 py-3 font-semibold text-flame"
-              onClick={() => setMatchedName(null)}
-            >
-              Continuar a descobrir
-            </button>
-          </div>
-        </div>
-      )}
+      <MatchOverlay
+        open={!!matched}
+        targetName={matched?.name ?? ""}
+        targetPhoto={matched?.photo}
+        onClose={() => setMatched(null)}
+        onSeeLikes={() => {
+          setMatched(null);
+          navigate({ to: "/matches" });
+        }}
+      />
 
       <FiltersSheet
         open={filtersOpen}
