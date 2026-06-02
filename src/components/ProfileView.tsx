@@ -32,7 +32,7 @@ export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSett
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
-  const { name, city, bio, interests, photos, isVerified, isPremium } = profile;
+  const { name, age, city, bio, interests, photos, isVerified, isPremium } = profile;
 
   const completion = computeProfileCompletion({
     photosCount: photos.length, bio, interests, city, isVerified,
