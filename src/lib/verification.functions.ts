@@ -79,11 +79,11 @@ export const submitVerification = createServerFn({ method: "POST" })
     if (insErr || !row) throw new Error("Não foi possível registar pedido");
 
     // 5. Download selfie + reference photos as base64 data URLs (admin to bypass RLS)
-    const selfieUrl = await fetchAsDataUrl(supabaseAdmin as never, "verification-selfies", data.selfie_path);
+    const selfieUrl = await fetchAsDataUrl(supabaseAdmin, "verification-selfies", data.selfie_path);
     const refUrls: string[] = [];
     for (const p of photos) {
       try {
-        refUrls.push(await fetchAsDataUrl(supabaseAdmin as never, "profile-photos", p.storage_path));
+        refUrls.push(await fetchAsDataUrl(supabaseAdmin, "profile-photos", p.storage_path));
       } catch {
         /* skip broken */
       }
