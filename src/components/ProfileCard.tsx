@@ -850,7 +850,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       className="absolute left-0 right-0 top-0 flex items-start justify-center swipe-card-container card-stack"
       style={{
         background: 'transparent',
-        bottom: 0,
+        bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 18px) + 54px + 10px)',
         contain: 'strict' as any,
         isolation: 'isolate',
         transform: 'translateZ(0)',
