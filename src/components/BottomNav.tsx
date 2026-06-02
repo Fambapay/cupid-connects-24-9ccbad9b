@@ -312,7 +312,7 @@ const TabButton = ({
 };
 
 // ─── Router-aware wrapper used across the app ───────────────────────────────
-import { useLocation, useNavigate } from "@tanstack/react-router";
+
 
 const TAB_TO_PATH = {
   discover: "/",
