@@ -164,7 +164,7 @@ export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryPro
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
       >
-        {loading
+        {isSearching
           ? "A encontrar pessoas perto de ti."
           : "Voltamos já com novos perfis para descobrires."}
       </motion.p>
