@@ -9,12 +9,22 @@ interface EmptyDiscoveryProps {
 }
 
 export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryProps) => {
-  const [searching, setSearching] = useState(false);
+  // Auto-iniciar a "procura" assim que a página abre, como se o utilizador
+  // tivesse clicado em Atualizar — dá sensação imediata de que estamos a
+  // buscar perfis novos.
+  const [searching, setSearching] = useState(true);
   const isSearching = loading || searching;
 
   useEffect(() => {
+    // Disparar a busca real uma vez ao montar
+    onRefresh?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (!searching) return;
-    const t = setTimeout(() => setSearching(false), 2200);
+    // Animação mais longa para parecer uma procura real
+    const t = setTimeout(() => setSearching(false), 3600);
     return () => clearTimeout(t);
   }, [searching]);
 
@@ -22,6 +32,7 @@ export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryPro
     setSearching(true);
     onRefresh?.();
   };
+
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden px-6 text-center">
