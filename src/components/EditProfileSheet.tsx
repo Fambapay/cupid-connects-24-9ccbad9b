@@ -95,10 +95,7 @@ export function EditProfileSheet({ open, profile, onClose, onSave }: Props) {
             />
 
             {/* Handle */}
-            <div className="relative shrink-0 flex flex-col items-center pb-1 pt-3" style={{ display: 'flex' }}>
-            </div>
-            {/* HANDLE_MARK */}
-            <div className="relative flex flex-col items-center pb-1 pt-3">
+            <div className="relative shrink-0 flex flex-col items-center pb-1 pt-3">
               <div
                 className="h-1 w-10 rounded-full"
                 style={{
@@ -110,7 +107,7 @@ export function EditProfileSheet({ open, profile, onClose, onSave }: Props) {
             </div>
 
             {/* Header */}
-            <div className="relative flex items-center justify-between px-5 pb-3 pt-2">
+            <div className="relative shrink-0 flex items-center justify-between px-5 pb-3 pt-2">
               <button
                 onClick={onClose}
                 aria-label="Fechar"
@@ -136,7 +133,8 @@ export function EditProfileSheet({ open, profile, onClose, onSave }: Props) {
               </button>
             </div>
 
-            <div className="relative flex-1 space-y-7 overflow-y-auto px-5 pb-10 pt-2">
+            <div className="relative flex-1 min-h-0 space-y-7 overflow-y-auto overscroll-contain px-5 pb-10 pt-2">
+
               {/* Photos */}
               <section>
                 <SectionHeader
