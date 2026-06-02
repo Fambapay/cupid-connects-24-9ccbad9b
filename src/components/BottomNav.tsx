@@ -272,7 +272,6 @@ const TabButton = ({
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!pointerStartRef.current) onTap();
       }}
       className="relative flex flex-col items-center justify-center gap-[3px] h-full flex-1 z-10"
       style={{ background: 'none', border: 'none' }}
