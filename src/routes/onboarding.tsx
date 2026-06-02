@@ -63,7 +63,7 @@ type Gender = "man" | "woman" | "nonbinary";
 type ExtendedGender = Gender | "transwoman" | "transman" | "genderfluid" | "agender" | "other";
 type InterestedIn = "men" | "women" | "everyone";
 
-const STEP_COUNT = 8;
+const STEP_COUNT = 10;
 type StepId =
   | "welcome"
   | "name"
@@ -72,7 +72,9 @@ type StepId =
   | "interested"
   | "photos"
   | "bio"
+  | "interests"
   | "location"
+  | "prompts"
   | "done";
 const STEPS: StepId[] = [
   "welcome",
@@ -82,8 +84,32 @@ const STEPS: StepId[] = [
   "interested",
   "photos",
   "bio",
+  "interests",
   "location",
+  "prompts",
 ];
+
+const AVAILABLE_INTERESTS = [
+  "Viajar", "Música", "Cinema", "Séries", "Cozinhar", "Café",
+  "Ginásio", "Yoga", "Correr", "Caminhadas", "Praia", "Surf",
+  "Futebol", "Basquete", "Dançar", "Fotografia", "Arte", "Livros",
+  "Jogos", "Tecnologia", "Animais", "Natureza", "Vinho", "Brunch",
+];
+
+const PROMPT_QUESTIONS = [
+  "A minha cena é…",
+  "O que me faz rir…",
+  "O melhor de mim…",
+  "Procuro alguém que…",
+  "O meu prato preferido é…",
+  "Domingo perfeito é…",
+  "Nunca sairei sem…",
+  "Confessar: sou viciado em…",
+];
+
+const MAX_INTERESTS = 5;
+const MIN_PROMPTS = 3;
+const PROMPT_SLOTS = 3;
 
 const STORAGE_KEY = "hunie:onboarding:v1";
 
@@ -112,6 +138,11 @@ const PROMPTS = [
 // ─────────────────────────────────────────────────────────────
 // Page
 
+interface PromptDraft {
+  question: string;
+  answer: string;
+}
+
 interface DraftState {
   stepIdx: number;
   name: string;
@@ -122,6 +153,10 @@ interface DraftState {
   interested: InterestedIn | null;
   bio: string;
   city: string;
+  interests: string[];
+  latitude: number | null;
+  longitude: number | null;
+  prompts: PromptDraft[];
 }
 
 const initialDraft: DraftState = {
@@ -134,6 +169,10 @@ const initialDraft: DraftState = {
   interested: null,
   bio: "",
   city: "",
+  interests: [],
+  latitude: null,
+  longitude: null,
+  prompts: [],
 };
 
 function OnboardingPage() {
@@ -205,7 +244,7 @@ function OnboardingPage() {
 
   const finish = useCallback(async () => {
     if (!user) return;
-    const { day, month, year, name, bio, city, gender, interested } = draft;
+    const { day, month, year, name, bio, city, gender, interested, interests, latitude, longitude, prompts } = draft;
     const birthdate =
       day && month && year
         ? `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
@@ -226,6 +265,9 @@ function OnboardingPage() {
         city: city.trim() || null,
         gender,
         interested_in: interested ? interestedMap[interested] : [],
+        interests,
+        latitude,
+        longitude,
         birthdate,
         age,
         onboarding_completed: true,
@@ -236,6 +278,21 @@ function OnboardingPage() {
       toast({ title: "Erro a guardar", description: error.message, variant: "destructive" });
       return;
     }
+
+    // Save prompts (replace previous)
+    const validPrompts = prompts.filter((p) => p.question.trim() && p.answer.trim());
+    if (validPrompts.length > 0) {
+      await supabase.from("profile_prompts").delete().eq("profile_id", user.id);
+      await supabase.from("profile_prompts").insert(
+        validPrompts.map((p, i) => ({
+          profile_id: user.id,
+          question: p.question.trim(),
+          answer: p.answer.trim(),
+          position: i,
+        })),
+      );
+    }
+
     try { localStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
     await reload();
     navigate({ to: "/discover" });
@@ -356,10 +413,28 @@ function OnboardingPage() {
                     onNext={goNext}
                   />
                 )}
+                {stepId === "interests" && (
+                  <InterestsStep
+                    value={draft.interests}
+                    onChange={(v) => set("interests", v)}
+                    onNext={goNext}
+                  />
+                )}
                 {stepId === "location" && (
                   <LocationStep
                     value={draft.city}
                     onChange={(v) => set("city", v)}
+                    onCoords={(lat, lng) => {
+                      set("latitude", lat);
+                      set("longitude", lng);
+                    }}
+                    onNext={goNext}
+                  />
+                )}
+                {stepId === "prompts" && (
+                  <PromptsStep
+                    value={draft.prompts}
+                    onChange={(v) => set("prompts", v)}
                     onNext={() => setDone(true)}
                   />
                 )}
