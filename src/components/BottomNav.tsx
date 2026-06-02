@@ -7,9 +7,10 @@ import {
   animate,
   type MotionValue,
 } from 'framer-motion';
-import { Flame, User, Heart, MessageCircle, type LucideIcon } from 'lucide-react';
+import { User, Heart, MessageCircle, type LucideIcon } from 'lucide-react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 import { hapticTap } from '@/hooks/useNativePlatform';
+import hunieMark from '@/assets/hunie-mark.png.asset.json';
 
 type Tab = 'discover' | 'likes' | 'chat' | 'profile';
 
