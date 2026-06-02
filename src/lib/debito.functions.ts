@@ -184,7 +184,7 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
         debito_reference: debitoReference,
         debito_transaction_id: debitoTransactionId,
         checkout_url: checkoutUrl,
-        raw_response: sanitizePayload(respJson) as object,
+        raw_response: sanitizePayload(respJson) as never,
       })
       .eq("id", row.id);
 
