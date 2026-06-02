@@ -175,7 +175,7 @@ function Discover() {
         onUpgrade={goShop}
       />
 
-      <BottomNav />
+      {!filtersOpen && <BottomNav />}
     </div>
   );
 }
