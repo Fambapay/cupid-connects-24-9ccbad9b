@@ -295,6 +295,8 @@ function OnboardingPage() {
     }
 
     try { localStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
+    const { invalidateOnboardingCache } = await import("@/lib/authGuard");
+    invalidateOnboardingCache();
     await reload();
     navigate({ to: "/discover" });
   }, [draft, user, navigate, reload, toast]);
