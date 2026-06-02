@@ -143,7 +143,7 @@ function Discover() {
             </div>
           </>
         ) : (
-          <EmptyDiscovery loading={loading} onRefresh={() => window.location.reload()} />
+          <EmptyDiscovery loading={loading} onRefresh={reload} />
         )}
       </div>
 
