@@ -28,7 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/onboarding")({
+export const Route = createFileRoute("/onboarding")({
   ssr: false,
   head: () => ({ meta: [{ title: "Bem-vindo — Hunie" }] }),
   component: OnboardingPage,
@@ -204,7 +204,7 @@ function OnboardingPage() {
     }
     try { localStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
     await reload();
-    navigate({ to: "/" });
+    navigate({ to: "/discover" });
   }, [draft, user, navigate, reload, toast]);
 
   // Auto-navigate after completion celebration
@@ -456,7 +456,7 @@ function WelcomeStep({ onStart }: { onStart: () => void }) {
         <PrimaryButton onClick={onStart}>Começar</PrimaryButton>
         <p className="text-center text-sm text-muted-foreground">
           Já tens conta?{" "}
-          <Link to="/auth" className="font-semibold text-foreground">
+          <Link to="/auth/login" className="font-semibold text-foreground">
             Entrar
           </Link>
         </p>
