@@ -1,7 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Heart } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Heart, Sparkles, Compass, Lock } from "lucide-react";
+import { motion } from "framer-motion";
 import { AppShell, TopBar } from "@/components/AppShell";
 import { useLikedMe } from "@/hooks/useLikedMe";
+import hunieMark from "@/assets/hunie-mark.png.asset.json";
+
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
