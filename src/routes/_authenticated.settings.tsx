@@ -51,13 +51,14 @@ const itemVariants = {
 
 function SectionHeader({ icon: Icon, label, accessory }: { icon?: any; label: string; accessory?: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-2 mb-3 px-1">
-      {Icon && <Icon className="w-3.5 h-3.5 text-muted-foreground/60" />}
-      <span className="text-[11px] font-semibold uppercase tracking-[1px] text-muted-foreground/70">{label}</span>
+    <div className="mb-3 flex items-center gap-2 px-1">
+      {Icon && <Icon className="h-3.5 w-3.5 text-flame" />}
+      <span className="hunie-section-label">{label}</span>
       {accessory}
     </div>
   );
 }
+
 
 function SettingsPage() {
   const navigate = useNavigate();
