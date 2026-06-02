@@ -193,9 +193,9 @@ export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSett
       {/* QUICK ACTIONS */}
       <div className="grid grid-cols-3 gap-2.5 px-5 pt-4 pb-5">
         {[
-          { Icon: Star, color: '#5BB8FF', label: '5 Super Likes', sub: 'Ver mais', to: '/shop', search: { tab: 'superlikes' as const } },
-          { Icon: Zap, color: '#B13CFF', label: 'Os meus Boosts', sub: 'Ver mais', to: '/shop', search: { tab: 'boosts' as const } },
-          { Icon: Heart, color: PINK, label: 'Membership', sub: 'Gerir', to: '/shop', search: { tab: 'membership' as const } },
+          { Icon: Star, color: '#5BB8FF', label: '5 Super Likes', sub: 'Ver mais', search: { tab: 'super_like' as const } },
+          { Icon: Zap, color: '#B13CFF', label: 'Os meus Boosts', sub: 'Ver mais', search: { tab: 'boost' as const } },
+          { Icon: Heart, color: PINK, label: 'Membership', sub: 'Gerir', search: {} as { tab?: 'boost' | 'super_like' } },
         ].map((a, i) => (
           <Link
             key={i}
