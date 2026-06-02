@@ -10,9 +10,15 @@ export const Route = createFileRoute("/chat/$matchId")({
 
 function ChatRoom() {
   const { matchId } = useParams({ from: "/chat/$matchId" });
-  const match = matches.find((m) => m.id === matchId);
-  const profile = match ? getProfile(match.profileId) : undefined;
+  const existingMatch = matches.find((m) => m.id === matchId);
+  const newProfileId = matchId.startsWith("new-") ? matchId.slice(4) : undefined;
+  const profile = existingMatch
+    ? getProfile(existingMatch.profileId)
+    : newProfileId
+      ? getProfile(newProfileId)
+      : undefined;
   const [msgs, setMsgs] = useState<Message[]>(conversations[matchId] ?? []);
+
   const [typing, setTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
