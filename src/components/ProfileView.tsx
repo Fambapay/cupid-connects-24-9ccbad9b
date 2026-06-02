@@ -254,7 +254,7 @@ export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSett
           </div>
 
           <Link
-            to="/shop"
+            to="/membership"
             onClick={() => hapticTap()}
             className="w-full h-12 rounded-2xl text-sm font-extrabold tracking-tight grid place-items-center"
             style={{ background: PINK, color: '#fff' }}
