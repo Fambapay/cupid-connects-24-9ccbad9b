@@ -97,24 +97,6 @@ export const BottomNavBase = ({
       style={bottomStyle}
     >
       <div className="tab-bar-pill">
-      {/* SVG filter — RGB chromatic split + slight displacement for liquid glass refraction */}
-      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden>
-        <defs>
-          <filter id="hunie-liquid-glass" x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="2" seed="3" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" result="disp" />
-            {/* split R / G / B channels with horizontal offsets to simulate chromatic aberration */}
-            <feColorMatrix in="disp" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r" />
-            <feColorMatrix in="disp" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g" />
-            <feColorMatrix in="disp" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b" />
-            <feOffset in="r" dx="-2.2" dy="0" result="rOff" />
-            <feOffset in="g" dx="0" dy="0" result="gOff" />
-            <feOffset in="b" dx="2.2" dy="0" result="bOff" />
-            <feBlend in="rOff" in2="gOff" mode="screen" result="rg" />
-            <feBlend in="rg" in2="bOff" mode="screen" />
-          </filter>
-        </defs>
-      </svg>
       <div ref={pillContainerRef} className="relative flex items-stretch w-full h-full">
         {/* Draggable active pill — slides between tabs */}
         {tabWidth > 0 && (
@@ -134,9 +116,7 @@ export const BottomNavBase = ({
           >
             <div
               className="w-full h-full nav-active-pill"
-              style={{
-                borderRadius: '22px',
-              }}
+              style={{ borderRadius: '20px' }}
             />
           </motion.div>
 
@@ -250,13 +230,10 @@ const TabButton = ({
   return (
     <motion.button
       data-nav-tab={tabId}
+      data-active={isActive}
       type="button"
       onPointerDown={(e) => {
-        pointerStartRef.current = {
-          x: e.clientX,
-          y: e.clientY,
-          time: Date.now(),
-        };
+        pointerStartRef.current = { x: e.clientX, y: e.clientY, time: Date.now() };
       }}
       onClick={(e) => {
         e.preventDefault();
@@ -264,15 +241,17 @@ const TabButton = ({
         pointerStartRef.current = null;
         onTap();
       }}
-      className="relative flex flex-col items-center justify-center gap-[3px] h-full flex-1 z-10"
+      whileTap={{ scale: 0.92 }}
+      transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+      className="tab-bar-item relative flex flex-col items-center justify-center gap-[3px] h-full flex-1 z-10"
       style={{ background: 'none', border: 'none' }}
       aria-label={label}
     >
-      <div className="relative flex items-center z-10 text-foreground">
+      <div className="relative flex items-center z-10">
         <Icon
-          className={`w-[22px] h-[22px] ${shouldAnimate ? 'animate-notification-bounce' : ''}`}
+          className={`tab-bar-icon w-[22px] h-[22px] ${shouldAnimate ? 'animate-notification-bounce' : ''}`}
           style={{ fill: 'none' }}
-          strokeWidth={isActive ? 2.5 : 2}
+          strokeWidth={isActive ? 2.4 : 1.9}
         />
         <AnimatePresence mode="wait">
           {badge !== undefined && badge > 0 && (
@@ -294,7 +273,10 @@ const TabButton = ({
           )}
         </AnimatePresence>
       </div>
-      <span className="relative text-[10px] leading-none z-10 text-foreground font-medium">
+      <span
+        className="relative text-[10px] leading-none z-10 font-semibold tracking-wide"
+        style={{ opacity: isActive ? 1 : 0.7 }}
+      >
         {label}
       </span>
     </motion.button>
