@@ -68,51 +68,38 @@ function AppleToastBase({
             }}
           />
 
-          <div className="flex items-start gap-3 px-3.5 py-3">
-            {/* Avatar with soft glow ring */}
-            <div className="relative shrink-0">
-              <div
-                aria-hidden
-                className="absolute -inset-[2px] rounded-[12px] opacity-70 blur-[6px]"
-                style={{ background: "var(--gradient-flame, linear-gradient(135deg,#ff6b35,#e84393))" }}
+          <div className="flex items-start gap-2.5 px-3.5 py-3">
+            {/* Avatar — clean iOS squircle */}
+            <div className="relative h-[38px] w-[38px] shrink-0 overflow-hidden rounded-[10px] bg-white/5 ring-1 ring-white/10">
+              <img
+                src={avatar || flameIcon}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                draggable={false}
+                className="h-full w-full object-cover"
               />
-              <div className="relative h-[42px] w-[42px] overflow-hidden rounded-[11px] bg-muted/40 ring-1 ring-white/15">
-                <img
-                  src={avatar || flameIcon}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  draggable={false}
-                  className="h-full w-full object-cover"
-                />
-              </div>
             </div>
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <div className="flex min-w-0 items-center gap-1.5">
-                  <span
-                    aria-hidden
-                    className="inline-block h-[14px] w-[14px] shrink-0 rounded-[4px]"
-                    style={{ background: "var(--gradient-flame, linear-gradient(135deg,#ff6b35,#e84393))" }}
-                  />
-                  <p className="truncate text-[11px] font-semibold uppercase tracking-[0.04em] text-foreground/55">
-                    {appName}
-                  </p>
-                </div>
-                <span className="ml-auto shrink-0 text-[11px] font-medium tabular-nums text-foreground/45">
+                <p className="truncate text-[12px] font-medium tracking-[0.01em] text-foreground/55">
+                  {appName}
+                </p>
+                <span className="ml-auto shrink-0 text-[12px] font-medium tabular-nums text-foreground/45">
                   {timeLabel}
                 </span>
               </div>
 
-              <p className="mt-1 truncate text-[15px] font-semibold leading-tight tracking-[-0.01em] text-foreground">
+              <p className="mt-[1px] truncate text-[15px] font-semibold leading-tight tracking-[-0.01em] text-foreground">
                 {title}
               </p>
-              <p className="mt-0.5 line-clamp-2 text-[13.5px] leading-snug text-foreground/80">
+              <p className="mt-[1px] line-clamp-2 text-[14px] leading-snug text-foreground/85">
                 {body}
               </p>
             </div>
           </div>
+
 
           {/* Bottom hairline */}
           <div
