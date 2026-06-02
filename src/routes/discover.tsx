@@ -9,15 +9,15 @@ import { DiscoverTopBar } from "@/components/DiscoverTopBar";
 import { profiles as mockProfiles } from "@/data/profiles";
 import type { Profile, SwipeDirection } from "@/types/dating";
 
+import { requireAuthAndOnboarding } from "@/lib/authGuard";
+
 export const Route = createFileRoute("/discover")({
+  ssr: false,
+  beforeLoad: requireAuthAndOnboarding,
   head: () => ({
     meta: [
-      { title: "Flama — Descubra novas conexões" },
-      {
-        name: "description",
-        content:
-          "Conheça pessoas perto de você. Desliza pra curtir, encontra seu match.",
-      },
+      { title: "Hunie — Descobrir" },
+      { name: "description", content: "Desliza pra curtir, encontra o teu match." },
     ],
   }),
   component: Discover,
