@@ -60,7 +60,7 @@ function ChatLayout() {
 
 
 
-      <section className="mt-6 px-5">
+      <section className={`${newMatches.length > 0 ? "mt-6" : ""} px-5`}>
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           Mensagens
         </h2>
