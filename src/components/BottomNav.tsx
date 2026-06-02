@@ -45,34 +45,8 @@ export const BottomNavBase = ({
     onTabChange(tab);
   };
 
-  const HoneyNavIcon = ({
-    className,
-    style,
-    strokeWidth = 1.8,
-  }: {
-    className?: string;
-    style?: React.CSSProperties;
-    strokeWidth?: number;
-  }) => (
-    <svg
-      viewBox="0 0 24 24"
-      className={className}
-      style={style}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={strokeWidth}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M9.1 3.4h5.8l2.9 5-2.9 5H9.1l-2.9-5 2.9-5Z" />
-      <path d="M4.2 11.5h5.3l2.7 4.6-2.7 4.5H4.2l-2.6-4.5 2.6-4.6Z" />
-      <path d="M14.5 11.5h5.3l2.6 4.6-2.6 4.5h-5.3l-2.7-4.5 2.7-4.6Z" />
-    </svg>
-  );
-
   const tabs = [
-    { id: "discover" as Tab, icon: HoneyNavIcon as unknown as LucideIcon, label: "Descobrir" },
+    { id: "discover" as Tab, icon: Flame, label: "Descobrir" },
     { id: "likes" as Tab, icon: Heart, label: "Likes", badge: likesCount },
     { id: "chat" as Tab, icon: MessageCircle, label: "Chat" },
     { id: "profile" as Tab, icon: User, label: "Perfil" },
