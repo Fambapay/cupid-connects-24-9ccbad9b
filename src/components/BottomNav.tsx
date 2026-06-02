@@ -258,20 +258,11 @@ const TabButton = ({
           time: Date.now(),
         };
       }}
-      onPointerUp={(e) => {
-        const start = pointerStartRef.current;
-        pointerStartRef.current = null;
-        if (!start) return;
-        const dx = Math.abs(e.clientX - start.x);
-        const dy = Math.abs(e.clientY - start.y);
-        if (dx > 10 || dy > 10) return;
-        e.preventDefault();
-        e.stopPropagation();
-        onTap();
-      }}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
+        pointerStartRef.current = null;
+        onTap();
       }}
       className="relative flex flex-col items-center justify-center gap-[3px] h-full flex-1 z-10"
       style={{ background: 'none', border: 'none' }}
