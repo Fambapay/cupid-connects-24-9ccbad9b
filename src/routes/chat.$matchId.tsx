@@ -248,8 +248,11 @@ function ChatRoom() {
             <input
               ref={inputRef}
               type="text"
-              onBeforeInput={() => { inputHasTextRef.current = true; }}
-              onInput={(e) => { inputHasTextRef.current = e.currentTarget.value.length > 0; }}
+              onBeforeInput={() => { inputHasTextRef.current = true; broadcastTyping(); }}
+              onInput={(e) => {
+                inputHasTextRef.current = e.currentTarget.value.length > 0;
+                if (inputHasTextRef.current) broadcastTyping();
+              }}
               onFocus={() => requestAnimationFrame(() => scrollToLatest("auto"))}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
