@@ -461,7 +461,7 @@ function OnboardingPage() {
 
 function StepScroll({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-1 flex-col overflow-y-auto px-6 pb-6">
+    <div className="flex flex-1 min-h-0 flex-col overflow-y-auto px-6 pb-6">
       {children}
     </div>
   );
@@ -504,7 +504,8 @@ function CtaBar({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: staggerDelay }}
-      className="px-6 pt-3 pb-5"
+      className="shrink-0 px-6 pt-3 pb-5"
+      style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
     >
       {children}
     </motion.div>
