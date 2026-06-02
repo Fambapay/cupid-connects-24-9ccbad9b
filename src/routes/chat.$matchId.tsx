@@ -19,7 +19,10 @@ function ChatRoom() {
   const { matchId } = useParams({ from: "/chat/$matchId" });
   const { user } = useAuth();
   const { messages, peer, loading, notFound, send } = useMessages(matchId);
-  const [typing] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const typingTimerRef = useRef<number | null>(null);
+  const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const lastSentTypingRef = useRef(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const inputHasTextRef = useRef(false);
