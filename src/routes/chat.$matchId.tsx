@@ -217,6 +217,26 @@ function ChatRoom() {
             })}
           </AnimatePresence>
         </ul>
+
+        <AnimatePresence>
+          {typing && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="mt-2 flex items-end gap-2"
+            >
+              {peer.photo ? (
+                <img src={peer.photo} alt="" className="h-7 w-7 shrink-0 rounded-full object-cover" />
+              ) : (
+                <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-flame" />
+              )}
+              <div className="rounded-2xl rounded-bl-md bg-muted px-4 py-3">
+                <TypingDots />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <form
