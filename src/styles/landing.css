@@ -615,3 +615,9 @@
 }
 .hunie-landing .hl-modal-step strong { font-size: 14px; }
 .hunie-landing .hl-modal-step p { margin: 4px 0 0; font-size: 13px; color: var(--hl-muted); line-height: 1.5; }
+
+/* Mobile-only CTA in nav */
+.hunie-landing .hl-nav-mobile-cta { display: inline-flex; }
+@media (min-width: 768px) {
+  .hunie-landing .hl-nav-mobile-cta { display: none !important; }
+}
