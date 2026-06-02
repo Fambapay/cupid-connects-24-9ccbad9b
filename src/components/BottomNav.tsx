@@ -46,8 +46,17 @@ export const BottomNavBase = ({
     onTabChange(tab);
   };
 
+  const HunieNavIcon = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+    <img
+      src={hunieMark.url}
+      className={className}
+      style={{ ...style, width: 22, height: 22, objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
+      alt=""
+    />
+  );
+
   const tabs = [
-    { id: 'discover' as Tab, icon: Flame, label: 'Descobrir' },
+    { id: 'discover' as Tab, icon: HunieNavIcon as unknown as LucideIcon, label: 'Descobrir' },
     { id: 'likes' as Tab, icon: Heart, label: 'Likes', badge: likesCount },
     { id: 'chat' as Tab, icon: MessageCircle, label: 'Chat' },
     { id: 'profile' as Tab, icon: User, label: 'Perfil' },
