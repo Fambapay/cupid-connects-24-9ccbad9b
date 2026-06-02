@@ -166,6 +166,15 @@ function Discover() {
         </div>
       )}
 
+      <FiltersSheet
+        open={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        value={filters}
+        onChange={setFilters}
+        isPremium={false}
+        onUpgrade={goShop}
+      />
+
       <BottomNav />
     </div>
   );
