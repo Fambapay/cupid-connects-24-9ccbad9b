@@ -300,7 +300,7 @@ function OnboardingPage() {
       );
     }
 
-    try { localStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
+    try { localStorage.removeItem(storageKey(user.id)); } catch { /* noop */ }
     const { invalidateOnboardingCache } = await import("@/lib/authGuard");
     invalidateOnboardingCache();
     await reload();
