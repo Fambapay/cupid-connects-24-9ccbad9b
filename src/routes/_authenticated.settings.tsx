@@ -518,11 +518,15 @@ function SettingsPage() {
             ))}
           </div>
           {!isPremium && (
-            <motion.button onClick={() => navigate({ to: '/membership' })} whileTap={{ scale: 0.98 }}
-              className="mt-3 w-full rounded-2xl bg-brand-purple text-primary-foreground py-3.5 font-semibold text-[15px] flex items-center justify-center gap-2">
-              <Crown className="w-4 h-4" /> Desbloquear com Hunie Plus
+            <motion.button
+              onClick={() => navigate({ to: '/membership' })}
+              whileTap={{ scale: 0.98 }}
+              className="hunie-pill-primary mt-3 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-[15px] font-semibold"
+            >
+              <Crown className="h-4 w-4" /> Desbloquear com Hunie Plus
             </motion.button>
           )}
+
         </motion.div>
 
         {/* Visibility */}
