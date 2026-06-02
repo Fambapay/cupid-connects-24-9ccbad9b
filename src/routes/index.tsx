@@ -107,9 +107,6 @@ function SplashScreen() {
   );
 }
 
-function _LegacySplash() {
-  return null;
-}
 
 /* ----------------------- helpers ----------------------- */
 
