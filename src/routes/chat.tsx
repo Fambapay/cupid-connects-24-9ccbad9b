@@ -1,6 +1,7 @@
 import { createFileRoute, Link, Outlet, useMatchRoute } from "@tanstack/react-router";
+import { useSyncExternalStore } from "react";
 import { AppShell, TopBar } from "@/components/AppShell";
-import { matches, getProfile, profiles } from "@/data/profiles";
+import { matches, getProfile, profiles, subscribeMatches } from "@/data/profiles";
 
 export const Route = createFileRoute("/chat")({
   head: () => ({
