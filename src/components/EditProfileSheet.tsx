@@ -70,7 +70,7 @@ export function EditProfileSheet({ open, profile, onClose, onSave }: Props) {
           <motion.div
             className="fixed inset-x-0 bottom-0 z-[9999] flex flex-col overflow-hidden rounded-t-[32px]"
             style={{
-              maxHeight: '92vh',
+              height: 'min(92dvh, 92vh)',
               background:
                 'linear-gradient(180deg, rgba(28,22,38,0.96) 0%, rgba(16,14,22,0.98) 100%)',
               borderTop: '1px solid rgba(255,255,255,0.08)',
