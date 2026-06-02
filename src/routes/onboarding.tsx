@@ -161,11 +161,21 @@ function OnboardingPage() {
     }));
   }, [profile, hydrated]);
 
-  // Persist draft
+  // Persist draft locally
   useEffect(() => {
     if (!hydrated) return;
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(draft)); } catch { /* noop */ }
   }, [draft, hydrated]);
+
+  // Persist current step to DB so reopen resumes
+  useEffect(() => {
+    if (!hydrated || !user) return;
+    supabase
+      .from("profiles")
+      .update({ onboarding_step: draft.stepIdx + 1 })
+      .eq("id", user.id)
+      .then(() => {});
+  }, [draft.stepIdx, hydrated, user]);
 
   const set = useCallback(<K extends keyof DraftState>(key: K, value: DraftState[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
