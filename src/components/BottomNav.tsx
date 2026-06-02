@@ -46,7 +46,7 @@ export const BottomNavBase = ({
     onTabChange(tab);
   };
 
-  const HunieNavIcon = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  const HunieNavIcon = ({ className, style, strokeWidth: _ }: { className?: string; style?: React.CSSProperties; strokeWidth?: number }) => (
     <img
       src={hunieMark.url}
       className={className}
