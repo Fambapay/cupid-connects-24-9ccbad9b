@@ -126,6 +126,30 @@ function SettingsPage() {
   const [showBlockedUsers, setShowBlockedUsers] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [phoneModalOpen, setPhoneModalOpen] = useState(false);
+  const [interestedSheet, setInterestedSheet] = useState(false);
+
+  const interestedIn = profile?.interested_in ?? [];
+  const interestedKey: 'men' | 'women' | 'everyone' | null =
+    interestedIn.length === 0 ? null
+      : interestedIn.length >= 3 ? 'everyone'
+      : interestedIn[0] === 'man' ? 'men'
+      : interestedIn[0] === 'woman' ? 'women'
+      : 'everyone';
+  const interestedLabel =
+    interestedKey === 'men' ? 'Homens'
+      : interestedKey === 'women' ? 'Mulheres'
+      : interestedKey === 'everyone' ? 'Todos'
+      : 'Selecionar';
+  const setInterested = async (key: 'men' | 'women' | 'everyone') => {
+    const map = { men: ['man'], women: ['woman'], everyone: ['man', 'woman', 'nonbinary'] };
+    try {
+      await updateProfile({ interested_in: map[key] });
+      setInterestedSheet(false);
+      toast({ title: 'Preferência guardada' });
+    } catch {
+      toast({ title: 'Erro', description: 'Não foi possível guardar', variant: 'destructive' });
+    }
+  };
 
   const initialMode: VisibilityMode = profile?.is_paused ? 'hidden' : 'standard';
   const [visibilityMode, setVisibilityMode] = useState<VisibilityMode>(initialMode);
