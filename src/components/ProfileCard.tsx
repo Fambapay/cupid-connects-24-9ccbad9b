@@ -243,6 +243,11 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
   const slides = useMemo(() => buildSlides(profile), [profile]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
+  useEffect(() => {
+    if (!isTop) return;
+    document.body.classList.toggle('profile-info-open', isInfoOpen);
+    return () => document.body.classList.remove('profile-info-open');
+  }, [isInfoOpen, isTop]);
   const [showLike, setShowLike] = useState(false);
   const [showNope, setShowNope] = useState(false);
   const [showSuper, setShowSuper] = useState(false);
