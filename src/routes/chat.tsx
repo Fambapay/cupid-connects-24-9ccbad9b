@@ -17,7 +17,8 @@ function ChatLayout() {
   const onDetail = matchRoute({ to: "/chat/$matchId" });
   if (onDetail) return <Outlet />;
 
-  const newMatches = profiles.slice(0, 4);
+  const matchedIds = new Set(matches.map((m) => m.profileId));
+  const newMatches = profiles.filter((p) => !matchedIds.has(p.id)).slice(0, 8);
 
   return (
     <AppShell>
@@ -29,7 +30,12 @@ function ChatLayout() {
         </h2>
         <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
           {newMatches.map((p) => (
-            <Link key={p.id} to="/chat" className="relative shrink-0">
+            <Link
+              key={p.id}
+              to="/chat/$matchId"
+              params={{ matchId: `new-${p.id}` }}
+              className="relative shrink-0"
+            >
               <div className="rounded-2xl bg-gradient-sunset p-[2px]">
                 <div className="h-24 w-20 overflow-hidden rounded-2xl bg-card">
                   <img src={p.photo} alt={p.name} className="h-full w-full object-cover" />
@@ -40,6 +46,7 @@ function ChatLayout() {
           ))}
         </div>
       </section>
+
 
       <section className="mt-6 px-5">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
