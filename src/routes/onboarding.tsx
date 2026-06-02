@@ -31,6 +31,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/onboarding")({
   ssr: false,
   head: () => ({ meta: [{ title: "Bem-vindo — Hunie" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    step: typeof s.step === "number" ? s.step : undefined,
+  }),
   beforeLoad: async () => {
     const { redirect } = await import("@tanstack/react-router");
     const { data, error } = await supabase.auth.getUser();
