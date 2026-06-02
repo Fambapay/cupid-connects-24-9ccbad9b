@@ -1,144 +1,128 @@
 /* ============================================================
-   HUNIE — Bottom Nav (Liquid Glass) — CSS isolado
-   Cole estas regras no seu index.css (ou importe este ficheiro).
-   Requer Tailwind apenas para utilitários usados no .tsx (flex, etc).
+   HUNIE — Bottom Nav (Floating Liquid Glass)
    ============================================================ */
 
-/* Bloquear long-press iOS na nav */
 .tab-bar, .tab-bar-pill {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
 }
 
-/* Wrapper fixo no fundo da viewport */
+/* Wrapper fixo no fundo da viewport — floating com margens */
 .tab-bar {
   position: fixed;
-  inset-inline: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 0;
+  padding: 0 14px calc(env(safe-area-inset-bottom, 0px) + 12px);
   background: transparent;
-  border-top: none;
   z-index: 9999;
-  pointer-events: none; /* só a pill recebe toques */
+  pointer-events: none;
   transform: translate3d(0, 0, 0);
   will-change: transform;
-  transition: transform 280ms cubic-bezier(0.32, 0.72, 0, 1);
+  transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* A "pill" central — vidro líquido */
+/* Pill flutuante */
 .tab-bar-pill {
   pointer-events: auto;
   width: 100%;
-  height: 64px;
-  margin-bottom: env(safe-area-inset-bottom, 0px);
+  height: 62px;
   box-sizing: border-box;
-  border-radius: 32px;
+  border-radius: 28px;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  gap: 6px;
-  padding: 9px 10px;
+  gap: 4px;
+  padding: 7px 8px;
   position: relative;
   isolation: isolate;
   background: linear-gradient(180deg,
-    rgba(255,255,255,0.55) 0%,
-    rgba(255,255,255,0.28) 50%,
-    rgba(255,255,255,0.40) 100%);
-  backdrop-filter: blur(36px) saturate(220%) brightness(1.05);
-  -webkit-backdrop-filter: blur(36px) saturate(220%) brightness(1.05);
+    rgba(255,255,255,0.62) 0%,
+    rgba(255,255,255,0.36) 100%);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
   border: 1px solid rgba(255, 255, 255, 0.55);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.05),
-    inset 0 0 24px rgba(255, 255, 255, 0.10),
-    0 18px 44px -16px rgba(0, 0, 0, 0.18),
-    0 2px 8px -2px rgba(0, 0, 0, 0.08);
-  transform: translate3d(0, 0, 0);
-  will-change: transform, backdrop-filter;
-  transition:
-    backdrop-filter 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    -webkit-backdrop-filter 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
+    0 14px 38px -10px rgba(15, 15, 30, 0.28),
+    0 4px 12px -4px rgba(15, 15, 30, 0.14);
+  transition: box-shadow 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Reflexo especular no topo (curvatura de vidro) */
+/* Reflexo especular topo */
 .tab-bar-pill::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 38%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 42%);
   mix-blend-mode: overlay;
-  opacity: 0.85;
+  opacity: 0.8;
   z-index: 1;
 }
 
-/* Luz interna suave em baixo */
-.tab-bar-pill::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: radial-gradient(120% 80% at 50% 110%, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 60%);
-  z-index: 1;
-}
-
-/* Variante dark */
+/* Variante dark — glass mais escuro com glow do primary */
 .dark .tab-bar-pill {
   background: linear-gradient(180deg,
-    rgba(14,14,16,0.96) 0%,
-    rgba(10,10,12,0.97) 55%,
-    rgba(8,8,10,0.98) 100%);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+    oklch(0.20 0.025 270 / 0.85) 0%,
+    oklch(0.16 0.025 270 / 0.92) 100%);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   box-shadow:
-    0 24px 56px -18px rgba(0, 0, 0, 0.85),
-    0 4px 14px -2px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
-    inset 1px 0 0 rgba(255, 255, 255, 0.06),
-    inset -1px 0 0 rgba(255, 255, 255, 0.06);
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.30),
+    0 20px 48px -14px rgba(0, 0, 0, 0.70),
+    0 4px 14px -2px rgba(0, 0, 0, 0.45);
 }
-.dark .tab-bar-pill::before { background: none; opacity: 0; }
-.dark .tab-bar-pill::after  { background: none; }
+.dark .tab-bar-pill::before {
+  background: linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 50%);
+  opacity: 1;
+}
 
-/* Pill ativa que desliza entre tabs */
+/* Pill ativa */
 .tab-bar-pill .nav-active-pill {
   background: linear-gradient(180deg,
-    rgba(255,255,255,0.55) 0%,
-    rgba(255,255,255,0.22) 100%) !important;
-  backdrop-filter: blur(26px) saturate(200%) brightness(1.08);
-  -webkit-backdrop-filter: blur(26px) saturate(200%) brightness(1.08);
-  border: 0.5px solid rgba(255, 255, 255, 0.7);
+    color-mix(in oklab, var(--primary) 22%, transparent) 0%,
+    color-mix(in oklab, var(--primary) 10%, transparent) 100%);
+  border: 1px solid color-mix(in oklab, var(--primary) 35%, transparent);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
-    0 6px 16px -3px rgba(0, 0, 0, 0.10);
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 6px 20px -6px color-mix(in oklab, var(--primary) 55%, transparent),
+    0 2px 6px -2px color-mix(in oklab, var(--primary) 40%, transparent);
   transform: translateZ(0);
   will-change: transform;
 }
 .dark .tab-bar-pill .nav-active-pill {
   background: linear-gradient(180deg,
-    rgba(255,255,255,0.07) 0%,
-    rgba(255,255,255,0.02) 100%) !important;
-  backdrop-filter: blur(16px) saturate(160%) brightness(1.05);
-  -webkit-backdrop-filter: blur(16px) saturate(160%) brightness(1.05);
-  border: 0.5px solid rgba(255, 255, 255, 0.10);
+    color-mix(in oklab, var(--primary) 28%, transparent) 0%,
+    color-mix(in oklab, var(--primary) 12%, transparent) 100%);
+  border: 1px solid color-mix(in oklab, var(--primary) 45%, transparent);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
     inset 0 -1px 0 rgba(0, 0, 0, 0.20),
-    0 3px 10px -3px rgba(0, 0, 0, 0.30);
+    0 8px 24px -6px color-mix(in oklab, var(--primary) 60%, transparent);
 }
 
-/* Esconder a nav enquanto um sheet/modal está aberto */
+/* Ícone/label states */
+.tab-bar-item {
+  color: var(--muted-foreground);
+  transition: color 220ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.tab-bar-item[data-active="true"] {
+  color: var(--primary);
+}
+.tab-bar-item[data-active="true"] .tab-bar-icon {
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--primary) 45%, transparent));
+}
+
+/* Esconder enquanto sheet aberto */
 body.sheet-open .tab-bar {
-  transform: translateY(120%);
+  transform: translateY(140%);
   pointer-events: none;
 }
 html[data-presenting] .tab-bar {
@@ -147,7 +131,7 @@ html[data-presenting] .tab-bar {
   transition: opacity 200ms ease-out;
 }
 
-/* Bounce do badge de notificação (usado em likes) */
+/* Badge bounce */
 @keyframes notification-bounce {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-3px); }
