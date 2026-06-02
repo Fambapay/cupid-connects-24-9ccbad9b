@@ -242,13 +242,6 @@ function OnboardingPage() {
     navigate({ to: "/discover" });
   }, [draft, user, navigate, reload, toast]);
 
-  // Auto-navigate after completion celebration
-  useEffect(() => {
-    if (!done) return;
-    const t = setTimeout(() => { finish(); }, 1500);
-    return () => clearTimeout(t);
-  }, [done, finish]);
-
   const showProgress = stepId !== "welcome" && !done;
   const showBackButton = stepId === "photos";
 
@@ -297,7 +290,14 @@ function OnboardingPage() {
         <div className="relative flex-1 overflow-hidden">
           <AnimatePresence mode="wait" custom={dir} initial={false}>
             {done ? (
-              <CompletionScreen key="done" onContinue={finish} />
+              phase === "done" ? (
+                <CompletionScreen
+                  key="done"
+                  onContinue={() => setPhase("tutorial")}
+                />
+              ) : (
+                <TutorialCarousel key="tutorial" onFinish={finish} />
+              )
             ) : (
               <motion.div
                 key={stepId}
