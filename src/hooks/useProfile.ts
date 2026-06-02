@@ -14,6 +14,8 @@ export interface Profile {
   is_incognito: boolean;
   is_verified: boolean;
   membership_tier: string;
+  membership_status?: string;
+  membership_expires_at?: string | null;
   onboarding_completed: boolean;
   onboarding_step: number;
   birthdate: string | null;
