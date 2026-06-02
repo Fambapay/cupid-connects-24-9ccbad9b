@@ -60,8 +60,8 @@ function ProfilePage() {
   }, [profile]);
 
   useEffect(() => {
-    if (dbProfile?.age != null) {
-      setProfile(p => p.age !== dbProfile.age ? { ...p, age: dbProfile.age } : p);
+    if (dbProfile?.age != null && profile.age !== dbProfile.age) {
+      setProfile({ ...profile, age: dbProfile.age });
     }
   }, [dbProfile?.age]);
 
