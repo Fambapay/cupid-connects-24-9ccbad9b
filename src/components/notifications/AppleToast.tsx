@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import flameIcon from "@/assets/hunie-logo.png";
+import flameAsset from "@/assets/hunie-logo.png.asset.json";
+const flameIcon = flameAsset.url;
 
 interface AppleToastProps {
   toastId: string | number;
