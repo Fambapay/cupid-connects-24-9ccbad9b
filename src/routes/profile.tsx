@@ -5,6 +5,7 @@ import { ProfileView, type ProfileViewData } from '@/components/ProfileView';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
 import { VerificationModal } from '@/components/VerificationModal';
 import { BottomNav } from '@/components/BottomNav';
+import { useProfile } from '@/hooks/useProfile';
 
 import { requireAuthAndOnboarding } from '@/lib/authGuard';
 
@@ -45,6 +46,7 @@ function loadProfile(): ProfileViewData {
 }
 
 function ProfilePage() {
+  const { profile: dbProfile } = useProfile();
   const [profile, setProfile] = useState<ProfileViewData>(loadProfile);
   const [editing, setEditing] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -56,6 +58,12 @@ function ProfilePage() {
       /* quota exceeded or unavailable — ignore */
     }
   }, [profile]);
+
+  useEffect(() => {
+    if (dbProfile?.age != null && profile.age !== dbProfile.age) {
+      setProfile({ ...profile, age: dbProfile.age });
+    }
+  }, [dbProfile?.age]);
 
   return (
     <div className="min-h-screen bg-background">

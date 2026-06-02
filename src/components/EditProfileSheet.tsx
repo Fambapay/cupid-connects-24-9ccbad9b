@@ -241,19 +241,11 @@ export function EditProfileSheet({ open, profile, onClose, onSave }: Props) {
                   value={draft.name}
                   onChange={(v) => setDraft(d => ({ ...d, name: v }))}
                 />
-                <div className="grid grid-cols-2 gap-3">
-                  <Field
-                    label="Idade"
-                    type="number"
-                    value={String(draft.age)}
-                    onChange={(v) => setDraft(d => ({ ...d, age: Number(v) || 0 }))}
-                  />
-                  <Field
-                    label="Cidade"
-                    value={draft.city}
-                    onChange={(v) => setDraft(d => ({ ...d, city: v }))}
-                  />
-                </div>
+                <Field
+                  label="Cidade"
+                  value={draft.city}
+                  onChange={(v) => setDraft(d => ({ ...d, city: v }))}
+                />
               </section>
 
               {/* Bio */}
