@@ -3,14 +3,20 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
+  ArrowRight,
   Camera,
   Check,
+  Flame,
+  Heart,
   MapPin,
+  MessageCircle,
   Plus,
+  Sparkles,
   Trash2,
   User,
   Users,
   UserSquare2,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
