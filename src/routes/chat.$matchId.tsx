@@ -2,7 +2,7 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, Send, Smile } from "lucide-react";
-import { conversations, matches, getProfile, type Message } from "@/data/profiles";
+import { conversations, matches, getProfile, promoteNewMatch, appendMessage, type Message } from "@/data/profiles";
 
 export const Route = createFileRoute("/chat/$matchId")({
   component: ChatRoom,
@@ -104,25 +104,31 @@ function ChatRoom() {
     const input = inputRef.current;
     const value = input?.value.trim() ?? "";
     if (!value) return;
-    setMsgs((m) => [...m, { id: String(Date.now()), text: value, fromMe: true, time: nowLabel() }]);
+    const myMsg: Message = { id: String(Date.now()), text: value, fromMe: true, time: nowLabel() };
+    setMsgs((m) => [...m, myMsg]);
+    // Promote a "new-X" match into the conversations list on first message.
+    if (newProfileId && !existingMatch && msgs.length === 0) {
+      promoteNewMatch(matchId, newProfileId, myMsg);
+    } else {
+      appendMessage(matchId, myMsg);
+    }
     if (input) input.value = "";
     inputHasTextRef.current = false;
-    // Re-focus instantly so the keyboard never closes
     inputRef.current?.focus();
     setTyping(true);
     setTimeout(() => {
       setTyping(false);
-      setMsgs((m) => [
-        ...m,
-        {
-          id: String(Date.now() + 1),
-          text: pickReply(value),
-          fromMe: false,
-          time: nowLabel(),
-        },
-      ]);
+      const reply: Message = {
+        id: String(Date.now() + 1),
+        text: pickReply(value),
+        fromMe: false,
+        time: nowLabel(),
+      };
+      setMsgs((m) => [...m, reply]);
+      appendMessage(matchId, reply);
     }, 900);
   };
+
 
   return (
     <div
