@@ -13,13 +13,21 @@ export const Route = createFileRoute("/chat")({
   component: ChatLayout,
 });
 
+const emptySnapshot = 0;
 function ChatLayout() {
+  // Re-render when matches/conversations change (e.g. new match promoted).
+  useSyncExternalStore(
+    subscribeMatches,
+    () => matches.length,
+    () => emptySnapshot,
+  );
   const matchRoute = useMatchRoute();
   const onDetail = matchRoute({ to: "/chat/$matchId" });
   if (onDetail) return <Outlet />;
 
   const matchedIds = new Set(matches.map((m) => m.profileId));
   const newMatches = profiles.filter((p) => !matchedIds.has(p.id)).slice(0, 8);
+
 
   return (
     <AppShell>
