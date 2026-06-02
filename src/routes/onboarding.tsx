@@ -3,10 +3,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
+  ArrowRight,
   Camera,
   Check,
+  Flame,
+  Heart,
   MapPin,
+  MessageCircle,
   Plus,
+  Sparkles,
   Trash2,
   User,
   Users,
@@ -141,6 +146,7 @@ function OnboardingPage() {
   const [draft, setDraft] = useState<DraftState>(initialDraft);
   const [hydrated, setHydrated] = useState(false);
   const [done, setDone] = useState(false);
+  const [phase, setPhase] = useState<"done" | "tutorial">("done");
 
   // Hydrate from localStorage + profile
   useEffect(() => {
@@ -235,13 +241,6 @@ function OnboardingPage() {
     navigate({ to: "/discover" });
   }, [draft, user, navigate, reload, toast]);
 
-  // Auto-navigate after completion celebration
-  useEffect(() => {
-    if (!done) return;
-    const t = setTimeout(() => { finish(); }, 1500);
-    return () => clearTimeout(t);
-  }, [done, finish]);
-
   const showProgress = stepId !== "welcome" && !done;
   const showBackButton = stepId === "photos";
 
@@ -290,7 +289,14 @@ function OnboardingPage() {
         <div className="relative flex-1 overflow-hidden">
           <AnimatePresence mode="wait" custom={dir} initial={false}>
             {done ? (
-              <CompletionScreen key="done" onContinue={finish} />
+              phase === "done" ? (
+                <CompletionScreen
+                  key="done"
+                  onContinue={() => setPhase("tutorial")}
+                />
+              ) : (
+                <TutorialCarousel key="tutorial" onFinish={finish} />
+              )
             ) : (
               <motion.div
                 key={stepId}
@@ -1537,7 +1543,7 @@ function CompletionScreen({ onContinue }: { onContinue: () => void }) {
         transition={{ duration: 0.25, delay: 0.6 }}
         className="mt-10 w-full max-w-xs"
       >
-        <PrimaryButton onClick={onContinue}>Ver o meu perfil</PrimaryButton>
+        <PrimaryButton onClick={onContinue}>Como funciona a app</PrimaryButton>
       </motion.div>
     </motion.div>
   );
@@ -1553,4 +1559,307 @@ function computeAge(iso: string): number {
   const m = now.getMonth() - dob.getMonth();
   if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) age--;
   return age;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Tutorial — premium 4-step "how to use the app" carousel
+
+type TutorialSlide = {
+  icon: typeof Heart;
+  iconBg: string;
+  kicker: string;
+  title: string;
+  body: string;
+  visual: "swipe" | "match" | "chat" | "profile";
+};
+
+const TUTORIAL_SLIDES: TutorialSlide[] = [
+  {
+    icon: Flame,
+    iconBg: "linear-gradient(135deg, var(--brand-pink), var(--brand-magenta))",
+    kicker: "Descobrir",
+    title: "Desliza para encontrar pessoas",
+    body: "Direita se gostares, esquerda para passar. Toca no perfil para veres mais.",
+    visual: "swipe",
+  },
+  {
+    icon: Heart,
+    iconBg: "linear-gradient(135deg, var(--brand-magenta), var(--brand-purple))",
+    kicker: "Match",
+    title: "Quando há interesse mútuo, é match",
+    body: "Recebes uma notificação assim que alguém te dá like de volta.",
+    visual: "match",
+  },
+  {
+    icon: MessageCircle,
+    iconBg: "linear-gradient(135deg, var(--brand-purple), var(--brand-pink))",
+    kicker: "Conversar",
+    title: "Inicia uma conversa autêntica",
+    body: "Sê tu próprio. Mensagens reais funcionam melhor que copy-paste.",
+    visual: "chat",
+  },
+  {
+    icon: Sparkles,
+    iconBg: "linear-gradient(135deg, var(--brand-pink), var(--brand-purple))",
+    kicker: "Perfil",
+    title: "Mantém o teu perfil fresco",
+    body: "Actualiza fotos e bio para apareceres mais e atrair melhores matches.",
+    visual: "profile",
+  },
+];
+
+function TutorialCarousel({ onFinish }: { onFinish: () => void }) {
+  const [idx, setIdx] = useState(0);
+  const last = TUTORIAL_SLIDES.length - 1;
+  const slide = TUTORIAL_SLIDES[idx];
+  const Icon = slide.icon;
+
+  const next = () => (idx < last ? setIdx(idx + 1) : onFinish());
+
+  return (
+    <motion.div
+      key="tutorial"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      className="absolute inset-0 flex flex-col"
+    >
+      {/* Skip */}
+      <div className="flex items-center justify-between px-5 pt-2">
+        <div className="flex gap-1.5">
+          {TUTORIAL_SLIDES.map((_, i) => (
+            <span
+              key={i}
+              className="h-1 rounded-full transition-all duration-300"
+              style={{
+                width: i === idx ? 22 : 8,
+                background:
+                  i === idx
+                    ? "linear-gradient(90deg, var(--brand-pink), var(--brand-purple))"
+                    : "color-mix(in oklab, white 14%, transparent)",
+              }}
+            />
+          ))}
+        </div>
+        <button
+          onClick={onFinish}
+          className="text-xs font-medium text-muted-foreground hover:text-foreground"
+        >
+          Saltar
+        </button>
+      </div>
+
+      {/* Visual */}
+      <div className="relative flex flex-1 items-center justify-center px-6">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={idx}
+            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -16, scale: 0.96 }}
+            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+            className="flex w-full max-w-sm flex-col items-center text-center"
+          >
+            <TutorialVisual variant={slide.visual} />
+
+            <div
+              className="mt-8 grid h-14 w-14 place-items-center rounded-2xl shadow-glow"
+              style={{ background: slide.iconBg }}
+            >
+              <Icon className="h-7 w-7 text-white" />
+            </div>
+
+            <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              {slide.kicker}
+            </p>
+            <h2 className="mt-2 text-2xl font-bold leading-tight tracking-tight">
+              {slide.title}
+            </h2>
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
+              {slide.body}
+            </p>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* CTA */}
+      <div
+        className="px-5 pb-6 pt-2"
+        style={{ paddingBottom: "max(env(safe-area-inset-bottom), 24px)" }}
+      >
+        <PrimaryButton onClick={next}>
+          <span className="inline-flex items-center gap-2">
+            {idx === last ? "Começar a explorar" : "Próximo"}
+            <ArrowRight className="h-4 w-4" />
+          </span>
+        </PrimaryButton>
+      </div>
+    </motion.div>
+  );
+}
+
+function TutorialVisual({ variant }: { variant: TutorialSlide["visual"] }) {
+  if (variant === "swipe") {
+    return (
+      <div className="relative h-56 w-full max-w-[260px]">
+        {/* Back card */}
+        <div
+          className="absolute inset-x-6 inset-y-2 rounded-3xl border border-white/10 bg-white/[0.03]"
+          style={{ transform: "rotate(-6deg)" }}
+        />
+        {/* Front card */}
+        <motion.div
+          animate={{ x: [0, 60, 0, -60, 0], rotate: [0, 8, 0, -8, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-0 overflow-hidden rounded-3xl border border-white/10"
+          style={{
+            background:
+              "linear-gradient(160deg, color-mix(in oklab, var(--brand-pink) 35%, transparent), color-mix(in oklab, var(--brand-purple) 35%, transparent))",
+          }}
+        >
+          <div className="absolute inset-x-0 bottom-0 flex items-end gap-3 p-4">
+            <div className="h-10 w-10 rounded-full bg-white/20" />
+            <div className="space-y-1.5">
+              <div className="h-2.5 w-20 rounded-full bg-white/70" />
+              <div className="h-2 w-14 rounded-full bg-white/40" />
+            </div>
+          </div>
+          {/* Like / Nope chips */}
+          <motion.div
+            animate={{ opacity: [0, 0, 1, 0, 0] }}
+            transition={{ duration: 4, repeat: Infinity }}
+            className="absolute right-3 top-3 rounded-md border-2 px-2 py-0.5 text-[10px] font-bold tracking-wider"
+            style={{ borderColor: "var(--brand-pink)", color: "var(--brand-pink)" }}
+          >
+            LIKE
+          </motion.div>
+          <motion.div
+            animate={{ opacity: [0, 0, 0, 0, 1, 0] }}
+            transition={{ duration: 4, repeat: Infinity }}
+            className="absolute left-3 top-3 rounded-md border-2 px-2 py-0.5 text-[10px] font-bold tracking-wider text-white/80"
+            style={{ borderColor: "rgba(255,255,255,0.6)" }}
+          >
+            NOPE
+          </motion.div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (variant === "match") {
+    return (
+      <div className="relative flex h-56 items-center justify-center">
+        <div className="relative flex items-center">
+          <motion.div
+            animate={{ x: [-40, -8, -8] }}
+            transition={{ duration: 1.4, ease: "easeOut", repeat: Infinity, repeatDelay: 1.4 }}
+            className="h-24 w-24 rounded-full border-2 border-white/20 bg-gradient-to-br from-white/15 to-white/5"
+          />
+          <motion.div
+            animate={{ scale: [0, 1.2, 1] }}
+            transition={{ duration: 0.6, delay: 0.6, repeat: Infinity, repeatDelay: 2.2 }}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          >
+            <div
+              className="grid h-12 w-12 place-items-center rounded-full shadow-glow"
+              style={{
+                background:
+                  "linear-gradient(135deg, var(--brand-pink), var(--brand-magenta))",
+              }}
+            >
+              <Heart className="h-6 w-6 fill-white text-white" />
+            </div>
+          </motion.div>
+          <motion.div
+            animate={{ x: [40, 8, 8] }}
+            transition={{ duration: 1.4, ease: "easeOut", repeat: Infinity, repeatDelay: 1.4 }}
+            className="h-24 w-24 rounded-full border-2 border-white/20 bg-gradient-to-br from-white/15 to-white/5"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (variant === "chat") {
+    return (
+      <div className="flex h-56 w-full max-w-[280px] flex-col justify-center gap-2">
+        {[
+          { side: "l", w: 60, delay: 0.1 },
+          { side: "r", w: 45, delay: 0.6 },
+          { side: "l", w: 75, delay: 1.1 },
+          { side: "r", w: 30, delay: 1.6 },
+        ].map((m, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: m.delay, repeat: Infinity, repeatDelay: 2.2 }}
+            className={cn("flex", m.side === "r" ? "justify-end" : "justify-start")}
+          >
+            <div
+              className="rounded-2xl px-3.5 py-2.5"
+              style={{
+                width: `${m.w}%`,
+                background:
+                  m.side === "r"
+                    ? "linear-gradient(135deg, var(--brand-pink), var(--brand-purple))"
+                    : "color-mix(in oklab, white 8%, transparent)",
+                borderBottomRightRadius: m.side === "r" ? 6 : 16,
+                borderBottomLeftRadius: m.side === "l" ? 6 : 16,
+              }}
+            >
+              <div
+                className="h-2 w-full rounded-full"
+                style={{
+                  background:
+                    m.side === "r"
+                      ? "rgba(255,255,255,0.7)"
+                      : "color-mix(in oklab, white 30%, transparent)",
+                }}
+              />
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    );
+  }
+
+  // profile
+  return (
+    <div className="relative h-56 w-full max-w-[240px]">
+      <div className="absolute inset-0 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03]">
+        <div
+          className="h-28 w-full"
+          style={{
+            background:
+              "linear-gradient(135deg, color-mix(in oklab, var(--brand-pink) 30%, transparent), color-mix(in oklab, var(--brand-purple) 30%, transparent))",
+          }}
+        />
+        <div className="-mt-8 px-4">
+          <div
+            className="h-16 w-16 rounded-full border-4 border-background"
+            style={{
+              background: "linear-gradient(135deg, var(--brand-pink), var(--brand-purple))",
+            }}
+          />
+          <div className="mt-3 space-y-2">
+            <div className="h-2.5 w-24 rounded-full bg-white/70" />
+            <div className="h-2 w-32 rounded-full bg-white/30" />
+            <div className="h-2 w-28 rounded-full bg-white/30" />
+          </div>
+        </div>
+        <motion.div
+          animate={{ y: [0, -4, 0], rotate: [0, 8, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full shadow-glow"
+          style={{
+            background: "linear-gradient(135deg, var(--brand-pink), var(--brand-magenta))",
+          }}
+        >
+          <Sparkles className="h-4 w-4 text-white" />
+        </motion.div>
+      </div>
+    </div>
+  );
 }
