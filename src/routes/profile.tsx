@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Settings as SettingsIcon } from 'lucide-react';
 import { ProfileView, type ProfileViewData } from '@/components/ProfileView';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
+import { VerificationModal } from '@/components/VerificationModal';
 import { BottomNav } from '@/components/BottomNav';
 
 import { requireAuthAndOnboarding } from '@/lib/authGuard';
@@ -33,6 +34,7 @@ const INITIAL: ProfileViewData = {
 function ProfilePage() {
   const [profile, setProfile] = useState<ProfileViewData>(INITIAL);
   const [editing, setEditing] = useState(false);
+  const [verifying, setVerifying] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
@@ -47,12 +49,18 @@ function ProfilePage() {
         profile={profile}
         onPhotosChange={(photos) => setProfile(p => ({ ...p, photos }))}
         onEditProfile={() => setEditing(true)}
+        onVerify={() => setVerifying(true)}
       />
       <EditProfileSheet
         open={editing}
         profile={profile}
         onClose={() => setEditing(false)}
         onSave={(next) => setProfile(next)}
+      />
+      <VerificationModal
+        open={verifying}
+        onOpenChange={setVerifying}
+        onConfirm={() => setProfile(p => ({ ...p, isVerified: true }))}
       />
       <BottomNav />
     </div>
