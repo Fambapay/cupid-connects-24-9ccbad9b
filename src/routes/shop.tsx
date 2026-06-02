@@ -19,7 +19,7 @@ import { z } from "zod";
 import { BottomNav } from "@/components/BottomNav";
 import { useCredits } from "@/hooks/useCredits";
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
-import { toast } from "sonner";
+import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 
 type PackKind = "boost" | "super_like";
 
