@@ -1316,7 +1316,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             className="absolute left-0 right-0 z-10"
             style={{
               // Sit above the action buttons row (clears swipe buttons + nav)
-              bottom: `calc(var(--card-nav-offset, 66px) - 63px + 92px + 16px)`,
+              bottom: `calc(var(--card-nav-offset, 66px) - 63px + 92px + 16px - 20px)`,
               paddingLeft: 16,
               paddingRight: 16,
             }}
