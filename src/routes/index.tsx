@@ -76,23 +76,12 @@ function Discover() {
         </AnimatePresence>
       </div>
 
-      {/* Action row — 5 equal glass buttons with colored stroke icons */}
-      <div className="mt-4 flex shrink-0 items-center justify-between gap-3 px-6">
-        <ActionButton onClick={reset} label="Voltar" iconColor="text-white/55">
-          <RotateCcw className="h-[22px] w-[22px]" strokeWidth={2.4} />
-        </ActionButton>
-        <ActionButton onClick={() => handleSwipe("left")} label="Passar" iconColor="text-rose">
-          <X className="h-[28px] w-[28px]" strokeWidth={3} />
-        </ActionButton>
-        <ActionButton onClick={() => handleSwipe("right")} label="Super like" iconColor="text-[oklch(0.72_0.16_240)]">
-          <Star className="h-[24px] w-[24px] fill-current" strokeWidth={0} />
-        </ActionButton>
-        <ActionButton onClick={() => handleSwipe("right")} label="Curtir" iconColor="text-mint">
-          <Heart className="h-[24px] w-[24px]" strokeWidth={2.6} />
-        </ActionButton>
-        <ActionButton onClick={() => {}} label="Mensagem" iconColor="text-[oklch(0.72_0.16_240)]">
-          <Send className="h-[22px] w-[22px] fill-current -rotate-12" strokeWidth={0} />
-        </ActionButton>
+      {/* Action row — Tinder-style: rewind, nope (coral), super (blue star), like (green heart) */}
+      <div className="mt-4 flex shrink-0 items-center justify-between gap-3 px-8">
+        <RewindButton onClick={reset} />
+        <NopeButton onClick={() => handleSwipe("left")} />
+        <SuperLikeButton onClick={() => handleSwipe("right")} />
+        <LikeButton onClick={() => handleSwipe("right")} />
       </div>
 
 
