@@ -8,6 +8,7 @@ import {
   type MotionValue,
 } from 'framer-motion';
 import { Flame, User, Heart, MessageCircle, type LucideIcon } from 'lucide-react';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { hapticTap } from '@/hooks/useNativePlatform';
 
 type Tab = 'discover' | 'likes' | 'chat' | 'profile';
@@ -311,7 +312,7 @@ const TabButton = ({
 };
 
 // ─── Router-aware wrapper used across the app ───────────────────────────────
-import { useLocation, useNavigate } from "@tanstack/react-router";
+
 
 const TAB_TO_PATH = {
   discover: "/",
