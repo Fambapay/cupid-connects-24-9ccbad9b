@@ -10,7 +10,6 @@ import {
 import { User, Heart, MessageCircle, type LucideIcon } from 'lucide-react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 import { hapticTap } from '@/hooks/useNativePlatform';
-import hunieMark from '@/assets/hunie-mark.png.asset.json';
 
 type Tab = 'discover' | 'likes' | 'chat' | 'profile';
 
@@ -46,17 +45,26 @@ export const BottomNavBase = ({
     onTabChange(tab);
   };
 
-  const HunieNavIcon = ({ className, style, strokeWidth: _ }: { className?: string; style?: React.CSSProperties; strokeWidth?: number }) => (
-    <img
-      src={hunieMark.url}
+  const HoneyNavIcon = ({ className, style, strokeWidth = 1.8 }: { className?: string; style?: React.CSSProperties; strokeWidth?: number }) => (
+    <svg
+      viewBox="0 0 24 24"
       className={className}
-      style={{ ...style, width: 32, height: 32, objectFit: 'contain', filter: 'brightness(0) invert(1)', margin: '-5px' }}
-      alt=""
-    />
+      style={style}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9.1 3.4h5.8l2.9 5-2.9 5H9.1l-2.9-5 2.9-5Z" />
+      <path d="M4.2 11.5h5.3l2.7 4.6-2.7 4.5H4.2l-2.6-4.5 2.6-4.6Z" />
+      <path d="M14.5 11.5h5.3l2.6 4.6-2.6 4.5h-5.3l-2.7-4.5 2.7-4.6Z" />
+    </svg>
   );
 
   const tabs = [
-    { id: 'discover' as Tab, icon: HunieNavIcon as unknown as LucideIcon, label: 'Descobrir' },
+    { id: 'discover' as Tab, icon: HoneyNavIcon as unknown as LucideIcon, label: 'Descobrir' },
     { id: 'likes' as Tab, icon: Heart, label: 'Likes', badge: likesCount },
     { id: 'chat' as Tab, icon: MessageCircle, label: 'Chat' },
     { id: 'profile' as Tab, icon: User, label: 'Perfil' },
