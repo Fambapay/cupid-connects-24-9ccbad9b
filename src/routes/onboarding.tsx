@@ -1639,7 +1639,8 @@ function PromptsStep({
   const canNext = validCount >= MIN_PROMPTS;
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 min-h-0 flex-col">
+
       <StepScroll>
         <Heading
           title="Mostra a tua personalidade"
