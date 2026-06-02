@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   motion,
   AnimatePresence,
@@ -60,7 +60,7 @@ export const BottomNavBase = ({
   const pillSat = isPressed || isDragging ? 220 : 160;
 
   // Measure container
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = pillContainerRef.current;
     if (!el) return;
     const measure = () => setContainerWidth(el.clientWidth);
@@ -71,9 +71,16 @@ export const BottomNavBase = ({
   }, []);
 
   // Snap pill to active tab when activeTab/width changes (and not dragging)
+  const didInitRef = useRef(false);
   useEffect(() => {
     if (isDragging || tabWidth === 0) return;
     const target = activeIndex * tabWidth;
+    if (!didInitRef.current) {
+      // First measurement after mount: jump instantly, no animation
+      pillX.set(target);
+      didInitRef.current = true;
+      return;
+    }
     const controls = animate(pillX, target, {
       type: 'spring',
       stiffness: 520,
