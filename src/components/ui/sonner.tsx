@@ -5,14 +5,23 @@ type ToasterProps = React.ComponentProps<typeof Sonner>;
 const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
+      position="top-center"
       className="toaster group"
       toastOptions={{
+        unstyled: false,
         classNames: {
-          toast:
-            "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
-          description: "group-[.toast]:text-muted-foreground",
-          actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-          cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
+          toast: "hunie-toast",
+          title: "hunie-toast__title",
+          description: "hunie-toast__desc",
+          actionButton: "hunie-toast__action",
+          cancelButton: "hunie-toast__cancel",
+          closeButton: "hunie-toast__close",
+          icon: "hunie-toast__icon",
+          success: "hunie-toast--success",
+          error: "hunie-toast--error",
+          info: "hunie-toast--info",
+          warning: "hunie-toast--warning",
+          loading: "hunie-toast--loading",
         },
       }}
       {...props}
