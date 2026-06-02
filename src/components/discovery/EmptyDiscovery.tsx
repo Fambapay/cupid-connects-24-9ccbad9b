@@ -87,7 +87,7 @@ export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryPro
           color: "transparent",
         }}
       >
-        {loading ? "À procura..." : "Sem mais mel por agora"}
+        {loading ? "À procura..." : "A colmeia está calma"}
       </motion.h2>
 
       <motion.p
