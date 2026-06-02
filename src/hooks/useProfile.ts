@@ -15,6 +15,7 @@ export interface Profile {
   is_verified: boolean;
   membership_tier: string;
   onboarding_completed: boolean;
+  onboarding_step: number;
   birthdate: string | null;
   gender: string | null;
   interested_in: string[];
