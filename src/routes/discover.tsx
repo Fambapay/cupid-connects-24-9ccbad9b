@@ -1,15 +1,19 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useRef, useState, useEffect } from "react";
 import { useMotionValue } from "framer-motion";
+import { toast } from "sonner";
 
 import { BottomNav } from "@/components/BottomNav";
 import { ProfileCard } from "@/components/ProfileCard";
 import { SwipeActions } from "@/components/SwipeActions";
 import { DiscoverTopBar } from "@/components/DiscoverTopBar";
 import { useDiscovery } from "@/hooks/useDiscovery";
+import { useCredits } from "@/hooks/useCredits";
+import { useBoost } from "@/hooks/useBoost";
 import type { Profile, SwipeDirection } from "@/types/dating";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
+
 
 export const Route = createFileRoute("/discover")({
   ssr: false,
