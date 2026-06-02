@@ -35,49 +35,93 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_photos: {
+        Row: {
+          created_at: string
+          id: string
+          position: number
+          profile_id: string
+          storage_path: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          position?: number
+          profile_id: string
+          storage_path: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          position?: number
+          profile_id?: string
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_photos_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           age: number | null
           bio: string | null
+          birthdate: string | null
           city: string | null
           country: string | null
           created_at: string
+          gender: string | null
           id: string
+          interested_in: string[]
           is_incognito: boolean
           is_paused: boolean
           is_verified: boolean
           membership_tier: string
           name: string | null
+          onboarding_completed: boolean
           phone: string | null
           updated_at: string
         }
         Insert: {
           age?: number | null
           bio?: string | null
+          birthdate?: string | null
           city?: string | null
           country?: string | null
           created_at?: string
+          gender?: string | null
           id: string
+          interested_in?: string[]
           is_incognito?: boolean
           is_paused?: boolean
           is_verified?: boolean
           membership_tier?: string
           name?: string | null
+          onboarding_completed?: boolean
           phone?: string | null
           updated_at?: string
         }
         Update: {
           age?: number | null
           bio?: string | null
+          birthdate?: string | null
           city?: string | null
           country?: string | null
           created_at?: string
+          gender?: string | null
           id?: string
+          interested_in?: string[]
           is_incognito?: boolean
           is_paused?: boolean
           is_verified?: boolean
           membership_tier?: string
           name?: string | null
+          onboarding_completed?: boolean
           phone?: string | null
           updated_at?: string
         }

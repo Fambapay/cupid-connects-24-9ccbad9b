@@ -14,6 +14,10 @@ export interface Profile {
   is_incognito: boolean;
   is_verified: boolean;
   membership_tier: string;
+  onboarding_completed: boolean;
+  birthdate: string | null;
+  gender: string | null;
+  interested_in: string[];
 }
 
 export function useProfile() {
