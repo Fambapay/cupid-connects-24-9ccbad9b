@@ -5,9 +5,9 @@ export type PlanTier = "select" | "plus" | "elite";
 export type PackKind = "boost" | "super_like";
 
 export const PLAN_PRICES: Record<PlanTier, { priceMzn: number; days: number; label: string }> = {
-  select: { priceMzn: 499, days: 30, label: "Select" },
-  plus:   { priceMzn: 999, days: 30, label: "Plus" },
-  elite:  { priceMzn: 1999, days: 30, label: "Elite" },
+  select: { priceMzn: 199, days: 30, label: "Select" },
+  plus:   { priceMzn: 599, days: 30, label: "Plus" },
+  elite:  { priceMzn: 999, days: 30, label: "Elite" },
 };
 
 export type Pack = {
