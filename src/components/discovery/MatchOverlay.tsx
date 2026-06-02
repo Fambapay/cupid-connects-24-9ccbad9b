@@ -182,8 +182,9 @@ export function MatchOverlay({ open, targetName, targetPhoto, sending, onClose, 
             >
               <button
                 type="button"
-                onClick={onSeeLikes}
-                className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3.5 text-[15px] font-bold text-white transition-transform active:scale-[0.97]"
+                onClick={onSendMessage}
+                disabled={sending}
+                className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3.5 text-[15px] font-bold text-white transition-transform active:scale-[0.97] disabled:opacity-70"
                 style={{
                   backgroundImage: `linear-gradient(135deg, ${PINK} 0%, #B13CFF 100%)`,
                   boxShadow:
@@ -191,7 +192,7 @@ export function MatchOverlay({ open, targetName, targetPhoto, sending, onClose, 
                 }}
               >
                 <MessageCircle className="h-[16px] w-[16px]" strokeWidth={2.4} />
-                Enviar mensagem
+                {sending ? "A abrir conversa…" : "Enviar mensagem"}
               </button>
 
               <button
