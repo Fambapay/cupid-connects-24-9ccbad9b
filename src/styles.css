@@ -43,6 +43,12 @@
   --color-rose: var(--rose);
   --color-grape: var(--grape);
   --color-mint: var(--mint);
+  --color-brand-pink: var(--brand-pink);
+  --color-brand-purple: var(--brand-purple);
+  --color-brand-magenta: var(--brand-magenta);
+  --color-success: var(--success);
+  --color-superlike: var(--super-like);
+  --color-boost: var(--boost);
 }
 
 :root {
