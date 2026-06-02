@@ -169,8 +169,11 @@ function SettingsPage() {
   };
 
   const handleLogout = async () => {
-    await signOut();
-    navigate({ to: '/auth' });
+    try {
+      await signOut();
+    } finally {
+      window.location.href = "/auth";
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -178,7 +181,7 @@ function SettingsPage() {
     try {
       await deleteAccount();
       toast({ title: 'Conta eliminada', description: 'A tua conta foi eliminada com sucesso.' });
-      navigate({ to: '/auth' });
+      window.location.href = "/auth";
     } catch (err) {
       toast({
         title: 'Erro',
