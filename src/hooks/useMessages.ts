@@ -88,16 +88,41 @@ export function useMessages(matchId: string | undefined) {
     async (text: string) => {
       const content = text.trim();
       if (!content || !user || !matchId) return;
+      // Optimistic insert so the sender sees the bubble immediately
+      const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const optimistic: ChatMessage = {
+        id: tempId,
+        match_id: matchId,
+        sender_id: user.id,
+        content,
+        created_at: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, optimistic]);
+
       const { data, error } = await supabase
         .from("messages")
         .insert({ match_id: matchId, sender_id: user.id, content })
         .select()
         .single();
-      if (!error && data) {
-        setMessages((prev) =>
-          prev.some((x) => x.id === (data.id as string)) ? prev : [...prev, data as ChatMessage],
-        );
+
+      if (error || !data) {
+        console.error("[messages.send] failed:", error);
+        // Roll back optimistic bubble
+        setMessages((prev) => prev.filter((x) => x.id !== tempId));
+        const { toast } = await import("sonner");
+        toast.error("Não foi possível enviar", {
+          description: error?.message ?? "Tenta novamente.",
+        });
+        return;
       }
+
+      // Replace optimistic with the real row
+      setMessages((prev) => {
+        if (prev.some((x) => x.id === (data.id as string))) {
+          return prev.filter((x) => x.id !== tempId);
+        }
+        return prev.map((x) => (x.id === tempId ? (data as ChatMessage) : x));
+      });
     },
     [user, matchId],
   );
