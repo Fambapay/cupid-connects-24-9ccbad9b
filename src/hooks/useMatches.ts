@@ -65,7 +65,7 @@ export function useMatches() {
       if (!firstPhotoByProfile[pid]) firstPhotoByProfile[pid] = p.storage_path as string;
     });
     const paths = otherIds.map((id) => firstPhotoByProfile[id]).filter(Boolean);
-    const signed = await signPhotos(paths);
+    const signed = await signPhotos(paths, 3600, { width: 160, height: 160, resize: "cover", quality: 70 });
     const signedByPath: Record<string, string> = {};
     paths.forEach((p, i) => (signedByPath[p] = signed[i] ?? ""));
 
