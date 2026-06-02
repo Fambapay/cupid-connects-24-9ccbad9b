@@ -2243,7 +2243,8 @@ function TutorialVisual({ variant }: { variant: TutorialSlide["visual"] }) {
         {/* Cover photo */}
         <div className="relative h-40 w-full overflow-hidden">
           <img
-            src={tutorialMan1}
+            src={tutorialWoman1}
+
             alt=""
             loading="lazy"
             className="h-full w-full object-cover"
