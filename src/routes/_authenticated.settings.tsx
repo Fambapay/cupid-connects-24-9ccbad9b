@@ -625,7 +625,7 @@ function SettingsPage() {
         <motion.div className="mt-6" variants={itemVariants}>
           <SectionHeader icon={Crown} label="Conta" />
           <div className="rounded-2xl bg-card border border-border overflow-hidden">
-            <motion.button onClick={soon}
+            <motion.button onClick={() => navigate({ to: '/shop', search: {} })}
               className="w-full p-4 flex items-center justify-between border-b border-border transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isPremium ? 'bg-amber-500' : 'bg-amber-500/10'}`}>
