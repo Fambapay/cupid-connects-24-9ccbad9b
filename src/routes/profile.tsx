@@ -46,6 +46,7 @@ function loadProfile(): ProfileViewData {
 }
 
 function ProfilePage() {
+  const { profile: dbProfile } = useProfile();
   const [profile, setProfile] = useState<ProfileViewData>(loadProfile);
   const [editing, setEditing] = useState(false);
   const [verifying, setVerifying] = useState(false);
