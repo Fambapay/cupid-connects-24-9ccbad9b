@@ -272,7 +272,7 @@ function SettingsPage() {
           ]).map(({ tier, name, tagline, accent, icon }) => {
             const isCurrent = isPremium && membershipTier === tier;
             return (
-              <motion.button key={tier} onClick={soon}
+              <motion.button key={tier} onClick={() => navigate({ to: '/shop', search: {} })}
                 className="w-full rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-1.5 relative overflow-hidden"
                 whileTap={{ scale: 0.98 }}
                 style={isCurrent ? { borderColor: accent } : undefined}
