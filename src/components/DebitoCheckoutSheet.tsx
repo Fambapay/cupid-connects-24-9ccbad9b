@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, CheckCircle2, X, Smartphone, CreditCard } from "lucide-react";
+import { Loader2, CheckCircle2, X, Smartphone, CreditCard, Lock, ShieldCheck, Sparkles } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { createDebitoPayment } from "@/lib/debito.functions";
 import { MOBILE_MONEY_METHODS, type PaymentMethod } from "@/lib/pricing";
