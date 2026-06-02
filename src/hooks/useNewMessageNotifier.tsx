@@ -30,10 +30,15 @@ export function useNewMessageNotifier() {
   useEffect(() => {
     if (!user) return;
 
-    const resolvePeer = async (matchId: string): Promise<PeerInfo | null> => {
-      const cached = peerCache.current.get(matchId);
-      if (cached) return cached;
+    const preloadImage = (url: string) => {
+      if (!url || typeof window === "undefined") return;
+      const img = new Image();
+      img.decoding = "async";
+      img.src = url;
+      img.decode?.().catch(() => {});
+    };
 
+    const fetchPeer = async (matchId: string): Promise<PeerInfo | null> => {
       const { data: match } = await supabase
         .from("matches")
         .select("user_a,user_b")
@@ -58,8 +63,28 @@ export function useNewMessageNotifier() {
         : "";
       const info: PeerInfo = { name: (prof?.name as string) ?? "Alguém", photo: photoUrl };
       peerCache.current.set(matchId, info);
+      preloadImage(photoUrl);
       return info;
     };
+
+    const resolvePeer = async (matchId: string): Promise<PeerInfo | null> => {
+      const cached = peerCache.current.get(matchId);
+      if (cached) return cached;
+      return fetchPeer(matchId);
+    };
+
+    // Warm cache: prefetch peer info + decode avatars for all existing
+    // matches so the first incoming toast renders the photo instantly.
+    (async () => {
+      const { data: matches } = await supabase
+        .from("matches")
+        .select("id")
+        .or(`user_a.eq.${user.id},user_b.eq.${user.id}`);
+      if (!matches) return;
+      await Promise.all(matches.map((row) => fetchPeer(row.id as string)));
+    })();
+
+
 
     const ch = supabase
       .channel(`global-msgs-${user.id}`)
