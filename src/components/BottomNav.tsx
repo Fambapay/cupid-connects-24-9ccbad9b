@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   motion,
   AnimatePresence,
@@ -6,13 +6,12 @@ import {
   useTransform,
   animate,
   type MotionValue,
-} from 'framer-motion';
-import { User, Heart, MessageCircle, type LucideIcon } from 'lucide-react';
-import { useLocation, useNavigate } from '@tanstack/react-router';
-import { hapticTap } from '@/hooks/useNativePlatform';
-import hunieMark from '@/assets/hunie-mark.png.asset.json';
+} from "framer-motion";
+import { User, Heart, MessageCircle, type LucideIcon } from "lucide-react";
+import { useLocation, useNavigate } from "@tanstack/react-router";
+import { hapticTap } from "@/hooks/useNativePlatform";
 
-type Tab = 'discover' | 'likes' | 'chat' | 'profile';
+type Tab = "discover" | "likes" | "chat" | "profile";
 
 interface BottomNavProps {
   activeTab: Tab;
@@ -46,23 +45,43 @@ export const BottomNavBase = ({
     onTabChange(tab);
   };
 
-  const HunieNavIcon = ({ className, style, strokeWidth: _ }: { className?: string; style?: React.CSSProperties; strokeWidth?: number }) => (
-    <img
-      src={hunieMark.url}
+  const HoneyNavIcon = ({
+    className,
+    style,
+    strokeWidth = 1.8,
+  }: {
+    className?: string;
+    style?: React.CSSProperties;
+    strokeWidth?: number;
+  }) => (
+    <svg
+      viewBox="0 0 24 24"
       className={className}
-      style={{ ...style, width: 32, height: 32, objectFit: 'contain', filter: 'brightness(0) invert(1)', margin: '-5px' }}
-      alt=""
-    />
+      style={style}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9.1 3.4h5.8l2.9 5-2.9 5H9.1l-2.9-5 2.9-5Z" />
+      <path d="M4.2 11.5h5.3l2.7 4.6-2.7 4.5H4.2l-2.6-4.5 2.6-4.6Z" />
+      <path d="M14.5 11.5h5.3l2.6 4.6-2.6 4.5h-5.3l-2.7-4.5 2.7-4.6Z" />
+    </svg>
   );
 
   const tabs = [
-    { id: 'discover' as Tab, icon: HunieNavIcon as unknown as LucideIcon, label: 'Descobrir' },
-    { id: 'likes' as Tab, icon: Heart, label: 'Likes', badge: likesCount },
-    { id: 'chat' as Tab, icon: MessageCircle, label: 'Chat' },
-    { id: 'profile' as Tab, icon: User, label: 'Perfil' },
+    { id: "discover" as Tab, icon: HoneyNavIcon as unknown as LucideIcon, label: "Descobrir" },
+    { id: "likes" as Tab, icon: Heart, label: "Likes", badge: likesCount },
+    { id: "chat" as Tab, icon: MessageCircle, label: "Chat" },
+    { id: "profile" as Tab, icon: User, label: "Perfil" },
   ];
 
-  const activeIndex = Math.max(0, tabs.findIndex((t) => t.id === activeTab));
+  const activeIndex = Math.max(
+    0,
+    tabs.findIndex((t) => t.id === activeTab),
+  );
   const tabWidth = containerWidth / tabs.length;
 
   // Pill refraction intensity follows press/drag state
@@ -92,7 +111,7 @@ export const BottomNavBase = ({
       return;
     }
     const controls = animate(pillX, target, {
-      type: 'spring',
+      type: "spring",
       stiffness: 520,
       damping: 38,
       mass: 0.55,
@@ -102,113 +121,106 @@ export const BottomNavBase = ({
   }, [activeIndex, tabWidth, isDragging, pillX]);
 
   const bottomStyle = dockToBottom
-    ? { bottom: '0px' }
+    ? { bottom: "0px" }
     : bottomOffsetPx
       ? { bottom: `${bottomOffsetPx}px` }
       : undefined;
 
   return (
-    <nav
-      ref={navRef as any}
-      className="tab-bar"
-      style={bottomStyle}
-    >
+    <nav ref={navRef} className="tab-bar" style={bottomStyle}>
       <div className="tab-bar-pill">
-      <div ref={pillContainerRef} className="relative flex items-stretch w-full h-full">
-        {/* Draggable active pill — slides between tabs */}
-        {tabWidth > 0 && (
-          <>
-          {/* Visual pill — sits behind icons, no pointer events */}
-          <motion.div
-            className="absolute top-0 bottom-0 z-0 pointer-events-none"
-            style={{
-              x: pillX,
-              width: tabWidth,
-              left: 0,
-              padding: '0 4px',
-              willChange: 'transform',
-            }}
-            animate={{ scale: isPressed || isDragging ? 1.08 : 1 }}
-            transition={{ type: 'spring', stiffness: 560, damping: 34, mass: 0.5 }}
-          >
-            <div
-              className="w-full h-full nav-active-pill"
-              style={{ borderRadius: '20px' }}
-            />
-          </motion.div>
+        <div ref={pillContainerRef} className="relative flex items-stretch w-full h-full">
+          {/* Draggable active pill — slides between tabs */}
+          {tabWidth > 0 && (
+            <>
+              {/* Visual pill — sits behind icons, no pointer events */}
+              <motion.div
+                className="absolute top-0 bottom-0 z-0 pointer-events-none"
+                style={{
+                  x: pillX,
+                  width: tabWidth,
+                  left: 0,
+                  padding: "0 4px",
+                  willChange: "transform",
+                }}
+                animate={{ scale: isPressed || isDragging ? 1.08 : 1 }}
+                transition={{ type: "spring", stiffness: 560, damping: 34, mass: 0.5 }}
+              >
+                <div className="w-full h-full nav-active-pill" style={{ borderRadius: "20px" }} />
+              </motion.div>
 
-          {/* Transparent drag handle — on top of active tab, captures gestures */}
-          <motion.div
-            className="absolute top-0 bottom-0 z-30"
-            style={{
-              x: pillX,
-              width: tabWidth,
-              left: 0,
-              touchAction: 'none',
-              cursor: 'grab',
-            }}
-            drag="x"
-            dragConstraints={{ left: 0, right: (tabs.length - 1) * tabWidth }}
-            dragElastic={0.08}
-            dragMomentum={false}
-            onPointerDown={() => {
-              setIsPressed(true);
-              hapticTap();
-            }}
-            onPointerUp={() => setIsPressed(false)}
-            onPointerCancel={() => setIsPressed(false)}
-            onDragStart={() => setIsDragging(true)}
-            onDrag={(_, info) => {
-              // live snap preview: highlight nearest tab
-              const idx = Math.round((pillX.get() ?? 0) / tabWidth);
-              const clamped = Math.max(0, Math.min(tabs.length - 1, idx));
-              if (tabs[clamped].id !== activeTab) {
-                onTabChange(tabs[clamped].id);
-              }
-            }}
-            onDragEnd={() => {
-              const idx = Math.round((pillX.get() ?? 0) / tabWidth);
-              const clamped = Math.max(0, Math.min(tabs.length - 1, idx));
-              setIsDragging(false);
-              setIsPressed(false);
-              hapticTap();
-              if (tabs[clamped].id !== activeTab) {
-                onTabChange(tabs[clamped].id);
-              } else {
-                // snap back
-                animate(pillX, clamped * tabWidth, {
-                  type: 'spring',
-                  stiffness: 380,
-                  damping: 32,
-                });
-              }
-            }}
-          />
-          </>
-        )}
+              {/* Transparent drag handle — on top of active tab, captures gestures */}
+              <motion.div
+                className="absolute top-0 bottom-0 z-30"
+                style={{
+                  x: pillX,
+                  width: tabWidth,
+                  left: 0,
+                  touchAction: "none",
+                  cursor: "grab",
+                }}
+                drag="x"
+                dragConstraints={{ left: 0, right: (tabs.length - 1) * tabWidth }}
+                dragElastic={0.08}
+                dragMomentum={false}
+                onPointerDown={() => {
+                  setIsPressed(true);
+                  hapticTap();
+                }}
+                onPointerUp={() => setIsPressed(false)}
+                onPointerCancel={() => setIsPressed(false)}
+                onDragStart={() => setIsDragging(true)}
+                onDrag={(_, info) => {
+                  // live snap preview: highlight nearest tab
+                  const idx = Math.round((pillX.get() ?? 0) / tabWidth);
+                  const clamped = Math.max(0, Math.min(tabs.length - 1, idx));
+                  if (tabs[clamped].id !== activeTab) {
+                    onTabChange(tabs[clamped].id);
+                  }
+                }}
+                onDragEnd={() => {
+                  const idx = Math.round((pillX.get() ?? 0) / tabWidth);
+                  const clamped = Math.max(0, Math.min(tabs.length - 1, idx));
+                  setIsDragging(false);
+                  setIsPressed(false);
+                  hapticTap();
+                  if (tabs[clamped].id !== activeTab) {
+                    onTabChange(tabs[clamped].id);
+                  } else {
+                    // snap back
+                    animate(pillX, clamped * tabWidth, {
+                      type: "spring",
+                      stiffness: 380,
+                      damping: 32,
+                    });
+                  }
+                }}
+              />
+            </>
+          )}
 
-      {tabs.map((tab, index) => {
-        const isActive = activeTab === tab.id;
-        const shouldAnimate = false;
+          {tabs.map((tab, index) => {
+            const isActive = activeTab === tab.id;
+            const shouldAnimate = false;
 
-        return (
-          <TabButton
-            key={tab.id}
-            tabId={tab.id}
-            Icon={tab.icon}
-            label={tab.label}
-            badge={tab.badge}
-            shouldAnimate={shouldAnimate}
-            isActive={isActive}
-            index={index}
-            tabWidth={tabWidth}
-            pillX={pillX}
-            pointerStartRef={pointerStartRef}
-            onTap={() => handleTabChange(tab.id)}
-          />
-        );
-      })}
-      </div>
+            return (
+              <TabButton
+                key={tab.id}
+                tabId={tab.id}
+                Icon={tab.icon}
+                label={tab.label}
+                badge={tab.badge}
+                shouldAnimate={shouldAnimate}
+                isActive={isActive}
+                index={index}
+                tabWidth={tabWidth}
+                pillX={pillX}
+                pointerStartRef={pointerStartRef}
+                onTap={() => handleTabChange(tab.id)}
+              />
+            );
+          })}
+        </div>
       </div>
     </nav>
   );
@@ -259,15 +271,15 @@ const TabButton = ({
         onTap();
       }}
       whileTap={{ scale: 0.92 }}
-      transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+      transition={{ type: "spring", stiffness: 500, damping: 28 }}
       className="tab-bar-item relative flex flex-col items-center justify-center gap-[3px] h-full flex-1 z-10"
-      style={{ background: 'none', border: 'none' }}
+      style={{ background: "none", border: "none" }}
       aria-label={label}
     >
       <div className="relative flex items-center z-10">
         <Icon
-          className={`tab-bar-icon w-[22px] h-[22px] ${shouldAnimate ? 'animate-notification-bounce' : ''}`}
-          style={{ fill: 'none' }}
+          className={`tab-bar-icon w-[22px] h-[22px] ${shouldAnimate ? "animate-notification-bounce" : ""}`}
+          style={{ fill: "none" }}
           strokeWidth={isActive ? 2.1 : 1.7}
         />
         <AnimatePresence mode="wait">
@@ -275,17 +287,15 @@ const TabButton = ({
             <motion.span
               key={`badge-${badge}`}
               className={`absolute -top-1.5 -right-2 min-w-[16px] h-[16px] text-[9px] rounded-full flex items-center justify-center font-bold px-1 ${
-                tabId === 'likes'
-                  ? 'bg-[#C89B0C] text-black'
-                  : 'bg-primary text-primary-foreground'
+                tabId === "likes" ? "bg-[#C89B0C] text-black" : "bg-primary text-primary-foreground"
               }`}
-              style={{ boxShadow: '0 0 0 1.5px hsl(var(--background))' }}
+              style={{ boxShadow: "0 0 0 1.5px hsl(var(--background))" }}
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+              transition={{ type: "spring", stiffness: 500, damping: 25 }}
             >
-              {badge > 99 ? '99+' : badge}
+              {badge > 99 ? "99+" : badge}
             </motion.span>
           )}
         </AnimatePresence>
@@ -296,13 +306,11 @@ const TabButton = ({
       >
         {label}
       </span>
-
     </motion.button>
   );
 };
 
 // ─── Router-aware wrapper used across the app ───────────────────────────────
-
 
 const TAB_TO_PATH = {
   discover: "/discover",
@@ -321,9 +329,7 @@ function pathToTab(pathname: string): TabId | null {
   return null;
 }
 
-export function BottomNav(
-  props: Omit<BottomNavProps, "activeTab" | "onTabChange"> = {},
-) {
+export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange"> = {}) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const activeTab = pathToTab(pathname) ?? "profile";
