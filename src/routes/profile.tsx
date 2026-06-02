@@ -59,6 +59,12 @@ function ProfilePage() {
     }
   }, [profile]);
 
+  useEffect(() => {
+    if (dbProfile?.age != null) {
+      setProfile(p => p.age !== dbProfile.age ? { ...p, age: dbProfile.age } : p);
+    }
+  }, [dbProfile?.age]);
+
   return (
     <div className="min-h-screen bg-background">
       <Link
