@@ -13,6 +13,8 @@ import { FiltersSheet, DEFAULT_FILTERS, type DiscoveryFilters } from "@/componen
 import { useDiscovery } from "@/hooks/useDiscovery";
 import { useCredits } from "@/hooks/useCredits";
 import { useBoost } from "@/hooks/useBoost";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import type { Profile, SwipeDirection } from "@/types/dating";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
