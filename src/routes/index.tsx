@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Menu, X, Heart, MapPin, MessageCircle, Sparkles, ShieldCheck, Brain, Flame, Globe2, Instagram, Facebook, Music2, Star } from "lucide-react";
+import { Menu, X, Heart, MapPin, MessageCircle, Sparkles, ShieldCheck, Brain, Flame, Globe2, Instagram, Facebook, Music2, Star, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -89,14 +89,24 @@ function LandingGate() {
   }, [navigate]);
 
   if (!ready) {
-    return (
-      <div className="grid min-h-[100dvh] place-items-center bg-background">
-        <h1 className="text-gradient-sunset text-5xl font-bold tracking-tight">Hunie</h1>
-      </div>
-    );
+    return <SplashScreen />;
   }
   return <Landing />;
 }
+
+function SplashScreen() {
+  return (
+    <div className="grid min-h-[100dvh] place-items-center bg-background animate-fade-in">
+      <div className="flex flex-col items-center gap-3">
+        <span className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-sunset shadow-glow">
+          <Heart className="h-8 w-8 fill-white text-white" />
+        </span>
+        <span className="text-gradient-sunset font-display text-3xl font-bold tracking-tight">Hunie</span>
+      </div>
+    </div>
+  );
+}
+
 
 /* ----------------------- helpers ----------------------- */
 
@@ -302,78 +312,119 @@ function Navbar() {
 
 function Hero() {
   return (
-    <section className="relative -mt-[72px] flex min-h-[100svh] items-center overflow-hidden px-5 pt-[72px] lg:px-8" aria-label="Apresentação">
-      <div className="pointer-events-none absolute inset-0 bg-aurora opacity-90" />
-      <motion.div
+    <section
+      className="relative -mt-[72px] flex min-h-[100svh] items-center overflow-hidden px-5 pt-[72px] lg:px-8"
+      aria-label="Apresentação"
+    >
+      {/* Layer 2 — three drifting gradient blobs */}
+      <div
         aria-hidden
-        className="pointer-events-none absolute -left-32 top-20 h-96 w-96 rounded-full blur-3xl"
-        style={{ background: "var(--brand-pink)" }}
-        animate={{ x: [0, 40, 0], y: [0, 30, 0], opacity: [0.25, 0.4, 0.25] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute -right-24 bottom-10 h-[28rem] w-[28rem] rounded-full blur-3xl"
-        style={{ background: "var(--brand-purple)" }}
-        animate={{ x: [0, -30, 0], y: [0, -20, 0], opacity: [0.2, 0.35, 0.2] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        className="pointer-events-none absolute -right-32 -top-32 h-[32rem] w-[32rem] rounded-full opacity-30 motion-safe:animate-[drift_14s_ease-in-out_infinite_alternate]"
+        style={{ background: "var(--brand-pink, hsl(var(--primary)))", filter: "blur(120px)" }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.06] mix-blend-overlay"
+        className="pointer-events-none absolute -bottom-32 -left-32 h-[26rem] w-[26rem] rounded-full opacity-25 motion-safe:animate-[drift_18s_ease-in-out_infinite_alternate-reverse]"
+        style={{ background: "var(--brand-purple, hsl(var(--secondary)))", filter: "blur(100px)" }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[0.15] motion-safe:animate-[drift_22s_ease-in-out_infinite_alternate]"
+        style={{ background: "hsl(var(--accent))", filter: "blur(80px)" }}
+      />
+
+      {/* Layer 3 — grain */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.04] mix-blend-overlay"
         style={{
           backgroundImage:
             "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>\")",
         }}
       />
 
+      {/* Layer 4 — radial vignette */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-60"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, transparent 40%, hsl(var(--background)) 100%)",
+        }}
+      />
+
       <div className="relative mx-auto w-full max-w-5xl text-center">
-        <motion.h1
-          initial={{ opacity: 0, y: 24 }}
+        {/* Eyebrow */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="font-display text-[clamp(2.75rem,8vw,5.75rem)] font-extrabold leading-[1.02] tracking-tight"
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="mx-auto flex items-center justify-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary"
         >
-          Encontra alguém
+          <span aria-hidden className="h-px w-8 bg-gradient-to-r from-transparent to-primary/60" />
+          <span>🇲🇿 Moçambique · Encontros reais</span>
+          <span aria-hidden className="h-px w-8 bg-gradient-to-l from-transparent to-primary/60" />
+        </motion.div>
+
+        {/* Main headline — serif */}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+          className="mt-5 font-bold leading-[1.0] tracking-tight"
+          style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(3.5rem, 9vw, 7rem)" }}
+        >
+          O amor que
           <br />
-          que <span className="text-gradient-sunset">vale a pena</span>
+          procuras
         </motion.h1>
 
+        {/* Typewriter line */}
         <motion.p
-          initial={{ opacity: 0, y: 18 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.08 }}
-          className="mt-5 text-xl text-muted-foreground sm:text-2xl"
+          transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+          className="mt-4 leading-tight"
+          style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(1.75rem, 4.5vw, 3rem)" }}
           aria-live="polite"
         >
-          <Typewriter words={["em Maputo.", "em Beira.", "em Nampula.", "perto de ti.", "agora."]} />
+          <span className="italic text-foreground/80">está em </span>
+          <span className="italic text-gradient-sunset">
+            <Typewriter words={["Maputo.", "Beira.", "Nampula.", "cada conversa.", "ti."]} />
+          </span>
         </motion.p>
 
+        {/* Subheadline */}
         <motion.p
-          initial={{ opacity: 0, y: 18 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.16 }}
-          className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg"
+          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+          className="mx-auto mt-6 max-w-[400px] text-sm text-muted-foreground sm:text-base"
         >
-          O primeiro app de encontros feito para quem vive e sente Moçambique.
-          <br className="hidden sm:inline" /> Pessoas reais. Histórias verdadeiras. Ligações que ficam.
+          Pessoas reais. Histórias verdadeiras.
+          <br />
+          Ligações que ficam.
         </motion.p>
 
+        {/* CTAs */}
         <motion.div
-          initial={{ opacity: 0, y: 18 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.24 }}
-          className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
+          transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
+          className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
         >
-          <Button asChild className="h-14 w-full rounded-2xl bg-gradient-sunset px-8 text-base font-semibold text-white shadow-glow sm:w-auto">
+          <Button
+            asChild
+            className="h-14 w-full rounded-full bg-gradient-sunset px-8 text-base font-semibold text-white shadow-glow sm:w-auto"
+          >
             <Link to="/auth/register" aria-label="Criar conta grátis">
-              Criar conta grátis
+              Criar conta — é grátis
             </Link>
           </Button>
           <Button
             asChild
             variant="outline"
-            className="h-14 w-full rounded-2xl border-border/60 bg-white/5 px-8 text-base font-semibold backdrop-blur-md hover:bg-white/10 sm:w-auto"
+            className="h-14 w-full rounded-full border-border/60 bg-white/5 px-8 text-base font-semibold backdrop-blur-md hover:bg-white/10 sm:w-auto"
           >
             <Link to="/auth/login" aria-label="Já tenho conta — entrar">
               Já tenho conta
@@ -381,17 +432,32 @@ function Hero() {
           </Button>
         </motion.div>
 
+        {/* Trust signals */}
         <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.45, delay: 0.32 }}
-          className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
+          className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted-foreground"
         >
           <span>✓ Grátis</span>
+          <span aria-hidden className="opacity-50">·</span>
           <span>✓ Sem cartão</span>
+          <span aria-hidden className="opacity-50">·</span>
           <span>✓ Feito para Moçambique</span>
         </motion.p>
       </div>
+
+      {/* Scroll indicator */}
+      <motion.a
+        href="#como-funciona"
+        aria-label="Descer para saber como funciona"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 text-muted-foreground motion-safe:animate-[bounce-soft_2.4s_ease-in-out_infinite]"
+      >
+        <ChevronDown className="h-6 w-6" />
+      </motion.a>
     </section>
   );
 }

@@ -7,9 +7,11 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthShell } from "@/components/AuthShell";
 import { cn } from "@/lib/utils";
+import { redirectIfAuthenticated } from "@/lib/authGuard";
 
 export const Route = createFileRoute("/auth/register")({
   ssr: false,
+  beforeLoad: redirectIfAuthenticated,
   head: () => ({ meta: [{ title: "Criar conta — Hunie" }] }),
   component: RegisterPage,
 });

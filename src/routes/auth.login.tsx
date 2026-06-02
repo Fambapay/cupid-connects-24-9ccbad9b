@@ -7,9 +7,11 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthShell } from "@/components/AuthShell";
+import { redirectIfAuthenticated } from "@/lib/authGuard";
 
 export const Route = createFileRoute("/auth/login")({
   ssr: false,
+  beforeLoad: redirectIfAuthenticated,
   head: () => ({ meta: [{ title: "Entrar — Hunie" }] }),
   component: LoginPage,
 });
