@@ -11,7 +11,6 @@ import {
   Crown,
   Flame,
   Infinity as InfinityIcon,
-  Loader2,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
@@ -19,7 +18,7 @@ import { z } from "zod";
 import { BottomNav } from "@/components/BottomNav";
 import { useCredits } from "@/hooks/useCredits";
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
-import { toast } from "sonner";
+import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 
 type PackKind = "boost" | "super_like";
 
@@ -301,7 +300,7 @@ function TrustTile({ icon, label }: { icon: React.ReactNode; label: string }) {
 }
 
 function PackCard({ pack, index }: { pack: Pack; index: number }) {
-  const [loading, setLoading] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const accent =
     pack.kind === "boost"
       ? "from-fuchsia-500 to-indigo-500"
@@ -311,15 +310,7 @@ function PackCard({ pack, index }: { pack: Pack; index: number }) {
   const unit = unitPrice(pack);
   const disc = discountPct(pack.kind, unit);
 
-  const handleBuy = async () => {
-    setLoading(true);
-    // Stripe Checkout integration coming soon — keep UX honest.
-    await new Promise((r) => setTimeout(r, 700));
-    toast("Pagamentos em breve", {
-      description: "Stripe Checkout vai ser ligado nesta loja muito em breve.",
-    });
-    setLoading(false);
-  };
+  const handleBuy = () => setSheetOpen(true);
 
   return (
     <motion.div
@@ -399,9 +390,8 @@ function PackCard({ pack, index }: { pack: Pack; index: number }) {
 
           <motion.button
             whileTap={{ scale: 0.97 }}
-            disabled={loading}
             onClick={handleBuy}
-            className={`relative mt-4 h-12 w-full overflow-hidden rounded-xl bg-gradient-to-r ${accent} text-sm font-bold text-white shadow-lg disabled:opacity-60`}
+            className={`relative mt-4 h-12 w-full overflow-hidden rounded-xl bg-gradient-to-r ${accent} text-sm font-bold text-white shadow-lg`}
           >
             <motion.span
               className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3"
@@ -418,17 +408,20 @@ function PackCard({ pack, index }: { pack: Pack; index: number }) {
               }}
             />
             <span className="relative flex items-center justify-center gap-2">
-              {loading ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" /> A processar…
-                </>
-              ) : (
-                <>✨ Desbloquear agora</>
-              )}
+              ✨ Desbloquear agora
             </span>
           </motion.button>
         </div>
       </div>
+      <DebitoCheckoutSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        title={`${pack.quantity} ${pack.kind === "boost" ? "Boosts" : "Super Likes"}`}
+        subtitle="Crédito instantâneo após confirmação"
+        amountMzn={pack.priceMzn}
+        packId={pack.id}
+      />
     </motion.div>
   );
 }
+

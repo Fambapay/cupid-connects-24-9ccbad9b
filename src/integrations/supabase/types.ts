@@ -56,6 +56,126 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_purchases: {
+        Row: {
+          amount_minor: number
+          created_at: string
+          currency: string
+          id: string
+          pack_kind: string
+          quantity: number
+          status: string
+          stripe_payment_intent: string | null
+          stripe_session_id: string
+          user_id: string
+        }
+        Insert: {
+          amount_minor: number
+          created_at?: string
+          currency?: string
+          id?: string
+          pack_kind: string
+          quantity: number
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id: string
+          user_id: string
+        }
+        Update: {
+          amount_minor?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          pack_kind?: string
+          quantity?: number
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      debito_payments: {
+        Row: {
+          amount: number
+          checkout_url: string | null
+          completed_at: string | null
+          created_at: string
+          currency: string
+          customer_email: string | null
+          debito_payment_id: string | null
+          debito_reference: string | null
+          debito_transaction_id: string | null
+          id: string
+          kind: string
+          pack_id: string | null
+          pack_kind: string | null
+          pack_quantity: number | null
+          payment_method: string
+          phone_hash: string | null
+          phone_last4: string | null
+          plan_tier: string | null
+          raw_response: Json | null
+          raw_webhook: Json | null
+          source_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          checkout_url?: string | null
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          customer_email?: string | null
+          debito_payment_id?: string | null
+          debito_reference?: string | null
+          debito_transaction_id?: string | null
+          id?: string
+          kind?: string
+          pack_id?: string | null
+          pack_kind?: string | null
+          pack_quantity?: number | null
+          payment_method: string
+          phone_hash?: string | null
+          phone_last4?: string | null
+          plan_tier?: string | null
+          raw_response?: Json | null
+          raw_webhook?: Json | null
+          source_id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          checkout_url?: string | null
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          customer_email?: string | null
+          debito_payment_id?: string | null
+          debito_reference?: string | null
+          debito_transaction_id?: string | null
+          id?: string
+          kind?: string
+          pack_id?: string | null
+          pack_kind?: string | null
+          pack_quantity?: number | null
+          payment_method?: string
+          phone_hash?: string | null
+          phone_last4?: string | null
+          plan_tier?: string | null
+          raw_response?: Json | null
+          raw_webhook?: Json | null
+          source_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       matches: {
         Row: {
           created_at: string
@@ -188,6 +308,8 @@ export type Database = {
           is_verified: boolean
           latitude: number | null
           longitude: number | null
+          membership_expires_at: string | null
+          membership_status: string
           membership_tier: string
           name: string | null
           onboarding_completed: boolean
@@ -211,6 +333,8 @@ export type Database = {
           is_verified?: boolean
           latitude?: number | null
           longitude?: number | null
+          membership_expires_at?: string | null
+          membership_status?: string
           membership_tier?: string
           name?: string | null
           onboarding_completed?: boolean
@@ -234,6 +358,8 @@ export type Database = {
           is_verified?: boolean
           latitude?: number | null
           longitude?: number | null
+          membership_expires_at?: string | null
+          membership_status?: string
           membership_tier?: string
           name?: string | null
           onboarding_completed?: boolean
@@ -332,8 +458,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      activate_membership_debito: {
+        Args: { _days: number; _plan_tier: string; _user_id: string }
+        Returns: Json
+      }
       consume_boost_credit: { Args: never; Returns: Json }
       consume_super_like_credit: { Args: never; Returns: Json }
+      credit_pack_debito: {
+        Args: {
+          _amount_minor: number
+          _currency: string
+          _debito_payment_id: string
+          _pack_kind: string
+          _quantity: number
+          _source_id: string
+          _user_id: string
+        }
+        Returns: Json
+      }
       grant_credits: {
         Args: { _pack_kind: string; _quantity: number; _user_id: string }
         Returns: Json
