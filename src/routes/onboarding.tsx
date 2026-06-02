@@ -155,6 +155,7 @@ function OnboardingPage() {
     if (!profile || !hydrated) return;
     setDraft((d) => ({
       ...d,
+      stepIdx: d.stepIdx || Math.max(0, (profile.onboarding_step ?? 1) - 1),
       name: d.name || profile.name || "",
       bio: d.bio || profile.bio || "",
       city: d.city || profile.city || "",
