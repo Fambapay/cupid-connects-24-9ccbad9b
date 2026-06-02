@@ -15,7 +15,6 @@ import type { Profile, SwipeDirection } from "@/types/dating";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
-
 export const Route = createFileRoute("/discover")({
   ssr: false,
   beforeLoad: requireAuthAndOnboarding,
@@ -44,7 +43,6 @@ function Discover() {
   useEffect(() => {
     setIndex(0);
   }, [items.length]);
-
 
   const mapped: Profile[] = items.map((p) => ({
     id: p.id,
@@ -96,6 +94,7 @@ function Discover() {
   return (
     <div className="fixed inset-0 overflow-hidden bg-black text-white">
       <div className="absolute inset-0" style={{ top: "-20px" }}>
+        <DiscoverTopBar onOpenFilters={() => {}} onBoost={boost.activate} />
         {current ? (
           <>
             <ProfileCard
@@ -108,7 +107,6 @@ function Discover() {
               sharedX={x}
               sharedY={y}
             />
-            <DiscoverTopBar onOpenFilters={() => {}} onBoost={boost.activate} />
             {boost.active && (
               <div
                 className="absolute left-1/2 z-30 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-semibold text-white shadow-lg"
@@ -140,12 +138,10 @@ function Discover() {
                 purchasedSuperLikes={credits.super_like_balance}
               />
             </div>
-
           </>
         ) : (
           <EmptyDiscovery loading={loading} onRefresh={() => window.location.reload()} />
         )}
-
       </div>
 
       {matchedName && (
