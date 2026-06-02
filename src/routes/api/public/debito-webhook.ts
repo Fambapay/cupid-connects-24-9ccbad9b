@@ -77,7 +77,7 @@ export const Route = createFileRoute("/api/public/debito-webhook")({
         if (reference && !row.debito_reference) updates.debito_reference = reference;
         if (newStatus === "success") updates.completed_at = new Date().toISOString();
 
-        await supabaseAdmin.from("debito_payments").update(updates).eq("id", row.id);
+        await supabaseAdmin.from("debito_payments").update(updates as never).eq("id", row.id);
 
         if (row.status !== "success" && newStatus === "success") {
           if (row.kind === "pack" && row.pack_kind && row.pack_quantity) {

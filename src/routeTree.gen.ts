@@ -26,6 +26,7 @@ import { Route as AuthRegisterRouteImport } from './routes/auth.register'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
+import { Route as ApiPublicDebitoWebhookRouteImport } from './routes/api/public/debito-webhook'
 
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
@@ -111,6 +112,11 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ApiPublicDebitoWebhookRoute = ApiPublicDebitoWebhookRouteImport.update({
+  id: '/api/public/debito-webhook',
+  path: '/api/public/debito-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/chat/$matchId': typeof ChatMatchIdRoute
+  '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/chat/$matchId': typeof ChatMatchIdRoute
+  '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -167,6 +175,7 @@ export interface FileRoutesById {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/chat/$matchId': typeof ChatMatchIdRoute
+  '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -187,6 +196,7 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/verify-email'
     | '/chat/$matchId'
+    | '/api/public/debito-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/verify-email'
     | '/chat/$matchId'
+    | '/api/public/debito-webhook'
   id:
     | '__root__'
     | '/'
@@ -224,6 +235,7 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/verify-email'
     | '/chat/$matchId'
+    | '/api/public/debito-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -238,6 +250,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   ShopRoute: typeof ShopRoute
   WelcomeRoute: typeof WelcomeRoute
+  ApiPublicDebitoWebhookRoute: typeof ApiPublicDebitoWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -361,6 +374,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/public/debito-webhook': {
+      id: '/api/public/debito-webhook'
+      path: '/api/public/debito-webhook'
+      fullPath: '/api/public/debito-webhook'
+      preLoaderRoute: typeof ApiPublicDebitoWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -414,6 +434,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   ShopRoute: ShopRoute,
   WelcomeRoute: WelcomeRoute,
+  ApiPublicDebitoWebhookRoute: ApiPublicDebitoWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
