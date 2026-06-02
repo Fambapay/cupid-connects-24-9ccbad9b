@@ -23,11 +23,12 @@ interface Props {
   onPhotosChange: (photos: string[]) => void;
   onEditProfile: () => void;
   onOpenSettings?: () => void;
+  onVerify?: () => void;
 }
 
 const PINK = '#FF4FA3';
 
-export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSettings }: Props) {
+export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSettings, onVerify }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
@@ -41,7 +42,7 @@ export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSett
     { key: 'photo', Icon: Camera, title: 'Adiciona pelo menos 1 foto', desc: 'Até 2× mais Likes com 6 fotos.', boost: '+7%', done: photos.length >= 1, action: () => fileRef.current?.click() },
     { key: 'bio', Icon: FileText, title: 'Adiciona uma bio', desc: 'Mostra a tua personalidade.', boost: '+10%', done: !!bio, action: onEditProfile },
     { key: 'interests', Icon: Tag, title: 'Adiciona interesses', desc: 'Pessoas com gostos em comum.', boost: '+5%', done: interests.length >= 3, action: onEditProfile },
-    { key: 'verify', Icon: ShieldCheck, title: 'Verifica o teu perfil', desc: 'Ganha o badge azul e mais confiança.', boost: '+10%', done: isVerified, action: () => {} },
+    { key: 'verify', Icon: ShieldCheck, title: 'Verifica o teu perfil', desc: 'Ganha o badge azul e mais confiança.', boost: '+10%', done: isVerified, action: () => onVerify?.() },
   ].filter(s => !s.done);
 
   const handleFiles = async (files: FileList) => {
