@@ -189,17 +189,20 @@ function OnboardingPage() {
   const [done, setDone] = useState(false);
   const [phase, setPhase] = useState<"done" | "tutorial">("done");
 
-  // Hydrate from localStorage + profile
+  // Hydrate from localStorage (scoped per user) + profile
   useEffect(() => {
+    if (!user) return;
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      // Clean up any legacy global key from previous versions
+      localStorage.removeItem("hunie:onboarding:v1");
+      const raw = localStorage.getItem(storageKey(user.id));
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<DraftState>;
         setDraft((d) => ({ ...d, ...parsed }));
       }
     } catch { /* noop */ }
     setHydrated(true);
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (!profile || !hydrated) return;
@@ -214,9 +217,11 @@ function OnboardingPage() {
 
   // Persist draft locally
   useEffect(() => {
-    if (!hydrated) return;
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(draft)); } catch { /* noop */ }
-  }, [draft, hydrated]);
+    if (!hydrated || !user) return;
+    try { localStorage.setItem(storageKey(user.id), JSON.stringify(draft)); } catch { /* noop */ }
+  }, [draft, hydrated, user]);
+
+
 
   // Persist current step to DB so reopen resumes
   useEffect(() => {
