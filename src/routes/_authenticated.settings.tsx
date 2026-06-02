@@ -20,6 +20,7 @@ import { PremiumBadge } from '@/components/PremiumBadge';
 import { SettingsListSkeleton } from '@/components/skeletons/AppSkeletons';
 import { BlockedUsersModal } from '@/components/BlockedUsersModal';
 import { PhoneVerificationModal } from '@/components/PhoneVerificationModal';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
