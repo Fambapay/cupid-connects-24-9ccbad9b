@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Menu, X, Heart, MapPin, MessageCircle, Sparkles, ShieldCheck, Brain, Flame, Globe2, Instagram, Facebook, Music2, Star } from "lucide-react";
+import { Menu, X, Heart, MapPin, MessageCircle, Sparkles, ShieldCheck, Brain, Flame, Globe2, Instagram, Facebook, Music2, Star, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
