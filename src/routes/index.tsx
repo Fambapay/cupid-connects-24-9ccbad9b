@@ -77,6 +77,7 @@ function Discover() {
               onBoost={() => {}}
             />
             <div
+              data-swipe-actions
               className="absolute inset-x-0 z-30"
               style={{
                 bottom: "calc(96px + env(safe-area-inset-bottom))",
