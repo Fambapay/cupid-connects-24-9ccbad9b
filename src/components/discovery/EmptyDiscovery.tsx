@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { RefreshCw } from "lucide-react";
 import hunieMark from "@/assets/hunie-mark.png.asset.json";
@@ -8,6 +9,20 @@ interface EmptyDiscoveryProps {
 }
 
 export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryProps) => {
+  const [searching, setSearching] = useState(false);
+  const isSearching = loading || searching;
+
+  useEffect(() => {
+    if (!searching) return;
+    const t = setTimeout(() => setSearching(false), 2200);
+    return () => clearTimeout(t);
+  }, [searching]);
+
+  const handleRefresh = () => {
+    setSearching(true);
+    onRefresh?.();
+  };
+
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden px-6 text-center">
       {/* Ambient brand glow */}
