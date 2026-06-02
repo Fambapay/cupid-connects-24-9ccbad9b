@@ -3,27 +3,23 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
-  beforeLoad: async ({ location }) => {
+  beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) throw redirect({ to: "/auth" });
+    if (error || !data.user) throw redirect({ to: "/welcome" });
+    if (!data.user.email_confirmed_at) throw redirect({ to: "/auth/verify-email" });
 
-    // Onboarding gate
     const { data: profile } = await supabase
       .from("profiles")
-      .select("onboarding_completed")
+      .select("onboarding_completed, onboarding_step")
       .eq("id", data.user.id)
       .maybeSingle();
 
-    const onboardingDone = profile?.onboarding_completed === true;
-    const onOnboarding = location.pathname.startsWith("/onboarding");
-
-    if (!onboardingDone && !onOnboarding) {
-      throw redirect({ to: "/onboarding" });
+    if (!profile?.onboarding_completed) {
+      throw redirect({
+        to: "/onboarding",
+        search: { step: profile?.onboarding_step ?? 1 },
+      });
     }
-    if (onboardingDone && onOnboarding) {
-      throw redirect({ to: "/" });
-    }
-
     return { user: data.user };
   },
   component: () => <Outlet />,
