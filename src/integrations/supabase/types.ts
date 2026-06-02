@@ -35,6 +35,27 @@ export type Database = {
         }
         Relationships: []
       }
+      boosts: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          profile_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          profile_id?: string
+        }
+        Relationships: []
+      }
       matches: {
         Row: {
           created_at: string
@@ -246,6 +267,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_credits: {
+        Row: {
+          boost_balance: number
+          created_at: string
+          super_like_balance: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          boost_balance?: number
+          created_at?: string
+          super_like_balance?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          boost_balance?: number
+          created_at?: string
+          super_like_balance?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_settings: {
         Row: {
           age_max: number
@@ -287,10 +332,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_boost_credit: { Args: never; Returns: Json }
+      consume_super_like_credit: { Args: never; Returns: Json }
+      grant_credits: {
+        Args: { _pack_kind: string; _quantity: number; _user_id: string }
+        Returns: Json
+      }
       is_match_member: {
         Args: { _match_id: string; _user_id: string }
         Returns: boolean
       }
+      rewind_last_swipe: { Args: never; Returns: Json }
     }
     Enums: {
       swipe_direction: "like" | "pass" | "super"

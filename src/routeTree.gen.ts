@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WelcomeRouteImport } from './routes/welcome'
+import { Route as ShopRouteImport } from './routes/shop'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -29,6 +30,11 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/shop': typeof ShopRoute
   '/welcome': typeof WelcomeRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/shop': typeof ShopRoute
   '/welcome': typeof WelcomeRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/shop': typeof ShopRoute
   '/welcome': typeof WelcomeRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/profile'
     | '/reset-password'
+    | '/shop'
     | '/welcome'
     | '/settings'
     | '/auth/forgot-password'
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/profile'
     | '/reset-password'
+    | '/shop'
     | '/welcome'
     | '/settings'
     | '/auth/forgot-password'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/profile'
     | '/reset-password'
+    | '/shop'
     | '/welcome'
     | '/_authenticated/settings'
     | '/auth/forgot-password'
@@ -224,6 +236,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ShopRoute: typeof ShopRoute
   WelcomeRoute: typeof WelcomeRoute
 }
 
@@ -234,6 +247,13 @@ declare module '@tanstack/react-router' {
       path: '/welcome'
       fullPath: '/welcome'
       preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -392,6 +412,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ShopRoute: ShopRoute,
   WelcomeRoute: WelcomeRoute,
 }
 export const routeTree = rootRouteImport

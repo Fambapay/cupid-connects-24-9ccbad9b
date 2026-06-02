@@ -116,8 +116,17 @@ export function useDiscovery() {
     async (
       targetId: string,
       direction: "like" | "pass" | "super",
-    ): Promise<{ matched: boolean; matchId?: string }> => {
+    ): Promise<{ matched: boolean; matchId?: string; reason?: string }> => {
       if (!user) return { matched: false };
+
+      if (direction === "super") {
+        const { data } = await supabase.rpc("consume_super_like_credit");
+        const res = data as { success: boolean; reason?: string } | null;
+        if (!res?.success) {
+          return { matched: false, reason: res?.reason ?? "insufficient_credits" };
+        }
+      }
+
       await supabase
         .from("swipes")
         .insert({ swiper_id: user.id, swiped_id: targetId, direction });
@@ -135,5 +144,24 @@ export function useDiscovery() {
     [user],
   );
 
-  return { items, loading, swipe, reload: load };
+  const rewind = useCallback(async (): Promise<{
+    success: boolean;
+    swipedId?: string;
+    error?: string;
+  }> => {
+    const { data } = await supabase.rpc("rewind_last_swipe");
+    const res = data as {
+      success: boolean;
+      swiped_id?: string;
+      error?: string;
+    } | null;
+    if (res?.success) {
+      await load();
+      return { success: true, swipedId: res.swiped_id };
+    }
+    return { success: false, error: res?.error };
+  }, [load]);
+
+  return { items, loading, swipe, rewind, reload: load };
 }
+
