@@ -16,17 +16,11 @@ export function AppShell({
       <div className="pointer-events-none fixed inset-0 -z-10 bg-aurora opacity-90" />
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(120%_80%_at_50%_-10%,oklch(0.3_0.08_280/0.5),transparent_60%)]" />
       {fullHeight ? (
-        <div
-          className="mx-auto flex h-full max-w-md flex-col"
-          style={{ paddingBottom: "calc(88px + env(safe-area-inset-bottom))" }}
-        >
+        <div className="mx-auto flex h-full max-w-md flex-col pb-32">
           {children}
         </div>
       ) : (
-        <div
-          className="mx-auto h-full max-w-md overflow-y-auto"
-          style={{ paddingBottom: "calc(88px + env(safe-area-inset-bottom))" }}
-        >
+        <div className="mx-auto h-full max-w-md overflow-y-auto pb-32">
           {children}
         </div>
       )}
@@ -37,7 +31,10 @@ export function AppShell({
 
 export function TopBar({ title }: { title: string }) {
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between bg-background/60 px-5 py-4 backdrop-blur-xl">
+    <header
+      className="sticky top-0 z-30 flex items-center justify-between bg-background/60 px-5 pb-4 backdrop-blur-xl"
+      style={{ paddingTop: "max(env(safe-area-inset-top), 16px)" }}
+    >
       <h1 className="text-2xl font-bold">
         <span className="text-gradient-sunset">{title}</span>
       </h1>
