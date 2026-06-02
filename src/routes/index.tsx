@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 
-import { AppShell } from "@/components/AppShell";
+import { BottomNav } from "@/components/BottomNav";
 import { DiscoveryPage } from "@/components/discovery/DiscoveryPage";
 import type { DiscoveryProfile } from "@/components/discovery/types";
 import { profiles } from "@/data/profiles";
@@ -31,17 +31,18 @@ function Discover() {
         bio: p.bio,
         photos: [p.photo],
         interests: p.interests,
-        isOnline: Math.random() > 0.5,
+        isOnline: true,
         isVerified: true,
       })),
     [],
   );
 
   return (
-    <AppShell fullHeight>
-      <div className="relative mx-4 mt-3 flex-1 min-h-0">
+    <div className="fixed inset-0 overflow-hidden bg-black text-white">
+      <div className="absolute inset-0">
         <DiscoveryPage profiles={items} />
       </div>
-    </AppShell>
+      <BottomNav />
+    </div>
   );
 }

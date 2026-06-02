@@ -45,7 +45,7 @@ export const DiscoveryPage = ({
 
   return (
     <div
-      className="relative h-full w-full overflow-hidden rounded-[28px]"
+      className="relative h-full w-full overflow-hidden"
       style={{ background: "#000", color: "#fff" }}
     >
       {current ? (
