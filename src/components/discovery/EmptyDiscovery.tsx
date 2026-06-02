@@ -34,47 +34,44 @@ export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryPro
         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
       />
 
-      {/* Honey jar — branded ring + float */}
+      {/* Hunie mark — branded */}
       <motion.div
         className="relative grid place-items-center"
-        initial={{ opacity: 0, y: 8, scale: 0.96 }}
+        initial={{ opacity: 0, y: 8, scale: 0.94 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
       >
+        {/* Soft halo behind the mark */}
         <div
-          className="absolute inset-0 -m-3 rounded-full"
+          aria-hidden
+          className="absolute inset-0 -m-6 rounded-full"
           style={{
             background:
-              "conic-gradient(from 120deg, var(--brand-pink), var(--brand-purple), var(--brand-magenta), var(--brand-pink))",
-            filter: "blur(14px)",
-            opacity: 0.55,
+              "radial-gradient(closest-side, color-mix(in oklab, var(--brand-pink) 55%, transparent) 0%, transparent 70%)",
+            filter: "blur(24px)",
+            opacity: 0.85,
           }}
         />
-        <div
-          className="relative grid h-[120px] w-[120px] place-items-center rounded-full"
-          style={{
-            background:
-              "linear-gradient(160deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.02) 60%, rgba(0,0,0,0.20) 100%)",
-            border: "1px solid rgba(255,255,255,0.10)",
-            boxShadow:
-              "inset 0 1px 0 rgba(255,255,255,0.12), 0 18px 50px -18px color-mix(in oklab, var(--brand-pink) 60%, transparent)",
-            backdropFilter: "blur(14px)",
+        <motion.img
+          src={hunieMark.url}
+          alt="Hunie"
+          width={132}
+          height={132}
+          className="relative h-[132px] w-[132px] select-none"
+          draggable={false}
+          animate={loading ? { rotate: [-3, 3, -3] } : { y: [0, -5, 0] }}
+          transition={{
+            duration: loading ? 1.6 : 3.4,
+            repeat: Infinity,
+            ease: "easeInOut",
           }}
-        >
-          <motion.div
-            className="text-[64px] leading-none"
-            animate={loading ? { rotate: [-4, 4, -4] } : { y: [0, -4, 0] }}
-            transition={{
-              duration: loading ? 1.6 : 3.2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            style={{ filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.45))" }}
-          >
-            🍯
-          </motion.div>
-        </div>
+          style={{
+            filter:
+              "drop-shadow(0 14px 28px color-mix(in oklab, var(--brand-pink) 45%, transparent)) drop-shadow(0 4px 10px rgba(0,0,0,0.45))",
+          }}
+        />
       </motion.div>
+
 
       {/* Title with brand gradient */}
       <motion.h2
