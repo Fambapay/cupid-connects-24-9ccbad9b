@@ -3,11 +3,15 @@ import { useSyncExternalStore } from "react";
 import { AppShell, TopBar } from "@/components/AppShell";
 import { matches, getProfile, profiles, subscribeMatches } from "@/data/profiles";
 
+import { requireAuthAndOnboarding } from "@/lib/authGuard";
+
 export const Route = createFileRoute("/chat")({
+  ssr: false,
+  beforeLoad: requireAuthAndOnboarding,
   head: () => ({
     meta: [
-      { title: "Conversas — Flama" },
-      { name: "description", content: "Suas conversas e novos matches." },
+      { title: "Conversas — Hunie" },
+      { name: "description", content: "As tuas conversas e novos matches." },
     ],
   }),
   component: ChatLayout,

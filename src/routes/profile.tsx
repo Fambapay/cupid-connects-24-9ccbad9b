@@ -5,7 +5,11 @@ import { ProfileView, type ProfileViewData } from '@/components/ProfileView';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
 import { BottomNav } from '@/components/BottomNav';
 
+import { requireAuthAndOnboarding } from '@/lib/authGuard';
+
 export const Route = createFileRoute('/profile')({
+  ssr: false,
+  beforeLoad: requireAuthAndOnboarding,
   head: () => ({
     meta: [
       { title: 'Meu perfil — Hunie' },

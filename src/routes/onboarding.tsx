@@ -28,9 +28,26 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/onboarding")({
+export const Route = createFileRoute("/onboarding")({
   ssr: false,
   head: () => ({ meta: [{ title: "Bem-vindo — Hunie" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    step: typeof s.step === "number" ? s.step : undefined,
+  }),
+  beforeLoad: async () => {
+    const { redirect } = await import("@tanstack/react-router");
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user) throw redirect({ to: "/welcome" });
+    if (!data.user.email_confirmed_at) {
+      throw redirect({ to: "/auth/verify-email" });
+    }
+    const { data: p } = await supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    if (p?.onboarding_completed) throw redirect({ to: "/discover" });
+  },
   component: OnboardingPage,
 });
 
@@ -141,17 +158,28 @@ function OnboardingPage() {
     if (!profile || !hydrated) return;
     setDraft((d) => ({
       ...d,
+      stepIdx: d.stepIdx || Math.max(0, (profile.onboarding_step ?? 1) - 1),
       name: d.name || profile.name || "",
       bio: d.bio || profile.bio || "",
       city: d.city || profile.city || "",
     }));
   }, [profile, hydrated]);
 
-  // Persist draft
+  // Persist draft locally
   useEffect(() => {
     if (!hydrated) return;
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(draft)); } catch { /* noop */ }
   }, [draft, hydrated]);
+
+  // Persist current step to DB so reopen resumes
+  useEffect(() => {
+    if (!hydrated || !user) return;
+    supabase
+      .from("profiles")
+      .update({ onboarding_step: draft.stepIdx + 1 })
+      .eq("id", user.id)
+      .then(() => {});
+  }, [draft.stepIdx, hydrated, user]);
 
   const set = useCallback(<K extends keyof DraftState>(key: K, value: DraftState[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
@@ -204,7 +232,7 @@ function OnboardingPage() {
     }
     try { localStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
     await reload();
-    navigate({ to: "/" });
+    navigate({ to: "/discover" });
   }, [draft, user, navigate, reload, toast]);
 
   // Auto-navigate after completion celebration
@@ -456,7 +484,7 @@ function WelcomeStep({ onStart }: { onStart: () => void }) {
         <PrimaryButton onClick={onStart}>Começar</PrimaryButton>
         <p className="text-center text-sm text-muted-foreground">
           Já tens conta?{" "}
-          <Link to="/auth" className="font-semibold text-foreground">
+          <Link to="/auth/login" className="font-semibold text-foreground">
             Entrar
           </Link>
         </p>

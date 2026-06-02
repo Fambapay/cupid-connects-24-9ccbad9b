@@ -3,11 +3,15 @@ import { Heart } from "lucide-react";
 import { AppShell, TopBar } from "@/components/AppShell";
 import { profiles } from "@/data/profiles";
 
+import { requireAuthAndOnboarding } from "@/lib/authGuard";
+
 export const Route = createFileRoute("/matches")({
+  ssr: false,
+  beforeLoad: requireAuthAndOnboarding,
   head: () => ({
     meta: [
-      { title: "Likes — Flama" },
-      { name: "description", content: "Veja quem deu like em você." },
+      { title: "Likes — Hunie" },
+      { name: "description", content: "Vê quem deu like em ti." },
     ],
   }),
   component: LikesPage,

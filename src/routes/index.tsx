@@ -1,111 +1,74 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
-import { useMotionValue } from "framer-motion";
-
-import { BottomNav } from "@/components/BottomNav";
-import { ProfileCard } from "@/components/ProfileCard";
-import { SwipeActions } from "@/components/SwipeActions";
-import { DiscoverTopBar } from "@/components/DiscoverTopBar";
-import { profiles as mockProfiles } from "@/data/profiles";
-import type { Profile, SwipeDirection } from "@/types/dating";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import type { Session } from "@supabase/supabase-js";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Flama — Descubra novas conexões" },
-      {
-        name: "description",
-        content:
-          "Conheça pessoas perto de você. Desliza pra curtir, encontra seu match.",
-      },
-    ],
-  }),
-  component: Discover,
+  ssr: false,
+  head: () => ({ meta: [{ title: "Hunie" }] }),
+  component: AuthGate,
 });
 
-function Discover() {
-  const items: Profile[] = useMemo(
-    () =>
-      mockProfiles.map((p) => ({
-        id: p.id,
-        name: p.name,
-        age: p.age,
-        city: p.distance,
-        country: "Portugal" as const,
-        distance: 5,
-        bio: p.bio,
-        photos: [p.photo],
-        gender: "feminino" as const,
-        lookingFor: "masculino" as const,
-        interests: p.interests,
-        isOnline: true,
-        is_verified: true,
-      })),
-    [],
-  );
+type Decision =
+  | { to: "/welcome" }
+  | { to: "/auth/verify-email" }
+  | { to: "/onboarding"; search?: { step?: number } }
+  | { to: "/discover" };
 
-  const [index, setIndex] = useState(0);
-  const cardRef = useRef<React.ComponentRef<typeof ProfileCard>>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const current = items[index];
-  const next = items.slice(index + 1, index + 3);
+function AuthGate() {
+  const [decision, setDecision] = useState<Decision | null>(null);
+  const [showSpinner, setShowSpinner] = useState(false);
 
-  const handleSwipe = (_dir: SwipeDirection) => {
-    x.set(0);
-    y.set(0);
-    setIndex((i) => i + 1);
-  };
+  useEffect(() => {
+    let cancelled = false;
+    const t = setTimeout(() => setShowSpinner(true), 800);
 
+    const resolve = async (session: Session | null) => {
+      if (cancelled) return;
+      if (!session) return setDecision({ to: "/welcome" });
+      if (!session.user.email_confirmed_at)
+        return setDecision({ to: "/auth/verify-email" });
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("onboarding_completed, onboarding_step")
+        .eq("id", session.user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      if (!profile?.onboarding_completed) {
+        setDecision({
+          to: "/onboarding",
+          search: { step: profile?.onboarding_step ?? 1 },
+        });
+        return;
+      }
+      setDecision({ to: "/discover" });
+    };
+
+    supabase.auth.getSession().then(({ data }) => resolve(data.session));
+
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, []);
+
+  if (!decision) return <Splash showSpinner={showSpinner} />;
+  if (decision.to === "/onboarding")
+    return <Navigate to="/onboarding" search={decision.search} replace />;
+  return <Navigate to={decision.to} replace />;
+}
+
+function Splash({ showSpinner }: { showSpinner: boolean }) {
   return (
-    <div className="fixed inset-0 overflow-hidden bg-black text-white">
-      <div className="absolute inset-0" style={{ top: '-20px' }}>
-        {current ? (
-          <>
-            <ProfileCard
-              ref={cardRef}
-              key={current.id}
-              profile={current}
-              nextProfiles={next}
-              isTop
-              onSwipe={handleSwipe}
-              sharedX={x}
-              sharedY={y}
-            />
-            <DiscoverTopBar
-              onOpenFilters={() => {}}
-              onBoost={() => {}}
-            />
-            <div
-              data-swipe-actions
-              className="absolute inset-x-0 z-30"
-              style={{
-                bottom: "calc(96px + env(safe-area-inset-bottom))",
-              }}
-            >
-              <SwipeActions
-                onSwipe={(d) => {
-                  if (d === "left") cardRef.current?.flyLeft?.();
-                  else if (d === "right") cardRef.current?.flyRight?.();
-                  else cardRef.current?.flyUp?.();
-                }}
-                cardX={x}
-                photoUrl={current.photos[0]}
-                cardKey={current.id}
-              />
-            </div>
-          </>
-        ) : (
-          <div className="flex h-full flex-col items-center justify-center text-center">
-            <div className="text-6xl">🍯</div>
-            <h2 className="mt-4 text-2xl font-bold">Voltamos já</h2>
-            <p className="mt-2 max-w-[280px] text-white/60">
-              Não há mais perfis por agora. Volta mais tarde.
-            </p>
-          </div>
+    <div className="grid min-h-[100dvh] place-items-center bg-background">
+      <div className="flex flex-col items-center gap-4">
+        <h1 className="text-gradient-sunset text-5xl font-bold tracking-tight">
+          Hunie
+        </h1>
+        {showSpinner && (
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
         )}
       </div>
-      <BottomNav />
     </div>
   );
 }
