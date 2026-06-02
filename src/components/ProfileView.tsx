@@ -242,32 +242,44 @@ export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSett
       {/* QUICK ACTIONS */}
       <div className="relative grid grid-cols-3 gap-2.5 px-5 pt-4 pb-5">
         {[
-          { Icon: Star, color: '#5BB8FF', label: '5 Super Likes', sub: 'Ver mais', to: '/shop', search: { tab: 'super_like' as const } },
-          { Icon: Zap, color: '#B13CFF', label: 'Os meus Boosts', sub: 'Ver mais', to: '/shop', search: { tab: 'boost' as const } },
-          { Icon: Heart, color: PINK, label: 'Membership', sub: 'Gerir', to: '/membership' },
+          { Icon: Star, color: '#5BB8FF', label: 'Super Likes', count: '5', sub: 'disponíveis', to: '/shop', search: { tab: 'super_like' as const } },
+          { Icon: Zap, color: '#B13CFF', label: 'Boosts', count: '0', sub: 'comprar', to: '/shop', search: { tab: 'boost' as const } },
+          { Icon: Heart, color: PINK, label: 'Membership', count: isPremium ? '✓' : '–', sub: isPremium ? 'ativo' : 'gerir', to: '/membership' },
         ].map((a, i) => (
           <Link
             key={i}
             to={a.to}
             {...('search' in a && a.search ? { search: a.search } : {})}
             onClick={() => hapticTap()}
-            className="relative overflow-hidden bg-card border border-border rounded-2xl p-3 flex flex-col items-start gap-2.5 text-left min-h-[108px] active:scale-[0.98] transition-transform"
+            className="group relative overflow-hidden rounded-2xl p-3 flex flex-col items-center text-center min-h-[118px] active:scale-[0.97] transition-transform"
+            style={{
+              background: `linear-gradient(160deg, ${a.color}22 0%, ${a.color}08 55%, transparent 100%)`,
+              border: `1px solid ${a.color}33`,
+            }}
           >
             <div
               aria-hidden
-              className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full opacity-30 blur-2xl"
+              className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-25 blur-2xl"
               style={{ background: a.color }}
             />
             <div
-              className="relative h-9 w-9 rounded-[10px] grid place-items-center"
-              style={{ background: `${a.color}1F` }}
+              className="relative h-11 w-11 rounded-full grid place-items-center mb-2 ring-1"
+              style={{
+                background: `${a.color}22`,
+                boxShadow: `0 6px 18px -6px ${a.color}99`,
+              }}
             >
-              <a.Icon size={18} color={a.color} fill={a.color} strokeWidth={0} />
+              <a.Icon size={20} color={a.color} fill={a.color} strokeWidth={0} />
             </div>
-            <div className="relative">
-              <p className="text-[12.5px] font-semibold text-foreground tracking-tight leading-tight">{a.label}</p>
-              <p className="text-[11px] font-bold mt-1 uppercase tracking-wider" style={{ color: a.color }}>{a.sub}</p>
-            </div>
+            <p className="relative text-[20px] font-black tracking-tight leading-none" style={{ color: a.color }}>
+              {a.count}
+            </p>
+            <p className="relative text-[12px] font-bold text-foreground tracking-tight mt-1 leading-tight">
+              {a.label}
+            </p>
+            <p className="relative text-[10px] text-muted-foreground tracking-tight mt-0.5">
+              {a.sub}
+            </p>
           </Link>
         ))}
       </div>
