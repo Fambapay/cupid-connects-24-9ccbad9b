@@ -261,27 +261,57 @@ function SettingsPage() {
       style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
     >
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background border-b border-white/[0.06]" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-        <div className="flex items-center justify-between p-4">
+      <div
+        className="sticky top-0 z-10 border-b border-white/[0.06]"
+        style={{
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          background:
+            'linear-gradient(180deg, rgba(16,14,22,0.92) 0%, rgba(16,14,22,0.78) 100%)',
+          backdropFilter: 'blur(18px) saturate(140%)',
+        }}
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-0 h-[140px] w-[360px] -translate-x-1/2 rounded-full"
+          style={{
+            background:
+              'radial-gradient(closest-side, color-mix(in oklab, var(--brand-pink) 18%, transparent) 0%, transparent 70%)',
+            filter: 'blur(24px)',
+          }}
+        />
+        <div className="relative flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
             <motion.button
               onClick={goBack}
-              className="w-10 h-10 hunie-card flex items-center justify-center"
+              className="hunie-glass-btn grid h-10 w-10 place-items-center rounded-2xl"
               whileTap={{ scale: 0.9 }}
+              aria-label="Voltar"
             >
-              <ArrowLeft className="w-5 h-5 text-foreground" />
+              <ArrowLeft className="h-5 w-5 text-white" />
             </motion.button>
-            <h2 className="text-[20px] font-semibold text-foreground">Definições</h2>
+            <h2
+              className="text-[20px] font-bold tracking-tight"
+              style={{
+                backgroundImage:
+                  'linear-gradient(135deg, #FFFFFF 0%, #FF4FA3 60%, #B13CFF 100%)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                color: 'transparent',
+              }}
+            >
+              Definições
+            </h2>
           </div>
           <motion.button
             onClick={goBack}
-            className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold"
+            className="hunie-pill-primary rounded-full px-4 py-2 text-[13px] font-semibold"
             whileTap={{ scale: 0.95 }}
           >
             Concluído
           </motion.button>
         </div>
       </div>
+
 
       <motion.div className="px-4" style={{ paddingBottom: '24px' }}
         variants={containerVariants} initial="hidden" animate="show"
