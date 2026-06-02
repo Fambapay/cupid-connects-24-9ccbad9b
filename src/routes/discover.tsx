@@ -28,7 +28,11 @@ export const Route = createFileRoute("/discover")({
 });
 
 function Discover() {
-  const { items, loading, swipe } = useDiscovery();
+  const navigate = useNavigate();
+  const { items, loading, swipe, rewind } = useDiscovery();
+  const { credits } = useCredits();
+  const goShop = () => navigate({ to: "/shop" });
+  const boost = useBoost(goShop);
   const [index, setIndex] = useState(0);
   const [matchedName, setMatchedName] = useState<string | null>(null);
   const cardRef = useRef<React.ComponentRef<typeof ProfileCard>>(null);
@@ -39,6 +43,7 @@ function Discover() {
   useEffect(() => {
     setIndex(0);
   }, [items.length]);
+
 
   const mapped: Profile[] = items.map((p) => ({
     id: p.id,
