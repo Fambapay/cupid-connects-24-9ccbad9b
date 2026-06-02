@@ -33,6 +33,7 @@ export const Route = createFileRoute("/discover")({
 
 function Discover() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { items, loading, swipe, rewind, reload } = useDiscovery();
   const { credits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
