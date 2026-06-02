@@ -303,7 +303,7 @@ function SettingsPage() {
             </div>
             <span className="text-[14px] font-semibold text-foreground">Super Likes</span>
           </motion.button>
-          <motion.button onClick={soon} className="rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
+          <motion.button onClick={() => goShop('boost')} className="rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
             <div className="w-12 h-12 rounded-full bg-brand-purple/10 flex items-center justify-center">
               <Zap className="w-6 h-6 text-brand-purple" fill="currentColor" />
             </div>
