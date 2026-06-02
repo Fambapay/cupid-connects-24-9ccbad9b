@@ -62,21 +62,42 @@ export async function signPhotos(
   });
 
   if (missingPaths.length) {
-    const { data } = await supabase.storage
-      .from(BUCKET)
-      .createSignedUrls(missingPaths, expires, transform ? { transform } : undefined);
-    (data ?? []).forEach((d, j) => {
-      const url = d.signedUrl ?? "";
-      const idx = missingIdx[j];
-      results[idx] = url;
-      if (url) {
-        cache.set(cacheKey(missingPaths[j], transform), {
-          url,
-          expiresAt: Date.now() + expires * 1000,
-        });
-      }
-    });
+    if (transform) {
+      // createSignedUrls (plural) doesn't accept transform — fan out singular calls in parallel.
+      const signed = await Promise.all(
+        missingPaths.map((p) =>
+          supabase.storage.from(BUCKET).createSignedUrl(p, expires, { transform }),
+        ),
+      );
+      signed.forEach((res, j) => {
+        const url = res.data?.signedUrl ?? "";
+        const idx = missingIdx[j];
+        results[idx] = url;
+        if (url) {
+          cache.set(cacheKey(missingPaths[j], transform), {
+            url,
+            expiresAt: Date.now() + expires * 1000,
+          });
+        }
+      });
+    } else {
+      const { data } = await supabase.storage
+        .from(BUCKET)
+        .createSignedUrls(missingPaths, expires);
+      (data ?? []).forEach((d, j) => {
+        const url = d.signedUrl ?? "";
+        const idx = missingIdx[j];
+        results[idx] = url;
+        if (url) {
+          cache.set(cacheKey(missingPaths[j], transform), {
+            url,
+            expiresAt: Date.now() + expires * 1000,
+          });
+        }
+      });
+    }
   }
+
 
   return results;
 }
