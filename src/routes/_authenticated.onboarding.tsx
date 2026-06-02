@@ -118,7 +118,16 @@ function OnboardingPage() {
 
   const persistStep = async () => {
     if (!user) return;
-    const patch: Record<string, unknown> = {};
+    type ProfileUpdate = {
+      name?: string;
+      age?: number;
+      birthdate?: string;
+      gender?: string;
+      interested_in?: string[];
+      city?: string;
+      bio?: string;
+    };
+    const patch: ProfileUpdate = {};
     switch (step) {
       case "name":
         patch.name = name.trim();
@@ -126,12 +135,11 @@ function OnboardingPage() {
       case "birthdate":
         if (age != null) {
           patch.age = age;
-          const iso = `${year.padStart(4, "0")}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-          patch.birthdate = iso;
+          patch.birthdate = `${year.padStart(4, "0")}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
         }
         break;
       case "gender":
-        patch.gender = gender;
+        if (gender) patch.gender = gender;
         break;
       case "interests":
         patch.interested_in = interestedIn;
