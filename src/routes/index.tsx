@@ -80,7 +80,7 @@ function Discover() {
               data-swipe-actions
               className="absolute inset-x-0 z-30"
               style={{
-                bottom: "calc(116px + env(safe-area-inset-bottom))",
+                bottom: "calc(56px + env(safe-area-inset-bottom))",
               }}
             >
               <SwipeActions
