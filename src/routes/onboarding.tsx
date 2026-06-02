@@ -664,24 +664,48 @@ function PillSelector({
   value: string | null;
   onClick: () => void;
 }) {
+  const filled = !!value;
   return (
     <motion.button
       type="button"
       onClick={onClick}
-      whileTap={{ scale: 0.96 }}
+      whileTap={{ scale: 0.97 }}
       transition={{ duration: 0 }}
       style={{ touchAction: "manipulation" }}
       className={cn(
-        "flex h-16 flex-col items-center justify-center rounded-2xl border",
-        value
-          ? "border-[color:var(--brand-pink)] bg-white/5"
-          : "border-white/15 bg-white/5",
+        "group relative flex h-20 flex-col items-center justify-center overflow-hidden rounded-2xl border px-2 text-center transition-colors",
+        filled
+          ? "border-transparent bg-white/[0.06] shadow-[0_0_0_1px_color-mix(in_oklab,var(--brand-pink)_55%,transparent),0_10px_30px_-12px_color-mix(in_oklab,var(--brand-pink)_45%,transparent)]"
+          : "border-white/10 bg-white/[0.03] hover:border-white/20",
       )}
     >
-      <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
+      {/* Soft gradient sheen when filled */}
+      {filled && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-70"
+          style={{
+            background:
+              "radial-gradient(120% 80% at 50% 0%, color-mix(in oklab, var(--brand-pink) 28%, transparent), transparent 70%)",
+          }}
+        />
+      )}
+      <span
+        className={cn(
+          "relative text-[10px] font-medium uppercase tracking-[0.18em] transition-colors",
+          filled ? "text-foreground/70" : "text-muted-foreground",
+        )}
+      >
         {label}
       </span>
-      <span className="mt-0.5 text-base font-semibold">
+      <span
+        className={cn(
+          "relative mt-1 leading-none transition-colors",
+          filled
+            ? "text-2xl font-semibold tracking-tight text-foreground"
+            : "text-lg font-light text-muted-foreground/60",
+        )}
+      >
         {value ?? "—"}
       </span>
     </motion.button>
@@ -703,40 +727,87 @@ function ScrollPickerSheet<T extends number>({
   selected: T | null;
   onSelect: (v: T) => void;
 }) {
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const id = requestAnimationFrame(() => {
+      const el = listRef.current?.querySelector<HTMLButtonElement>("[data-active='true']");
+      el?.scrollIntoView({ block: "center" });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [open]);
+
   return (
     <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
-      <DrawerContent className="bg-card">
-        <DrawerHeader>
-          <DrawerTitle className="text-center text-base">{title}</DrawerTitle>
+      <DrawerContent className="border-t border-white/10 bg-card">
+        <DrawerHeader className="pb-2 pt-3">
+          <DrawerTitle className="text-center text-sm font-semibold tracking-tight text-foreground">
+            {title}
+          </DrawerTitle>
         </DrawerHeader>
-        <div className="max-h-[60vh] overflow-y-auto px-4 pb-2">
+        <div
+          ref={listRef}
+          className="relative max-h-[60vh] overflow-y-auto px-3 pb-2"
+          style={{
+            maskImage:
+              "linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%)",
+          }}
+        >
           {items.map((it) => {
             const active = selected === it.value;
             return (
               <button
                 key={it.value}
+                data-active={active}
                 onClick={() => onSelect(it.value)}
                 className={cn(
-                  "flex w-full items-center justify-between rounded-xl px-4 py-3 text-left",
-                  active ? "bg-white/10" : "active:bg-white/5",
+                  "relative flex w-full items-center justify-between rounded-xl px-4 py-3 text-left transition-colors",
+                  active
+                    ? "bg-white/[0.06]"
+                    : "text-muted-foreground hover:bg-white/[0.03] active:bg-white/[0.05]",
                 )}
               >
+                {active && (
+                  <span
+                    aria-hidden
+                    className="absolute left-1 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-full"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, var(--brand-pink), var(--brand-purple))",
+                    }}
+                  />
+                )}
                 <span
                   className={cn(
-                    "text-base",
-                    active && "font-semibold text-[color:var(--brand-pink)]",
+                    "text-base transition-all",
+                    active
+                      ? "translate-x-2 font-semibold text-foreground"
+                      : "translate-x-0 font-normal",
                   )}
                 >
                   {it.label}
                 </span>
-                {active && <Check className="h-4 w-4 text-[color:var(--brand-pink)]" />}
+                {active && (
+                  <Check
+                    className="h-4 w-4"
+                    style={{ color: "var(--brand-pink)" }}
+                  />
+                )}
               </button>
             );
           })}
         </div>
-        <DrawerFooter>
+        <DrawerFooter className="pt-2">
           <DrawerClose asChild>
-            <Button variant="ghost" className="w-full">Cancelar</Button>
+            <Button
+              variant="ghost"
+              className="h-12 w-full rounded-xl text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground"
+            >
+              Cancelar
+            </Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
