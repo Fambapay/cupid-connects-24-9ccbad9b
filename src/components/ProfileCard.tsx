@@ -856,6 +856,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
         transform: 'translateZ(0)',
         backfaceVisibility: 'hidden',
         WebkitBackfaceVisibility: 'hidden',
+        // Harmonia vertical: nav (62px) + gap (10) + actions (64) + gap (12) ≈ 148px
+        ['--card-nav-offset' as any]: '128px',
       }}
     >
       {nextProfiles[1] && (
