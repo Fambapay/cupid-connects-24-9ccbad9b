@@ -50,7 +50,7 @@ export const BottomNavBase = ({
     <img
       src={hunieMark.url}
       className={className}
-      style={{ ...style, width: 24, height: 24, objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
+      style={{ ...style, width: 32, height: 32, objectFit: 'contain', filter: 'brightness(0) invert(1)', margin: '-5px' }}
       alt=""
     />
   );
