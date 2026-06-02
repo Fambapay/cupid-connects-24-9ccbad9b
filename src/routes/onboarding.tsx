@@ -147,6 +147,7 @@ function OnboardingPage() {
   const [draft, setDraft] = useState<DraftState>(initialDraft);
   const [hydrated, setHydrated] = useState(false);
   const [done, setDone] = useState(false);
+  const [phase, setPhase] = useState<"done" | "tutorial">("done");
 
   // Hydrate from localStorage + profile
   useEffect(() => {
