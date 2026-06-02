@@ -1544,7 +1544,7 @@ function CompletionScreen({ onContinue }: { onContinue: () => void }) {
         transition={{ duration: 0.25, delay: 0.6 }}
         className="mt-10 w-full max-w-xs"
       >
-        <PrimaryButton onClick={onContinue}>Ver o meu perfil</PrimaryButton>
+        <PrimaryButton onClick={onContinue}>Como funciona a app</PrimaryButton>
       </motion.div>
     </motion.div>
   );
