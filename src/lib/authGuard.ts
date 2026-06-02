@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export async function requireAuthAndOnboarding() {
   const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) throw redirect({ to: "/welcome" });
+  if (error || !data.user) throw redirect({ to: "/" });
   if (!data.user.email_confirmed_at) throw redirect({ to: "/auth/verify-email" });
 
   const { data: profile } = await supabase

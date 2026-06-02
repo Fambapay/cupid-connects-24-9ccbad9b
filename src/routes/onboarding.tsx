@@ -37,7 +37,7 @@ export const Route = createFileRoute("/onboarding")({
   beforeLoad: async () => {
     const { redirect } = await import("@tanstack/react-router");
     const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) throw redirect({ to: "/welcome" });
+    if (error || !data.user) throw redirect({ to: "/" });
     if (!data.user.email_confirmed_at) {
       throw redirect({ to: "/auth/verify-email" });
     }
