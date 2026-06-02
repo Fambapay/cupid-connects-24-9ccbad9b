@@ -193,12 +193,15 @@ export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSett
       {/* QUICK ACTIONS */}
       <div className="grid grid-cols-3 gap-2.5 px-5 pt-4 pb-5">
         {[
-          { Icon: Star, color: '#5BB8FF', label: '5 Super Likes', sub: 'Ver mais' },
-          { Icon: Zap, color: '#B13CFF', label: 'Os meus Boosts', sub: 'Ver mais' },
-          { Icon: Heart, color: PINK, label: 'Membership', sub: 'Gerir' },
+          { Icon: Star, color: '#5BB8FF', label: '5 Super Likes', sub: 'Ver mais', to: '/shop', search: { tab: 'superlikes' as const } },
+          { Icon: Zap, color: '#B13CFF', label: 'Os meus Boosts', sub: 'Ver mais', to: '/shop', search: { tab: 'boosts' as const } },
+          { Icon: Heart, color: PINK, label: 'Membership', sub: 'Gerir', to: '/shop', search: { tab: 'membership' as const } },
         ].map((a, i) => (
-          <button
+          <Link
             key={i}
+            to={a.to}
+            search={a.search}
+            onClick={() => hapticTap()}
             className="bg-card border border-border rounded-2xl p-3 flex flex-col items-start gap-2.5 text-left min-h-[108px]"
           >
             <div
@@ -211,7 +214,7 @@ export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSett
               <p className="text-[12.5px] font-semibold text-foreground tracking-tight leading-tight">{a.label}</p>
               <p className="text-[11px] font-bold mt-1 uppercase tracking-wider" style={{ color: a.color }}>{a.sub}</p>
             </div>
-          </button>
+          </Link>
         ))}
       </div>
 
