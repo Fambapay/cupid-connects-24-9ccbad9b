@@ -301,7 +301,7 @@ function TrustTile({ icon, label }: { icon: React.ReactNode; label: string }) {
 }
 
 function PackCard({ pack, index }: { pack: Pack; index: number }) {
-  const [loading, setLoading] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const accent =
     pack.kind === "boost"
       ? "from-fuchsia-500 to-indigo-500"
@@ -311,15 +311,7 @@ function PackCard({ pack, index }: { pack: Pack; index: number }) {
   const unit = unitPrice(pack);
   const disc = discountPct(pack.kind, unit);
 
-  const handleBuy = async () => {
-    setLoading(true);
-    // Stripe Checkout integration coming soon — keep UX honest.
-    await new Promise((r) => setTimeout(r, 700));
-    toast("Pagamentos em breve", {
-      description: "Stripe Checkout vai ser ligado nesta loja muito em breve.",
-    });
-    setLoading(false);
-  };
+  const handleBuy = () => setSheetOpen(true);
 
   return (
     <motion.div
