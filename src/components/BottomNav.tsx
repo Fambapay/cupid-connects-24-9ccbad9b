@@ -117,7 +117,7 @@ export const BottomNavBase = ({
 
   return (
     <nav
-      ref={navRef as any}
+      ref={navRef}
       className="tab-bar"
       style={bottomStyle}
     >
