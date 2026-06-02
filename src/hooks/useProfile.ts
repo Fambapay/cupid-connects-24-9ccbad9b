@@ -59,8 +59,8 @@ export function useProfile() {
 
   const deleteAccount = async () => {
     if (!user) throw new Error("Not authenticated");
-    const { error } = await supabase.from("profiles").delete().eq("id", user.id);
-    if (error) throw error;
+    const { deleteMyAccount } = await import("@/lib/account.functions");
+    await deleteMyAccount();
     await supabase.auth.signOut();
   };
 
