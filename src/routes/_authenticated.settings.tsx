@@ -158,12 +158,12 @@ function SettingsPage() {
   const requireBio = settings?.require_bio ?? false;
 
   const handleMinPhotosChange = async (value: number[]) => {
-    if (!isPremium) return soon();
+    if (!isPremium) return goUpgrade();
     try { setLiveMinPhotos(null); await updateSettings({ min_photos: value[0] }); }
     catch { toast({ title: 'Erro', description: 'Não foi possível guardar', variant: 'destructive' }); }
   };
   const handleRequireBioChange = async (enabled: boolean) => {
-    if (!isPremium) return soon();
+    if (!isPremium) return goUpgrade();
     try { await updateSettings({ require_bio: enabled }); }
     catch { toast({ title: 'Erro', description: 'Não foi possível guardar', variant: 'destructive' }); }
   };
