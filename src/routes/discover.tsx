@@ -156,10 +156,34 @@ function Discover() {
         open={!!matched}
         targetName={matched?.name ?? ""}
         targetPhoto={matched?.photo}
+        sending={openingChat}
         onClose={() => setMatched(null)}
-        onSeeLikes={() => {
-          setMatched(null);
-          navigate({ to: "/matches" });
+        onSendMessage={async () => {
+          if (!matched || !user) return;
+          setOpeningChat(true);
+          // Try a few times — match row is created by a trigger that may
+          // race with the swipe insert response.
+          let matchId: string | null = null;
+          for (let i = 0; i < 5 && !matchId; i++) {
+            const { data } = await supabase
+              .from("matches")
+              .select("id")
+              .or(
+                `and(user_a.eq.${user.id},user_b.eq.${matched.id}),and(user_a.eq.${matched.id},user_b.eq.${user.id})`
+              )
+              .maybeSingle();
+            matchId = (data as { id?: string } | null)?.id ?? null;
+            if (!matchId) await new Promise((r) => setTimeout(r, 250));
+          }
+          setOpeningChat(false);
+          if (matchId) {
+            setMatched(null);
+            navigate({ to: "/chat/$matchId", params: { matchId } });
+          } else {
+            toast.error("Match ainda a sincronizar — tenta em /matches");
+            setMatched(null);
+            navigate({ to: "/matches" });
+          }
         }}
       />
 
