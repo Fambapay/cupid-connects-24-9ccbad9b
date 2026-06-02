@@ -409,13 +409,13 @@ function SettingsPage() {
               </div>
             </div>
 
-            <button onClick={soon} className="w-full p-4 flex items-center justify-between">
+            <button onClick={() => setInterestedSheet(true)} className="w-full p-4 flex items-center justify-between transition-colors hover:bg-accent">
               <div className="flex items-center gap-3">
                 <Heart className="w-5 h-5 text-muted-foreground" />
                 <span className="text-[15px] text-foreground font-medium">Interessado em</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[14px] text-muted-foreground">—</span>
+                <span className="text-[14px] text-muted-foreground">{interestedLabel}</span>
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </div>
             </button>
