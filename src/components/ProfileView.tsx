@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { Link } from '@tanstack/react-router';
 import {
   Settings, Pencil, BadgeCheck, Camera, FileText, Tag, ShieldCheck,
   Star, Zap, Heart, ChevronRight, Sparkles, Check,
