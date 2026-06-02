@@ -92,7 +92,7 @@ const StackCard = ({
         zIndex: stackIndex === 1 ? 9 : 8,
         pointerEvents: "none",
         background: "#000",
-        borderRadius: 28,
+        borderRadius: 0,
         willChange: "transform",
         transform:
           stackIndex === 1
@@ -289,7 +289,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     useMotionValueEvent(y, "change", recompute);
 
     return (
-      <div className="absolute inset-0 overflow-hidden rounded-[28px]" style={{ background: "#000" }}>
+      <div className="absolute inset-0 overflow-hidden" style={{ background: "#000" }}>
         {isTop && nextProfiles[1] && (
           <StackCard profile={nextProfiles[1]} topX={x} topY={y} stackIndex={2} />
         )}
@@ -319,7 +319,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               inset: 0,
               overflow: "hidden",
               background: "#111",
-              borderRadius: 28,
+              borderRadius: 0,
             }}
           >
             {photos.map((src, i) => (
@@ -615,7 +615,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               color: "#fff",
               overflowY: "auto",
               paddingBottom: 120,
-              borderRadius: 28,
+              borderRadius: 0,
             }}
           >
             {profile.photos[0] && (
