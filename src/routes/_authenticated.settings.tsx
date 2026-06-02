@@ -76,9 +76,38 @@ function SettingsPage() {
     : membershipTier === 'plus' ? 'Plus'
     : membershipTier === 'select' ? 'Select' : 'Membership';
 
-  // Pages that aren't built yet — soft fallback
+  const goShop = (tab?: 'boost' | 'super_like') =>
+    navigate({ to: '/shop', search: tab ? { tab } : {} });
+  const goUpgrade = () => {
+    toast({ title: 'Funcionalidade Premium', description: 'Faz upgrade para desbloquear.' });
+    navigate({ to: '/shop', search: {} });
+  };
   const soon = () => toast({ title: 'Em breve' });
   const goBack = () => navigate({ to: '/profile' });
+
+  const pwa = usePWAInstall();
+  const handleInstallApp = async () => {
+    if (pwa.installed) {
+      toast({ title: 'Já instalada', description: 'Estás a usar a app instalada.' });
+      return;
+    }
+    if (pwa.canInstall) {
+      const outcome = await pwa.promptInstall();
+      if (outcome === 'accepted') toast({ title: 'App instalada' });
+      return;
+    }
+    if (pwa.isIOS) {
+      toast({
+        title: 'Adicionar ao ecrã inicial',
+        description: 'Toca em Partilhar e escolhe "Adicionar ao Ecrã Principal".',
+      });
+      return;
+    }
+    toast({
+      title: 'Instalação indisponível',
+      description: 'Abre no Chrome/Edge para instalar a app.',
+    });
+  };
 
   const handleEnableLocation = async () => {
     if (locationPermission === 'denied') {
