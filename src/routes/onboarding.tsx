@@ -605,7 +605,7 @@ function NameStep({
   }, []);
   const canNext = value.trim().length >= 2;
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 min-h-0 flex-col">
       <StepScroll>
         <Heading
           title="Como te chamas?"
@@ -674,7 +674,7 @@ function BirthdateStep({
   const canNext = !!complete && !underage;
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 min-h-0 flex-col">
       <StepScroll>
         <Heading
           title="Quando nasceste?"
@@ -990,7 +990,7 @@ function GenderStep({
     { value: "nonbinary", label: "Não-binário", Icon: Users },
   ];
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 min-h-0 flex-col">
       <StepScroll>
         <Heading title="Como te identificas?" />
         <motion.div
@@ -1112,7 +1112,7 @@ function InterestedStep({
     { value: "everyone", label: "Todos", Icon: Users },
   ];
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 min-h-0 flex-col">
       <StepScroll>
         <Heading title="Quem queres conhecer?" />
         <motion.div
@@ -1156,7 +1156,7 @@ function PhotosStep({ onNext }: { onNext: () => void; count?: number }) {
   };
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 min-h-0 flex-col">
       <StepScroll>
         <Heading
           title="Adiciona as tuas melhores fotos"
@@ -1315,7 +1315,7 @@ function BioStep({
     onChange((value + sep + p + " ").slice(0, 300));
   };
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 min-h-0 flex-col">
       <StepScroll>
         <Heading
           title="Fala um pouco de ti"
@@ -1447,7 +1447,7 @@ function LocationStep({
   const canNext = state === "granted" || value.trim().length >= 2;
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 min-h-0 flex-col">
       <StepScroll>
         <Heading
           title="Onde estás?"
@@ -1553,7 +1553,7 @@ function InterestsStep({
     else if (value.length < MAX_INTERESTS) onChange([...value, item]);
   };
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 min-h-0 flex-col">
       <StepScroll>
         <div className="flex items-start justify-between gap-3 pt-2">
           <Heading
@@ -1639,7 +1639,8 @@ function PromptsStep({
   const canNext = validCount >= MIN_PROMPTS;
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 min-h-0 flex-col">
+
       <StepScroll>
         <Heading
           title="Mostra a tua personalidade"
