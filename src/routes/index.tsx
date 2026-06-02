@@ -198,8 +198,8 @@ function Landing() {
             <Link to="/auth/login" className="hl-nav-link">Entrar</Link>
             <Link to="/auth/register" className="hl-btn-primary">Criar conta</Link>
           </div>
-          <Link to="/auth/register" className="hl-btn-primary" style={{ display: "inline-flex" }}>
-            <span className="md:hidden" style={{ fontSize: 13 }}>Entrar</span>
+          <Link to="/auth/register" className="hl-btn-primary md:hidden" style={{ padding: "10px 18px", fontSize: 13 }}>
+            Criar conta
           </Link>
         </div>
       </nav>
