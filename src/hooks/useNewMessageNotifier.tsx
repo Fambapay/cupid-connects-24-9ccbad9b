@@ -115,7 +115,7 @@ export function useNewMessageNotifier() {
                 title={peer.name}
                 body={body}
                 avatar={peer.photo}
-                appName="Hunie · Mensagem"
+                appName="Hunie"
                 timeLabel="agora"
                 onClick={() => {
                   toast.dismiss(t);
