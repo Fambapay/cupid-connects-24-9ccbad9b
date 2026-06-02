@@ -294,7 +294,7 @@ const TabButton = ({
 
 
 const TAB_TO_PATH = {
-  discover: "/",
+  discover: "/discover",
   likes: "/matches",
   chat: "/chat",
   profile: "/profile",
@@ -303,7 +303,7 @@ const TAB_TO_PATH = {
 type TabId = keyof typeof TAB_TO_PATH;
 
 function pathToTab(pathname: string): TabId {
-  if (pathname === "/" || pathname.startsWith("/explore")) return "discover";
+  if (pathname.startsWith("/discover") || pathname.startsWith("/explore")) return "discover";
   if (pathname.startsWith("/matches")) return "likes";
   if (pathname.startsWith("/chat")) return "chat";
   if (pathname.startsWith("/profile")) return "profile";
