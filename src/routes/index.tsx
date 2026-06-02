@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Heart, Star, RotateCcw, Sparkles, Send } from "lucide-react";
+import { RotateCcw, Sparkles } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { SwipeCard } from "@/components/SwipeCard";
