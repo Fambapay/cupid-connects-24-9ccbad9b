@@ -694,6 +694,28 @@ function SettingsPage() {
       <VerificationModal open={showVerificationModal} onOpenChange={setShowVerificationModal} />
       <BlockedUsersModal open={showBlockedUsers} onOpenChange={setShowBlockedUsers} />
       <PhoneVerificationModal open={phoneModalOpen} onOpenChange={setPhoneModalOpen} />
+
+      <Sheet open={interestedSheet} onOpenChange={setInterestedSheet}>
+        <SheetContent side="bottom" className="rounded-t-3xl bg-card border-border">
+          <SheetHeader>
+            <SheetTitle className="text-foreground">Interessado em</SheetTitle>
+            <SheetDescription className="text-muted-foreground">Quem queres ver na descoberta.</SheetDescription>
+          </SheetHeader>
+          <div className="mt-4 space-y-2">
+            {([
+              { key: 'women' as const, label: 'Mulheres' },
+              { key: 'men' as const, label: 'Homens' },
+              { key: 'everyone' as const, label: 'Todos' },
+            ]).map(({ key, label }) => (
+              <button key={key} onClick={() => setInterested(key)}
+                className="w-full p-4 rounded-xl bg-background border border-border flex items-center justify-between hover:bg-accent transition-colors">
+                <span className="text-[15px] text-foreground font-medium">{label}</span>
+                {interestedKey === key && <Check className="w-5 h-5 text-brand-purple" />}
+              </button>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
