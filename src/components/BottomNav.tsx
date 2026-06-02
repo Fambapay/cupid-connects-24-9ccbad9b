@@ -302,12 +302,12 @@ const TAB_TO_PATH = {
 
 type TabId = keyof typeof TAB_TO_PATH;
 
-function pathToTab(pathname: string): TabId {
+function pathToTab(pathname: string): TabId | null {
   if (pathname.startsWith("/discover") || pathname.startsWith("/explore")) return "discover";
   if (pathname.startsWith("/matches")) return "likes";
   if (pathname.startsWith("/chat")) return "chat";
-  if (pathname.startsWith("/profile")) return "profile";
-  return "discover";
+  if (pathname.startsWith("/profile") || pathname.startsWith("/settings")) return "profile";
+  return null;
 }
 
 export function BottomNav(
