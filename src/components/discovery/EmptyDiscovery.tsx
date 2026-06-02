@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { RefreshCw } from "lucide-react";
 import hunieMark from "@/assets/hunie-mark.png.asset.json";
@@ -8,6 +9,20 @@ interface EmptyDiscoveryProps {
 }
 
 export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryProps) => {
+  const [searching, setSearching] = useState(false);
+  const isSearching = loading || searching;
+
+  useEffect(() => {
+    if (!searching) return;
+    const t = setTimeout(() => setSearching(false), 2200);
+    return () => clearTimeout(t);
+  }, [searching]);
+
+  const handleRefresh = () => {
+    setSearching(true);
+    onRefresh?.();
+  };
+
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden px-6 text-center">
       {/* Ambient brand glow */}
@@ -35,7 +50,7 @@ export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryPro
       />
 
       {/* Radar search animation */}
-      {loading && (
+      {isSearching && (
         <div className="pointer-events-none absolute left-1/2 top-[38%] -translate-x-1/2 -translate-y-1/2">
           {/* Expanding rings */}
           {[0, 1, 2].map((i) => (
@@ -112,9 +127,9 @@ export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryPro
           height={132}
           className="relative h-[132px] w-[132px] select-none"
           draggable={false}
-          animate={loading ? { rotate: [-3, 3, -3] } : { y: [0, -5, 0] }}
+          animate={isSearching ? { rotate: [-3, 3, -3] } : { y: [0, -5, 0] }}
           transition={{
-            duration: loading ? 1.6 : 3.4,
+            duration: isSearching ? 1.6 : 3.4,
             repeat: Infinity,
             ease: "easeInOut",
           }}
@@ -140,7 +155,7 @@ export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryPro
           color: "transparent",
         }}
       >
-        {loading ? "À procura..." : "A colmeia está calma"}
+        {isSearching ? "À procura..." : "A colmeia está calma"}
       </motion.h2>
 
       <motion.p
@@ -149,15 +164,15 @@ export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryPro
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
       >
-        {loading
+        {isSearching
           ? "A encontrar pessoas perto de ti."
           : "Voltamos já com novos perfis para descobrires."}
       </motion.p>
 
-      {!loading && onRefresh && (
+      {!isSearching && onRefresh && (
         <motion.button
           type="button"
-          onClick={onRefresh}
+          onClick={handleRefresh}
           whileTap={{ scale: 0.96 }}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
