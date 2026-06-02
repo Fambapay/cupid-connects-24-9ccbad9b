@@ -19,7 +19,9 @@ import { VerificationModal } from '@/components/VerificationModal';
 import { PremiumBadge } from '@/components/PremiumBadge';
 import { SettingsListSkeleton } from '@/components/skeletons/AppSkeletons';
 import { BlockedUsersModal } from '@/components/BlockedUsersModal';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { PhoneVerificationModal } from '@/components/PhoneVerificationModal';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
@@ -75,9 +77,38 @@ function SettingsPage() {
     : membershipTier === 'plus' ? 'Plus'
     : membershipTier === 'select' ? 'Select' : 'Membership';
 
-  // Pages that aren't built yet — soft fallback
+  const goShop = (tab?: 'boost' | 'super_like') =>
+    navigate({ to: '/shop', search: tab ? { tab } : {} });
+  const goUpgrade = () => {
+    toast({ title: 'Funcionalidade Premium', description: 'Faz upgrade para desbloquear.' });
+    navigate({ to: '/shop', search: {} });
+  };
   const soon = () => toast({ title: 'Em breve' });
   const goBack = () => navigate({ to: '/profile' });
+
+  const pwa = usePWAInstall();
+  const handleInstallApp = async () => {
+    if (pwa.installed) {
+      toast({ title: 'Já instalada', description: 'Estás a usar a app instalada.' });
+      return;
+    }
+    if (pwa.canInstall) {
+      const outcome = await pwa.promptInstall();
+      if (outcome === 'accepted') toast({ title: 'App instalada' });
+      return;
+    }
+    if (pwa.isIOS) {
+      toast({
+        title: 'Adicionar ao ecrã inicial',
+        description: 'Toca em Partilhar e escolhe "Adicionar ao Ecrã Principal".',
+      });
+      return;
+    }
+    toast({
+      title: 'Instalação indisponível',
+      description: 'Abre no Chrome/Edge para instalar a app.',
+    });
+  };
 
   const handleEnableLocation = async () => {
     if (locationPermission === 'denied') {
@@ -96,6 +127,30 @@ function SettingsPage() {
   const [showBlockedUsers, setShowBlockedUsers] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [phoneModalOpen, setPhoneModalOpen] = useState(false);
+  const [interestedSheet, setInterestedSheet] = useState(false);
+
+  const interestedIn = profile?.interested_in ?? [];
+  const interestedKey: 'men' | 'women' | 'everyone' | null =
+    interestedIn.length === 0 ? null
+      : interestedIn.length >= 3 ? 'everyone'
+      : interestedIn[0] === 'man' ? 'men'
+      : interestedIn[0] === 'woman' ? 'women'
+      : 'everyone';
+  const interestedLabel =
+    interestedKey === 'men' ? 'Homens'
+      : interestedKey === 'women' ? 'Mulheres'
+      : interestedKey === 'everyone' ? 'Todos'
+      : 'Selecionar';
+  const setInterested = async (key: 'men' | 'women' | 'everyone') => {
+    const map = { men: ['man'], women: ['woman'], everyone: ['man', 'woman', 'nonbinary'] };
+    try {
+      await updateProfile({ interested_in: map[key] });
+      setInterestedSheet(false);
+      toast({ title: 'Preferência guardada' });
+    } catch {
+      toast({ title: 'Erro', description: 'Não foi possível guardar', variant: 'destructive' });
+    }
+  };
 
   const initialMode: VisibilityMode = profile?.is_paused ? 'hidden' : 'standard';
   const [visibilityMode, setVisibilityMode] = useState<VisibilityMode>(initialMode);
@@ -128,12 +183,12 @@ function SettingsPage() {
   const requireBio = settings?.require_bio ?? false;
 
   const handleMinPhotosChange = async (value: number[]) => {
-    if (!isPremium) return soon();
+    if (!isPremium) return goUpgrade();
     try { setLiveMinPhotos(null); await updateSettings({ min_photos: value[0] }); }
     catch { toast({ title: 'Erro', description: 'Não foi possível guardar', variant: 'destructive' }); }
   };
   const handleRequireBioChange = async (enabled: boolean) => {
-    if (!isPremium) return soon();
+    if (!isPremium) return goUpgrade();
     try { await updateSettings({ require_bio: enabled }); }
     catch { toast({ title: 'Erro', description: 'Não foi possível guardar', variant: 'destructive' }); }
   };
@@ -242,7 +297,7 @@ function SettingsPage() {
           ]).map(({ tier, name, tagline, accent, icon }) => {
             const isCurrent = isPremium && membershipTier === tier;
             return (
-              <motion.button key={tier} onClick={soon}
+              <motion.button key={tier} onClick={() => navigate({ to: '/shop', search: {} })}
                 className="w-full rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-1.5 relative overflow-hidden"
                 whileTap={{ scale: 0.98 }}
                 style={isCurrent ? { borderColor: accent } : undefined}
@@ -267,13 +322,13 @@ function SettingsPage() {
 
         {/* 2x2 actions grid */}
         <motion.div className="mt-4 grid grid-cols-2 gap-3" variants={itemVariants}>
-          <motion.button onClick={soon} className="rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
+          <motion.button onClick={() => goShop('super_like')} className="rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
             <div className="w-12 h-12 rounded-full bg-superlike/10 flex items-center justify-center">
               <Star className="w-6 h-6 text-superlike" fill="currentColor" />
             </div>
             <span className="text-[14px] font-semibold text-foreground">Super Likes</span>
           </motion.button>
-          <motion.button onClick={soon} className="rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
+          <motion.button onClick={() => goShop('boost')} className="rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
             <div className="w-12 h-12 rounded-full bg-brand-purple/10 flex items-center justify-center">
               <Zap className="w-6 h-6 text-brand-purple" fill="currentColor" />
             </div>
@@ -289,7 +344,7 @@ function SettingsPage() {
             </span>
             {profile?.is_incognito && <span className="text-[11px] text-brand-purple font-semibold">Ativo</span>}
           </motion.button>
-          <motion.button onClick={soon} className="rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
+          <motion.button onClick={() => (isPremium ? soon() : goUpgrade())} className="rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
             <div className="w-12 h-12 rounded-full bg-brand-purple/10 flex items-center justify-center">
               <Plane className="w-6 h-6 text-brand-purple" />
             </div>
@@ -379,13 +434,13 @@ function SettingsPage() {
               </div>
             </div>
 
-            <button onClick={soon} className="w-full p-4 flex items-center justify-between">
+            <button onClick={() => setInterestedSheet(true)} className="w-full p-4 flex items-center justify-between transition-colors hover:bg-accent">
               <div className="flex items-center gap-3">
                 <Heart className="w-5 h-5 text-muted-foreground" />
                 <span className="text-[15px] text-foreground font-medium">Interessado em</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[14px] text-muted-foreground">—</span>
+                <span className="text-[14px] text-muted-foreground">{interestedLabel}</span>
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </div>
             </button>
@@ -421,7 +476,7 @@ function SettingsPage() {
               <Switch checked={requireBio} onCheckedChange={handleRequireBioChange} disabled={!isPremium} />
             </div>
             {['Interesses', 'À procura de', 'Idiomas', 'Signo', 'Educação', 'Planos de família'].map((label, i, arr) => (
-              <button key={label} onClick={soon}
+              <button key={label} onClick={() => (isPremium ? soon() : goUpgrade())}
                 className={`w-full p-4 flex items-center justify-between transition-colors hover:bg-accent ${i < arr.length - 1 ? 'border-b border-border' : ''}`}>
                 <span className="text-[15px] text-foreground font-medium">{label}</span>
                 <div className="flex items-center gap-1 text-muted-foreground">
@@ -432,7 +487,7 @@ function SettingsPage() {
             ))}
           </div>
           {!isPremium && (
-            <motion.button onClick={soon} whileTap={{ scale: 0.98 }}
+            <motion.button onClick={() => navigate({ to: '/shop', search: {} })} whileTap={{ scale: 0.98 }}
               className="mt-3 w-full rounded-2xl bg-brand-purple text-primary-foreground py-3.5 font-semibold text-[15px] flex items-center justify-center gap-2">
               <Crown className="w-4 h-4" /> Desbloquear com Hunie Plus
             </motion.button>
@@ -551,7 +606,7 @@ function SettingsPage() {
             </motion.button>
           </div>
           <motion.div className="mt-3" variants={itemVariants}>
-            <motion.button onClick={soon}
+            <motion.button onClick={handleInstallApp}
               className="w-full p-4 flex items-center justify-between rounded-2xl bg-card border border-border transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
@@ -571,7 +626,7 @@ function SettingsPage() {
         <motion.div className="mt-6" variants={itemVariants}>
           <SectionHeader icon={Crown} label="Conta" />
           <div className="rounded-2xl bg-card border border-border overflow-hidden">
-            <motion.button onClick={soon}
+            <motion.button onClick={() => navigate({ to: '/shop', search: {} })}
               className="w-full p-4 flex items-center justify-between border-b border-border transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isPremium ? 'bg-amber-500' : 'bg-amber-500/10'}`}>
@@ -640,6 +695,28 @@ function SettingsPage() {
       <VerificationModal open={showVerificationModal} onOpenChange={setShowVerificationModal} />
       <BlockedUsersModal open={showBlockedUsers} onOpenChange={setShowBlockedUsers} />
       <PhoneVerificationModal open={phoneModalOpen} onOpenChange={setPhoneModalOpen} />
+
+      <Sheet open={interestedSheet} onOpenChange={setInterestedSheet}>
+        <SheetContent side="bottom" className="rounded-t-3xl bg-card border-border">
+          <SheetHeader>
+            <SheetTitle className="text-foreground">Interessado em</SheetTitle>
+            <SheetDescription className="text-muted-foreground">Quem queres ver na descoberta.</SheetDescription>
+          </SheetHeader>
+          <div className="mt-4 space-y-2">
+            {([
+              { key: 'women' as const, label: 'Mulheres' },
+              { key: 'men' as const, label: 'Homens' },
+              { key: 'everyone' as const, label: 'Todos' },
+            ]).map(({ key, label }) => (
+              <button key={key} onClick={() => setInterested(key)}
+                className="w-full p-4 rounded-xl bg-background border border-border flex items-center justify-between hover:bg-accent transition-colors">
+                <span className="text-[15px] text-foreground font-medium">{label}</span>
+                {interestedKey === key && <Check className="w-5 h-5 text-brand-purple" />}
+              </button>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
