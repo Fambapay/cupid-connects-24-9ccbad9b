@@ -49,7 +49,9 @@ export function usePWAInstall() {
   return {
     canInstall: !!deferred,
     installed,
+    isStandalone: installed,
     isIOS,
+    deferredPrompt: deferred,
     promptInstall,
   };
 }
