@@ -194,14 +194,14 @@ export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSett
       {/* QUICK ACTIONS */}
       <div className="grid grid-cols-3 gap-2.5 px-5 pt-4 pb-5">
         {[
-          { Icon: Star, color: '#5BB8FF', label: '5 Super Likes', sub: 'Ver mais', search: { tab: 'super_like' as const } },
-          { Icon: Zap, color: '#B13CFF', label: 'Os meus Boosts', sub: 'Ver mais', search: { tab: 'boost' as const } },
-          { Icon: Heart, color: PINK, label: 'Membership', sub: 'Gerir', search: {} as { tab?: 'boost' | 'super_like' } },
+          { Icon: Star, color: '#5BB8FF', label: '5 Super Likes', sub: 'Ver mais', to: '/shop', search: { tab: 'super_like' as const } },
+          { Icon: Zap, color: '#B13CFF', label: 'Os meus Boosts', sub: 'Ver mais', to: '/shop', search: { tab: 'boost' as const } },
+          { Icon: Heart, color: PINK, label: 'Membership', sub: 'Gerir', to: '/membership' },
         ].map((a, i) => (
           <Link
             key={i}
-            to="/shop"
-            search={a.search}
+            to={a.to}
+            {...('search' in a && a.search ? { search: a.search } : {})}
             onClick={() => hapticTap()}
             className="bg-card border border-border rounded-2xl p-3 flex flex-col items-start gap-2.5 text-left min-h-[108px]"
           >
