@@ -60,11 +60,11 @@ export function VerificationModal({
   const handleSelectFile = (f: File | null) => {
     if (!f) return;
     if (!f.type.startsWith("image/")) {
-      toast({ title: "Ficheiro inválido", description: "Tem de ser uma imagem.", variant: "destructive" });
+      toast.error("Ficheiro inválido", { description: "Tem de ser uma imagem." });
       return;
     }
     if (f.size > 8 * 1024 * 1024) {
-      toast({ title: "Imagem muito grande", description: "Máximo 8 MB.", variant: "destructive" });
+      toast.error("Imagem muito grande", { description: "Máximo 8 MB." });
       return;
     }
     setFile(f);
@@ -91,13 +91,13 @@ export function VerificationModal({
 
       if (res.approved) {
         onConfirm?.();
-        toast({ title: "Perfil verificado ✓", description: "Já tens o emblema azul." });
+        toast.success("Perfil verificado ✓", { description: "Já tens o emblema azul." });
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Erro inesperado";
       setError(msg);
       setStage("capture");
-      toast({ title: "Erro", description: msg, variant: "destructive" });
+      toast.error("Erro", { description: msg });
     }
   };
 
