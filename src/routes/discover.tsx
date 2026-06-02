@@ -7,6 +7,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { ProfileCard } from "@/components/ProfileCard";
 import { SwipeActions } from "@/components/SwipeActions";
 import { DiscoverTopBar } from "@/components/DiscoverTopBar";
+import { EmptyDiscovery } from "@/components/discovery/EmptyDiscovery";
 import { useDiscovery } from "@/hooks/useDiscovery";
 import { useCredits } from "@/hooks/useCredits";
 import { useBoost } from "@/hooks/useBoost";
@@ -142,18 +143,9 @@ function Discover() {
 
           </>
         ) : (
-          <div className="flex h-full flex-col items-center justify-center text-center px-6">
-            <div className="text-6xl">🍯</div>
-            <h2 className="mt-4 text-2xl font-bold">
-              {loading ? "A carregar..." : "Voltamos já"}
-            </h2>
-            <p className="mt-2 max-w-[280px] text-white/60">
-              {loading
-                ? "À procura de pessoas perto de ti."
-                : "Não há mais perfis por agora. Volta mais tarde."}
-            </p>
-          </div>
+          <EmptyDiscovery loading={loading} onRefresh={() => window.location.reload()} />
         )}
+
       </div>
 
       {matchedName && (
