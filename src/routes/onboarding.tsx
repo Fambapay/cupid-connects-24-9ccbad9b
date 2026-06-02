@@ -504,7 +504,8 @@ function CtaBar({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: staggerDelay }}
-      className="px-6 pt-3 pb-5"
+      className="shrink-0 px-6 pt-3 pb-5"
+      style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
     >
       {children}
     </motion.div>
