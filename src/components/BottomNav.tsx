@@ -24,7 +24,7 @@ interface BottomNavProps {
   ambientColor?: { r: number; g: number; b: number };
 }
 
-export const BottomNav = ({
+export const BottomNavBase = ({
   activeTab,
   onTabChange,
   likesCount = 0,
