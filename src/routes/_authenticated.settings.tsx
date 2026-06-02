@@ -605,7 +605,7 @@ function SettingsPage() {
             </motion.button>
           </div>
           <motion.div className="mt-3" variants={itemVariants}>
-            <motion.button onClick={soon}
+            <motion.button onClick={handleInstallApp}
               className="w-full p-4 flex items-center justify-between rounded-2xl bg-card border border-border transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
