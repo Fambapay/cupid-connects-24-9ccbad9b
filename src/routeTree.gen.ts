@@ -14,6 +14,7 @@ import { Route as ShopRouteImport } from './routes/shop'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as ChatRouteImport } from './routes/chat'
@@ -51,6 +52,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembershipRoute = MembershipRouteImport.update({
+  id: '/membership',
+  path: '/membership',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MatchesRoute = MatchesRouteImport.update({
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof ChatRouteWithChildren
   '/discover': typeof DiscoverRoute
   '/matches': typeof MatchesRoute
+  '/membership': typeof MembershipRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -143,6 +150,7 @@ export interface FileRoutesByTo {
   '/chat': typeof ChatRouteWithChildren
   '/discover': typeof DiscoverRoute
   '/matches': typeof MatchesRoute
+  '/membership': typeof MembershipRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/chat': typeof ChatRouteWithChildren
   '/discover': typeof DiscoverRoute
   '/matches': typeof MatchesRoute
+  '/membership': typeof MembershipRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/discover'
     | '/matches'
+    | '/membership'
     | '/onboarding'
     | '/profile'
     | '/reset-password'
@@ -204,6 +214,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/discover'
     | '/matches'
+    | '/membership'
     | '/onboarding'
     | '/profile'
     | '/reset-password'
@@ -224,6 +235,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/discover'
     | '/matches'
+    | '/membership'
     | '/onboarding'
     | '/profile'
     | '/reset-password'
@@ -245,6 +257,7 @@ export interface RootRouteChildren {
   ChatRoute: typeof ChatRouteWithChildren
   DiscoverRoute: typeof DiscoverRoute
   MatchesRoute: typeof MatchesRoute
+  MembershipRoute: typeof MembershipRoute
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -288,6 +301,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membership': {
+      id: '/membership'
+      path: '/membership'
+      fullPath: '/membership'
+      preLoaderRoute: typeof MembershipRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/matches': {
@@ -429,6 +449,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChatRoute: ChatRouteWithChildren,
   DiscoverRoute: DiscoverRoute,
   MatchesRoute: MatchesRoute,
+  MembershipRoute: MembershipRoute,
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,

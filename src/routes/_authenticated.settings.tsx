@@ -81,7 +81,7 @@ function SettingsPage() {
     navigate({ to: '/shop', search: tab ? { tab } : {} });
   const goUpgrade = () => {
     toast({ title: 'Funcionalidade Premium', description: 'Faz upgrade para desbloquear.' });
-    navigate({ to: '/shop', search: {} });
+    navigate({ to: '/membership' });
   };
   const soon = () => toast({ title: 'Em breve' });
   const goBack = () => navigate({ to: '/profile' });
@@ -297,7 +297,7 @@ function SettingsPage() {
           ]).map(({ tier, name, tagline, accent, icon }) => {
             const isCurrent = isPremium && membershipTier === tier;
             return (
-              <motion.button key={tier} onClick={() => navigate({ to: '/shop', search: {} })}
+              <motion.button key={tier} onClick={() => navigate({ to: '/membership' })}
                 className="w-full rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-1.5 relative overflow-hidden"
                 whileTap={{ scale: 0.98 }}
                 style={isCurrent ? { borderColor: accent } : undefined}
@@ -487,7 +487,7 @@ function SettingsPage() {
             ))}
           </div>
           {!isPremium && (
-            <motion.button onClick={() => navigate({ to: '/shop', search: {} })} whileTap={{ scale: 0.98 }}
+            <motion.button onClick={() => navigate({ to: '/membership' })} whileTap={{ scale: 0.98 }}
               className="mt-3 w-full rounded-2xl bg-brand-purple text-primary-foreground py-3.5 font-semibold text-[15px] flex items-center justify-center gap-2">
               <Crown className="w-4 h-4" /> Desbloquear com Hunie Plus
             </motion.button>
@@ -626,7 +626,7 @@ function SettingsPage() {
         <motion.div className="mt-6" variants={itemVariants}>
           <SectionHeader icon={Crown} label="Conta" />
           <div className="rounded-2xl bg-card border border-border overflow-hidden">
-            <motion.button onClick={() => navigate({ to: '/shop', search: {} })}
+            <motion.button onClick={() => navigate({ to: '/membership' })}
               className="w-full p-4 flex items-center justify-between border-b border-border transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isPremium ? 'bg-amber-500' : 'bg-amber-500/10'}`}>
