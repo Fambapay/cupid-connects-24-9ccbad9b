@@ -89,13 +89,26 @@ function LandingGate() {
   }, [navigate]);
 
   if (!ready) {
-    return (
-      <div className="grid min-h-[100dvh] place-items-center bg-background">
-        <h1 className="text-gradient-sunset text-5xl font-bold tracking-tight">Hunie</h1>
-      </div>
-    );
+    return <SplashScreen />;
   }
   return <Landing />;
+}
+
+function SplashScreen() {
+  return (
+    <div className="grid min-h-[100dvh] place-items-center bg-background animate-fade-in">
+      <div className="flex flex-col items-center gap-3">
+        <span className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-sunset shadow-glow">
+          <Heart className="h-8 w-8 fill-white text-white" />
+        </span>
+        <span className="text-gradient-sunset font-display text-3xl font-bold tracking-tight">Hunie</span>
+      </div>
+    </div>
+  );
+}
+
+function _LegacySplash() {
+  return null;
 }
 
 /* ----------------------- helpers ----------------------- */
