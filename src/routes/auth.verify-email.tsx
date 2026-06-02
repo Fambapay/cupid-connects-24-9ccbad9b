@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { AuthShell } from "./auth.login";
+import { AuthShell } from "@/components/AuthShell";
 
 export const Route = createFileRoute("/auth/verify-email")({
   ssr: false,

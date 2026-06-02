@@ -145,7 +145,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-export function AuthShell({ title, children }: { title: string; children: React.ReactNode }) {
+function AuthShell({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="relative min-h-[100dvh] overflow-hidden bg-background text-foreground">
       <div className="pointer-events-none absolute inset-0 bg-aurora opacity-70" />

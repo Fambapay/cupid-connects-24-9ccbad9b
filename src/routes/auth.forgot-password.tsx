@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
-import { AuthShell } from "./auth.login";
+import { AuthShell } from "@/components/AuthShell";
 
 export const Route = createFileRoute("/auth/forgot-password")({
   ssr: false,
