@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import confetti from "canvas-confetti";
 import {
   ArrowLeft,
   ArrowRight,
@@ -1377,10 +1378,12 @@ function BioStep({
 function LocationStep({
   value,
   onChange,
+  onCoords,
   onNext,
 }: {
   value: string;
   onChange: (v: string) => void;
+  onCoords: (lat: number | null, lng: number | null) => void;
   onNext: () => void;
 }) {
   const [state, setState] = useState<"idle" | "loading" | "granted" | "denied">(
@@ -1398,6 +1401,7 @@ function LocationStep({
     setState("loading");
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
+        onCoords(pos.coords.latitude, pos.coords.longitude);
         try {
           const r = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&accept-language=pt`,
