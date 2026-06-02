@@ -31,6 +31,20 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/onboarding")({
   ssr: false,
   head: () => ({ meta: [{ title: "Bem-vindo — Hunie" }] }),
+  beforeLoad: async () => {
+    const { redirect } = await import("@tanstack/react-router");
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user) throw redirect({ to: "/welcome" });
+    if (!data.user.email_confirmed_at) {
+      throw redirect({ to: "/auth/verify-email" });
+    }
+    const { data: p } = await supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    if (p?.onboarding_completed) throw redirect({ to: "/discover" });
+  },
   component: OnboardingPage,
 });
 
