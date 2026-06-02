@@ -72,7 +72,24 @@ function Discover() {
     if (!target) return;
     const direction = dir === "right" ? "like" : dir === "up" ? "super" : "pass";
     const result = await swipe(target.id, direction);
+    if (direction === "super" && result.reason === "insufficient_credits") {
+      toast.error("Sem Super Likes — vai à loja");
+      goShop();
+      return;
+    }
     if (result.matched) setMatchedName(target.name);
+  };
+
+  const handleRewind = async () => {
+    const res = await rewind();
+    if (res.success) {
+      toast.success("Voltaste atrás");
+      setIndex(0);
+    } else if (res.error === "no_swipe_found") {
+      toast("Não há swipe para reverter");
+    } else if (res.error === "match_exists") {
+      toast.error("Já fizeram match — não dá para desfazer");
+    }
   };
 
   return (
@@ -90,7 +107,19 @@ function Discover() {
               sharedX={x}
               sharedY={y}
             />
-            <DiscoverTopBar onOpenFilters={() => {}} onBoost={() => {}} />
+            <DiscoverTopBar onOpenFilters={() => {}} onBoost={boost.activate} />
+            {boost.active && (
+              <div
+                className="absolute left-1/2 z-30 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-semibold text-white shadow-lg"
+                style={{
+                  top: "calc(max(var(--sat, 54px), 54px) + 8px)",
+                  background: "linear-gradient(135deg,#a855f7,#ec4899)",
+                  boxShadow: "0 0 16px rgba(168,85,247,0.55)",
+                }}
+              >
+                ⚡ Boost ativo · {boost.remainingMinutes} min
+              </div>
+            )}
             <div
               data-swipe-actions
               className="absolute inset-x-0 z-30"
@@ -102,11 +131,15 @@ function Discover() {
                   else if (d === "right") cardRef.current?.flyRight?.();
                   else cardRef.current?.flyUp?.();
                 }}
+                onRewind={handleRewind}
+                canRewind
                 cardX={x}
                 photoUrl={current.photos[0]}
                 cardKey={current.id}
+                purchasedSuperLikes={credits.super_like_balance}
               />
             </div>
+
           </>
         ) : (
           <div className="flex h-full flex-col items-center justify-center text-center px-6">
