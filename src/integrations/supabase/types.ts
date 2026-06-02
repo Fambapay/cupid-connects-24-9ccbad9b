@@ -14,7 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      blocked_users: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          age: number | null
+          bio: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          id: string
+          is_incognito: boolean
+          is_paused: boolean
+          is_verified: boolean
+          membership_tier: string
+          name: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          age?: number | null
+          bio?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id: string
+          is_incognito?: boolean
+          is_paused?: boolean
+          is_verified?: boolean
+          membership_tier?: string
+          name?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          age?: number | null
+          bio?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          is_incognito?: boolean
+          is_paused?: boolean
+          is_verified?: boolean
+          membership_tier?: string
+          name?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          age_max: number
+          age_min: number
+          created_at: string
+          distance_radius: number
+          min_photos: number
+          notifications_enabled: boolean
+          require_bio: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age_max?: number
+          age_min?: number
+          created_at?: string
+          distance_radius?: number
+          min_photos?: number
+          notifications_enabled?: boolean
+          require_bio?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age_max?: number
+          age_min?: number
+          created_at?: string
+          distance_radius?: number
+          min_photos?: number
+          notifications_enabled?: boolean
+          require_bio?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
