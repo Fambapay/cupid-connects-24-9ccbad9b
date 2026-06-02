@@ -15,7 +15,6 @@ import type { Profile, SwipeDirection } from "@/types/dating";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
-
 export const Route = createFileRoute("/discover")({
   ssr: false,
   beforeLoad: requireAuthAndOnboarding,
@@ -44,7 +43,6 @@ function Discover() {
   useEffect(() => {
     setIndex(0);
   }, [items.length]);
-
 
   const mapped: Profile[] = items.map((p) => ({
     id: p.id,
