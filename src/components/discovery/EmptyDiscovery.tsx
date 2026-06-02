@@ -50,7 +50,7 @@ export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryPro
       />
 
       {/* Radar search animation */}
-      {loading && (
+      {isSearching && (
         <div className="pointer-events-none absolute left-1/2 top-[38%] -translate-x-1/2 -translate-y-1/2">
           {/* Expanding rings */}
           {[0, 1, 2].map((i) => (
@@ -127,9 +127,9 @@ export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryPro
           height={132}
           className="relative h-[132px] w-[132px] select-none"
           draggable={false}
-          animate={loading ? { rotate: [-3, 3, -3] } : { y: [0, -5, 0] }}
+          animate={isSearching ? { rotate: [-3, 3, -3] } : { y: [0, -5, 0] }}
           transition={{
-            duration: loading ? 1.6 : 3.4,
+            duration: isSearching ? 1.6 : 3.4,
             repeat: Infinity,
             ease: "easeInOut",
           }}
@@ -155,7 +155,7 @@ export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryPro
           color: "transparent",
         }}
       >
-        {loading ? "À procura..." : "A colmeia está calma"}
+        {isSearching ? "À procura..." : "A colmeia está calma"}
       </motion.h2>
 
       <motion.p
@@ -169,10 +169,10 @@ export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryPro
           : "Voltamos já com novos perfis para descobrires."}
       </motion.p>
 
-      {!loading && onRefresh && (
+      {!isSearching && onRefresh && (
         <motion.button
           type="button"
-          onClick={onRefresh}
+          onClick={handleRefresh}
           whileTap={{ scale: 0.96 }}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
