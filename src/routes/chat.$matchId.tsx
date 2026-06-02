@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, Send, Smile } from "lucide-react";
 import { useMessages, type ChatMessage } from "@/hooks/useMessages";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { TypingDots } from "@/components/chat/TypingDots";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
@@ -17,7 +19,10 @@ function ChatRoom() {
   const { matchId } = useParams({ from: "/chat/$matchId" });
   const { user } = useAuth();
   const { messages, peer, loading, notFound, send } = useMessages(matchId);
-  const [typing] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const typingTimerRef = useRef<number | null>(null);
+  const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const lastSentTypingRef = useRef(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const inputHasTextRef = useRef(false);
@@ -73,6 +78,38 @@ function ChatRoom() {
       document.documentElement.style.overflow = prevHtml;
     };
   }, []);
+
+  // Typing indicator over broadcast channel
+  useEffect(() => {
+    if (!matchId || !user) return;
+    const ch = supabase.channel(`typing-${matchId}`, {
+      config: { broadcast: { self: false } },
+    });
+    ch.on("broadcast", { event: "typing" }, (payload) => {
+      const senderId = (payload.payload as { userId?: string })?.userId;
+      if (!senderId || senderId === user.id) return;
+      setTyping(true);
+      if (typingTimerRef.current) window.clearTimeout(typingTimerRef.current);
+      typingTimerRef.current = window.setTimeout(() => setTyping(false), 3000);
+    });
+    ch.subscribe();
+    typingChannelRef.current = ch;
+    return () => {
+      if (typingTimerRef.current) window.clearTimeout(typingTimerRef.current);
+      supabase.removeChannel(ch);
+      typingChannelRef.current = null;
+    };
+  }, [matchId, user]);
+
+  const broadcastTyping = useCallback(() => {
+    const ch = typingChannelRef.current;
+    if (!ch || !user) return;
+    const now = Date.now();
+    if (now - lastSentTypingRef.current < 1200) return;
+    lastSentTypingRef.current = now;
+    ch.send({ type: "broadcast", event: "typing", payload: { userId: user.id } });
+  }, [user]);
+
 
   if (notFound) {
     return (
@@ -180,6 +217,26 @@ function ChatRoom() {
             })}
           </AnimatePresence>
         </ul>
+
+        <AnimatePresence>
+          {typing && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="mt-2 flex items-end gap-2"
+            >
+              {peer.photo ? (
+                <img src={peer.photo} alt="" className="h-7 w-7 shrink-0 rounded-full object-cover" />
+              ) : (
+                <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-flame" />
+              )}
+              <div className="rounded-2xl rounded-bl-md bg-muted px-4 py-3">
+                <TypingDots />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <form
@@ -191,8 +248,11 @@ function ChatRoom() {
             <input
               ref={inputRef}
               type="text"
-              onBeforeInput={() => { inputHasTextRef.current = true; }}
-              onInput={(e) => { inputHasTextRef.current = e.currentTarget.value.length > 0; }}
+              onBeforeInput={() => { inputHasTextRef.current = true; broadcastTyping(); }}
+              onInput={(e) => {
+                inputHasTextRef.current = e.currentTarget.value.length > 0;
+                if (inputHasTextRef.current) broadcastTyping();
+              }}
               onFocus={() => requestAnimationFrame(() => scrollToLatest("auto"))}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
