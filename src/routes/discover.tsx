@@ -84,7 +84,7 @@ function Discover() {
       goShop();
       return;
     }
-    if (result.matched) setMatched({ name: target.name, photo: target.photos?.[0] ?? null });
+    if (result.matched) setMatched({ id: target.id, name: target.name, photo: target.photos?.[0] ?? null });
   };
 
   const handleRewind = async () => {
