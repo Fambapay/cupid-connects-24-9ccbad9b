@@ -486,7 +486,7 @@ function SettingsPage() {
             ))}
           </div>
           {!isPremium && (
-            <motion.button onClick={soon} whileTap={{ scale: 0.98 }}
+            <motion.button onClick={() => navigate({ to: '/shop', search: {} })} whileTap={{ scale: 0.98 }}
               className="mt-3 w-full rounded-2xl bg-brand-purple text-primary-foreground py-3.5 font-semibold text-[15px] flex items-center justify-center gap-2">
               <Crown className="w-4 h-4" /> Desbloquear com Hunie Plus
             </motion.button>
