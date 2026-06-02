@@ -108,13 +108,18 @@ export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSett
             )}
           </button>
 
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 mb-2">
-              <span className="text-[22px] font-semibold tracking-tight text-foreground truncate">
-                {name}
-              </span>
-              {isVerified && <BadgeCheck size={20} color="#5BB8FF" fill="#5BB8FF" stroke="#000" />}
-            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 mb-2">
+                <span className="text-[22px] font-semibold tracking-tight text-foreground truncate">
+                  {name}
+                </span>
+                {age > 0 && (
+                  <span className="text-[15px] font-medium text-muted-foreground">
+                    {age}
+                  </span>
+                )}
+                {isVerified && <BadgeCheck size={20} color="#5BB8FF" fill="#5BB8FF" stroke="#000" />}
+              </div>
             <button
               onClick={() => { hapticTap(); onEditProfile(); }}
               className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5"
