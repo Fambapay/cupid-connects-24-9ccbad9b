@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { Link } from '@tanstack/react-router';
 import {
   Settings, Pencil, BadgeCheck, Camera, FileText, Tag, ShieldCheck,
   Star, Zap, Heart, ChevronRight, Sparkles, Check,
@@ -192,12 +193,15 @@ export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSett
       {/* QUICK ACTIONS */}
       <div className="grid grid-cols-3 gap-2.5 px-5 pt-4 pb-5">
         {[
-          { Icon: Star, color: '#5BB8FF', label: '5 Super Likes', sub: 'Ver mais' },
-          { Icon: Zap, color: '#B13CFF', label: 'Os meus Boosts', sub: 'Ver mais' },
-          { Icon: Heart, color: PINK, label: 'Membership', sub: 'Gerir' },
+          { Icon: Star, color: '#5BB8FF', label: '5 Super Likes', sub: 'Ver mais', search: { tab: 'super_like' as const } },
+          { Icon: Zap, color: '#B13CFF', label: 'Os meus Boosts', sub: 'Ver mais', search: { tab: 'boost' as const } },
+          { Icon: Heart, color: PINK, label: 'Membership', sub: 'Gerir', search: {} as { tab?: 'boost' | 'super_like' } },
         ].map((a, i) => (
-          <button
+          <Link
             key={i}
+            to="/shop"
+            search={a.search}
+            onClick={() => hapticTap()}
             className="bg-card border border-border rounded-2xl p-3 flex flex-col items-start gap-2.5 text-left min-h-[108px]"
           >
             <div
@@ -210,7 +214,7 @@ export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSett
               <p className="text-[12.5px] font-semibold text-foreground tracking-tight leading-tight">{a.label}</p>
               <p className="text-[11px] font-bold mt-1 uppercase tracking-wider" style={{ color: a.color }}>{a.sub}</p>
             </div>
-          </button>
+          </Link>
         ))}
       </div>
 
@@ -248,12 +252,14 @@ export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSett
             ))}
           </div>
 
-          <button
-            className="w-full h-12 rounded-2xl text-sm font-extrabold tracking-tight"
+          <Link
+            to="/shop"
+            onClick={() => hapticTap()}
+            className="w-full h-12 rounded-2xl text-sm font-extrabold tracking-tight grid place-items-center"
             style={{ background: PINK, color: '#fff' }}
           >
             Ver planos
-          </button>
+          </Link>
         </div>
       )}
     </div>
