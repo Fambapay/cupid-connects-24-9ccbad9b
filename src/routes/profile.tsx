@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Settings as SettingsIcon } from 'lucide-react';
 import { ProfileView, type ProfileViewData } from '@/components/ProfileView';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
@@ -31,10 +31,31 @@ const INITIAL: ProfileViewData = {
   isPremium: false,
 };
 
+const STORAGE_KEY = 'hunie:profile:v1';
+
+function loadProfile(): ProfileViewData {
+  if (typeof window === 'undefined') return INITIAL;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return INITIAL;
+    return { ...INITIAL, ...JSON.parse(raw) };
+  } catch {
+    return INITIAL;
+  }
+}
+
 function ProfilePage() {
-  const [profile, setProfile] = useState<ProfileViewData>(INITIAL);
+  const [profile, setProfile] = useState<ProfileViewData>(loadProfile);
   const [editing, setEditing] = useState(false);
   const [verifying, setVerifying] = useState(false);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+    } catch {
+      /* quota exceeded or unavailable — ignore */
+    }
+  }, [profile]);
 
   return (
     <div className="min-h-screen bg-background">
