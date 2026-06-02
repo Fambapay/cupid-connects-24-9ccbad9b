@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { RefreshCw } from "lucide-react";
+import hunieMark from "@/assets/hunie-mark.png.asset.json";
 
 interface EmptyDiscoveryProps {
   loading?: boolean;
