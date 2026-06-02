@@ -13,6 +13,8 @@ import { FiltersSheet, DEFAULT_FILTERS, type DiscoveryFilters } from "@/componen
 import { useDiscovery } from "@/hooks/useDiscovery";
 import { useCredits } from "@/hooks/useCredits";
 import { useBoost } from "@/hooks/useBoost";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import type { Profile, SwipeDirection } from "@/types/dating";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
@@ -31,12 +33,14 @@ export const Route = createFileRoute("/discover")({
 
 function Discover() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { items, loading, swipe, rewind, reload } = useDiscovery();
   const { credits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
   const boost = useBoost(goShop);
   const [index, setIndex] = useState(0);
-  const [matched, setMatched] = useState<{ name: string; photo?: string | null } | null>(null);
+  const [matched, setMatched] = useState<{ id: string; name: string; photo?: string | null } | null>(null);
+  const [openingChat, setOpeningChat] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
   const cardRef = useRef<React.ComponentRef<typeof ProfileCard>>(null);
@@ -80,7 +84,7 @@ function Discover() {
       goShop();
       return;
     }
-    if (result.matched) setMatched({ name: target.name, photo: target.photos?.[0] ?? null });
+    if (result.matched) setMatched({ id: target.id, name: target.name, photo: target.photos?.[0] ?? null });
   };
 
   const handleRewind = async () => {
@@ -152,10 +156,34 @@ function Discover() {
         open={!!matched}
         targetName={matched?.name ?? ""}
         targetPhoto={matched?.photo}
+        sending={openingChat}
         onClose={() => setMatched(null)}
-        onSeeLikes={() => {
-          setMatched(null);
-          navigate({ to: "/matches" });
+        onSendMessage={async () => {
+          if (!matched || !user) return;
+          setOpeningChat(true);
+          // Try a few times — match row is created by a trigger that may
+          // race with the swipe insert response.
+          let matchId: string | null = null;
+          for (let i = 0; i < 5 && !matchId; i++) {
+            const { data } = await supabase
+              .from("matches")
+              .select("id")
+              .or(
+                `and(user_a.eq.${user.id},user_b.eq.${matched.id}),and(user_a.eq.${matched.id},user_b.eq.${user.id})`
+              )
+              .maybeSingle();
+            matchId = (data as { id?: string } | null)?.id ?? null;
+            if (!matchId) await new Promise((r) => setTimeout(r, 250));
+          }
+          setOpeningChat(false);
+          if (matchId) {
+            setMatched(null);
+            navigate({ to: "/chat/$matchId", params: { matchId } });
+          } else {
+            toast.error("Match ainda a sincronizar — tenta em /matches");
+            setMatched(null);
+            navigate({ to: "/matches" });
+          }
         }}
       />
 
