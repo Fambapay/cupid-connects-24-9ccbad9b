@@ -10,11 +10,12 @@ interface Props {
   open: boolean;
   targetName: string;
   targetPhoto?: string | null;
+  sending?: boolean;
   onClose: () => void;
-  onSeeLikes?: () => void;
+  onSendMessage?: () => void;
 }
 
-export function MatchOverlay({ open, targetName, targetPhoto, onClose, onSeeLikes }: Props) {
+export function MatchOverlay({ open, targetName, targetPhoto, sending, onClose, onSendMessage }: Props) {
   const { user } = useAuth();
   const [myPhoto, setMyPhoto] = useState<string | null>(null);
 
