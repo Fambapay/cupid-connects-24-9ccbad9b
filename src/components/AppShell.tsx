@@ -16,7 +16,7 @@ export function AppShell({
       <div className="pointer-events-none fixed inset-0 -z-10 bg-aurora opacity-90" />
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(120%_80%_at_50%_-10%,oklch(0.3_0.08_280/0.5),transparent_60%)]" />
       {fullHeight ? (
-        <div className="mx-auto flex h-full max-w-md flex-col pt-[env(safe-area-inset-top)] pb-[calc(env(safe-area-inset-bottom)+108px)]">
+        <div className="mx-auto flex h-full max-w-md flex-col pb-[108px]">
           {children}
         </div>
       ) : (
