@@ -7,7 +7,7 @@ import {
   animate,
   type MotionValue,
 } from "framer-motion";
-import { User, Heart, MessageCircle, type LucideIcon } from "lucide-react";
+import { User, Heart, MessageCircle, Flame, type LucideIcon } from "lucide-react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { hapticTap } from "@/hooks/useNativePlatform";
 
