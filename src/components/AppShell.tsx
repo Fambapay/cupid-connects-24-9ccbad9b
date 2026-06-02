@@ -17,15 +17,15 @@ export function AppShell({
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(120%_80%_at_50%_-10%,oklch(0.3_0.08_280/0.5),transparent_60%)]" />
       {fullHeight ? (
         <div
-          className="mx-auto flex h-full max-w-md flex-col"
-          style={{ paddingBottom: "calc(88px + env(safe-area-inset-bottom))" }}
+          className="mx-auto flex h-full max-w-md flex-col pb-32"
+          style={{ paddingTop: "max(env(safe-area-inset-top), 16px)" }}
         >
           {children}
         </div>
       ) : (
         <div
-          className="mx-auto h-full max-w-md overflow-y-auto"
-          style={{ paddingBottom: "calc(88px + env(safe-area-inset-bottom))" }}
+          className="mx-auto h-full max-w-md overflow-y-auto pb-32"
+          style={{ paddingTop: "max(env(safe-area-inset-top), 16px)" }}
         >
           {children}
         </div>
