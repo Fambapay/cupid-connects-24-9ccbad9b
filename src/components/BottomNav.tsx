@@ -46,7 +46,7 @@ export const BottomNavBase = ({
   };
 
   const tabs = [
-    { id: "discover" as Tab, icon: Flame, label: "Descobrir" },
+    { id: "discover" as Tab, icon: Compass, label: "Descobrir" },
     { id: "likes" as Tab, icon: Heart, label: "Likes", badge: likesCount },
     { id: "chat" as Tab, icon: MessageCircle, label: "Chat" },
     { id: "profile" as Tab, icon: User, label: "Perfil" },
