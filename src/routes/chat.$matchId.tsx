@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, Send, Smile } from "lucide-react";
 import { useMessages, type ChatMessage } from "@/hooks/useMessages";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { TypingDots } from "@/components/chat/TypingDots";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
