@@ -807,10 +807,12 @@ function ScrollPickerSheet<T extends number>({
           <div
             ref={listRef}
             onScroll={handleScroll}
-            className="relative overflow-y-auto no-scrollbar"
+            className="relative overflow-y-auto [&::-webkit-scrollbar]:hidden"
             style={{
               height: containerH,
               scrollSnapType: "y mandatory",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
               maskImage:
                 "linear-gradient(to bottom, transparent 0, #000 30%, #000 70%, transparent 100%)",
               WebkitMaskImage:
