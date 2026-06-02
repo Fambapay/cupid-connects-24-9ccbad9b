@@ -192,16 +192,36 @@ export function DebitoCheckoutSheet({
                   whileTap={{ scale: 0.97 }}
                   disabled={stage === "submitting" || !phoneOk}
                   onClick={submit}
-                  className="mt-5 h-12 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 to-pink-500 text-sm font-bold text-white shadow-lg disabled:opacity-50"
+                  className="relative mt-5 h-13 w-full overflow-hidden rounded-2xl bg-gradient-to-r from-fuchsia-500 via-pink-500 to-rose-500 py-3.5 text-sm font-bold text-white shadow-[0_10px_30px_-10px_rgba(240,70,140,0.7)] disabled:opacity-50"
                 >
                   {stage === "submitting" ? (
                     <span className="inline-flex items-center gap-2">
                       <Loader2 size={16} className="animate-spin" /> A processar…
                     </span>
                   ) : (
-                    "Pagar agora"
+                    <span className="inline-flex items-center gap-2">
+                      <Lock size={14} /> Pagar {amountMzn.toLocaleString("pt-PT")} MZN
+                    </span>
                   )}
                 </motion.button>
+
+                <div className="mt-3 grid grid-cols-3 gap-2 text-center text-[10px] text-white/60">
+                  <div className="flex flex-col items-center gap-1 rounded-lg bg-white/[0.03] py-2">
+                    <ShieldCheck size={13} className="text-emerald-400" />
+                    <span>Garantia 7 dias</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 rounded-lg bg-white/[0.03] py-2">
+                    <Lock size={13} className="text-sky-400" />
+                    <span>SSL · 256-bit</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 rounded-lg bg-white/[0.03] py-2">
+                    <Sparkles size={13} className="text-fuchsia-400" />
+                    <span>Ativação imediata</span>
+                  </div>
+                </div>
+                <p className="mt-2 text-center text-[10px] text-white/40">
+                  Renova automaticamente · Cancela quando quiseres
+                </p>
               </>
             ) : stage === "pending" ? (
               <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-center">
