@@ -34,6 +34,59 @@ export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryPro
         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
       />
 
+      {/* Radar search animation */}
+      {loading && (
+        <div className="pointer-events-none absolute left-1/2 top-[38%] -translate-x-1/2 -translate-y-1/2">
+          {/* Expanding rings */}
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="absolute left-1/2 top-1/2 rounded-full border"
+              style={{
+                width: 180,
+                height: 180,
+                borderColor: `color-mix(in oklab, var(--brand-pink) ${70 - i * 15}%, transparent)`,
+                background: `radial-gradient(circle, color-mix(in oklab, var(--brand-pink) ${8 - i * 2}%, transparent) 0%, transparent 70%)`,
+                animation: `radar-ring 2s ease-out ${i * 0.6}s infinite`,
+              }}
+            />
+          ))}
+          {/* Rotating sweep arc */}
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            style={{ width: 180, height: 180 }}
+          >
+            <svg
+              width="180"
+              height="180"
+              viewBox="0 0 180 180"
+              className="animate-[radar-sweep_2.5s_linear_infinite]"
+              style={{ transformOrigin: 'center' }}
+            >
+              <defs>
+                <linearGradient id="radarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="var(--brand-pink)" stopOpacity="0" />
+                  <stop offset="50%" stopColor="var(--brand-pink)" stopOpacity="0.35" />
+                  <stop offset="100%" stopColor="var(--brand-purple)" stopOpacity="0.7" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M 90 90 L 90 0 A 90 90 0 0 1 180 90 Z"
+                fill="url(#radarGrad)"
+              />
+            </svg>
+          </div>
+          {/* Center dot */}
+          <div
+            className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              background: 'var(--brand-pink)',
+              boxShadow: '0 0 12px 3px color-mix(in oklab, var(--brand-pink) 50%, transparent)',
+            }}
+          />
+        </div>
+      )}
+
       {/* Hunie mark — branded */}
       <motion.div
         className="relative grid place-items-center"
