@@ -79,6 +79,38 @@ function ChatRoom() {
     };
   }, []);
 
+  // Typing indicator over broadcast channel
+  useEffect(() => {
+    if (!matchId || !user) return;
+    const ch = supabase.channel(`typing-${matchId}`, {
+      config: { broadcast: { self: false } },
+    });
+    ch.on("broadcast", { event: "typing" }, (payload) => {
+      const senderId = (payload.payload as { userId?: string })?.userId;
+      if (!senderId || senderId === user.id) return;
+      setTyping(true);
+      if (typingTimerRef.current) window.clearTimeout(typingTimerRef.current);
+      typingTimerRef.current = window.setTimeout(() => setTyping(false), 3000);
+    });
+    ch.subscribe();
+    typingChannelRef.current = ch;
+    return () => {
+      if (typingTimerRef.current) window.clearTimeout(typingTimerRef.current);
+      supabase.removeChannel(ch);
+      typingChannelRef.current = null;
+    };
+  }, [matchId, user]);
+
+  const broadcastTyping = useCallback(() => {
+    const ch = typingChannelRef.current;
+    if (!ch || !user) return;
+    const now = Date.now();
+    if (now - lastSentTypingRef.current < 1200) return;
+    lastSentTypingRef.current = now;
+    ch.send({ type: "broadcast", event: "typing", payload: { userId: user.id } });
+  }, [user]);
+
+
   if (notFound) {
     return (
       <div className="p-8 text-center">
