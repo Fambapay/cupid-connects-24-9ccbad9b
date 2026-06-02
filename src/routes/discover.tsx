@@ -80,7 +80,7 @@ function Discover() {
       goShop();
       return;
     }
-    if (result.matched) setMatchedName(target.name);
+    if (result.matched) setMatched({ name: target.name, photo: target.photos?.[0] ?? null });
   };
 
   const handleRewind = async () => {
