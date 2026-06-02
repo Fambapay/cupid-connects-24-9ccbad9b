@@ -199,7 +199,7 @@ export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSett
         ].map((a, i) => (
           <Link
             key={i}
-            to={a.to}
+            to="/shop"
             search={a.search}
             onClick={() => hapticTap()}
             className="bg-card border border-border rounded-2xl p-3 flex flex-col items-start gap-2.5 text-left min-h-[108px]"
