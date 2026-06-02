@@ -109,11 +109,9 @@ export function useMessages(matchId: string | undefined) {
         console.error("[messages.send] failed:", error);
         // Roll back optimistic bubble
         setMessages((prev) => prev.filter((x) => x.id !== tempId));
-        const { toast } = await import("@/hooks/use-toast");
-        toast({
-          title: "Não foi possível enviar",
+        const { toast } = await import("sonner");
+        toast.error("Não foi possível enviar", {
           description: error?.message ?? "Tenta novamente.",
-          variant: "destructive",
         });
         return;
       }
