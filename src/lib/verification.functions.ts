@@ -21,18 +21,13 @@ const INPUT = z.object({
   pose_code: z.enum(["hand_right_cheek", "thumbs_up", "peace_sign"]),
 });
 
-async function fetchAsDataUrl(supabase: ReturnType<typeof signedClient>, bucket: string, path: string) {
-  const { data, error } = await supabase.storage.from(bucket).download(path);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function fetchAsDataUrl(client: any, bucket: string, path: string) {
+  const { data, error } = await client.storage.from(bucket).download(path);
   if (error || !data) throw new Error(`Não foi possível abrir ${bucket}/${path}`);
   const buf = Buffer.from(await data.arrayBuffer());
   const mime = data.type || "image/jpeg";
   return `data:${mime};base64,${buf.toString("base64")}`;
-}
-
-// Type helper
-function signedClient(c: unknown): never {
-  throw new Error("type-only");
-  void c;
 }
 
 export const submitVerification = createServerFn({ method: "POST" })
