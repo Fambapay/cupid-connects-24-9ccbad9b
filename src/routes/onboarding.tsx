@@ -112,7 +112,8 @@ const MAX_INTERESTS = 5;
 const MIN_PROMPTS = 3;
 const PROMPT_SLOTS = 3;
 
-const STORAGE_KEY = "hunie:onboarding:v1";
+const STORAGE_KEY_PREFIX = "hunie:onboarding:v2:";
+const storageKey = (uid?: string | null) => `${STORAGE_KEY_PREFIX}${uid ?? "anon"}`;
 
 const MONTHS_PT = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
