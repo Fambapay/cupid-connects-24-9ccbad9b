@@ -453,6 +453,45 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_requests: {
+        Row: {
+          ai_raw: Json | null
+          ai_reason: string | null
+          ai_score: number | null
+          created_at: string
+          id: string
+          pose_code: string
+          reviewed_at: string | null
+          selfie_path: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          ai_raw?: Json | null
+          ai_reason?: string | null
+          ai_score?: number | null
+          created_at?: string
+          id?: string
+          pose_code: string
+          reviewed_at?: string | null
+          selfie_path: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          ai_raw?: Json | null
+          ai_reason?: string | null
+          ai_score?: number | null
+          created_at?: string
+          id?: string
+          pose_code?: string
+          reviewed_at?: string | null
+          selfie_path?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
