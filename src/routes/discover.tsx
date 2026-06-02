@@ -36,6 +36,8 @@ function Discover() {
   const boost = useBoost(goShop);
   const [index, setIndex] = useState(0);
   const [matchedName, setMatchedName] = useState<string | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
   const cardRef = useRef<React.ComponentRef<typeof ProfileCard>>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
