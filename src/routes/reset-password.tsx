@@ -42,7 +42,7 @@ function ResetPasswordPage() {
       if (error) throw error;
       toast({ title: "Password atualizada", description: "Já podes entrar." });
       await supabase.auth.signOut();
-      navigate({ to: "/auth" });
+      navigate({ to: "/auth/login" });
     } catch (err: any) {
       toast({ title: "Erro", description: err?.message ?? "Tenta de novo", variant: "destructive" });
     } finally {
