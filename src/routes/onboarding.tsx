@@ -1525,8 +1525,231 @@ function LocationStep({
   );
 }
 
+// Interests ─────
+function InterestsStep({
+  value,
+  onChange,
+  onNext,
+}: {
+  value: string[];
+  onChange: (v: string[]) => void;
+  onNext: () => void;
+}) {
+  const toggle = (item: string) => {
+    if (value.includes(item)) onChange(value.filter((x) => x !== item));
+    else if (value.length < MAX_INTERESTS) onChange([...value, item]);
+  };
+  return (
+    <div className="flex flex-1 flex-col">
+      <StepScroll>
+        <div className="flex items-start justify-between gap-3 pt-2">
+          <Heading
+            title="O que gostas de fazer?"
+            subtitle={`Escolhe até ${MAX_INTERESTS} interesses`}
+          />
+          <span className="mt-2 shrink-0 rounded-full bg-white/8 px-2.5 py-1 text-xs font-semibold text-foreground">
+            {value.length}/{MAX_INTERESTS}
+          </span>
+        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, delay: 0.12 }}
+          className="mt-8 flex flex-wrap gap-2"
+        >
+          {AVAILABLE_INTERESTS.map((it) => {
+            const active = value.includes(it);
+            const disabled = !active && value.length >= MAX_INTERESTS;
+            return (
+              <motion.button
+                key={it}
+                type="button"
+                onClick={() => toggle(it)}
+                disabled={disabled}
+                whileTap={!disabled ? { scale: 0.96 } : undefined}
+                transition={{ duration: 0 }}
+                style={{ touchAction: "manipulation" }}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium transition-colors",
+                  active
+                    ? "border-transparent bg-gradient-sunset text-white shadow-rose"
+                    : disabled
+                      ? "border-white/8 bg-white/[0.02] text-muted-foreground/50"
+                      : "border-white/12 bg-white/[0.04] text-foreground active:bg-white/10",
+                )}
+              >
+                {active && <Check className="h-3.5 w-3.5" />}
+                {it}
+              </motion.button>
+            );
+          })}
+        </motion.div>
+      </StepScroll>
+      <CtaBar>
+        <PrimaryButton onClick={onNext}>Continuar</PrimaryButton>
+        <button
+          type="button"
+          onClick={onNext}
+          className="mt-3 block w-full text-center text-sm text-muted-foreground"
+        >
+          Saltar por agora
+        </button>
+      </CtaBar>
+    </div>
+  );
+}
+
+// Prompts ─────
+function PromptsStep({
+  value,
+  onChange,
+  onNext,
+}: {
+  value: PromptDraft[];
+  onChange: (v: PromptDraft[]) => void;
+  onNext: () => void;
+}) {
+  const slots: PromptDraft[] = Array.from(
+    { length: PROMPT_SLOTS },
+    (_, i) => value[i] ?? { question: "", answer: "" },
+  );
+  const [pickerFor, setPickerFor] = useState<number | null>(null);
+
+  const updateSlot = (i: number, patch: Partial<PromptDraft>) => {
+    const next = slots.map((s, idx) => (idx === i ? { ...s, ...patch } : s));
+    onChange(next);
+  };
+
+  const validCount = slots.filter(
+    (s) => s.question.trim() && s.answer.trim(),
+  ).length;
+  const canNext = validCount >= MIN_PROMPTS;
+
+  return (
+    <div className="flex flex-1 flex-col">
+      <StepScroll>
+        <Heading
+          title="Mostra a tua personalidade"
+          subtitle={`Escolhe ${MIN_PROMPTS} perguntas e responde`}
+        />
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, delay: 0.12 }}
+          className="mt-6 space-y-3"
+        >
+          {slots.map((slot, i) => {
+            const filled = !!slot.question;
+            return (
+              <div
+                key={i}
+                className={cn(
+                  "rounded-2xl border bg-white/[0.04] p-4 transition-colors",
+                  filled ? "border-white/15" : "border-dashed border-white/15",
+                )}
+              >
+                <button
+                  type="button"
+                  onClick={() => setPickerFor(i)}
+                  className="flex w-full items-center justify-between text-left"
+                  style={{ touchAction: "manipulation" }}
+                >
+                  <span
+                    className={cn(
+                      "text-sm font-semibold",
+                      filled ? "text-foreground" : "text-muted-foreground",
+                    )}
+                  >
+                    {slot.question || `Escolher pergunta ${i + 1}`}
+                  </span>
+                  <span className="ml-3 text-xs text-muted-foreground">Mudar</span>
+                </button>
+                {filled && (
+                  <textarea
+                    value={slot.answer}
+                    onChange={(e) =>
+                      updateSlot(i, { answer: e.target.value.slice(0, 150) })
+                    }
+                    placeholder="A tua resposta…"
+                    rows={2}
+                    maxLength={150}
+                    className={cn(
+                      "mt-3 w-full resize-none bg-transparent text-base outline-none",
+                      "border-b border-white/10 pb-2 focus:border-[color:var(--brand-pink)]",
+                      "placeholder:text-muted-foreground transition-colors",
+                    )}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </motion.div>
+        <p className="mt-4 text-xs text-muted-foreground">
+          {validCount}/{MIN_PROMPTS} prompts completos
+        </p>
+      </StepScroll>
+      <CtaBar>
+        <PrimaryButton disabled={!canNext} onClick={onNext}>
+          Continuar
+        </PrimaryButton>
+      </CtaBar>
+
+      <Drawer open={pickerFor !== null} onOpenChange={(o) => !o && setPickerFor(null)}>
+        <DrawerContent className="bg-card">
+          <DrawerHeader>
+            <DrawerTitle className="text-center text-base">Escolhe uma pergunta</DrawerTitle>
+          </DrawerHeader>
+          <div className="max-h-[60vh] overflow-y-auto px-4 pb-2">
+            {PROMPT_QUESTIONS.filter(
+              (q) => !slots.some((s, i) => i !== pickerFor && s.question === q),
+            ).map((q) => {
+              const active = pickerFor !== null && slots[pickerFor]?.question === q;
+              return (
+                <button
+                  key={q}
+                  onClick={() => {
+                    if (pickerFor !== null) updateSlot(pickerFor, { question: q });
+                    setPickerFor(null);
+                  }}
+                  className={cn(
+                    "flex w-full items-center justify-between rounded-xl px-4 py-3 text-left",
+                    active ? "bg-white/10" : "active:bg-white/5",
+                  )}
+                >
+                  <span className={cn("text-base", active && "font-semibold")}>{q}</span>
+                  {active && <Check className="h-4 w-4 text-[color:var(--brand-pink)]" />}
+                </button>
+              );
+            })}
+          </div>
+          <DrawerFooter>
+            <DrawerClose asChild>
+              <Button variant="ghost" className="w-full">Cancelar</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    </div>
+  );
+}
+
 // Completion ─────
 function CompletionScreen({ onContinue }: { onContinue: () => void }) {
+  useEffect(() => {
+    const fire = (origin: { x: number; y: number }) =>
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        startVelocity: 45,
+        ticks: 200,
+        origin,
+        colors: ["#ff4d8d", "#a855f7", "#f43f5e", "#ec4899", "#c084fc"],
+      });
+    fire({ x: 0.3, y: 0.4 });
+    setTimeout(() => fire({ x: 0.7, y: 0.4 }), 200);
+    setTimeout(() => fire({ x: 0.5, y: 0.35 }), 400);
+  }, []);
+
   const particles = useMemo(
     () =>
       Array.from({ length: 24 }, (_, i) => ({
