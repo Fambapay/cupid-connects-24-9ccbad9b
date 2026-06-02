@@ -252,12 +252,15 @@ export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSett
             ))}
           </div>
 
-          <button
-            className="w-full h-12 rounded-2xl text-sm font-extrabold tracking-tight"
+          <Link
+            to="/shop"
+            search={{ tab: 'membership' as const }}
+            onClick={() => hapticTap()}
+            className="w-full h-12 rounded-2xl text-sm font-extrabold tracking-tight grid place-items-center"
             style={{ background: PINK, color: '#fff' }}
           >
             Ver planos
-          </button>
+          </Link>
         </div>
       )}
     </div>
