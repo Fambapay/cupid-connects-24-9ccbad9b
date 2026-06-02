@@ -727,40 +727,87 @@ function ScrollPickerSheet<T extends number>({
   selected: T | null;
   onSelect: (v: T) => void;
 }) {
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const id = requestAnimationFrame(() => {
+      const el = listRef.current?.querySelector<HTMLButtonElement>("[data-active='true']");
+      el?.scrollIntoView({ block: "center" });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [open]);
+
   return (
     <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
-      <DrawerContent className="bg-card">
-        <DrawerHeader>
-          <DrawerTitle className="text-center text-base">{title}</DrawerTitle>
+      <DrawerContent className="border-t border-white/10 bg-card">
+        <DrawerHeader className="pb-2 pt-3">
+          <DrawerTitle className="text-center text-sm font-semibold tracking-tight text-foreground">
+            {title}
+          </DrawerTitle>
         </DrawerHeader>
-        <div className="max-h-[60vh] overflow-y-auto px-4 pb-2">
+        <div
+          ref={listRef}
+          className="relative max-h-[60vh] overflow-y-auto px-3 pb-2"
+          style={{
+            maskImage:
+              "linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%)",
+          }}
+        >
           {items.map((it) => {
             const active = selected === it.value;
             return (
               <button
                 key={it.value}
+                data-active={active}
                 onClick={() => onSelect(it.value)}
                 className={cn(
-                  "flex w-full items-center justify-between rounded-xl px-4 py-3 text-left",
-                  active ? "bg-white/10" : "active:bg-white/5",
+                  "relative flex w-full items-center justify-between rounded-xl px-4 py-3 text-left transition-colors",
+                  active
+                    ? "bg-white/[0.06]"
+                    : "text-muted-foreground hover:bg-white/[0.03] active:bg-white/[0.05]",
                 )}
               >
+                {active && (
+                  <span
+                    aria-hidden
+                    className="absolute left-1 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-full"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, var(--brand-pink), var(--brand-purple))",
+                    }}
+                  />
+                )}
                 <span
                   className={cn(
-                    "text-base",
-                    active && "font-semibold text-[color:var(--brand-pink)]",
+                    "text-base transition-all",
+                    active
+                      ? "translate-x-2 font-semibold text-foreground"
+                      : "translate-x-0 font-normal",
                   )}
                 >
                   {it.label}
                 </span>
-                {active && <Check className="h-4 w-4 text-[color:var(--brand-pink)]" />}
+                {active && (
+                  <Check
+                    className="h-4 w-4"
+                    style={{ color: "var(--brand-pink)" }}
+                  />
+                )}
               </button>
             );
           })}
         </div>
-        <DrawerFooter>
+        <DrawerFooter className="pt-2">
           <DrawerClose asChild>
-            <Button variant="ghost" className="w-full">Cancelar</Button>
+            <Button
+              variant="ghost"
+              className="h-12 w-full rounded-xl text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground"
+            >
+              Cancelar
+            </Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
