@@ -19,6 +19,7 @@ import { VerificationModal } from '@/components/VerificationModal';
 import { PremiumBadge } from '@/components/PremiumBadge';
 import { SettingsListSkeleton } from '@/components/skeletons/AppSkeletons';
 import { BlockedUsersModal } from '@/components/BlockedUsersModal';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { PhoneVerificationModal } from '@/components/PhoneVerificationModal';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import {
