@@ -757,7 +757,7 @@ function FooterCol({ title, links }: { title: string; links: { label: string; hr
         {links.map((l) => (
           <li key={l.label}>
             {l.to ? (
-              <Link to={l.to} className="transition hover:text-primary">{l.label}</Link>
+              <Link to={l.to as never} className="transition hover:text-primary">{l.label}</Link>
             ) : (
               <a href={l.href} className="transition hover:text-primary">{l.label}</a>
             )}
