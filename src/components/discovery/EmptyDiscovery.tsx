@@ -51,56 +51,50 @@ export const EmptyDiscovery = ({ loading = false, onRefresh }: EmptyDiscoveryPro
 
       {/* Radar search animation */}
       {isSearching && (
-        <div className="pointer-events-none absolute left-1/2 top-[38%] -translate-x-1/2 -translate-y-1/2">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{ width: 260, height: 260 }}
+        >
           {/* Expanding rings */}
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="absolute left-1/2 top-1/2 rounded-full border"
+              className="absolute inset-0 rounded-full border"
               style={{
-                width: 180,
-                height: 180,
-                borderColor: `color-mix(in oklab, var(--brand-pink) ${70 - i * 15}%, transparent)`,
-                background: `radial-gradient(circle, color-mix(in oklab, var(--brand-pink) ${8 - i * 2}%, transparent) 0%, transparent 70%)`,
-                animation: `radar-ring 2s ease-out ${i * 0.6}s infinite`,
+                borderColor: `color-mix(in oklab, var(--brand-pink) ${55 - i * 12}%, transparent)`,
+                background: `radial-gradient(circle, color-mix(in oklab, var(--brand-pink) ${6 - i * 1.5}%, transparent) 0%, transparent 65%)`,
+                animation: `radar-pulse 2.4s ease-out ${i * 0.8}s infinite`,
+                opacity: 0,
               }}
             />
           ))}
-          {/* Rotating sweep arc */}
+
+          {/* Static base ring */}
           <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-            style={{ width: 180, height: 180 }}
-          >
-            <svg
-              width="180"
-              height="180"
-              viewBox="0 0 180 180"
-              className="animate-[radar-sweep_2.5s_linear_infinite]"
-              style={{ transformOrigin: 'center' }}
-            >
-              <defs>
-                <linearGradient id="radarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="var(--brand-pink)" stopOpacity="0" />
-                  <stop offset="50%" stopColor="var(--brand-pink)" stopOpacity="0.35" />
-                  <stop offset="100%" stopColor="var(--brand-purple)" stopOpacity="0.7" />
-                </linearGradient>
-              </defs>
-              <path
-                d="M 90 90 L 90 0 A 90 90 0 0 1 180 90 Z"
-                fill="url(#radarGrad)"
-              />
-            </svg>
-          </div>
-          {/* Center dot */}
-          <div
-            className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            className="absolute inset-0 rounded-full border"
             style={{
-              background: 'var(--brand-pink)',
-              boxShadow: '0 0 12px 3px color-mix(in oklab, var(--brand-pink) 50%, transparent)',
+              borderColor: "color-mix(in oklab, var(--brand-pink) 22%, transparent)",
             }}
+          />
+
+          {/* Rotating conic sweep */}
+          <motion.div
+            className="absolute inset-0 rounded-full"
+            style={{
+              background:
+                "conic-gradient(from 0deg, transparent 0deg, transparent 270deg, color-mix(in oklab, var(--brand-pink) 55%, transparent) 350deg, color-mix(in oklab, var(--brand-purple) 75%, transparent) 360deg)",
+              maskImage:
+                "radial-gradient(circle, black 58%, transparent 70%)",
+              WebkitMaskImage:
+                "radial-gradient(circle, black 58%, transparent 70%)",
+            }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: "linear" }}
           />
         </div>
       )}
+
 
       {/* Hunie mark — branded */}
       <motion.div
