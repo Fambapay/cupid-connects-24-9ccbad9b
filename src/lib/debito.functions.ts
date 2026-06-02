@@ -198,7 +198,7 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
           _amount_minor: Math.round(amount * 100),
           _currency: "MZN",
           _source_id: row.source_id,
-          _debito_payment_id: debitoPaymentId,
+          _debito_payment_id: debitoPaymentId ?? "",
         });
       } else if (kind === "plan" && plan_tier) {
         await supabaseAdmin.rpc("activate_membership_debito", {
