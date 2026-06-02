@@ -8,6 +8,7 @@ import { ProfileCard } from "@/components/ProfileCard";
 import { SwipeActions } from "@/components/SwipeActions";
 import { DiscoverTopBar } from "@/components/DiscoverTopBar";
 import { EmptyDiscovery } from "@/components/discovery/EmptyDiscovery";
+import { MatchOverlay } from "@/components/discovery/MatchOverlay";
 import { FiltersSheet, DEFAULT_FILTERS, type DiscoveryFilters } from "@/components/FiltersSheet";
 import { useDiscovery } from "@/hooks/useDiscovery";
 import { useCredits } from "@/hooks/useCredits";
@@ -35,7 +36,7 @@ function Discover() {
   const goShop = () => navigate({ to: "/shop" });
   const boost = useBoost(goShop);
   const [index, setIndex] = useState(0);
-  const [matchedName, setMatchedName] = useState<string | null>(null);
+  const [matched, setMatched] = useState<{ name: string; photo?: string | null } | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
   const cardRef = useRef<React.ComponentRef<typeof ProfileCard>>(null);
@@ -79,7 +80,7 @@ function Discover() {
       goShop();
       return;
     }
-    if (result.matched) setMatchedName(target.name);
+    if (result.matched) setMatched({ name: target.name, photo: target.photos?.[0] ?? null });
   };
 
   const handleRewind = async () => {
@@ -147,24 +148,16 @@ function Discover() {
         )}
       </div>
 
-      {matchedName && (
-        <div
-          className="fixed inset-0 z-50 grid place-items-center bg-black/80 backdrop-blur-xl px-6"
-          onClick={() => setMatchedName(null)}
-        >
-          <div className="rounded-3xl bg-gradient-flame p-8 text-center shadow-glow">
-            <div className="text-6xl">🔥</div>
-            <h3 className="mt-4 text-3xl font-black text-white">É um match!</h3>
-            <p className="mt-2 text-white/90">Tu e {matchedName} curtiram-se mutuamente.</p>
-            <button
-              className="mt-6 rounded-full bg-white px-6 py-3 font-semibold text-flame"
-              onClick={() => setMatchedName(null)}
-            >
-              Continuar a descobrir
-            </button>
-          </div>
-        </div>
-      )}
+      <MatchOverlay
+        open={!!matched}
+        targetName={matched?.name ?? ""}
+        targetPhoto={matched?.photo}
+        onClose={() => setMatched(null)}
+        onSeeLikes={() => {
+          setMatched(null);
+          navigate({ to: "/matches" });
+        }}
+      />
 
       <FiltersSheet
         open={filtersOpen}
