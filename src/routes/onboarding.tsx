@@ -33,6 +33,10 @@ import { usePhotoUpload } from "@/hooks/usePhotoUpload";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import tutorialWoman1 from "@/assets/tutorial-woman-1.jpg";
+import tutorialWoman2 from "@/assets/tutorial-woman-2.jpg";
+import tutorialMan1 from "@/assets/tutorial-man-1.jpg";
+import tutorialMan2 from "@/assets/tutorial-man-2.jpg";
 
 export const Route = createFileRoute("/onboarding")({
   ssr: false,
