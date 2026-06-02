@@ -60,7 +60,7 @@ export const BottomNavBase = ({
   const pillSat = isPressed || isDragging ? 220 : 160;
 
   // Measure container
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = pillContainerRef.current;
     if (!el) return;
     const measure = () => setContainerWidth(el.clientWidth);
