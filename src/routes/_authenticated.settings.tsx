@@ -475,7 +475,7 @@ function SettingsPage() {
               <Switch checked={requireBio} onCheckedChange={handleRequireBioChange} disabled={!isPremium} />
             </div>
             {['Interesses', 'À procura de', 'Idiomas', 'Signo', 'Educação', 'Planos de família'].map((label, i, arr) => (
-              <button key={label} onClick={soon}
+              <button key={label} onClick={() => (isPremium ? soon() : goUpgrade())}
                 className={`w-full p-4 flex items-center justify-between transition-colors hover:bg-accent ${i < arr.length - 1 ? 'border-b border-border' : ''}`}>
                 <span className="text-[15px] text-foreground font-medium">{label}</span>
                 <div className="flex items-center gap-1 text-muted-foreground">
