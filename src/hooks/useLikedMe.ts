@@ -66,7 +66,7 @@ export function useLikedMe() {
       if (!firstPath[pid]) firstPath[pid] = p.storage_path as string;
     });
     const paths = ids.map((id) => firstPath[id]).filter(Boolean);
-    const signed = await signPhotos(paths);
+    const signed = await signPhotos(paths, 3600, { width: 240, height: 320, resize: "cover", quality: 65 });
     const urlByPath: Record<string, string> = {};
     paths.forEach((p, i) => (urlByPath[p] = signed[i] ?? ""));
 
