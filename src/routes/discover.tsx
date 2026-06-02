@@ -97,7 +97,7 @@ function Discover() {
   return (
     <div className="fixed inset-0 overflow-hidden bg-black text-white">
       <div className="absolute inset-0" style={{ top: "-20px" }}>
-        <DiscoverTopBar onOpenFilters={() => {}} onBoost={boost.activate} />
+        <DiscoverTopBar onOpenFilters={() => setFiltersOpen(true)} onBoost={boost.activate} />
         {current ? (
           <>
             <ProfileCard
