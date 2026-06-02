@@ -84,6 +84,7 @@ export type Database = {
           membership_tier: string
           name: string | null
           onboarding_completed: boolean
+          onboarding_step: number
           phone: string | null
           updated_at: string
         }
@@ -103,6 +104,7 @@ export type Database = {
           membership_tier?: string
           name?: string | null
           onboarding_completed?: boolean
+          onboarding_step?: number
           phone?: string | null
           updated_at?: string
         }
@@ -122,6 +124,7 @@ export type Database = {
           membership_tier?: string
           name?: string | null
           onboarding_completed?: boolean
+          onboarding_step?: number
           phone?: string | null
           updated_at?: string
         }
