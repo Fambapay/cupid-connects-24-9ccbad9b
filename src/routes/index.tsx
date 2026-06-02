@@ -90,28 +90,100 @@ function Discover() {
   );
 }
 
-function ActionButton({
-  children,
+const darkGlass = {
+  background: "rgba(20,20,22,0.78)",
+  backdropFilter: "blur(20px)",
+  WebkitBackdropFilter: "blur(20px)",
+  border: "1px solid rgba(255,255,255,0.08)",
+  boxShadow:
+    "inset 0 1px 0 rgba(255,255,255,0.06), 0 6px 18px rgba(0,0,0,0.35)",
+} as const;
+
+function CircleBtn({
+  size,
   onClick,
   label,
-  iconColor,
+  style,
+  children,
 }: {
-  children: React.ReactNode;
+  size: number;
   onClick: () => void;
   label: string;
-  iconColor: string;
+  style?: React.CSSProperties;
+  children: React.ReactNode;
 }) {
   return (
     <motion.button
-      whileTap={{ scale: 0.86 }}
-      whileHover={{ y: -2, scale: 1.05 }}
-      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      whileTap={{ scale: 0.92, opacity: 0.85 }}
       onClick={onClick}
       aria-label={label}
-      className={`glass grid h-[58px] w-[58px] ${iconColor} place-items-center rounded-full`}
+      className="grid place-items-center rounded-full"
+      style={{ width: size, height: size, flexShrink: 0, ...style }}
     >
       {children}
     </motion.button>
+  );
+}
+
+function RewindButton({ onClick }: { onClick: () => void }) {
+  return (
+    <CircleBtn size={48} onClick={onClick} label="Voltar" style={darkGlass}>
+      <RotateCcw className="h-[22px] w-[22px]" strokeWidth={2.4} color="#FFB020" />
+    </CircleBtn>
+  );
+}
+
+function NopeButton({ onClick }: { onClick: () => void }) {
+  return (
+    <CircleBtn
+      size={62}
+      onClick={onClick}
+      label="Passar"
+      style={{
+        background: "#FF3B6B",
+        border: "none",
+        boxShadow:
+          "0 8px 22px -6px rgba(255,59,107,0.55), inset 0 1px 0 rgba(255,255,255,0.18)",
+      }}
+    >
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+        <path d="M18 6L6 18M6 6l12 12" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
+      </svg>
+    </CircleBtn>
+  );
+}
+
+function SuperLikeButton({ onClick }: { onClick: () => void }) {
+  return (
+    <CircleBtn size={54} onClick={onClick} label="Super like" style={darkGlass}>
+      <svg width="26" height="26" viewBox="0 0 24 24">
+        <defs>
+          <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#1A6FFF" />
+            <stop offset="100%" stopColor="#5BB8FF" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+          fill="url(#starGrad)"
+        />
+      </svg>
+    </CircleBtn>
+  );
+}
+
+function LikeButton({ onClick }: { onClick: () => void }) {
+  return (
+    <CircleBtn size={62} onClick={onClick} label="Curtir" style={darkGlass}>
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
+          stroke="#30E37C"
+          strokeWidth="2.2"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </CircleBtn>
   );
 }
 
