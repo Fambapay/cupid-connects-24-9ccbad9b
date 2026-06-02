@@ -33,31 +33,34 @@ function ChatLayout() {
     <AppShell>
       <TopBar title="Conversas" />
 
-      <section className="px-5">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          Novos matches
-        </h2>
-        <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
-          {newMatches.map((p) => (
-            <Link
-              key={p.id}
-              to="/chat/$matchId"
-              params={{ matchId: `new-${p.id}` }}
-              className="relative shrink-0"
-            >
-              <div className="rounded-2xl bg-gradient-sunset p-[2px]">
-                <div className="h-24 w-20 overflow-hidden rounded-2xl bg-card">
-                  <img src={p.photo} alt={p.name} className="h-full w-full object-cover" />
+      {newMatches.length > 0 && (
+        <section className="px-5">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            Novos matches
+          </h2>
+          <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
+            {newMatches.map((p) => (
+              <Link
+                key={p.id}
+                to="/chat/$matchId"
+                params={{ matchId: `new-${p.id}` }}
+                className="relative shrink-0"
+              >
+                <div className="rounded-2xl bg-gradient-sunset p-[2px]">
+                  <div className="h-24 w-20 overflow-hidden rounded-2xl bg-card">
+                    <img src={p.photo} alt={p.name} className="h-full w-full object-cover" />
+                  </div>
                 </div>
-              </div>
-              <span className="mt-1.5 block text-center text-xs font-medium">{p.name}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
+                <span className="mt-1.5 block text-center text-xs font-medium">{p.name}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
 
-      <section className="mt-6 px-5">
+
+      <section className={`${newMatches.length > 0 ? "mt-6" : ""} px-5`}>
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           Mensagens
         </h2>
