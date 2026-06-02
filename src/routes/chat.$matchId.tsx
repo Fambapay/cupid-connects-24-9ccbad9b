@@ -238,7 +238,7 @@ function ChatRoom() {
           e.preventDefault();
           send();
         }}
-        className="shrink-0 overflow-hidden border-t border-border/60 bg-background/95 px-3 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl"
+        className="shrink-0 overflow-hidden border-t border-border/60 bg-background/95 px-3 pt-2.5 pb-3 backdrop-blur-xl"
       >
         <div className="flex w-full items-center gap-2">
           <div className="flex h-12 min-w-0 flex-1 items-center gap-1 rounded-full bg-muted px-3 focus-within:ring-2 focus-within:ring-flame">
