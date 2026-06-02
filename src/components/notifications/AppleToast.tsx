@@ -51,7 +51,7 @@ function AppleToastBase({
           className="relative overflow-hidden rounded-[22px]"
           style={{
             background:
-              "linear-gradient(180deg, color-mix(in oklab, var(--background) 67%, transparent) 0%, color-mix(in oklab, var(--background) 83%, transparent) 100%)",
+              "linear-gradient(180deg, color-mix(in oklab, var(--background) 78%, transparent) 0%, color-mix(in oklab, var(--background) 92%, transparent) 100%)",
             boxShadow:
               "0 1px 0 0 color-mix(in oklab, white 14%, transparent) inset, 0 0 0 1px color-mix(in oklab, white 6%, transparent), 0 24px 48px -16px rgba(0,0,0,0.55), 0 8px 18px -8px rgba(0,0,0,0.35)",
             backdropFilter: "blur(28px) saturate(180%)",
