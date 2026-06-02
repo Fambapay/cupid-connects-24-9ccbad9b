@@ -112,27 +112,42 @@ export function DebitoCheckoutSheet({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 360, damping: 36 }}
-            className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl border-t border-white/10 bg-background p-5 pb-[max(env(safe-area-inset-bottom),24px)] text-foreground"
+            className="fixed inset-x-0 bottom-0 z-50 max-h-[92dvh] overflow-y-auto rounded-t-3xl border-t border-white/10 bg-gradient-to-b from-[#1a0a14] to-background p-5 pb-[max(env(safe-area-inset-bottom),24px)] text-foreground shadow-[0_-20px_60px_-10px_rgba(240,70,140,0.3)]"
           >
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/15" />
             <div className="flex items-start justify-between gap-3">
-              <div>
+              <div className="min-w-0">
+                <div className="mb-1 inline-flex items-center gap-1 rounded-full bg-fuchsia-500/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-fuchsia-300">
+                  <Lock size={9} /> Checkout seguro
+                </div>
                 <h3 className="text-lg font-extrabold leading-tight">{title}</h3>
                 <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
               </div>
               <button
                 onClick={handleClose}
                 disabled={stage === "submitting"}
-                className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.06] disabled:opacity-40"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/[0.06] disabled:opacity-40"
                 aria-label="Fechar"
               >
                 <X size={16} />
               </button>
             </div>
 
-            <div className="mt-3 flex items-baseline justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3">
-              <span className="text-xs text-muted-foreground">Total</span>
-              <span className="text-xl font-extrabold">{amountMzn.toLocaleString("pt-PT")} MZN</span>
+            {/* Order summary */}
+            <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-3">
+              <div className="flex items-baseline justify-between text-xs text-muted-foreground">
+                <span>Subscrição</span>
+                <span>{amountMzn.toLocaleString("pt-PT")} MZN</span>
+              </div>
+              <div className="mt-1 flex items-baseline justify-between text-xs text-emerald-300">
+                <span>Bónus de boas-vindas</span>
+                <span className="font-semibold">+1 Boost grátis</span>
+              </div>
+              <div className="my-2 h-px bg-white/8" />
+              <div className="flex items-baseline justify-between">
+                <span className="text-xs font-semibold">Total hoje</span>
+                <span className="text-xl font-extrabold">{amountMzn.toLocaleString("pt-PT")} <span className="text-xs font-bold text-white/60">MZN</span></span>
+              </div>
             </div>
 
             {stage === "form" || stage === "submitting" ? (
