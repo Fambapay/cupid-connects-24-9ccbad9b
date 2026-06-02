@@ -319,7 +319,7 @@ function SettingsPage() {
             </span>
             {profile?.is_incognito && <span className="text-[11px] text-brand-purple font-semibold">Ativo</span>}
           </motion.button>
-          <motion.button onClick={soon} className="rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
+          <motion.button onClick={() => (isPremium ? soon() : goUpgrade())} className="rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
             <div className="w-12 h-12 rounded-full bg-brand-purple/10 flex items-center justify-center">
               <Plane className="w-6 h-6 text-brand-purple" />
             </div>
