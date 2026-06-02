@@ -67,6 +67,33 @@ export type Database = {
           },
         ]
       }
+      profile_prompts: {
+        Row: {
+          answer: string
+          created_at: string
+          id: string
+          position: number
+          profile_id: string
+          question: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          id?: string
+          position?: number
+          profile_id: string
+          question: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: string
+          position?: number
+          profile_id?: string
+          question?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
@@ -78,9 +105,12 @@ export type Database = {
           gender: string | null
           id: string
           interested_in: string[]
+          interests: string[]
           is_incognito: boolean
           is_paused: boolean
           is_verified: boolean
+          latitude: number | null
+          longitude: number | null
           membership_tier: string
           name: string | null
           onboarding_completed: boolean
@@ -98,9 +128,12 @@ export type Database = {
           gender?: string | null
           id: string
           interested_in?: string[]
+          interests?: string[]
           is_incognito?: boolean
           is_paused?: boolean
           is_verified?: boolean
+          latitude?: number | null
+          longitude?: number | null
           membership_tier?: string
           name?: string | null
           onboarding_completed?: boolean
@@ -118,9 +151,12 @@ export type Database = {
           gender?: string | null
           id?: string
           interested_in?: string[]
+          interests?: string[]
           is_incognito?: boolean
           is_paused?: boolean
           is_verified?: boolean
+          latitude?: number | null
+          longitude?: number | null
           membership_tier?: string
           name?: string | null
           onboarding_completed?: boolean
