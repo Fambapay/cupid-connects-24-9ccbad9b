@@ -1,5 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
+import { Settings as SettingsIcon } from 'lucide-react';
 import { ProfileView, type ProfileViewData } from '@/components/ProfileView';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
 import { BottomNav } from '@/components/BottomNav';
@@ -31,6 +32,13 @@ function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Link
+        to="/settings"
+        className="fixed top-4 right-4 z-30 w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center backdrop-blur-md"
+        aria-label="Definições"
+      >
+        <SettingsIcon className="w-5 h-5 text-foreground" />
+      </Link>
       <ProfileView
         profile={profile}
         onPhotosChange={(photos) => setProfile(p => ({ ...p, photos }))}
