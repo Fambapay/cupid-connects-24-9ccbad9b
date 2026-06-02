@@ -33,6 +33,10 @@ import { usePhotoUpload } from "@/hooks/usePhotoUpload";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import tutorialWoman1 from "@/assets/tutorial-woman-1.jpg";
+import tutorialWoman2 from "@/assets/tutorial-woman-2.jpg";
+import tutorialMan1 from "@/assets/tutorial-man-1.jpg";
+import tutorialMan2 from "@/assets/tutorial-man-2.jpg";
 
 export const Route = createFileRoute("/onboarding")({
   ssr: false,
@@ -2013,43 +2017,65 @@ function TutorialCarousel({ onFinish }: { onFinish: () => void }) {
 function TutorialVisual({ variant }: { variant: TutorialSlide["visual"] }) {
   if (variant === "swipe") {
     return (
-      <div className="relative h-56 w-full max-w-[260px]">
+      <div className="relative mx-auto h-72 w-full max-w-[260px]">
         {/* Back card */}
         <div
-          className="absolute inset-x-6 inset-y-2 rounded-3xl border border-white/10 bg-white/[0.03]"
-          style={{ transform: "rotate(-6deg)" }}
-        />
+          className="absolute inset-x-8 inset-y-4 overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04]"
+          style={{ transform: "rotate(-7deg)" }}
+        >
+          <img
+            src={tutorialMan2}
+            alt=""
+            loading="lazy"
+            className="h-full w-full object-cover opacity-60"
+          />
+        </div>
         {/* Front card */}
         <motion.div
-          animate={{ x: [0, 60, 0, -60, 0], rotate: [0, 8, 0, -8, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-0 overflow-hidden rounded-3xl border border-white/10"
-          style={{
-            background:
-              "linear-gradient(160deg, color-mix(in oklab, var(--brand-pink) 35%, transparent), color-mix(in oklab, var(--brand-purple) 35%, transparent))",
-          }}
+          animate={{ x: [0, 70, 0, -70, 0], rotate: [0, 9, 0, -9, 0] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-0 overflow-hidden rounded-[28px] border border-white/15 shadow-[0_20px_60px_-15px_rgba(236,72,153,0.5)]"
         >
-          <div className="absolute inset-x-0 bottom-0 flex items-end gap-3 p-4">
-            <div className="h-10 w-10 rounded-full bg-white/20" />
-            <div className="space-y-1.5">
-              <div className="h-2.5 w-20 rounded-full bg-white/70" />
-              <div className="h-2 w-14 rounded-full bg-white/40" />
+          <img
+            src={tutorialWoman1}
+            alt="Perfil exemplo"
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+
+          {/* Profile info */}
+          <div className="absolute inset-x-0 bottom-0 p-4">
+            <div className="flex items-baseline gap-2">
+              <span className="text-lg font-bold text-white drop-shadow-lg">Amara</span>
+              <span className="text-base text-white/90">24</span>
+              <span className="ml-1 inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.9)]" />
+            </div>
+            <div className="mt-1 flex items-center gap-1 text-[11px] text-white/80">
+              <MapPin className="h-3 w-3" />
+              <span>2 km de distância</span>
             </div>
           </div>
+
           {/* Like / Nope chips */}
           <motion.div
-            animate={{ opacity: [0, 0, 1, 0, 0] }}
-            transition={{ duration: 4, repeat: Infinity }}
-            className="absolute right-3 top-3 rounded-md border-2 px-2 py-0.5 text-[10px] font-bold tracking-wider"
-            style={{ borderColor: "var(--brand-pink)", color: "var(--brand-pink)" }}
+            animate={{ opacity: [0, 0, 1, 0, 0], scale: [0.8, 0.8, 1, 0.8, 0.8] }}
+            transition={{ duration: 5, repeat: Infinity }}
+            className="absolute right-4 top-4 rounded-lg border-2 px-2.5 py-1 text-[11px] font-extrabold tracking-[0.18em] backdrop-blur-sm"
+            style={{
+              borderColor: "var(--brand-pink)",
+              color: "var(--brand-pink)",
+              background: "rgba(236,72,153,0.12)",
+            }}
           >
             LIKE
           </motion.div>
           <motion.div
-            animate={{ opacity: [0, 0, 0, 0, 1, 0] }}
-            transition={{ duration: 4, repeat: Infinity }}
-            className="absolute left-3 top-3 rounded-md border-2 px-2 py-0.5 text-[10px] font-bold tracking-wider text-white/80"
-            style={{ borderColor: "rgba(255,255,255,0.6)" }}
+            animate={{ opacity: [0, 0, 0, 0, 1, 0], scale: [0.8, 0.8, 0.8, 0.8, 1, 0.8] }}
+            transition={{ duration: 5, repeat: Infinity }}
+            className="absolute left-4 top-4 rounded-lg border-2 border-white/70 px-2.5 py-1 text-[11px] font-extrabold tracking-[0.18em] text-white/90 backdrop-blur-sm"
+            style={{ background: "rgba(255,255,255,0.08)" }}
           >
             NOPE
           </motion.div>
@@ -2060,110 +2086,206 @@ function TutorialVisual({ variant }: { variant: TutorialSlide["visual"] }) {
 
   if (variant === "match") {
     return (
-      <div className="relative flex h-56 items-center justify-center">
+      <div className="relative flex h-72 items-center justify-center">
         <div className="relative flex items-center">
+          {/* Left avatar */}
           <motion.div
-            animate={{ x: [-40, -8, -8] }}
-            transition={{ duration: 1.4, ease: "easeOut", repeat: Infinity, repeatDelay: 1.4 }}
-            className="h-24 w-24 rounded-full border-2 border-white/20 bg-gradient-to-br from-white/15 to-white/5"
-          />
+            animate={{ x: [-50, -14, -14], opacity: [0, 1, 1] }}
+            transition={{ duration: 1.4, ease: "easeOut", repeat: Infinity, repeatDelay: 1.6 }}
+            className="relative z-10 h-28 w-28 overflow-hidden rounded-full border-2 border-white/30 shadow-[0_10px_40px_-10px_rgba(236,72,153,0.7)]"
+          >
+            <img
+              src={tutorialMan1}
+              alt=""
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
+          </motion.div>
+          {/* Heart burst */}
           <motion.div
-            animate={{ scale: [0, 1.2, 1] }}
-            transition={{ duration: 0.6, delay: 0.6, repeat: Infinity, repeatDelay: 2.2 }}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            animate={{ scale: [0, 1.25, 1], opacity: [0, 1, 1] }}
+            transition={{ duration: 0.7, delay: 0.7, repeat: Infinity, repeatDelay: 2.3 }}
+            className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2"
           >
             <div
-              className="grid h-12 w-12 place-items-center rounded-full shadow-glow"
+              className="grid h-14 w-14 place-items-center rounded-full shadow-[0_0_30px_rgba(236,72,153,0.8)]"
               style={{
-                background:
-                  "linear-gradient(135deg, var(--brand-pink), var(--brand-magenta))",
+                background: "linear-gradient(135deg, var(--brand-pink), var(--brand-magenta))",
               }}
             >
-              <Heart className="h-6 w-6 fill-white text-white" />
+              <Heart className="h-7 w-7 fill-white text-white" />
             </div>
           </motion.div>
+          {/* Right avatar */}
           <motion.div
-            animate={{ x: [40, 8, 8] }}
-            transition={{ duration: 1.4, ease: "easeOut", repeat: Infinity, repeatDelay: 1.4 }}
-            className="h-24 w-24 rounded-full border-2 border-white/20 bg-gradient-to-br from-white/15 to-white/5"
-          />
+            animate={{ x: [50, 14, 14], opacity: [0, 1, 1] }}
+            transition={{ duration: 1.4, ease: "easeOut", repeat: Infinity, repeatDelay: 1.6 }}
+            className="relative z-10 h-28 w-28 overflow-hidden rounded-full border-2 border-white/30 shadow-[0_10px_40px_-10px_rgba(168,85,247,0.7)]"
+          >
+            <img
+              src={tutorialWoman2}
+              alt=""
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
+          </motion.div>
         </div>
+        {/* MATCH label */}
+        <motion.div
+          animate={{ opacity: [0, 0, 1, 1], y: [10, 10, 0, 0] }}
+          transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 1.4 }}
+          className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.25em] text-white"
+          style={{
+            background: "linear-gradient(90deg, var(--brand-pink), var(--brand-purple))",
+            boxShadow: "0 8px 24px -8px rgba(236,72,153,0.6)",
+          }}
+        >
+          It's a Match
+        </motion.div>
       </div>
     );
   }
 
   if (variant === "chat") {
+    // Premium iMessage-style chat with avatars and real text
+    const messages: Array<{ side: "l" | "r"; text: string; delay: number; tail?: boolean }> = [
+      { side: "l", text: "Olá! Adorei o teu perfil 😊", delay: 0.1, tail: true },
+      { side: "r", text: "Olá Amara! Obrigado 💫", delay: 0.7, tail: true },
+      { side: "l", text: "Café este sábado?", delay: 1.3, tail: true },
+      { side: "r", text: "Combinado!", delay: 1.9, tail: true },
+    ];
     return (
-      <div className="flex h-56 w-full max-w-[280px] flex-col justify-center gap-2">
-        {[
-          { side: "l", w: 60, delay: 0.1 },
-          { side: "r", w: 45, delay: 0.6 },
-          { side: "l", w: 75, delay: 1.1 },
-          { side: "r", w: 30, delay: 1.6 },
-        ].map((m, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: m.delay, repeat: Infinity, repeatDelay: 2.2 }}
-            className={cn("flex", m.side === "r" ? "justify-end" : "justify-start")}
-          >
-            <div
-              className="rounded-2xl px-3.5 py-2.5"
-              style={{
-                width: `${m.w}%`,
-                background:
-                  m.side === "r"
-                    ? "linear-gradient(135deg, var(--brand-pink), var(--brand-purple))"
-                    : "color-mix(in oklab, white 8%, transparent)",
-                borderBottomRightRadius: m.side === "r" ? 6 : 16,
-                borderBottomLeftRadius: m.side === "l" ? 6 : 16,
+      <div className="mx-auto flex h-72 w-full max-w-[280px] flex-col">
+        {/* Header bar */}
+        <div className="flex items-center gap-2.5 border-b border-white/10 pb-2">
+          <div className="relative h-9 w-9 overflow-hidden rounded-full border border-white/15">
+            <img src={tutorialWoman1} alt="" loading="lazy" className="h-full w-full object-cover" />
+            <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-emerald-400" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-xs font-semibold text-foreground">Amara</div>
+            <div className="text-[10px] text-emerald-400">online agora</div>
+          </div>
+        </div>
+        {/* Messages */}
+        <div className="flex flex-1 flex-col justify-end gap-1.5 pt-3">
+          {messages.map((m, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 6, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{
+                duration: 0.35,
+                delay: m.delay,
+                repeat: Infinity,
+                repeatDelay: 2.6,
+                ease: [0.4, 0, 0.2, 1],
               }}
+              className={cn("flex", m.side === "r" ? "justify-end" : "justify-start")}
             >
               <div
-                className="h-2 w-full rounded-full"
+                className={cn(
+                  "max-w-[78%] px-3 py-1.5 text-[12px] leading-snug",
+                  m.side === "r" ? "text-white" : "text-foreground/95",
+                )}
                 style={{
                   background:
                     m.side === "r"
-                      ? "rgba(255,255,255,0.7)"
-                      : "color-mix(in oklab, white 30%, transparent)",
+                      ? "linear-gradient(135deg, var(--brand-pink), var(--brand-purple))"
+                      : "color-mix(in oklab, white 10%, transparent)",
+                  borderRadius: 18,
+                  borderBottomRightRadius: m.side === "r" ? 4 : 18,
+                  borderBottomLeftRadius: m.side === "l" ? 4 : 18,
+                  boxShadow:
+                    m.side === "r"
+                      ? "0 4px 14px -4px rgba(236,72,153,0.5)"
+                      : "0 2px 8px -2px rgba(0,0,0,0.3)",
                 }}
-              />
+              >
+                {m.text}
+              </div>
+            </motion.div>
+          ))}
+          {/* Typing indicator */}
+          <motion.div
+            animate={{ opacity: [0, 0, 0, 0, 1, 1, 0] }}
+            transition={{ duration: 4, repeat: Infinity, repeatDelay: 1 }}
+            className="flex justify-start"
+          >
+            <div
+              className="flex items-center gap-1 px-3 py-2"
+              style={{
+                background: "color-mix(in oklab, white 10%, transparent)",
+                borderRadius: 18,
+                borderBottomLeftRadius: 4,
+              }}
+            >
+              {[0, 1, 2].map((d) => (
+                <motion.span
+                  key={d}
+                  animate={{ y: [0, -3, 0], opacity: [0.4, 1, 0.4] }}
+                  transition={{ duration: 0.9, repeat: Infinity, delay: d * 0.15 }}
+                  className="h-1.5 w-1.5 rounded-full bg-white/70"
+                />
+              ))}
             </div>
           </motion.div>
-        ))}
+        </div>
       </div>
     );
   }
 
-  // profile
+  // profile — premium mockup with real photo
   return (
-    <div className="relative h-56 w-full max-w-[240px]">
-      <div className="absolute inset-0 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03]">
-        <div
-          className="h-28 w-full"
-          style={{
-            background:
-              "linear-gradient(135deg, color-mix(in oklab, var(--brand-pink) 30%, transparent), color-mix(in oklab, var(--brand-purple) 30%, transparent))",
-          }}
-        />
-        <div className="-mt-8 px-4">
-          <div
-            className="h-16 w-16 rounded-full border-4 border-background"
-            style={{
-              background: "linear-gradient(135deg, var(--brand-pink), var(--brand-purple))",
-            }}
+    <div className="relative mx-auto h-72 w-full max-w-[240px]">
+      <div className="absolute inset-0 overflow-hidden rounded-[28px] border border-white/15 bg-white/[0.03] shadow-[0_20px_60px_-15px_rgba(168,85,247,0.45)]">
+        {/* Cover photo */}
+        <div className="relative h-40 w-full overflow-hidden">
+          <img
+            src={tutorialMan1}
+            alt=""
+            loading="lazy"
+            className="h-full w-full object-cover"
           />
-          <div className="mt-3 space-y-2">
-            <div className="h-2.5 w-24 rounded-full bg-white/70" />
-            <div className="h-2 w-32 rounded-full bg-white/30" />
-            <div className="h-2 w-28 rounded-full bg-white/30" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/90" />
+        </div>
+        {/* Avatar */}
+        <div className="relative -mt-10 px-4">
+          <div className="h-16 w-16 overflow-hidden rounded-full border-4 border-background shadow-lg">
+            <img
+              src={tutorialWoman2}
+              alt=""
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <div className="mt-3 space-y-1.5">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-sm font-bold text-foreground">Zuri</span>
+              <span className="text-xs text-muted-foreground">26</span>
+            </div>
+            <div className="text-[10px] leading-relaxed text-muted-foreground">
+              Fotógrafa · Luanda
+              <br />
+              Café, livros e viagens 📷
+            </div>
+            <div className="flex gap-1.5 pt-1">
+              {["Arte", "Viagens", "Música"].map((t) => (
+                <span
+                  key={t}
+                  className="rounded-full border border-white/15 bg-white/[0.06] px-2 py-0.5 text-[9px] font-medium text-foreground/80"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
+        {/* Sparkle badge */}
         <motion.div
-          animate={{ y: [0, -4, 0], rotate: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full shadow-glow"
+          animate={{ y: [0, -5, 0], rotate: [0, 10, 0] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full shadow-[0_0_20px_rgba(236,72,153,0.6)]"
           style={{
             background: "linear-gradient(135deg, var(--brand-pink), var(--brand-magenta))",
           }}
