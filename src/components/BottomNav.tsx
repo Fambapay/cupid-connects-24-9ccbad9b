@@ -309,3 +309,37 @@ const TabButton = ({
     </motion.button>
   );
 };
+
+// ─── Router-aware wrapper used across the app ───────────────────────────────
+import { useLocation, useNavigate } from "@tanstack/react-router";
+
+const TAB_TO_PATH = {
+  discover: "/",
+  likes: "/matches",
+  chat: "/chat",
+  profile: "/profile",
+} as const;
+
+type TabId = keyof typeof TAB_TO_PATH;
+
+function pathToTab(pathname: string): TabId {
+  if (pathname === "/" || pathname.startsWith("/explore")) return "discover";
+  if (pathname.startsWith("/matches")) return "likes";
+  if (pathname.startsWith("/chat")) return "chat";
+  if (pathname.startsWith("/profile")) return "profile";
+  return "discover";
+}
+
+export function BottomNav(
+  props: Omit<BottomNavProps, "activeTab" | "onTabChange"> = {},
+) {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  return (
+    <BottomNavBase
+      {...props}
+      activeTab={pathToTab(pathname)}
+      onTabChange={(t) => navigate({ to: TAB_TO_PATH[t] })}
+    />
+  );
+}
