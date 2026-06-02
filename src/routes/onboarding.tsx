@@ -1042,11 +1042,12 @@ function InterestedStep({
 }
 
 // Photos ─────
-function PhotosStep({ onNext, count }: { onNext: () => void; count: number }) {
+function PhotosStep({ onNext }: { onNext: () => void; count?: number }) {
   const { photos, upload, remove, loading } = usePhotoUpload();
   const { toast } = useToast();
   const [actionFor, setActionFor] = useState<string | null>(null);
 
+  const count = photos.length;
   const slots = Array.from({ length: 6 }, (_, i) => photos[i] ?? null);
 
   const handleFile = async (file: File, replaceId?: string) => {
@@ -1094,6 +1095,7 @@ function PhotosStep({ onNext, count }: { onNext: () => void; count: number }) {
           Continuar
         </PrimaryButton>
       </CtaBar>
+
 
       <Drawer open={!!actionFor} onOpenChange={(o) => !o && setActionFor(null)}>
         <DrawerContent className="bg-card">
