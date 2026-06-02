@@ -372,3 +372,51 @@
     0 0 0 3px color-mix(in oklab, var(--brand-pink) 18%, transparent),
     inset 0 1px 0 rgba(255,255,255,0.04);
 }
+
+/* ============ Hunie cards & rows ============ */
+.hunie-card {
+  position: relative;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.02) 100%);
+  border: 1px solid rgba(255,255,255,0.07);
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.04) inset,
+    0 12px 28px -18px rgba(0,0,0,0.6);
+  transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
+}
+.hunie-card:hover {
+  border-color: color-mix(in oklab, var(--brand-pink) 28%, rgba(255,255,255,0.10));
+}
+.hunie-card .hunie-divider {
+  border-color: rgba(255,255,255,0.06);
+}
+.hunie-row {
+  transition: background 0.15s ease;
+}
+.hunie-row:active { background: rgba(255,255,255,0.04); }
+
+.hunie-section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.45);
+}
+
+.hunie-pill-primary {
+  background-image: linear-gradient(135deg, #FF4FA3 0%, #B13CFF 100%);
+  color: #fff;
+  box-shadow:
+    0 10px 24px -10px color-mix(in oklab, var(--brand-pink) 70%, transparent),
+    inset 0 1px 0 rgba(255,255,255,0.22);
+}
+
+.hunie-glass-btn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  backdrop-filter: blur(14px);
+}

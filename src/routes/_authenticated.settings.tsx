@@ -51,13 +51,14 @@ const itemVariants = {
 
 function SectionHeader({ icon: Icon, label, accessory }: { icon?: any; label: string; accessory?: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-2 mb-3 px-1">
-      {Icon && <Icon className="w-3.5 h-3.5 text-muted-foreground/60" />}
-      <span className="text-[11px] font-semibold uppercase tracking-[1px] text-muted-foreground/70">{label}</span>
+    <div className="mb-3 flex items-center gap-2 px-1">
+      {Icon && <Icon className="h-3.5 w-3.5 text-flame" />}
+      <span className="hunie-section-label">{label}</span>
       {accessory}
     </div>
   );
 }
+
 
 function SettingsPage() {
   const navigate = useNavigate();
@@ -260,27 +261,57 @@ function SettingsPage() {
       style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
     >
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background border-b border-border" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-        <div className="flex items-center justify-between p-4">
+      <div
+        className="sticky top-0 z-10 border-b border-white/[0.06]"
+        style={{
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          background:
+            'linear-gradient(180deg, rgba(16,14,22,0.92) 0%, rgba(16,14,22,0.78) 100%)',
+          backdropFilter: 'blur(18px) saturate(140%)',
+        }}
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-0 h-[140px] w-[360px] -translate-x-1/2 rounded-full"
+          style={{
+            background:
+              'radial-gradient(closest-side, color-mix(in oklab, var(--brand-pink) 18%, transparent) 0%, transparent 70%)',
+            filter: 'blur(24px)',
+          }}
+        />
+        <div className="relative flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
             <motion.button
               onClick={goBack}
-              className="w-10 h-10 rounded-2xl bg-card border border-border flex items-center justify-center"
+              className="hunie-glass-btn grid h-10 w-10 place-items-center rounded-2xl"
               whileTap={{ scale: 0.9 }}
+              aria-label="Voltar"
             >
-              <ArrowLeft className="w-5 h-5 text-foreground" />
+              <ArrowLeft className="h-5 w-5 text-white" />
             </motion.button>
-            <h2 className="text-[20px] font-semibold text-foreground">Definições</h2>
+            <h2
+              className="text-[20px] font-bold tracking-tight"
+              style={{
+                backgroundImage:
+                  'linear-gradient(135deg, #FFFFFF 0%, #FF4FA3 60%, #B13CFF 100%)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                color: 'transparent',
+              }}
+            >
+              Definições
+            </h2>
           </div>
           <motion.button
             onClick={goBack}
-            className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold"
+            className="hunie-pill-primary rounded-full px-4 py-2 text-[13px] font-semibold"
             whileTap={{ scale: 0.95 }}
           >
             Concluído
           </motion.button>
         </div>
       </div>
+
 
       <motion.div className="px-4" style={{ paddingBottom: '24px' }}
         variants={containerVariants} initial="hidden" animate="show"
@@ -298,7 +329,7 @@ function SettingsPage() {
             const isCurrent = isPremium && membershipTier === tier;
             return (
               <motion.button key={tier} onClick={() => navigate({ to: '/membership' })}
-                className="w-full rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-1.5 relative overflow-hidden"
+                className="w-full hunie-card p-5 flex flex-col items-center gap-1.5 relative overflow-hidden"
                 whileTap={{ scale: 0.98 }}
                 style={isCurrent ? { borderColor: accent } : undefined}
               >
@@ -322,20 +353,20 @@ function SettingsPage() {
 
         {/* 2x2 actions grid */}
         <motion.div className="mt-4 grid grid-cols-2 gap-3" variants={itemVariants}>
-          <motion.button onClick={() => goShop('super_like')} className="rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
+          <motion.button onClick={() => goShop('super_like')} className="hunie-card p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
             <div className="w-12 h-12 rounded-full bg-superlike/10 flex items-center justify-center">
               <Star className="w-6 h-6 text-superlike" fill="currentColor" />
             </div>
             <span className="text-[14px] font-semibold text-foreground">Super Likes</span>
           </motion.button>
-          <motion.button onClick={() => goShop('boost')} className="rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
+          <motion.button onClick={() => goShop('boost')} className="hunie-card p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
             <div className="w-12 h-12 rounded-full bg-brand-purple/10 flex items-center justify-center">
               <Zap className="w-6 h-6 text-brand-purple" fill="currentColor" />
             </div>
             <span className="text-[14px] font-semibold text-foreground">Boosts</span>
           </motion.button>
           <motion.button onClick={() => handleIncognitoChange(!profile?.is_incognito)}
-            className="rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-2 relative" whileTap={{ scale: 0.97 }}>
+            className="hunie-card p-5 flex flex-col items-center gap-2 relative" whileTap={{ scale: 0.97 }}>
             <div className={`w-12 h-12 rounded-full flex items-center justify-center ${profile?.is_incognito ? 'bg-foreground' : 'bg-foreground/10'}`}>
               <EyeOff className={`w-6 h-6 ${profile?.is_incognito ? 'text-background' : 'text-foreground'}`} />
             </div>
@@ -344,7 +375,7 @@ function SettingsPage() {
             </span>
             {profile?.is_incognito && <span className="text-[11px] text-brand-purple font-semibold">Ativo</span>}
           </motion.button>
-          <motion.button onClick={() => (isPremium ? soon() : goUpgrade())} className="rounded-2xl bg-card border border-border p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
+          <motion.button onClick={() => (isPremium ? soon() : goUpgrade())} className="hunie-card p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
             <div className="w-12 h-12 rounded-full bg-brand-purple/10 flex items-center justify-center">
               <Plane className="w-6 h-6 text-brand-purple" />
             </div>
@@ -357,8 +388,8 @@ function SettingsPage() {
         {/* Conta */}
         <motion.div className="mt-6" variants={itemVariants}>
           <SectionHeader label="Definições da conta" />
-          <div className="rounded-2xl bg-card border border-border overflow-hidden">
-            <div className="w-full p-4 flex items-center justify-between border-b border-border">
+          <div className="hunie-card overflow-hidden">
+            <div className="w-full p-4 flex items-center justify-between border-b border-white/[0.06]">
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-muted-foreground" />
                 <span className="text-[15px] text-foreground font-medium">Email</span>
@@ -381,9 +412,9 @@ function SettingsPage() {
         {/* Discovery */}
         <motion.div className="mt-6" variants={itemVariants}>
           <SectionHeader icon={Compass} label="Descoberta" />
-          <div className="rounded-2xl bg-card border border-border overflow-hidden">
+          <div className="hunie-card overflow-hidden">
             <button onClick={handleEnableLocation} disabled={locationLoading}
-              className="w-full p-4 border-b border-border flex items-center justify-between transition-colors hover:bg-accent disabled:opacity-60">
+              className="w-full p-4 border-b border-white/[0.06] flex items-center justify-between transition-colors hover:bg-accent disabled:opacity-60">
               <div className="flex items-center gap-3">
                 <MapPin className="w-5 h-5 text-muted-foreground" />
                 <div className="text-left">
@@ -409,7 +440,7 @@ function SettingsPage() {
             </button>
 
             {/* Distance */}
-            <div className="p-4 border-b border-border">
+            <div className="p-4 border-b border-white/[0.06]">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-[15px] text-foreground font-medium">Distância máxima</span>
                 <span className="text-[13px] font-semibold text-brand-purple tabular-nums tracking-tight">{distanceValue} km</span>
@@ -422,7 +453,7 @@ function SettingsPage() {
             </div>
 
             {/* Age */}
-            <div className="p-4 border-b border-border">
+            <div className="p-4 border-b border-white/[0.06]">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-[15px] text-foreground font-medium">Faixa etária</span>
                 <span className="text-[13px] font-semibold text-brand-purple tabular-nums tracking-tight">{ageMin}–{ageMax}</span>
@@ -459,8 +490,8 @@ function SettingsPage() {
           <p className="px-1 mb-3 text-[12px] leading-[1.5] text-muted-foreground">
             As tuas preferências mostram primeiro pessoas que combinam contigo. Não bloqueiam ninguém — continuas a poder dar match com outros perfis.
           </p>
-          <div className="rounded-2xl bg-card border border-border overflow-hidden">
-            <div className="p-4 border-b border-border">
+          <div className="hunie-card overflow-hidden">
+            <div className="p-4 border-b border-white/[0.06]">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-[15px] text-foreground font-medium">Nº mínimo de fotos</span>
                 <span className="text-[13px] font-semibold text-brand-purple tabular-nums tracking-tight">{minPhotosValue}</span>
@@ -471,13 +502,13 @@ function SettingsPage() {
                 min={1} max={6} step={1} disabled={!isPremium} />
               <div className="flex justify-between mt-2 text-[13px] text-muted-foreground"><span>1</span><span>6</span></div>
             </div>
-            <div className="p-4 border-b border-border flex items-center justify-between">
+            <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
               <span className="text-[15px] text-foreground font-medium">Tem bio</span>
               <Switch checked={requireBio} onCheckedChange={handleRequireBioChange} disabled={!isPremium} />
             </div>
             {['Interesses', 'À procura de', 'Idiomas', 'Signo', 'Educação', 'Planos de família'].map((label, i, arr) => (
               <button key={label} onClick={() => (isPremium ? soon() : goUpgrade())}
-                className={`w-full p-4 flex items-center justify-between transition-colors hover:bg-accent ${i < arr.length - 1 ? 'border-b border-border' : ''}`}>
+                className={`w-full p-4 flex items-center justify-between transition-colors hover:bg-accent ${i < arr.length - 1 ? 'border-b border-white/[0.06]' : ''}`}>
                 <span className="text-[15px] text-foreground font-medium">{label}</span>
                 <div className="flex items-center gap-1 text-muted-foreground">
                   <span className="text-[14px]">Selecionar</span>
@@ -487,19 +518,23 @@ function SettingsPage() {
             ))}
           </div>
           {!isPremium && (
-            <motion.button onClick={() => navigate({ to: '/membership' })} whileTap={{ scale: 0.98 }}
-              className="mt-3 w-full rounded-2xl bg-brand-purple text-primary-foreground py-3.5 font-semibold text-[15px] flex items-center justify-center gap-2">
-              <Crown className="w-4 h-4" /> Desbloquear com Hunie Plus
+            <motion.button
+              onClick={() => navigate({ to: '/membership' })}
+              whileTap={{ scale: 0.98 }}
+              className="hunie-pill-primary mt-3 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-[15px] font-semibold"
+            >
+              <Crown className="h-4 w-4" /> Desbloquear com Hunie Plus
             </motion.button>
           )}
+
         </motion.div>
 
         {/* Visibility */}
         <motion.div className="mt-6" variants={itemVariants}>
           <SectionHeader icon={Eye} label="Quem te vê" />
-          <div className="rounded-2xl bg-card border border-border overflow-hidden">
+          <div className="hunie-card overflow-hidden">
             <motion.button onClick={() => handleVisibilityChange('standard')} disabled={saving}
-              className="w-full p-4 flex items-center justify-between border-b border-border transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between border-b border-white/[0.06] transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${visibilityMode === 'standard' ? 'bg-brand-purple' : 'bg-card border border-border'}`}>
                   <Eye className={`w-5 h-5 ${visibilityMode === 'standard' ? 'text-white' : 'text-muted-foreground'}`} />
@@ -538,7 +573,7 @@ function SettingsPage() {
         {/* Notifications */}
         <motion.div className="mt-6" variants={itemVariants}>
           <SectionHeader icon={Bell} label="Notificações" />
-          <div className="rounded-2xl bg-card border border-border overflow-hidden">
+          <div className="hunie-card overflow-hidden">
             <div className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center">
@@ -557,7 +592,7 @@ function SettingsPage() {
         {/* Verification */}
         <motion.div className="mt-6" variants={itemVariants}>
           <SectionHeader icon={BadgeCheck} label="Verificação" />
-          <div className="rounded-2xl bg-card border border-border overflow-hidden">
+          <div className="hunie-card overflow-hidden">
             <div className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${profile?.is_verified ? 'bg-brand-purple border-brand-purple' : 'bg-card border-border'}`}>
@@ -590,7 +625,7 @@ function SettingsPage() {
         {/* Connections */}
         <motion.div className="mt-6" variants={itemVariants}>
           <SectionHeader icon={Ban} label="Conexões" />
-          <div className="rounded-2xl bg-card border border-border overflow-hidden">
+          <div className="hunie-card overflow-hidden">
             <motion.button onClick={() => setShowBlockedUsers(true)}
               className="w-full p-4 flex items-center justify-between transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
@@ -607,7 +642,7 @@ function SettingsPage() {
           </div>
           <motion.div className="mt-3" variants={itemVariants}>
             <motion.button onClick={handleInstallApp}
-              className="w-full p-4 flex items-center justify-between rounded-2xl bg-card border border-border transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between hunie-card transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
                   <Download className="w-5 h-5 text-success" />
@@ -625,9 +660,9 @@ function SettingsPage() {
         {/* Account */}
         <motion.div className="mt-6" variants={itemVariants}>
           <SectionHeader icon={Crown} label="Conta" />
-          <div className="rounded-2xl bg-card border border-border overflow-hidden">
+          <div className="hunie-card overflow-hidden">
             <motion.button onClick={() => navigate({ to: '/membership' })}
-              className="w-full p-4 flex items-center justify-between border-b border-border transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between border-b border-white/[0.06] transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isPremium ? 'bg-amber-500' : 'bg-amber-500/10'}`}>
                   <Crown className={`w-5 h-5 ${isPremium ? 'text-white' : 'text-amber-500'}`} />
@@ -646,7 +681,7 @@ function SettingsPage() {
             </motion.button>
 
             <motion.button onClick={handleLogout}
-              className="w-full p-4 flex items-center justify-between border-b border-border transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between border-b border-white/[0.06] transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center">
                   <LogOut className="w-5 h-5 text-muted-foreground" />
