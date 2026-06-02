@@ -8,6 +8,7 @@ import { ProfileCard } from "@/components/ProfileCard";
 import { SwipeActions } from "@/components/SwipeActions";
 import { DiscoverTopBar } from "@/components/DiscoverTopBar";
 import { EmptyDiscovery } from "@/components/discovery/EmptyDiscovery";
+import { MatchOverlay } from "@/components/discovery/MatchOverlay";
 import { FiltersSheet, DEFAULT_FILTERS, type DiscoveryFilters } from "@/components/FiltersSheet";
 import { useDiscovery } from "@/hooks/useDiscovery";
 import { useCredits } from "@/hooks/useCredits";
