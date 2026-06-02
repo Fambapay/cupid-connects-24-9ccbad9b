@@ -120,7 +120,13 @@ function ShopPage() {
         <div className="flex items-center gap-3 px-4 pb-3">
           <motion.button
             whileTap={{ scale: 0.9 }}
-            onClick={() => navigate({ to: "/discover" })}
+            onClick={() => {
+              if (typeof window !== "undefined" && window.history.length > 1) {
+                window.history.back();
+              } else {
+                navigate({ to: "/profile" });
+              }
+            }}
             className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.06]"
             aria-label="Voltar"
           >
