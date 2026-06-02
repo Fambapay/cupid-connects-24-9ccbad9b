@@ -8,6 +8,7 @@ import { ProfileCard } from "@/components/ProfileCard";
 import { SwipeActions } from "@/components/SwipeActions";
 import { DiscoverTopBar } from "@/components/DiscoverTopBar";
 import { EmptyDiscovery } from "@/components/discovery/EmptyDiscovery";
+import { FiltersSheet, DEFAULT_FILTERS, type DiscoveryFilters } from "@/components/FiltersSheet";
 import { useDiscovery } from "@/hooks/useDiscovery";
 import { useCredits } from "@/hooks/useCredits";
 import { useBoost } from "@/hooks/useBoost";
@@ -35,6 +36,8 @@ function Discover() {
   const boost = useBoost(goShop);
   const [index, setIndex] = useState(0);
   const [matchedName, setMatchedName] = useState<string | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
   const cardRef = useRef<React.ComponentRef<typeof ProfileCard>>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -94,7 +97,7 @@ function Discover() {
   return (
     <div className="fixed inset-0 overflow-hidden bg-black text-white">
       <div className="absolute inset-0" style={{ top: "-20px" }}>
-        <DiscoverTopBar onOpenFilters={() => {}} onBoost={boost.activate} />
+        <DiscoverTopBar onOpenFilters={() => setFiltersOpen(true)} onBoost={boost.activate} />
         {current ? (
           <>
             <ProfileCard
@@ -162,6 +165,15 @@ function Discover() {
           </div>
         </div>
       )}
+
+      <FiltersSheet
+        open={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        value={filters}
+        onChange={setFilters}
+        isPremium={false}
+        onUpgrade={goShop}
+      />
 
       <BottomNav />
     </div>
