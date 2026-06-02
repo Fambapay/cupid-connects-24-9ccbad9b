@@ -258,7 +258,7 @@ const TabButton = ({
         <Icon
           className={`tab-bar-icon w-[22px] h-[22px] ${shouldAnimate ? 'animate-notification-bounce' : ''}`}
           style={{ fill: 'none' }}
-          strokeWidth={isActive ? 2.4 : 1.9}
+          strokeWidth={isActive ? 2.1 : 1.7}
         />
         <AnimatePresence mode="wait">
           {badge !== undefined && badge > 0 && (
@@ -281,11 +281,12 @@ const TabButton = ({
         </AnimatePresence>
       </div>
       <span
-        className="relative text-[10px] leading-none z-10 font-semibold tracking-wide"
-        style={{ opacity: isActive ? 1 : 0.7 }}
+        className="relative text-[10px] leading-none z-10 font-medium tracking-wide"
+        style={{ opacity: isActive ? 0.95 : 0.6 }}
       >
         {label}
       </span>
+
     </motion.button>
   );
 };
