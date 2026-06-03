@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { useSubscription } from "./useSubscription";
 import { signPhotos } from "@/lib/photos";
 
 export interface Liker {
@@ -20,6 +21,8 @@ function computeAge(birthdate: string | null): number {
 
 export function useLikedMe() {
   const { user } = useAuth();
+  const { entitlements } = useSubscription();
+  const canSeeWhoLiked = entitlements.canSeeWhoLiked;
   const [likers, setLikers] = useState<Liker[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -65,6 +68,23 @@ export function useLikedMe() {
       return;
     }
 
+    // Non-premium: do NOT fetch identifying data or photos.
+    // Return opaque placeholders so the UI shows blurred mystery cards only.
+    if (!canSeeWhoLiked) {
+      setLikers(
+        pending.map((s) => ({
+          id: `hidden-${s.swiper_id}`,
+          name: "",
+          age: 0,
+          city: "",
+          photo: "",
+          isSuper: s.direction === "super",
+        })),
+      );
+      setLoading(false);
+      return;
+    }
+
     const ids = pending.map((s) => s.swiper_id as string);
     const [{ data: profiles }, { data: photos }] = await Promise.all([
       supabase.from("profiles").select("id,name,age,birthdate,city").in("id", ids),
@@ -105,7 +125,7 @@ export function useLikedMe() {
         .filter((x): x is Liker => !!x),
     );
     setLoading(false);
-  }, [user]);
+  }, [user, canSeeWhoLiked]);
 
   useEffect(() => {
     load();
