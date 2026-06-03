@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { computeProfileCompletion } from '@/lib/profileCompletion';
 import { hapticTap } from '@/hooks/useNativePlatform';
+import { ProfileBundles } from '@/components/ProfileBundles';
+
 
 export interface ProfileViewData {
   name: string;
@@ -311,7 +313,11 @@ export function ProfileView({
         ))}
       </div>
 
+      {/* BUNDLES & PACKS — upsell */}
+      <ProfileBundles />
+
       {/* MEMBERSHIP CARD */}
+
       {!isPremium && (
         <div className="relative mx-5 mb-6">
           <div
