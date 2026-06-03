@@ -68,22 +68,49 @@ export function useLikedMe() {
       return;
     }
 
-    // Non-premium: do NOT fetch identifying data or photos.
-    // Return opaque placeholders so the UI shows blurred mystery cards only.
+    // Non-premium: Tinder-style teaser.
+    // Show age + a heavily downscaled (≈20px) photo so the silhouette/colors
+    // come through but identity stays hidden. No name, no city.
     if (!canSeeWhoLiked) {
+      const ids = pending.map((s) => s.swiper_id as string);
+      const [{ data: profiles }, { data: photos }] = await Promise.all([
+        supabase.from("profiles").select("id,age,birthdate").in("id", ids),
+        supabase
+          .from("profile_photos")
+          .select("profile_id,storage_path,position")
+          .in("profile_id", ids)
+          .order("position", { ascending: true }),
+      ]);
+      const firstPath: Record<string, string> = {};
+      (photos ?? []).forEach((p) => {
+        const pid = p.profile_id as string;
+        if (!firstPath[pid]) firstPath[pid] = p.storage_path as string;
+      });
+      const paths = ids.map((id) => firstPath[id]).filter(Boolean);
+      // Tiny image — pixelated, cannot be re-signed at higher quality by the client.
+      const signed = await signPhotos(paths, 3600, { width: 24, height: 32, resize: "cover", quality: 30 });
+      const urlByPath: Record<string, string> = {};
+      paths.forEach((p, i) => (urlByPath[p] = signed[i] ?? ""));
+      const profById = new Map((profiles ?? []).map((p) => [p.id as string, p]));
+
       setLikers(
-        pending.map((s) => ({
-          id: `hidden-${s.swiper_id}`,
-          name: "",
-          age: 0,
-          city: "",
-          photo: "",
-          isSuper: s.direction === "super",
-        })),
+        pending.map((s) => {
+          const id = s.swiper_id as string;
+          const p = profById.get(id);
+          return {
+            id: `hidden-${id}`,
+            name: "",
+            age: (p?.age as number) ?? computeAge((p?.birthdate as string | null) ?? null),
+            city: "",
+            photo: firstPath[id] ? urlByPath[firstPath[id]] : "",
+            isSuper: s.direction === "super",
+          };
+        }),
       );
       setLoading(false);
       return;
     }
+
 
     const ids = pending.map((s) => s.swiper_id as string);
     const [{ data: profiles }, { data: photos }] = await Promise.all([
