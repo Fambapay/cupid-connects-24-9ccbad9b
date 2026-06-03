@@ -206,13 +206,9 @@ export function SwipeableConversationItem({
       <AlertDialog open={confirmKind !== null} onOpenChange={(o) => !o && setConfirmKind(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {confirmKind === "block" ? `Bloquear ${name}?` : `Desfazer match com ${name}?`}
-            </AlertDialogTitle>
+            <AlertDialogTitle>Desfazer match com {name}?</AlertDialogTitle>
             <AlertDialogDescription>
-              {confirmKind === "block"
-                ? "Não vão poder ver-se nem enviar mensagens. O match será removido."
-                : "A conversa será apagada e não voltam a ser sugeridos um ao outro num like."}
+              A conversa será apagada e não voltam a ser sugeridos um ao outro num like.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -221,7 +217,7 @@ export function SwipeableConversationItem({
               disabled={busy}
               onClick={(e) => {
                 e.preventDefault();
-                confirmKind === "block" ? handleBlock() : handleUnmatch();
+                handleUnmatch();
               }}
             >
               Confirmar
