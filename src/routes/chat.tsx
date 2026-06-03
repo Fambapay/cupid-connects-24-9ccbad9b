@@ -1,6 +1,7 @@
 import { createFileRoute, Link, Outlet, useMatchRoute } from "@tanstack/react-router";
 import { AppShell, TopBar } from "@/components/AppShell";
 import { useMatches } from "@/hooks/useMatches";
+import { SwipeableConversationItem } from "@/components/chat/SwipeableConversationItem";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
