@@ -71,10 +71,10 @@ export function ChatActionsMenu({
     setBusy(true);
     try {
       await unmatchFn({ data: { matchId } });
-      toast({ title: "Match desfeito" });
+      toast.success("Match desfeito");
       navigate({ to: "/chat" });
     } catch (e) {
-      toast({ title: "Erro", description: String((e as Error).message), variant: "destructive" });
+      toast.error("Erro", { description: String((e as Error).message) });
     } finally {
       setBusy(false);
       setConfirmKind(null);
@@ -85,10 +85,10 @@ export function ChatActionsMenu({
     setBusy(true);
     try {
       await blockFn({ data: { userId: otherUserId, matchId } });
-      toast({ title: `${otherName} foi bloqueado` });
+      toast.success(`${otherName} foi bloqueado`);
       navigate({ to: "/chat" });
     } catch (e) {
-      toast({ title: "Erro", description: String((e as Error).message), variant: "destructive" });
+      toast.error("Erro", { description: String((e as Error).message) });
     } finally {
       setBusy(false);
       setConfirmKind(null);
@@ -107,11 +107,11 @@ export function ChatActionsMenu({
           alsoBlock: true,
         },
       });
-      toast({ title: "Denúncia enviada", description: "Obrigado. A nossa equipa vai rever." });
+      toast.success("Denúncia enviada", { description: "Obrigado. A nossa equipa vai rever." });
       setReportOpen(false);
       navigate({ to: "/chat" });
     } catch (e) {
-      toast({ title: "Erro", description: String((e as Error).message), variant: "destructive" });
+      toast.error("Erro", { description: String((e as Error).message) });
     } finally {
       setBusy(false);
     }
