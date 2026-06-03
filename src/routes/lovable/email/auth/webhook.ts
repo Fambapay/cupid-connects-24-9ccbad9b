@@ -31,7 +31,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "cupid-connects-24"
+const SITE_NAME = "Hunie"
 const SENDER_DOMAIN = "suporte.hunie.app"
 const ROOT_DOMAIN = "hunie.app"
 const FROM_DOMAIN = "hunie.app"
