@@ -159,7 +159,7 @@ export function SwipeableConversationItem({
       {/* Actions layer (behind) */}
       <motion.div
         style={{ opacity: bgOpacity }}
-        className="absolute inset-y-0 right-0 flex w-[160px] items-stretch"
+        className="absolute inset-y-0 right-0 flex w-[180px] items-stretch"
       >
         <button
           onClick={() => {
@@ -169,27 +169,17 @@ export function SwipeableConversationItem({
           className="flex flex-1 flex-col items-center justify-center gap-1 bg-amber-500 text-white"
         >
           <Flag className="h-5 w-5" />
-          <span className="text-[10px] font-semibold uppercase tracking-wide">Denunciar</span>
-        </button>
-        <button
-          onClick={() => {
-            snapClose();
-            setConfirmKind("block");
-          }}
-          className="flex flex-1 flex-col items-center justify-center gap-1 bg-red-500 text-white"
-        >
-          <Ban className="h-5 w-5" />
-          <span className="text-[10px] font-semibold uppercase tracking-wide">Bloquear</span>
+          <span className="text-[11px] font-semibold tracking-wide">Reportar</span>
         </button>
         <button
           onClick={() => {
             snapClose();
             setConfirmKind("unmatch");
           }}
-          className="flex flex-1 flex-col items-center justify-center gap-1 bg-muted-foreground text-white"
+          className="flex flex-1 flex-col items-center justify-center gap-1 bg-red-500 text-white"
         >
           <HeartCrack className="h-5 w-5" />
-          <span className="text-[10px] font-semibold uppercase tracking-wide">Unmatch</span>
+          <span className="text-[11px] font-semibold tracking-wide">Unmatch</span>
         </button>
       </motion.div>
 
