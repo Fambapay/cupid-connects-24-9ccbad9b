@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Check, Crown, Shield, Sparkles, Flame, Star, Lock, Clock, TrendingUp, Heart } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Check, Shield, Sparkles, Flame, Lock, Clock, TrendingUp, Heart } from "lucide-react";
+import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 import { PLAN_CARDS, formatPrice, type PlanCardConfig } from "@/lib/plans";
@@ -21,16 +21,6 @@ export const Route = createFileRoute("/membership")({
   component: MembershipPage,
 });
 
-// ── Mental trigger: live social proof ticker ─────────────────────────────
-const TICKER_MESSAGES = [
-  { name: "Aida", city: "Maputo", action: "acabou de subscrever Plus", t: "agora" },
-  { name: "Bruno", city: "Matola", action: "começou um match Premium", t: "há 1 min" },
-  { name: "Carla", city: "Beira", action: "subscreveu Elite", t: "há 2 min" },
-  { name: "Dércio", city: "Maputo", action: "subscreveu Plus", t: "há 3 min" },
-  { name: "Eunice", city: "Nampula", action: "subscreveu Select", t: "há 4 min" },
-  { name: "Filipe", city: "Tete", action: "subscreveu Plus", t: "há 5 min" },
-];
-
 function useCountdown(targetMinutes: number) {
   const [secondsLeft, setSecondsLeft] = useState(targetMinutes * 60);
   useEffect(() => {
@@ -45,20 +35,15 @@ function useCountdown(targetMinutes: number) {
 function MembershipPage() {
   const navigate = useNavigate();
   const { subscription, isPremium } = useSubscription();
-  const { reload } = useProfile();
+  const { reload, profile } = useProfile();
   const [selected, setSelected] = useState<PlanCardConfig | null>(null);
   const [expanded, setExpanded] = useState<string>("plus");
-  const [tickerIdx, setTickerIdx] = useState(0);
   const countdown = useCountdown(14); // urgency: 14min flash offer
-
-  useEffect(() => {
-    const i = setInterval(() => setTickerIdx((x) => (x + 1) % TICKER_MESSAGES.length), 3200);
-    return () => clearInterval(i);
-  }, []);
 
   const currentTier = subscription.membershipTier;
   const expiresAt = subscription.expiresAt;
-  const ticker = TICKER_MESSAGES[tickerIdx];
+  const welcomeBonusAvailable =
+    !(profile as { welcome_bonus_granted_at?: string | null } | null)?.welcome_bonus_granted_at;
 
   const handleSelect = (plan: PlanCardConfig) => {
     if (isPremium && currentTier === plan.tier) {
@@ -125,62 +110,29 @@ function MembershipPage() {
           <p className="mt-2 text-sm text-white/65">
             10× mais matches em média no primeiro mês.
           </p>
-
-          {/* Star rating - social proof */}
-          <div className="mt-3 inline-flex items-center gap-1.5">
-            <div className="flex">
-              {[0,1,2,3,4].map((i) => (
-                <Star key={i} size={13} className="fill-amber-300 text-amber-300" />
-              ))}
-            </div>
-            <span className="text-[11px] font-semibold text-white/70">4.8 · 12.430 reviews</span>
-          </div>
         </div>
 
-        {/* Urgency countdown */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.97 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-fuchsia-500/30 bg-gradient-to-r from-fuchsia-500/15 via-pink-500/10 to-amber-400/10 px-4 py-3"
-        >
-          <div className="flex items-center gap-2">
-            <div className="grid h-8 w-8 place-items-center rounded-full bg-fuchsia-500/20">
-              <Clock size={16} className="text-fuchsia-300" />
+        {/* Welcome bonus (real — credited on first paid plan/pack) */}
+        {welcomeBonusAvailable && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-fuchsia-500/30 bg-gradient-to-r from-fuchsia-500/15 via-pink-500/10 to-amber-400/10 px-4 py-3"
+          >
+            <div className="flex items-center gap-2">
+              <div className="grid h-8 w-8 place-items-center rounded-full bg-fuchsia-500/20">
+                <Clock size={16} className="text-fuchsia-300" />
+              </div>
+              <div>
+                <div className="text-[12px] font-bold">Bónus de boas-vindas</div>
+                <div className="text-[10px] text-white/60">+1 Boost grátis na 1ª compra</div>
+              </div>
             </div>
-            <div>
-              <div className="text-[12px] font-bold">Bónus de boas-vindas</div>
-              <div className="text-[10px] text-white/60">+1 Boost grátis nas próximas</div>
+            <div className="rounded-xl bg-black/40 px-2.5 py-1.5 font-mono text-sm font-extrabold tabular-nums text-fuchsia-200">
+              {countdown}
             </div>
-          </div>
-          <div className="rounded-xl bg-black/40 px-2.5 py-1.5 font-mono text-sm font-extrabold tabular-nums text-fuchsia-200">
-            {countdown}
-          </div>
-        </motion.div>
-
-        {/* Live ticker - social proof */}
-        <div className="mt-3 overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03] px-3 py-2.5">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={tickerIdx}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3 }}
-              className="flex items-center gap-2 text-[12px]"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-              </span>
-              <span className="text-white/85">
-                <span className="font-bold">{ticker.name}</span>
-                <span className="text-white/55"> de {ticker.city} </span>
-                {ticker.action}
-              </span>
-              <span className="ml-auto text-[10px] text-white/40">{ticker.t}</span>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+          </motion.div>
+        )}
 
         {isPremium && (
           <div className="mt-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-center text-xs">
@@ -311,24 +263,7 @@ function MembershipPage() {
           </ul>
         </div>
 
-        {/* Testimonial - authority/social proof */}
-        <div className="mt-4 rounded-2xl border border-white/8 bg-gradient-to-br from-white/[0.05] to-white/[0.02] p-4">
-          <div className="flex items-center gap-2">
-            <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-pink-500 to-fuchsia-600 text-sm font-black">
-              AC
-            </div>
-            <div>
-              <div className="text-[13px] font-bold">Ana C. · Maputo</div>
-              <div className="flex items-center gap-1 text-[10px] text-amber-300">
-                {[0,1,2,3,4].map((i) => <Star key={i} size={9} className="fill-current" />)}
-                <span className="ml-1 text-white/50">há 3 dias</span>
-              </div>
-            </div>
-          </div>
-          <p className="mt-2 text-[13px] leading-relaxed text-white/85">
-            "Em duas semanas com o Plus tive mais encontros do que em meses no plano grátis. Vale cada metical." 💖
-          </p>
-        </div>
+        {/* Testimonial section removed (was placeholder content) */}
 
         {/* Trust row */}
         <div className="mt-5 grid grid-cols-3 gap-2 text-center text-[10px] text-white/65">

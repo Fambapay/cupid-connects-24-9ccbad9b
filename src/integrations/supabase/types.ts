@@ -306,6 +306,7 @@ export type Database = {
           is_incognito: boolean
           is_paused: boolean
           is_verified: boolean
+          last_active_at: string | null
           latitude: number | null
           longitude: number | null
           membership_expires_at: string | null
@@ -316,6 +317,7 @@ export type Database = {
           onboarding_step: number
           phone: string | null
           updated_at: string
+          welcome_bonus_granted_at: string | null
         }
         Insert: {
           age?: number | null
@@ -331,6 +333,7 @@ export type Database = {
           is_incognito?: boolean
           is_paused?: boolean
           is_verified?: boolean
+          last_active_at?: string | null
           latitude?: number | null
           longitude?: number | null
           membership_expires_at?: string | null
@@ -341,6 +344,7 @@ export type Database = {
           onboarding_step?: number
           phone?: string | null
           updated_at?: string
+          welcome_bonus_granted_at?: string | null
         }
         Update: {
           age?: number | null
@@ -356,6 +360,7 @@ export type Database = {
           is_incognito?: boolean
           is_paused?: boolean
           is_verified?: boolean
+          last_active_at?: string | null
           latitude?: number | null
           longitude?: number | null
           membership_expires_at?: string | null
@@ -366,6 +371,7 @@ export type Database = {
           onboarding_step?: number
           phone?: string | null
           updated_at?: string
+          welcome_bonus_granted_at?: string | null
         }
         Relationships: []
       }
@@ -524,6 +530,7 @@ export type Database = {
         Returns: boolean
       }
       rewind_last_swipe: { Args: never; Returns: Json }
+      touch_last_active: { Args: never; Returns: undefined }
     }
     Enums: {
       swipe_direction: "like" | "pass" | "super"

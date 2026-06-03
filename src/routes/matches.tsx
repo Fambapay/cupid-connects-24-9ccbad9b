@@ -3,6 +3,7 @@ import { Heart, Sparkles, Compass, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { AppShell, TopBar } from "@/components/AppShell";
 import { useLikedMe } from "@/hooks/useLikedMe";
+import { useSubscription } from "@/hooks/useSubscription";
 import hunieMark from "@/assets/hunie-mark.png.asset.json";
 
 
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/matches")({
 
 function LikesPage() {
   const { likers, loading } = useLikedMe();
+  const { isPremium } = useSubscription();
   const navigate = useNavigate();
   const isEmpty = !loading && likers.length === 0;
 
@@ -47,33 +49,46 @@ function LikesPage() {
         ) : (
           <div className="mt-4 grid grid-cols-2 gap-3">
             {likers.map((p) => (
-              <div
+              <button
                 key={p.id}
-                className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-card"
+                type="button"
+                onClick={() => !isPremium && navigate({ to: "/membership" })}
+                className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-card text-left"
               >
                 {p.photo ? (
                   <img
                     src={p.photo}
                     alt={p.name}
-                    className="h-full w-full object-cover blur-md scale-110"
+                    className={`h-full w-full object-cover transition ${
+                      isPremium ? "" : "blur-md scale-110"
+                    }`}
                   />
                 ) : (
                   <div className="h-full w-full bg-gradient-flame opacity-60" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                {!isPremium && (
+                  <div className="absolute inset-0 grid place-items-center">
+                    <div className="grid h-11 w-11 place-items-center rounded-full bg-black/40 backdrop-blur-md ring-1 ring-white/20">
+                      <Lock className="h-4 w-4 text-white" />
+                    </div>
+                  </div>
+                )}
                 <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between gap-2">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-white">
-                      {p.name}
-                      {p.age ? `, ${p.age}` : ""}
+                      {isPremium ? p.name : "Alguém"}
+                      {isPremium && p.age ? `, ${p.age}` : ""}
                     </p>
-                    <p className="truncate text-xs text-white/80">{p.city}</p>
+                    <p className="truncate text-xs text-white/80">
+                      {isPremium ? p.city : "Toca para desbloquear"}
+                    </p>
                   </div>
                   <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-flame text-flame-foreground shadow-lg">
                     <Heart className="h-4 w-4" fill="currentColor" />
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         )}

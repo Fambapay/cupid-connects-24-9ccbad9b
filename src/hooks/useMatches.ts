@@ -27,13 +27,24 @@ export function useMatches() {
     }
     setLoading(true);
 
-    const { data: rows } = await supabase
-      .from("matches")
-      .select("id,user_a,user_b,last_message_at,created_at")
-      .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
-      .order("last_message_at", { ascending: false });
+    const [{ data: rows }, { data: blocksA }, { data: blocksB }] = await Promise.all([
+      supabase
+        .from("matches")
+        .select("id,user_a,user_b,last_message_at,created_at")
+        .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
+        .order("last_message_at", { ascending: false }),
+      supabase.from("blocked_users").select("blocked_id").eq("blocker_id", user.id),
+      supabase.from("blocked_users").select("blocker_id").eq("blocked_id", user.id),
+    ]);
 
-    const list = rows ?? [];
+    const blocked = new Set<string>();
+    (blocksA ?? []).forEach((b) => blocked.add(b.blocked_id as string));
+    (blocksB ?? []).forEach((b) => blocked.add(b.blocker_id as string));
+
+    const list = (rows ?? []).filter((m) => {
+      const otherId = (m.user_a === user.id ? m.user_b : m.user_a) as string;
+      return !blocked.has(otherId);
+    });
     if (!list.length) {
       setMatches([]);
       setLoading(false);
@@ -104,7 +115,6 @@ export function useMatches() {
     load();
   }, [load]);
 
-  // Realtime: refresh on new matches or messages
   useEffect(() => {
     if (!user) return;
     const ch = supabase

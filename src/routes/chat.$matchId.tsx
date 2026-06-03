@@ -6,8 +6,11 @@ import { useMessages, type ChatMessage } from "@/hooks/useMessages";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { TypingDots } from "@/components/chat/TypingDots";
+import { getActivityStatus } from "@/lib/activityStatus";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
+
+const QUICK_EMOJIS = ["❤️", "😂", "😍", "🔥", "😘", "👀", "🙈", "😉", "🥰", "💋", "✨", "👋"];
 
 export const Route = createFileRoute("/chat/$matchId")({
   ssr: false,
@@ -20,12 +23,15 @@ function ChatRoom() {
   const { user } = useAuth();
   const { messages, peer, loading, notFound, send } = useMessages(matchId);
   const [typing, setTyping] = useState(false);
+  const [emojiOpen, setEmojiOpen] = useState(false);
   const typingTimerRef = useRef<number | null>(null);
   const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const lastSentTypingRef = useRef(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const inputHasTextRef = useRef(false);
+
+  const activity = peer ? getActivityStatus(true, peer.lastActiveAt) : null;
 
   const scrollToLatest = useCallback((behavior: ScrollBehavior = "auto") => {
     const el = scrollRef.current;
@@ -162,12 +168,20 @@ function ChatRoom() {
                 )}
               </div>
               <span className="absolute -bottom-0.5 -right-0.5 grid h-3.5 w-3.5 place-items-center rounded-full bg-background">
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                <span
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{ background: activity?.dot ?? "#6b6f76" }}
+                />
               </span>
             </div>
             <div className="min-w-0">
               <p className="truncate text-[15px] font-semibold leading-tight">{peer.name}</p>
-              <p className="truncate text-xs text-emerald-600 dark:text-emerald-400">online agora</p>
+              <p
+                className="truncate text-xs"
+                style={{ color: activity?.isLive ? "rgb(16 185 129)" : "rgb(148 163 184)" }}
+              >
+                {activity?.label ?? "Inativa"}
+              </p>
             </div>
           </Link>
         </div>
@@ -239,40 +253,77 @@ function ChatRoom() {
         </AnimatePresence>
       </div>
 
-      <form
-        onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-        className="shrink-0 overflow-hidden border-t border-border/60 bg-background/95 px-3 pt-2.5 pb-3 backdrop-blur-xl"
-      >
-        <div className="flex w-full items-center gap-2">
-          <div className="flex h-12 min-w-0 flex-1 items-center gap-1 rounded-full bg-muted px-3 focus-within:ring-2 focus-within:ring-flame">
-            <input
-              ref={inputRef}
-              type="text"
-              onBeforeInput={() => { inputHasTextRef.current = true; broadcastTyping(); }}
-              onInput={(e) => {
-                inputHasTextRef.current = e.currentTarget.value.length > 0;
-                if (inputHasTextRef.current) broadcastTyping();
-              }}
-              onFocus={() => requestAnimationFrame(() => scrollToLatest("auto"))}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
-              }}
-              placeholder={`Mensagem para ${peer.name}…`}
-              autoCapitalize="sentences"
-              spellCheck={false}
-              enterKeyHint="send"
-              className="block h-10 min-w-0 flex-1 appearance-none bg-transparent px-2 py-0 text-[16px] outline-none placeholder:text-muted-foreground [-webkit-appearance:none]"
-              style={{ lineHeight: "40px", WebkitTextFillColor: "currentColor" }}
-            />
-            <button
-              type="button"
-              aria-label="Emoji"
-              onMouseDown={(e) => e.preventDefault()}
-              className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-foreground/50 hover:text-foreground active:scale-95"
+      <div className="relative shrink-0">
+        <AnimatePresence>
+          {emojiOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.18 }}
+              className="absolute inset-x-3 bottom-full mb-2 grid grid-cols-6 gap-1.5 rounded-2xl border border-border/60 bg-background/95 p-2 shadow-xl backdrop-blur-xl"
             >
-              <Smile className="h-5 w-5" />
-            </button>
-          </div>
+              {QUICK_EMOJIS.map((e) => (
+                <button
+                  key={e}
+                  type="button"
+                  onMouseDown={(ev) => ev.preventDefault()}
+                  onClick={() => {
+                    const input = inputRef.current;
+                    if (!input) return;
+                    input.value = `${input.value}${e}`;
+                    inputHasTextRef.current = input.value.length > 0;
+                    broadcastTyping();
+                    input.focus();
+                  }}
+                  className="grid h-10 place-items-center rounded-xl text-xl transition active:scale-95 hover:bg-muted"
+                  aria-label={`Inserir ${e}`}
+                >
+                  {e}
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <form
+          onSubmit={(e) => { e.preventDefault(); handleSend(); }}
+          className="overflow-hidden border-t border-border/60 bg-background/95 px-3 pt-2.5 pb-3 backdrop-blur-xl"
+        >
+          <div className="flex w-full items-center gap-2">
+            <div className="flex h-12 min-w-0 flex-1 items-center gap-1 rounded-full bg-muted px-3 focus-within:ring-2 focus-within:ring-flame">
+              <input
+                ref={inputRef}
+                type="text"
+                onBeforeInput={() => { inputHasTextRef.current = true; broadcastTyping(); }}
+                onInput={(e) => {
+                  inputHasTextRef.current = e.currentTarget.value.length > 0;
+                  if (inputHasTextRef.current) broadcastTyping();
+                }}
+                onFocus={() => requestAnimationFrame(() => scrollToLatest("auto"))}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
+                }}
+                placeholder={`Mensagem para ${peer.name}…`}
+                autoCapitalize="sentences"
+                spellCheck={false}
+                enterKeyHint="send"
+                className="block h-10 min-w-0 flex-1 appearance-none bg-transparent px-2 py-0 text-[16px] outline-none placeholder:text-muted-foreground [-webkit-appearance:none]"
+                style={{ lineHeight: "40px", WebkitTextFillColor: "currentColor" }}
+              />
+              <button
+                type="button"
+                aria-label="Emoji"
+                aria-expanded={emojiOpen}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => setEmojiOpen((v) => !v)}
+                className={`grid h-8 w-8 shrink-0 place-items-center rounded-full transition active:scale-95 ${
+                  emojiOpen ? "text-flame" : "text-foreground/50 hover:text-foreground"
+                }`}
+              >
+                <Smile className="h-5 w-5" />
+              </button>
+            </div>
 
           <motion.button
             type="submit"
@@ -283,8 +334,9 @@ function ChatRoom() {
           >
             <Send className="h-5 w-5 translate-x-[1px]" />
           </motion.button>
-        </div>
-      </form>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
