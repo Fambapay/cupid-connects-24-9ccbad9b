@@ -22,6 +22,8 @@ export interface ProfileViewData {
 
 interface Props {
   profile: ProfileViewData;
+  superLikeBalance?: number;
+  boostBalance?: number;
   /** Legacy: receives the full updated photo list (data URLs). Prefer onAddFiles. */
   onPhotosChange?: (photos: string[]) => void;
   /** When provided, header file input uploads via this callback instead of local state. */
@@ -37,6 +39,8 @@ const PINK = '#FF4FA3';
 
 export function ProfileView({
   profile,
+  superLikeBalance = 0,
+  boostBalance = 0,
   onPhotosChange,
   onAddFiles,
   onEditProfile,
@@ -53,6 +57,8 @@ export function ProfileView({
   const completion = computeProfileCompletion({
     photosCount: photos.length, bio, interests, city, isVerified,
   });
+  const superLikeCount = Math.max(0, superLikeBalance);
+  const boostCount = Math.max(0, boostBalance);
 
   const suggestions = [
     { key: 'photo', Icon: Camera, title: 'Adiciona pelo menos 1 foto', desc: 'Até 2× mais Likes com 6 fotos.', boost: '+7%', done: photos.length >= 1, action: () => fileRef.current?.click() },
@@ -271,8 +277,8 @@ export function ProfileView({
       {/* QUICK ACTIONS */}
       <div className="relative grid grid-cols-3 gap-2.5 px-5 pt-4 pb-5">
         {[
-          { Icon: Star, color: '#5BB8FF', label: 'Super Likes', count: '5', sub: 'disponíveis', to: '/shop', search: { tab: 'super_like' as const } },
-          { Icon: Zap, color: '#B13CFF', label: 'Boosts', count: '0', sub: 'comprar', to: '/shop', search: { tab: 'boost' as const } },
+          { Icon: Star, color: '#5BB8FF', label: 'Super Likes', count: String(superLikeCount), sub: superLikeCount > 0 ? 'disponíveis' : 'comprar', to: '/shop', search: { tab: 'super_like' as const } },
+          { Icon: Zap, color: '#B13CFF', label: 'Boosts', count: String(boostCount), sub: boostCount > 0 ? 'disponíveis' : 'comprar', to: '/shop', search: { tab: 'boost' as const } },
           { Icon: Heart, color: PINK, label: 'Membership', count: isPremium ? '✓' : '–', sub: isPremium ? 'ativo' : 'gerir', to: '/membership' },
         ].map((a, i) => (
           <Link
