@@ -138,14 +138,14 @@ export function DebitoCheckoutSheet({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={handleClose}
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm touch-none"
           />
           <motion.div
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 360, damping: 36 }}
-            className="fixed inset-x-0 bottom-0 z-50 max-h-[92dvh] overflow-y-auto rounded-t-3xl border-t border-white/10 bg-gradient-to-b from-[#1a0a14] to-background p-5 pb-[max(env(safe-area-inset-bottom),24px)] text-foreground shadow-[0_-20px_60px_-10px_rgba(240,70,140,0.3)]"
+            className="fixed inset-x-0 bottom-0 z-50 max-h-[92dvh] overflow-y-auto overscroll-contain rounded-t-3xl border-t border-white/10 bg-gradient-to-b from-[#1a0a14] to-background p-5 pb-[max(env(safe-area-inset-bottom),24px)] text-foreground shadow-[0_-20px_60px_-10px_rgba(240,70,140,0.3)]"
           >
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/15" />
             <div className="flex items-start justify-between gap-3">
