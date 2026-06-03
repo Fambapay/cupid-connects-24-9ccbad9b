@@ -61,22 +61,22 @@ export function SocialProofToasts() {
   }, []);
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-[max(env(safe-area-inset-top),12px)] z-40 flex justify-center px-4">
+    <div className="relative mt-3 h-[52px]">
       <AnimatePresence mode="wait">
         {notice && (
           <motion.div
             key={notice.id}
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 56, scale: 1 }}
-            exit={{ opacity: 0, y: 30, scale: 0.95 }}
+            initial={{ opacity: 0, y: 8, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.97 }}
             transition={{ type: "spring", stiffness: 320, damping: 28 }}
-            className="pointer-events-auto flex items-center gap-2.5 rounded-full border border-white/10 bg-black/80 px-3 py-2 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)] backdrop-blur-xl"
+            className="absolute inset-x-0 flex items-center gap-2.5 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-2.5 backdrop-blur-xl"
           >
             <div
-              className="grid h-7 w-7 shrink-0 place-items-center rounded-full"
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-full"
               style={{ background: `${notice.plan.accent}22`, color: notice.plan.accent }}
             >
-              <Sparkles size={13} />
+              <Sparkles size={14} />
             </div>
             <div className="min-w-0 text-[11px] leading-tight">
               <div className="truncate font-semibold text-white">
@@ -90,9 +90,11 @@ export function SocialProofToasts() {
                 · {notice.when}
               </div>
             </div>
+            <span className="ml-auto h-2 w-2 shrink-0 animate-pulse rounded-full bg-emerald-400" />
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
 }
+
