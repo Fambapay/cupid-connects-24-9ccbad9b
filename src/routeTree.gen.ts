@@ -29,6 +29,7 @@ import { Route as AuthRegisterRouteImport } from './routes/auth.register'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as ApiPublicDebitoWebhookRouteImport } from './routes/api/public/debito-webhook'
 import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
@@ -132,6 +133,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -162,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRoute
   '/welcome': typeof WelcomeRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRoute
   '/welcome': typeof WelcomeRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -211,6 +219,7 @@ export interface FileRoutesById {
   '/shop': typeof ShopRoute
   '/welcome': typeof WelcomeRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -237,6 +246,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/welcome'
     | '/settings'
+    | '/admin/payments'
     | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/welcome'
     | '/settings'
+    | '/admin/payments'
     | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -285,6 +296,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/welcome'
     | '/_authenticated/settings'
+    | '/admin/payments'
     | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -455,6 +467,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/payments': {
+      id: '/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminPaymentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -504,11 +523,13 @@ const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
+  AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminUsersRoute: typeof AdminUsersRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminPaymentsRoute: AdminPaymentsRoute,
   AdminUsersRoute: AdminUsersRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
 }
