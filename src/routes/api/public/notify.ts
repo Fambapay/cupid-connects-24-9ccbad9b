@@ -1,13 +1,25 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { dispatchNotification } from '@/lib/push/notify.server'
+import { supabaseAdmin } from '@/integrations/supabase/client.server'
 
 export const Route = createFileRoute('/api/public/notify')({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const secret = request.headers.get('x-notify-secret')
-        const expected = process.env.PUSH_WEBHOOK_SECRET
-        if (!expected || secret !== expected) {
+        const secret = request.headers.get('x-notify-secret') || ''
+        const envSecret = process.env.PUSH_WEBHOOK_SECRET || ''
+        let ok = !!envSecret && secret === envSecret
+        if (!ok) {
+          // Fallback: compare against app_config (kept in sync by DB triggers)
+          const { data } = await supabaseAdmin
+            .from('app_config')
+            .select('value')
+            .eq('key', 'notify_webhook_secret')
+            .maybeSingle()
+          const cfgSecret = (data?.value as string | null)?.toString().replace(/^"|"$/g, '') || ''
+          ok = !!cfgSecret && secret === cfgSecret
+        }
+        if (!ok) {
           return new Response('Unauthorized', { status: 401 })
         }
 
