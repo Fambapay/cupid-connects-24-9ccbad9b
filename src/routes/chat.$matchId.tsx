@@ -185,6 +185,8 @@ function ChatRoom() {
               </p>
             </div>
           </Link>
+
+          <ChatActionsMenu matchId={matchId} otherUserId={peer.id} otherName={peer.name} />
         </div>
       </header>
 
