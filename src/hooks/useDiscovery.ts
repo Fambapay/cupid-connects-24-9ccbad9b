@@ -63,9 +63,9 @@ function haversine(
 
 function mapGenderFilter(g: DiscoveryFilters["gender"]): string[] | null {
   switch (g) {
-    case "feminino": return ["feminino"];
-    case "masculino": return ["masculino"];
-    case "nao_binario": return ["nao_binario", "outro"];
+    case "feminino": return ["woman", "transwoman"];
+    case "masculino": return ["man", "transman"];
+    case "nao_binario": return ["nonbinary", "genderfluid", "agender", "other"];
     case "todos":
     default: return null;
   }
