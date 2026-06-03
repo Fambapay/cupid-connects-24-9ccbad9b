@@ -124,6 +124,7 @@ export function useNewMessageNotifier() {
             content: string;
           };
           if (m.sender_id === user.id) return;
+          if (!notificationsEnabled) return;
 
           // Skip toast if user is already in this chat
           if (currentPathRef.current === `/chat/${m.match_id}`) return;
@@ -157,6 +158,7 @@ export function useNewMessageNotifier() {
 
     return () => {
       supabase.removeChannel(ch);
+      supabase.removeChannel(settingsCh);
     };
   }, [user, navigate]);
 }
