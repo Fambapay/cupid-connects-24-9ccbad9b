@@ -19,15 +19,21 @@ import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ChatMatchIdRouteImport } from './routes/chat.$matchId'
 import { Route as AuthVerifyEmailRouteImport } from './routes/auth.verify-email'
 import { Route as AuthRegisterRouteImport } from './routes/auth.register'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
+import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as ApiPublicDebitoWebhookRouteImport } from './routes/api/public/debito-webhook'
+import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
 
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
@@ -79,6 +85,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -87,6 +98,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const ChatMatchIdRoute = ChatMatchIdRouteImport.update({
   id: '/$matchId',
@@ -113,6 +129,21 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => AuthRoute,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -123,9 +154,15 @@ const ApiPublicDebitoWebhookRoute = ApiPublicDebitoWebhookRouteImport.update({
   path: '/api/public/debito-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersIdRoute = AdminUsersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminUsersRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/chat': typeof ChatRouteWithChildren
   '/discover': typeof DiscoverRoute
@@ -137,11 +174,16 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRoute
   '/welcome': typeof WelcomeRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/chat/$matchId': typeof ChatMatchIdRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -157,17 +199,23 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRoute
   '/welcome': typeof WelcomeRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/chat/$matchId': typeof ChatMatchIdRoute
+  '/admin': typeof AdminIndexRoute
+  '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/chat': typeof ChatRouteWithChildren
   '/discover': typeof DiscoverRoute
@@ -179,17 +227,23 @@ export interface FileRoutesById {
   '/shop': typeof ShopRoute
   '/welcome': typeof WelcomeRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/chat/$matchId': typeof ChatMatchIdRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/auth'
     | '/chat'
     | '/discover'
@@ -201,11 +255,16 @@ export interface FileRouteTypes {
     | '/shop'
     | '/welcome'
     | '/settings'
+    | '/admin/audit'
+    | '/admin/payments'
+    | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/auth/verify-email'
     | '/chat/$matchId'
+    | '/admin/'
+    | '/admin/users/$id'
     | '/api/public/debito-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -221,16 +280,22 @@ export interface FileRouteTypes {
     | '/shop'
     | '/welcome'
     | '/settings'
+    | '/admin/audit'
+    | '/admin/payments'
+    | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/auth/verify-email'
     | '/chat/$matchId'
+    | '/admin'
+    | '/admin/users/$id'
     | '/api/public/debito-webhook'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/admin'
     | '/auth'
     | '/chat'
     | '/discover'
@@ -242,17 +307,23 @@ export interface FileRouteTypes {
     | '/shop'
     | '/welcome'
     | '/_authenticated/settings'
+    | '/admin/audit'
+    | '/admin/payments'
+    | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/auth/verify-email'
     | '/chat/$matchId'
+    | '/admin/'
+    | '/admin/users/$id'
     | '/api/public/debito-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   ChatRoute: typeof ChatRouteWithChildren
   DiscoverRoute: typeof DiscoverRoute
@@ -338,6 +409,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -351,6 +429,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/chat/$matchId': {
       id: '/chat/$matchId'
@@ -387,6 +472,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/payments': {
+      id: '/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminPaymentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -400,6 +506,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/debito-webhook'
       preLoaderRoute: typeof ApiPublicDebitoWebhookRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/users/$id': {
+      id: '/admin/users/$id'
+      path: '/$id'
+      fullPath: '/admin/users/$id'
+      preLoaderRoute: typeof AdminUsersIdRouteImport
+      parentRoute: typeof AdminUsersRoute
     }
   }
 }
@@ -415,6 +528,34 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
+
+interface AdminUsersRouteChildren {
+  AdminUsersIdRoute: typeof AdminUsersIdRoute
+}
+
+const AdminUsersRouteChildren: AdminUsersRouteChildren = {
+  AdminUsersIdRoute: AdminUsersIdRoute,
+}
+
+const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
+  AdminUsersRouteChildren,
+)
+
+interface AdminRouteChildren {
+  AdminAuditRoute: typeof AdminAuditRoute
+  AdminPaymentsRoute: typeof AdminPaymentsRoute
+  AdminUsersRoute: typeof AdminUsersRouteWithChildren
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAuditRoute: AdminAuditRoute,
+  AdminPaymentsRoute: AdminPaymentsRoute,
+  AdminUsersRoute: AdminUsersRouteWithChildren,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface AuthRouteChildren {
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
@@ -445,6 +586,7 @@ const ChatRouteWithChildren = ChatRoute._addFileChildren(ChatRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   ChatRoute: ChatRouteWithChildren,
   DiscoverRoute: DiscoverRoute,
