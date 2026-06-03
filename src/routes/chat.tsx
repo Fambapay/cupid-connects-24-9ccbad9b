@@ -72,11 +72,30 @@ function ChatList() {
         {loading && matches.length === 0 ? (
           <p className="mt-6 text-center text-sm text-muted-foreground">A carregar...</p>
         ) : conversations.length === 0 && newMatches.length === 0 ? (
-          <div className="mt-10 text-center">
-            <div className="text-5xl">💬</div>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Sem matches ainda. Vai descobrir pessoas!
+          <div className="mt-16 flex flex-col items-center px-6 text-center">
+            <div className="relative">
+              <div className="absolute inset-0 -z-10 rounded-full bg-gradient-sunset opacity-30 blur-3xl" />
+              <div className="relative flex h-28 w-28 items-center justify-center rounded-3xl bg-gradient-to-br from-card to-muted/40 ring-1 ring-border/60 shadow-2xl">
+                <MessageCircle className="h-12 w-12 text-foreground/80" strokeWidth={1.5} />
+                <span className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-sunset shadow-lg">
+                  <Sparkles className="h-4 w-4 text-white" />
+                </span>
+              </div>
+            </div>
+            <h3 className="mt-6 text-xl font-semibold tracking-tight">
+              A tua caixa está pronta
+            </h3>
+            <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
+              Quando deres match com alguém, a conversa começa aqui. Vai descobrir pessoas
+              perto de ti.
             </p>
+            <Link
+              to="/discover"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-sunset px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-transform active:scale-95"
+            >
+              <Compass className="h-4 w-4" />
+              Descobrir pessoas
+            </Link>
           </div>
         ) : (
           <ul className="mt-3 space-y-1">
