@@ -27,6 +27,7 @@ function AdminLayout() {
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { to: "/admin/users", label: "Utilizadores", icon: Users },
     { to: "/admin/reports", label: "Denúncias", icon: Flag },
+    { to: "/admin/seeds", label: "Seeds", icon: Sparkles },
     { to: "/admin/payments", label: "Pagamentos", icon: CreditCard },
     { to: "/admin/audit", label: "Audit log", icon: ScrollText },
   ];
