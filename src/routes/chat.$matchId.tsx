@@ -195,14 +195,8 @@ function ChatRoom() {
                 />
               </span>
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex items-center">
               <p className="truncate text-[15px] font-semibold leading-tight">{peer.name}</p>
-              <p
-                className="truncate text-xs"
-                style={{ color: activity?.isLive ? "rgb(16 185 129)" : "rgb(148 163 184)" }}
-              >
-                {activity?.label ?? "Inativa"}
-              </p>
             </div>
           </button>
 
