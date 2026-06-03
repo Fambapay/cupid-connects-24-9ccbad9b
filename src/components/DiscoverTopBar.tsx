@@ -13,13 +13,14 @@ export const DiscoverTopBar = ({
   onOpenFilters,
   onBoost,
   boostActive = false,
+  boostRemainingMinutes = 0,
 }: DiscoverTopBarProps) => {
   return (
     <div
       className="absolute top-0 left-0 right-0 z-30"
       style={{ pointerEvents: 'none' }}
     >
-      {/* Frosted blur band behind tabs */}
+      {/* Frosted blur band */}
       <div
         aria-hidden
         style={{
@@ -64,62 +65,95 @@ export const DiscoverTopBar = ({
 
         <div className="flex-1" />
 
-        {/* Boost — clean premium lightning */}
+        {/* Boost — premium animated */}
         {onBoost && (
           <motion.button
             onClick={() => { hapticTap(); onBoost(); }}
             className="relative flex-shrink-0 flex items-center justify-center"
             style={{
-              width: 36,
-              height: 36,
+              width: 44,
+              height: 44,
               background: 'transparent',
               border: 'none',
               padding: 0,
-              willChange: 'transform',
             }}
             whileTap={{ scale: 0.88 }}
             aria-label="Boost"
           >
             {boostActive && (
               <>
-                {/* Outer breathing halo */}
-                <motion.span
+                {/* Outer soft halo (breathing) */}
+                <span
                   aria-hidden
-                  animate={{ opacity: [0.45, 0.8, 0.45] }}
-                  transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute pointer-events-none"
+                  className="boost-halo"
                   style={{
-                    width: 56,
-                    height: 56,
+                    position: 'absolute',
+                    width: 60,
+                    height: 60,
                     borderRadius: '50%',
                     background:
-                      'radial-gradient(circle, rgba(236,72,153,0.55) 0%, rgba(168,85,247,0.28) 45%, transparent 72%)',
+                      'radial-gradient(circle, rgba(236,72,153,0.5) 0%, rgba(168,85,247,0.25) 45%, transparent 72%)',
                     filter: 'blur(6px)',
-                    willChange: 'opacity',
+                    pointerEvents: 'none',
                   }}
                 />
+
+                {/* Rotating conic ring — pure CSS, no flicker */}
+                <span
+                  aria-hidden
+                  className="boost-ring"
+                  style={{
+                    position: 'absolute',
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    background:
+                      'conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.95) 50deg, rgba(236,72,153,1) 95deg, rgba(168,85,247,0.6) 130deg, transparent 170deg, transparent 360deg)',
+                    WebkitMask:
+                      'radial-gradient(circle, transparent 16px, black 17px, black 19px, transparent 20px)',
+                    mask: 'radial-gradient(circle, transparent 16px, black 17px, black 19px, transparent 20px)',
+                    pointerEvents: 'none',
+                  }}
+                />
+
+                {/* Countdown badge */}
+                {boostRemainingMinutes > 0 && (
+                  <span
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      bottom: -6,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      padding: '2px 6px',
+                      borderRadius: 999,
+                      fontSize: 9,
+                      fontWeight: 800,
+                      lineHeight: 1,
+                      color: '#fff',
+                      background: 'linear-gradient(135deg, #ec4899, #a855f7)',
+                      boxShadow:
+                        '0 2px 8px rgba(236,72,153,0.55), 0 0 0 1.5px rgba(0,0,0,0.4)',
+                      whiteSpace: 'nowrap',
+                      letterSpacing: 0.2,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {boostRemainingMinutes}m
+                  </span>
+                )}
               </>
             )}
 
-            {/* Lightning icon — gentle pulse */}
-            <motion.div
-              animate={
-                boostActive
-                  ? { scale: [1, 1.08, 1] }
-                  : { scale: 1 }
-              }
-              transition={
-                boostActive
-                  ? { duration: 2, repeat: Infinity, ease: 'easeInOut' }
-                  : { duration: 0.2 }
-              }
+            {/* Lightning icon */}
+            <span
               style={{
                 position: 'relative',
                 zIndex: 2,
+                display: 'flex',
                 filter: boostActive
                   ? 'drop-shadow(0 0 8px rgba(236,72,153,0.9)) drop-shadow(0 0 3px rgba(255,255,255,0.6))'
                   : 'drop-shadow(0 0 6px rgba(192,38,211,0.55))',
-                willChange: 'transform',
               }}
             >
               <Zap
@@ -127,7 +161,25 @@ export const DiscoverTopBar = ({
                 fill={boostActive ? '#fff' : '#C026D3'}
                 stroke="none"
               />
-            </motion.div>
+            </span>
+
+            <style>{`
+              @keyframes boost-ring-spin {
+                to { transform: rotate(360deg); }
+              }
+              .boost-ring {
+                animation: boost-ring-spin 3.5s linear infinite;
+                will-change: transform;
+              }
+              @keyframes boost-halo-breathe {
+                0%, 100% { opacity: 0.55; transform: scale(1); }
+                50% { opacity: 0.9; transform: scale(1.06); }
+              }
+              .boost-halo {
+                animation: boost-halo-breathe 2.6s ease-in-out infinite;
+                will-change: opacity, transform;
+              }
+            `}</style>
           </motion.button>
         )}
       </div>
