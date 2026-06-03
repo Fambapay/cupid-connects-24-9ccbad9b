@@ -7,7 +7,7 @@ import { InstallModal } from "@/components/landing/InstallModal";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useTypewriter } from "@/hooks/useTypewriter";
 import hunieWordmark from "@/assets/hunie-wordmark.png.asset.json";
-import hunieMark from "@/assets/hunie-mark.png.asset.json";
+import hunieMark from "@/assets/hunie-mark-transparent.png.asset.json";
 
 export const Route = createFileRoute("/")({
   ssr: false,
