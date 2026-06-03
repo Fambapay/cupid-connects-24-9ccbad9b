@@ -61,7 +61,7 @@ function LikesPage() {
                     src={p.photo}
                     alt={p.name}
                     className={`h-full w-full object-cover transition ${
-                      isPremium ? "" : "blur-md scale-110"
+                      isPremium ? "" : "blur-2xl scale-110 brightness-50"
                     }`}
                   />
                 ) : (

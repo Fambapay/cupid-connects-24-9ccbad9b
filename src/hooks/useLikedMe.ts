@@ -88,7 +88,7 @@ export function useLikedMe() {
       });
       const paths = ids.map((id) => firstPath[id]).filter(Boolean);
       // Tiny image — pixelated, cannot be re-signed at higher quality by the client.
-      const signed = await signPhotos(paths, 3600, { width: 24, height: 32, resize: "cover", quality: 30 });
+      const signed = await signPhotos(paths, 3600, { width: 16, height: 20, resize: "cover", quality: 15 });
       const urlByPath: Record<string, string> = {};
       paths.forEach((p, i) => (urlByPath[p] = signed[i] ?? ""));
       const profById = new Map((profiles ?? []).map((p) => [p.id as string, p]));
