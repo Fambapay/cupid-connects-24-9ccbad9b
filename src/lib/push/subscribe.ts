@@ -1,6 +1,8 @@
 import { supabase } from '@/integrations/supabase/client'
 import { VAPID_PUBLIC_KEY } from './config'
 
+const VAPID_KEY_STORAGE = 'hunie:vapid-public-key'
+
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
@@ -16,6 +18,20 @@ function arrayBufferToBase64Url(buffer: ArrayBuffer | null): string {
   let binary = ''
   for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i])
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+async function getCurrentVapidPublicKey(): Promise<string> {
+  try {
+    const res = await fetch('/api/public/vapid-key', { cache: 'no-store' })
+    if (!res.ok) throw new Error('Failed to load VAPID key')
+    const data = await res.json()
+    if (typeof data.publicKey === 'string' && data.publicKey.length > 0) {
+      return data.publicKey
+    }
+  } catch {
+    // Fall back to the bundled key so old deployments still behave gracefully.
+  }
+  return localStorage.getItem(VAPID_KEY_STORAGE) || VAPID_PUBLIC_KEY
 }
 
 export function isPushSupported(): boolean {
@@ -51,13 +67,24 @@ export async function subscribeToPush(): Promise<{ ok: boolean; reason?: string 
   const registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' })
   await navigator.serviceWorker.ready
 
+  const previousKey = localStorage.getItem(VAPID_KEY_STORAGE)
+  const vapidPublicKey = await getCurrentVapidPublicKey()
+
   let sub = await registration.pushManager.getSubscription()
+  if (sub && (!previousKey || previousKey !== vapidPublicKey)) {
+    await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint)
+    await sub.unsubscribe()
+    sub = null
+  }
+
   if (!sub) {
     sub = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY).buffer as ArrayBuffer,
+      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey).buffer as ArrayBuffer,
     })
   }
+
+  localStorage.setItem(VAPID_KEY_STORAGE, vapidPublicKey)
 
   const p256dh = arrayBufferToBase64Url(sub.getKey('p256dh'))
   const auth = arrayBufferToBase64Url(sub.getKey('auth'))

@@ -16,6 +16,10 @@ export function PushPermissionPrompt() {
 
   useEffect(() => {
     if (!isPushSupported()) return
+    if (Notification.permission === 'granted') {
+      subscribeToPush().catch(() => undefined)
+      return
+    }
     if (Notification.permission !== 'default') return
     const dismissed = localStorage.getItem(STORAGE_KEY)
     if (dismissed) {

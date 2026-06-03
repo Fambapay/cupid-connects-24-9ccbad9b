@@ -37,6 +37,7 @@ import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPublicVapidKeyRouteImport } from './routes/api/public/vapid-key'
 import { Route as ApiPublicNotifyRouteImport } from './routes/api/public/notify'
 import { Route as ApiPublicDebitoWebhookRouteImport } from './routes/api/public/debito-webhook'
 import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
@@ -186,6 +187,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicVapidKeyRoute = ApiPublicVapidKeyRouteImport.update({
+  id: '/api/public/vapid-key',
+  path: '/api/public/vapid-key',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicNotifyRoute = ApiPublicNotifyRouteImport.update({
   id: '/api/public/notify',
   path: '/api/public/notify',
@@ -267,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
   '/api/public/notify': typeof ApiPublicNotifyRoute
+  '/api/public/vapid-key': typeof ApiPublicVapidKeyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -304,6 +311,7 @@ export interface FileRoutesByTo {
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
   '/api/public/notify': typeof ApiPublicNotifyRoute
+  '/api/public/vapid-key': typeof ApiPublicVapidKeyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -344,6 +352,7 @@ export interface FileRoutesById {
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
   '/api/public/notify': typeof ApiPublicNotifyRoute
+  '/api/public/vapid-key': typeof ApiPublicVapidKeyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -384,6 +393,7 @@ export interface FileRouteTypes {
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
     | '/api/public/notify'
+    | '/api/public/vapid-key'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -421,6 +431,7 @@ export interface FileRouteTypes {
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
     | '/api/public/notify'
+    | '/api/public/vapid-key'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -460,6 +471,7 @@ export interface FileRouteTypes {
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
     | '/api/public/notify'
+    | '/api/public/vapid-key'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -486,6 +498,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ApiPublicDebitoWebhookRoute: typeof ApiPublicDebitoWebhookRoute
   ApiPublicNotifyRoute: typeof ApiPublicNotifyRoute
+  ApiPublicVapidKeyRoute: typeof ApiPublicVapidKeyRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -692,6 +705,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/vapid-key': {
+      id: '/api/public/vapid-key'
+      path: '/api/public/vapid-key'
+      fullPath: '/api/public/vapid-key'
+      preLoaderRoute: typeof ApiPublicVapidKeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/notify': {
       id: '/api/public/notify'
       path: '/api/public/notify'
@@ -860,6 +880,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ApiPublicDebitoWebhookRoute: ApiPublicDebitoWebhookRoute,
   ApiPublicNotifyRoute: ApiPublicNotifyRoute,
+  ApiPublicVapidKeyRoute: ApiPublicVapidKeyRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
