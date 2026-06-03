@@ -25,6 +25,8 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as LegalTermosRouteImport } from './routes/legal.termos'
+import { Route as LegalPrivacidadeRouteImport } from './routes/legal.privacidade'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as ChatMatchIdRouteImport } from './routes/chat.$matchId'
 import { Route as AuthVerifyEmailRouteImport } from './routes/auth.verify-email'
@@ -127,6 +129,16 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const LegalTermosRoute = LegalTermosRouteImport.update({
+  id: '/legal/termos',
+  path: '/legal/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalPrivacidadeRoute = LegalPrivacidadeRouteImport.update({
+  id: '/legal/privacidade',
+  path: '/legal/privacidade',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
@@ -275,6 +287,8 @@ export interface FileRoutesByFullPath {
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/chat/$matchId': typeof ChatMatchIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/legal/privacidade': typeof LegalPrivacidadeRoute
+  '/legal/termos': typeof LegalTermosRoute
   '/admin/': typeof AdminIndexRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
@@ -314,6 +328,8 @@ export interface FileRoutesByTo {
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/chat/$matchId': typeof ChatMatchIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/legal/privacidade': typeof LegalPrivacidadeRoute
+  '/legal/termos': typeof LegalTermosRoute
   '/admin': typeof AdminIndexRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
@@ -356,6 +372,8 @@ export interface FileRoutesById {
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/chat/$matchId': typeof ChatMatchIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/legal/privacidade': typeof LegalPrivacidadeRoute
+  '/legal/termos': typeof LegalTermosRoute
   '/admin/': typeof AdminIndexRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
@@ -398,6 +416,8 @@ export interface FileRouteTypes {
     | '/auth/verify-email'
     | '/chat/$matchId'
     | '/email/unsubscribe'
+    | '/legal/privacidade'
+    | '/legal/termos'
     | '/admin/'
     | '/settings/notifications'
     | '/admin/users/$id'
@@ -437,6 +457,8 @@ export interface FileRouteTypes {
     | '/auth/verify-email'
     | '/chat/$matchId'
     | '/email/unsubscribe'
+    | '/legal/privacidade'
+    | '/legal/termos'
     | '/admin'
     | '/settings/notifications'
     | '/admin/users/$id'
@@ -478,6 +500,8 @@ export interface FileRouteTypes {
     | '/auth/verify-email'
     | '/chat/$matchId'
     | '/email/unsubscribe'
+    | '/legal/privacidade'
+    | '/legal/termos'
     | '/admin/'
     | '/_authenticated/settings/notifications'
     | '/admin/users/$id'
@@ -509,6 +533,8 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   WelcomeRoute: typeof WelcomeRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  LegalPrivacidadeRoute: typeof LegalPrivacidadeRoute
+  LegalTermosRoute: typeof LegalTermosRoute
   ApiPublicDebitoWebhookRoute: typeof ApiPublicDebitoWebhookRoute
   ApiPublicNotifyRoute: typeof ApiPublicNotifyRoute
   ApiPublicVapidKeyRoute: typeof ApiPublicVapidKeyRoute
@@ -633,6 +659,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/legal/termos': {
+      id: '/legal/termos'
+      path: '/legal/termos'
+      fullPath: '/legal/termos'
+      preLoaderRoute: typeof LegalTermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/privacidade': {
+      id: '/legal/privacidade'
+      path: '/legal/privacidade'
+      fullPath: '/legal/privacidade'
+      preLoaderRoute: typeof LegalPrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
@@ -899,6 +939,8 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   WelcomeRoute: WelcomeRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  LegalPrivacidadeRoute: LegalPrivacidadeRoute,
+  LegalTermosRoute: LegalTermosRoute,
   ApiPublicDebitoWebhookRoute: ApiPublicDebitoWebhookRoute,
   ApiPublicNotifyRoute: ApiPublicNotifyRoute,
   ApiPublicVapidKeyRoute: ApiPublicVapidKeyRoute,
@@ -912,13 +954,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

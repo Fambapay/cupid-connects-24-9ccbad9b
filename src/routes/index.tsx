@@ -420,6 +420,8 @@ function Landing() {
                 <a href="#planos">Planos</a>
                 <a href="#faq">FAQ</a>
                 <Link to="/auth/login">Entrar</Link>
+                <Link to="/legal/privacidade">Privacidade</Link>
+                <Link to="/legal/termos">Termos</Link>
                 <a href="mailto:ola@hunie.app">Contacto</a>
               </div>
               <span>© 2026 Hunie · Made in MZ</span>
