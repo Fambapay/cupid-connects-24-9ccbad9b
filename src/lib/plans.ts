@@ -97,13 +97,14 @@ export const PLAN_CARDS: PlanCardConfig[] = [
     tier: "select",
     label: "Select",
     priceMzn: PLAN_PRICES.select.priceMzn,
-    tagline: "Sem limites para começar.",
+    tagline: "Aparece. Sem ser ignorado.",
     accent: "#5BB8FF",
     highlights: [
-      { label: "Likes ilimitados", bold: true },
-      { label: "Perfis verificados primeiro" },
-      { label: "Sem anúncios" },
+      { label: "1 Boost grátis (30 min) na ativação", bold: true },
+      { label: "Selo Verificado no teu perfil", bold: true },
+      { label: "Likes ilimitados" },
       { label: "1 Super Like por dia" },
+      { label: "Sem anúncios" },
     ],
   },
   {
