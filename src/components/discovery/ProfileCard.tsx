@@ -11,6 +11,7 @@ import {
   motion,
   useMotionValue,
   useMotionValueEvent,
+  animate,
   type MotionValue,
 } from "framer-motion";
 import { MapPin, ChevronDown, BadgeCheck } from "lucide-react";
@@ -164,7 +165,14 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       const dy = y.get();
       const w = getVW();
       const rot = (dx / w) * 30;
-      el.style.transform = `translate3d(${dx}px,${dy}px,0) rotate(${rot.toFixed(2)}deg)`;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const progress = Math.min(1, dist / (w * 0.4));
+      const scale = 1 + progress * 0.025;
+      const shadowY = 12 + progress * 24;
+      const shadowBlur = 30 + progress * 30;
+      const shadowAlpha = 0.25 + progress * 0.35;
+      el.style.transform = `translate3d(${dx}px,${dy}px,0) rotate(${rot.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+      el.style.boxShadow = `0 ${shadowY.toFixed(0)}px ${shadowBlur.toFixed(0)}px rgba(0,0,0,${shadowAlpha.toFixed(2)})`;
     }, [x, y]);
     useEffect(() => {
       apply();
@@ -172,32 +180,24 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     useMotionValueEvent(x, "change", apply);
     useMotionValueEvent(y, "change", apply);
 
-    const animRef = useRef<number | null>(null);
+    const snapSpring = { type: "spring" as const, stiffness: 320, damping: 28, mass: 0.9 };
+    const flySpring = { type: "spring" as const, stiffness: 280, damping: 24, mass: 0.8 };
+
+    const animXRef = useRef<ReturnType<typeof animate> | null>(null);
+    const animYRef = useRef<ReturnType<typeof animate> | null>(null);
     const cancelAnim = () => {
-      if (animRef.current) {
-        cancelAnimationFrame(animRef.current);
-        animRef.current = null;
-      }
+      animXRef.current?.stop();
+      animYRef.current?.stop();
+      animXRef.current = null;
+      animYRef.current = null;
     };
+
     const animateTo = useCallback(
-      (tx: number, ty: number, dur = 260, onDone?: () => void) => {
+      (tx: number, ty: number, isFly = false, onDone?: () => void) => {
         cancelAnim();
-        const sx = x.get();
-        const sy = y.get();
-        const start = performance.now();
-        const ease = (t: number) => 1 - Math.pow(1 - t, 3);
-        const step = (now: number) => {
-          const t = Math.min(1, (now - start) / dur);
-          const k = ease(t);
-          x.set(sx + (tx - sx) * k);
-          y.set(sy + (ty - sy) * k);
-          if (t < 1) animRef.current = requestAnimationFrame(step);
-          else {
-            animRef.current = null;
-            onDone?.();
-          }
-        };
-        animRef.current = requestAnimationFrame(step);
+        const spring = isFly ? flySpring : snapSpring;
+        animXRef.current = animate(x, tx, { ...spring, onComplete: onDone });
+        animYRef.current = animate(y, ty, spring);
       },
       [x, y],
     );
@@ -209,19 +209,14 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       if (enterAnim === "rewind-left") {
         x.set(-w * 1.2);
         y.set(0);
-      }
-      if (enterAnim === "rewind-right") {
+      } else if (enterAnim === "rewind-right") {
         x.set(w * 1.2);
         y.set(0);
-      }
-      if (enterAnim === "rewind-up") {
+      } else if (enterAnim === "rewind-up") {
         x.set(0);
         y.set(-h * 1.2);
       }
-      const id = requestAnimationFrame(() => {
-        animateTo(0, 0, 280);
-      });
-      return () => cancelAnimationFrame(id);
+      requestAnimationFrame(() => animateTo(0, 0));
     }, [enterAnim, animateTo, x, y]);
 
     const flyOut = (dir: SwipeDirection) => {
@@ -229,7 +224,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       const h = getVH();
       const tx = dir === "left" ? -w * 1.4 : dir === "right" ? w * 1.4 : 0;
       const ty = dir === "up" ? -h * 1.4 : 0;
-      animateTo(tx, ty, 320, () => onSwipe(dir));
+      animateTo(tx, ty, true, () => onSwipe(dir));
     };
 
     useImperativeHandle(ref, () => ({
@@ -260,7 +255,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       if (dy < -160 && Math.abs(dx) < 100) flyOut("up");
       else if (dx > swipeX) flyOut("right");
       else if (dx < -swipeX) flyOut("left");
-      else animateTo(0, 0, 240);
+      else animateTo(0, 0);
     };
 
     const onClickPhoto = (e: React.MouseEvent) => {
