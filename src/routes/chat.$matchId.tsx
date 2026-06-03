@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { TypingDots } from "@/components/chat/TypingDots";
 import { ChatActionsMenu } from "@/components/chat/ChatActionsMenu";
+import { PeerProfileSheet } from "@/components/chat/PeerProfileSheet";
 import { getActivityStatus } from "@/lib/activityStatus";
 
 import { requireMembership } from "@/lib/authGuard";
