@@ -104,22 +104,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" },
-      { title: "Hunie — Encontre seu match" },
-      { name: "description", content: "Encontre matches e converse em tempo real." },
+      { title: "Hunie — Namoro em Moçambique. Comunidade verificada." },
+      { name: "description", content: "Hunie é a comunidade de encontros feita em Moçambique. Perfis verificados em Maputo, Matola, Beira, Nampula e Chimoio. Pagamento M-Pesa, preços em MZN." },
       { name: "author", content: "Hunie" },
-      { name: "theme-color", content: "#FF4FA3" },
+      { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
+      { name: "googlebot", content: "index, follow" },
+      { name: "theme-color", content: "#07060a" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { name: "apple-mobile-web-app-title", content: "hunie" },
-      { property: "og:title", content: "Hunie — Encontre seu match" },
-      { property: "og:description", content: "Encontre matches e converse em tempo real." },
+      { name: "apple-mobile-web-app-title", content: "Hunie" },
+      { name: "format-detection", content: "telephone=no" },
+      { property: "og:site_name", content: "Hunie" },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "Hunie — Encontre seu match" },
-      { name: "twitter:description", content: "Encontre matches e converse em tempo real." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/165ab5ba-60ad-46cc-93ff-7991a77bee26/id-preview-23bfb013--ac3ce7cc-9867-441c-8cee-57941b6b8f08.lovable.app-1780072175786.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/165ab5ba-60ad-46cc-93ff-7991a77bee26/id-preview-23bfb013--ac3ce7cc-9867-441c-8cee-57941b6b8f08.lovable.app-1780072175786.png" },
+      { property: "og:locale", content: "pt_MZ" },
+      { property: "og:locale:alternate", content: "pt_BR" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@hunieapp" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -128,6 +129,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", type: "image/png", sizes: "192x192", href: "/icon-192.png" },
       { rel: "icon", type: "image/png", sizes: "512x512", href: "/icon-512.png" },
     ],
+    scripts: [{
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "Hunie",
+        url: "https://hunie.app",
+        logo: "https://hunie.app/icon-512.png",
+        description: "Comunidade de encontros membership-only feita em Moçambique.",
+        sameAs: ["https://www.instagram.com/hunie.app", "https://www.tiktok.com/@hunie.app"],
+        areaServed: { "@type": "Country", name: "Mozambique" },
+      }),
+    }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -137,7 +151,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <HeadContent />
       </head>
