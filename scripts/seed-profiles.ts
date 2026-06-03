@@ -315,16 +315,6 @@ async function insertProfile(p: Profile, idx: number, total: number) {
   const { error: pErr } = await sb
     .from("profiles")
     .upsert({ id, ...profilePayload }, { onConflict: "id" });
-    is_paused: false,
-    is_incognito: false,
-    membership_tier: "free",
-    membership_status: "inactive",
-    onboarding_completed: true,
-    onboarding_step: 99,
-    is_seed: true,
-    seed_active: true,
-    last_active_at: p.last_active_at,
-  });
 
   if (pErr) {
     console.error(`[${idx}/${total}] ERROR ${p.name}, ${p.city}:`, pErr.message);
