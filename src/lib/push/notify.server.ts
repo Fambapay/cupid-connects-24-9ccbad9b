@@ -232,22 +232,7 @@ async function enqueueFallbackEmail(kind: NotifyKind, r: Recipient, ctx: NotifyC
   const tpl = tplMap[kind]
   if (!tpl) return
 
-  // Reuse the transactional send route via direct invocation (server-side, with service role).
   try {
-    const messageId = crypto.randomUUID()
-    const { error } = await supabaseAdmin.rpc('enqueue_email', {
-      queue_name: 'transactional_emails',
-      payload: {
-        message_id: messageId,
-        template_fallback_for: kind,
-        // The dispatcher receives a pre-rendered email; we use the transactional route logic
-        // by enqueuing here. Use the transactional send route instead for full template rendering.
-      },
-    })
-    if (error) console.warn('email fallback enqueue failed', error)
-
-    // Simpler: just call the transactional send route HTTP endpoint. But we don't have an
-    // authenticated user context here. So we render inline via a helper.
     await callTransactionalSend(tpl.template, r.email, tpl.data, `notify-${kind}-${r.user_id}-${Date.now()}`)
   } catch (e) {
     console.warn('email fallback failed', e)
