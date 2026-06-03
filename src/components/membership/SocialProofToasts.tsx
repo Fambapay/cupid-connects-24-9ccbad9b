@@ -32,14 +32,17 @@ interface Notice {
 }
 
 export function SocialProofToasts() {
-  const [notice, setNotice] = useState<Notice | null>(null);
+  const [notice, setNotice] = useState<Notice>(() => ({
+    id: 0,
+    name: pick(NAMES),
+    city: pick(CITIES),
+    plan: pick(PLANS),
+    when: pick(TIME_AGO),
+  }));
 
   useEffect(() => {
     let counter = 0;
-    let hideTimer: number | undefined;
-    let nextTimer: number | undefined;
-
-    const show = () => {
+    const id = window.setInterval(() => {
       counter += 1;
       setNotice({
         id: counter,
@@ -48,53 +51,44 @@ export function SocialProofToasts() {
         plan: pick(PLANS),
         when: pick(TIME_AGO),
       });
-      hideTimer = window.setTimeout(() => setNotice(null), 4500);
-      nextTimer = window.setTimeout(show, 9000 + Math.random() * 6000);
-    };
-
-    const initial = window.setTimeout(show, 2500);
-    return () => {
-      window.clearTimeout(initial);
-      if (hideTimer) window.clearTimeout(hideTimer);
-      if (nextTimer) window.clearTimeout(nextTimer);
-    };
+    }, 5000 + Math.random() * 2000);
+    return () => window.clearInterval(id);
   }, []);
 
   return (
-    <div className="relative mt-3 h-[52px]">
-      <AnimatePresence mode="wait">
-        {notice && (
-          <motion.div
-            key={notice.id}
-            initial={{ opacity: 0, y: 8, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.97 }}
-            transition={{ type: "spring", stiffness: 320, damping: 28 }}
-            className="absolute inset-x-0 flex items-center gap-2.5 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-2.5 backdrop-blur-xl"
+    <div className="relative mt-3 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl">
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.div
+          key={notice.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ type: "spring", stiffness: 360, damping: 30 }}
+          className="flex items-center gap-2.5 px-3 py-2.5"
+        >
+          <div
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-full"
+            style={{ background: `${notice.plan.accent}22`, color: notice.plan.accent }}
           >
-            <div
-              className="grid h-8 w-8 shrink-0 place-items-center rounded-full"
-              style={{ background: `${notice.plan.accent}22`, color: notice.plan.accent }}
-            >
-              <Sparkles size={14} />
+            <Sparkles size={14} />
+          </div>
+          <div className="min-w-0 flex-1 text-[11px] leading-tight">
+            <div className="truncate font-semibold text-white">
+              {notice.name} de {notice.city}
             </div>
-            <div className="min-w-0 text-[11px] leading-tight">
-              <div className="truncate font-semibold text-white">
-                {notice.name} de {notice.city}
-              </div>
-              <div className="truncate text-white/55">
-                subscreveu{" "}
-                <span style={{ color: notice.plan.accent }} className="font-bold">
-                  {notice.plan.label}
-                </span>{" "}
-                · {notice.when}
-              </div>
+            <div className="truncate text-white/55">
+              subscreveu{" "}
+              <span style={{ color: notice.plan.accent }} className="font-bold">
+                {notice.plan.label}
+              </span>{" "}
+              · {notice.when}
             </div>
-            <span className="ml-auto h-2 w-2 shrink-0 animate-pulse rounded-full bg-emerald-400" />
-          </motion.div>
-        )}
+          </div>
+          <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-emerald-400" />
+        </motion.div>
       </AnimatePresence>
     </div>
   );
 }
+
 
