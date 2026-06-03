@@ -277,38 +277,6 @@ function ChatRoom() {
       </div>
 
       <div className="relative shrink-0">
-        <AnimatePresence>
-          {emojiOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              transition={{ duration: 0.18 }}
-              className="absolute inset-x-3 bottom-full mb-2 grid grid-cols-6 gap-1.5 rounded-2xl border border-border/60 bg-background/95 p-2 shadow-xl backdrop-blur-xl"
-            >
-              {QUICK_EMOJIS.map((e) => (
-                <button
-                  key={e}
-                  type="button"
-                  onMouseDown={(ev) => ev.preventDefault()}
-                  onClick={() => {
-                    const input = inputRef.current;
-                    if (!input) return;
-                    input.value = `${input.value}${e}`;
-                    inputHasTextRef.current = input.value.length > 0;
-                    broadcastTyping();
-                    input.focus();
-                  }}
-                  className="grid h-10 place-items-center rounded-xl text-xl transition active:scale-95 hover:bg-muted"
-                  aria-label={`Inserir ${e}`}
-                >
-                  {e}
-                </button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         <form
           onSubmit={(e) => { e.preventDefault(); handleSend(); }}
           className="overflow-hidden border-t border-border/60 bg-background/95 px-3 pt-2.5 pb-3 backdrop-blur-xl"
@@ -334,19 +302,8 @@ function ChatRoom() {
                 className="block h-10 min-w-0 flex-1 appearance-none bg-transparent px-2 py-0 text-[16px] outline-none placeholder:text-muted-foreground [-webkit-appearance:none]"
                 style={{ lineHeight: "40px", WebkitTextFillColor: "currentColor" }}
               />
-              <button
-                type="button"
-                aria-label="Emoji"
-                aria-expanded={emojiOpen}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => setEmojiOpen((v) => !v)}
-                className={`grid h-8 w-8 shrink-0 place-items-center rounded-full transition active:scale-95 ${
-                  emojiOpen ? "text-flame" : "text-foreground/50 hover:text-foreground"
-                }`}
-              >
-                <Smile className="h-5 w-5" />
-              </button>
             </div>
+
 
           <motion.button
             type="submit"
