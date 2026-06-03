@@ -25,6 +25,7 @@ export const Route = createFileRoute('/profile')({
 });
 
 function ProfilePage() {
+  const navigate = useNavigate();
   const { profile, updateProfile, reload } = useProfile();
   const { photos, upload, remove } = usePhotoUpload();
   const { isPremium } = useSubscription();
