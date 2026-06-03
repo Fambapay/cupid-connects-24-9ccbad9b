@@ -117,19 +117,6 @@ export function SwipeableConversationItem({
     }
   };
 
-  const handleBlock = async () => {
-    setBusy(true);
-    try {
-      await blockFn({ data: { userId: otherId, matchId } });
-      toast.success(`${name} foi bloqueado`);
-      onActionTaken?.();
-    } catch (e) {
-      toast.error("Erro", { description: String((e as Error).message) });
-    } finally {
-      setBusy(false);
-      setConfirmKind(null);
-    }
-  };
 
   const handleReport = async () => {
     setBusy(true);
