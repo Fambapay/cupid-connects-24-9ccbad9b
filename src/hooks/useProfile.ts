@@ -38,12 +38,19 @@ export function useProfile() {
       return;
     }
     setLoading(true);
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .maybeSingle();
-    setProfile(data as Profile | null);
+    const [{ data }, { data: phoneData }] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("id,name,age,city,country,bio,is_paused,is_incognito,is_verified,membership_tier,membership_status,membership_expires_at,onboarding_completed,onboarding_step,birthdate,gender,interested_in,interests,latitude,longitude")
+        .eq("id", user.id)
+        .maybeSingle(),
+      supabase.rpc("get_my_phone"),
+    ]);
+    setProfile(
+      data
+        ? ({ ...(data as any), phone: (phoneData as unknown as string | null) ?? null } as Profile)
+        : null
+    );
     setLoading(false);
   }, [user]);
 
@@ -51,15 +58,13 @@ export function useProfile() {
 
   const updateProfile = async (patch: Partial<Profile>) => {
     if (!user) throw new Error("Not authenticated");
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("profiles")
       .update(patch)
-      .eq("id", user.id)
-      .select()
-      .single();
+      .eq("id", user.id);
     if (error) throw error;
-    setProfile(data as Profile);
-    return data;
+    await load();
+    return patch as Profile;
   };
 
   const deleteAccount = async () => {
