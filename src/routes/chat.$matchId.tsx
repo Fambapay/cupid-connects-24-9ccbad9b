@@ -334,8 +334,9 @@ function ChatRoom() {
           >
             <Send className="h-5 w-5 translate-x-[1px]" />
           </motion.button>
-        </div>
-      </form>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
