@@ -27,6 +27,8 @@ interface Props {
   onEditProfile: () => void;
   onOpenSettings?: () => void;
   onVerify?: () => void;
+  isAdmin?: boolean;
+  onOpenAdmin?: () => void;
 }
 
 const PINK = '#FF4FA3';
@@ -38,6 +40,8 @@ export function ProfileView({
   onEditProfile,
   onOpenSettings,
   onVerify,
+  isAdmin,
+  onOpenAdmin,
 }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
