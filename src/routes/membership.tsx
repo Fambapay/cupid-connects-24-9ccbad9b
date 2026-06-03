@@ -110,16 +110,6 @@ function MembershipPage() {
           <p className="mt-2 text-sm text-white/65">
             10× mais matches em média no primeiro mês.
           </p>
-
-          {/* Star rating - social proof */}
-          <div className="mt-3 inline-flex items-center gap-1.5">
-            <div className="flex">
-              {[0,1,2,3,4].map((i) => (
-                <Star key={i} size={13} className="fill-amber-300 text-amber-300" />
-              ))}
-            </div>
-            <span className="text-[11px] font-semibold text-white/70">4.8 · 12.430 reviews</span>
-          </div>
         </div>
 
         {/* Welcome bonus (real — credited on first paid plan/pack) */}
