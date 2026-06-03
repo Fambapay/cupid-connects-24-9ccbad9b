@@ -206,13 +206,9 @@ export function EditProfileSheet({
                               </div>
                             )}
                             <button
-                              onClick={() =>
-                                setDraft(d => ({
-                                  ...d,
-                                  photos: d.photos.filter((_, j) => j !== i),
-                                }))
-                              }
-                              className="absolute right-1.5 top-1.5 grid h-7 w-7 place-items-center rounded-full backdrop-blur-md"
+                              onClick={() => removePhoto(i)}
+                              disabled={photoBusy}
+                              className="absolute right-1.5 top-1.5 grid h-7 w-7 place-items-center rounded-full backdrop-blur-md disabled:opacity-60"
                               style={{
                                 background: 'rgba(0,0,0,0.55)',
                                 border: '1px solid rgba(255,255,255,0.12)',
