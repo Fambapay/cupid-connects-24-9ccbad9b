@@ -13,9 +13,11 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { useNewMessageNotifier } from "@/hooks/useNewMessageNotifier";
+import { useHeartbeat } from "@/hooks/useHeartbeat";
 
 function GlobalNotifiers() {
   useNewMessageNotifier();
+  useHeartbeat();
   return null;
 }
 

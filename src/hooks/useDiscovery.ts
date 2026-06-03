@@ -25,6 +25,7 @@ export interface DiscoverProfile {
   is_verified: boolean;
   gender: string | null;
   isOnline: boolean;
+  lastActiveAt: string | null;
   distance: number;
 }
 
@@ -33,6 +34,10 @@ export interface DiscoveryOptions {
   userCoords?: { lat: number; lng: number } | null;
 }
 
+// Mirror of activityStatus LIVE_WINDOW_MS — consider a user "online now"
+// if their last heartbeat is within this window.
+const ONLINE_WINDOW_MS = 90_000;
+
 function computeAge(birthdate: string | null): number {
   if (!birthdate) return 0;
   const d = new Date(birthdate);
@@ -40,7 +45,6 @@ function computeAge(birthdate: string | null): number {
   return Math.max(0, Math.floor(diff / (365.25 * 24 * 3600 * 1000)));
 }
 
-/** Haversine distance in km between two lat/lng pairs. */
 function haversine(
   a: { lat: number; lng: number },
   b: { lat: number; lng: number },
@@ -57,18 +61,13 @@ function haversine(
   return Math.round(2 * R * Math.asin(Math.sqrt(s)));
 }
 
-/** Map FiltersSheet gender values → DB gender values. */
 function mapGenderFilter(g: DiscoveryFilters["gender"]): string[] | null {
   switch (g) {
-    case "feminino":
-      return ["feminino"];
-    case "masculino":
-      return ["masculino"];
-    case "nao_binario":
-      return ["nao_binario", "outro"];
+    case "feminino": return ["feminino"];
+    case "masculino": return ["masculino"];
+    case "nao_binario": return ["nao_binario", "outro"];
     case "todos":
-    default:
-      return null;
+    default: return null;
   }
 }
 
@@ -89,6 +88,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     const [
       { data: mySwipes },
       { data: me },
+      { data: mySettings },
       { data: blocksA },
       { data: blocksB },
     ] = await Promise.all([
@@ -97,6 +97,11 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
         .from("profiles")
         .select("interested_in, latitude, longitude")
         .eq("id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("user_settings")
+        .select("age_min, age_max, distance_radius, require_bio, min_photos")
+        .eq("user_id", user.id)
         .maybeSingle(),
       supabase.from("blocked_users").select("blocked_id").eq("blocker_id", user.id),
       supabase.from("blocked_users").select("blocker_id").eq("blocked_id", user.id),
@@ -110,7 +115,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     let q = supabase
       .from("profiles")
       .select(
-        "id,name,age,birthdate,city,country,bio,interests,is_verified,gender,latitude,longitude",
+        "id,name,age,birthdate,city,country,bio,interests,is_verified,gender,latitude,longitude,last_active_at",
       )
       .eq("onboarding_completed", true)
       .eq("is_paused", false)
@@ -125,18 +130,20 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       if (interestedIn.length) q = q.in("gender", interestedIn);
     }
 
-    // Age range (column `age` is denormalised in profiles).
-    if (filters) {
-      if (filters.ageMin > 18) q = q.gte("age", filters.ageMin);
-      if (filters.ageMax < 80) q = q.lte("age", filters.ageMax);
-      if (filters.verifiedOnly) q = q.eq("is_verified", true);
-      if (filters.hasBio) q = q.not("bio", "is", null).neq("bio", "");
-    }
+    // Resolve age + bio settings: explicit filters win, otherwise saved settings.
+    const ageMin = filters?.ageMin ?? mySettings?.age_min ?? 18;
+    const ageMax = filters?.ageMax ?? mySettings?.age_max ?? 80;
+    const distanceMax = filters?.distance ?? mySettings?.distance_radius ?? 200;
+    const requireBio = filters?.hasBio ?? mySettings?.require_bio ?? false;
+
+    if (ageMin > 18) q = q.gte("age", ageMin);
+    if (ageMax < 80) q = q.lte("age", ageMax);
+    if (filters?.verifiedOnly) q = q.eq("is_verified", true);
+    if (requireBio) q = q.not("bio", "is", null).neq("bio", "");
 
     const { data: rows } = await q;
     let candidates = (rows ?? []).filter((r) => !excluded.has(r.id));
 
-    // Distance filter (client-side haversine; requires both user + candidate coords).
     const myCoords =
       userCoords ??
       (me?.latitude != null && me?.longitude != null
@@ -150,9 +157,18 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       return { ...r, _distance: dist };
     });
     candidates =
-      filters && myCoords
-        ? withDistance.filter((r) => r._distance <= filters.distance)
+      myCoords && distanceMax < 200
+        ? withDistance.filter((r) => r._distance <= distanceMax)
         : withDistance;
+
+    // Online-now filter
+    if (filters?.onlineNow) {
+      const now = Date.now();
+      candidates = candidates.filter((r) => {
+        const t = r.last_active_at ? new Date(r.last_active_at as string).getTime() : 0;
+        return now - t <= ONLINE_WINDOW_MS;
+      });
+    }
 
     if (!candidates.length) {
       setItems([]);
@@ -176,23 +192,29 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       (byProfile[p.profile_id as string] ??= []).push(url);
     });
 
+    const minPhotos = Math.max(1, mySettings?.min_photos ?? 1);
+    const now = Date.now();
     setItems(
       candidates
-        .filter((r) => (byProfile[r.id]?.length ?? 0) > 0)
-        .map((r) => ({
-          id: r.id,
-          name: r.name ?? "",
-          age: r.age ?? computeAge(r.birthdate as string | null),
-          city: r.city ?? "",
-          country: r.country ?? "",
-          bio: r.bio ?? "",
-          photos: byProfile[r.id] ?? [],
-          interests: (r.interests as string[]) ?? [],
-          is_verified: !!r.is_verified,
-          gender: r.gender as string | null,
-          isOnline: false,
-          distance: (r as { _distance?: number })._distance ?? 0,
-        })),
+        .filter((r) => (byProfile[r.id]?.length ?? 0) >= minPhotos)
+        .map((r) => {
+          const t = r.last_active_at ? new Date(r.last_active_at as string).getTime() : 0;
+          return {
+            id: r.id,
+            name: r.name ?? "",
+            age: r.age ?? computeAge(r.birthdate as string | null),
+            city: r.city ?? "",
+            country: r.country ?? "",
+            bio: r.bio ?? "",
+            photos: byProfile[r.id] ?? [],
+            interests: (r.interests as string[]) ?? [],
+            is_verified: !!r.is_verified,
+            gender: r.gender as string | null,
+            isOnline: t > 0 && now - t <= ONLINE_WINDOW_MS,
+            lastActiveAt: (r.last_active_at as string | null) ?? null,
+            distance: (r as { _distance?: number })._distance ?? 0,
+          };
+        }),
     );
     setLoading(false);
   }, [user, filters, userCoords]);

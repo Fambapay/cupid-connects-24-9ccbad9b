@@ -31,7 +31,12 @@ export function useLikedMe() {
     }
     setLoading(true);
 
-    const [{ data: incoming }, { data: outgoing }] = await Promise.all([
+    const [
+      { data: incoming },
+      { data: outgoing },
+      { data: blocksA },
+      { data: blocksB },
+    ] = await Promise.all([
       supabase
         .from("swipes")
         .select("swiper_id,direction,created_at")
@@ -39,10 +44,20 @@ export function useLikedMe() {
         .in("direction", ["like", "super"])
         .order("created_at", { ascending: false }),
       supabase.from("swipes").select("swiped_id").eq("swiper_id", user.id),
+      supabase.from("blocked_users").select("blocked_id").eq("blocker_id", user.id),
+      supabase.from("blocked_users").select("blocker_id").eq("blocked_id", user.id),
     ]);
 
     const alreadyResponded = new Set((outgoing ?? []).map((s) => s.swiped_id as string));
-    const pending = (incoming ?? []).filter((s) => !alreadyResponded.has(s.swiper_id as string));
+    const blocked = new Set<string>();
+    (blocksA ?? []).forEach((b) => blocked.add(b.blocked_id as string));
+    (blocksB ?? []).forEach((b) => blocked.add(b.blocker_id as string));
+
+    const pending = (incoming ?? []).filter(
+      (s) =>
+        !alreadyResponded.has(s.swiper_id as string) &&
+        !blocked.has(s.swiper_id as string),
+    );
 
     if (!pending.length) {
       setLikers([]);
