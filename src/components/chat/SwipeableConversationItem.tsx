@@ -1,10 +1,10 @@
 import { useState, useRef, useCallback } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
-import { Flag, Ban, HeartCrack } from "lucide-react";
+import { Flag, HeartCrack } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "@/hooks/use-toast";
-import { unmatchUser, blockUser, reportUser, type ReportReason } from "@/lib/moderation.functions";
+import { unmatchUser, reportUser, type ReportReason } from "@/lib/moderation.functions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,8 +26,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
-const SWIPE_THRESHOLD = -80;
-const ACTION_WIDTH = 160;
+const SWIPE_THRESHOLD = -90;
+const ACTION_WIDTH = 180;
 
 const REASONS: { value: ReportReason; label: string }[] = [
   { value: "fake_profile", label: "Perfil falso" },
@@ -61,14 +61,13 @@ export function SwipeableConversationItem({
   const x = useMotionValue(0);
   const bgOpacity = useTransform(x, [-ACTION_WIDTH, 0], [1, 0]);
   const [open, setOpen] = useState(false);
-  const [confirmKind, setConfirmKind] = useState<"unmatch" | "block" | null>(null);
+  const [confirmKind, setConfirmKind] = useState<"unmatch" | null>(null);
   const [reportOpen, setReportOpen] = useState(false);
   const [reason, setReason] = useState<ReportReason>("fake_profile");
   const [details, setDetails] = useState("");
   const [busy, setBusy] = useState(false);
   const containerRef = useRef<HTMLLIElement>(null);
   const unmatchFn = useServerFn(unmatchUser);
-  const blockFn = useServerFn(blockUser);
   const reportFn = useServerFn(reportUser);
 
   const snapOpen = useCallback(() => {
@@ -118,19 +117,6 @@ export function SwipeableConversationItem({
     }
   };
 
-  const handleBlock = async () => {
-    setBusy(true);
-    try {
-      await blockFn({ data: { userId: otherId, matchId } });
-      toast.success(`${name} foi bloqueado`);
-      onActionTaken?.();
-    } catch (e) {
-      toast.error("Erro", { description: String((e as Error).message) });
-    } finally {
-      setBusy(false);
-      setConfirmKind(null);
-    }
-  };
 
   const handleReport = async () => {
     setBusy(true);
@@ -159,7 +145,7 @@ export function SwipeableConversationItem({
       {/* Actions layer (behind) */}
       <motion.div
         style={{ opacity: bgOpacity }}
-        className="absolute inset-y-0 right-0 flex w-[160px] items-stretch"
+        className="absolute inset-y-0 right-0 flex w-[180px] items-stretch"
       >
         <button
           onClick={() => {
@@ -169,27 +155,17 @@ export function SwipeableConversationItem({
           className="flex flex-1 flex-col items-center justify-center gap-1 bg-amber-500 text-white"
         >
           <Flag className="h-5 w-5" />
-          <span className="text-[10px] font-semibold uppercase tracking-wide">Denunciar</span>
-        </button>
-        <button
-          onClick={() => {
-            snapClose();
-            setConfirmKind("block");
-          }}
-          className="flex flex-1 flex-col items-center justify-center gap-1 bg-red-500 text-white"
-        >
-          <Ban className="h-5 w-5" />
-          <span className="text-[10px] font-semibold uppercase tracking-wide">Bloquear</span>
+          <span className="text-[11px] font-semibold tracking-wide">Reportar</span>
         </button>
         <button
           onClick={() => {
             snapClose();
             setConfirmKind("unmatch");
           }}
-          className="flex flex-1 flex-col items-center justify-center gap-1 bg-muted-foreground text-white"
+          className="flex flex-1 flex-col items-center justify-center gap-1 bg-red-500 text-white"
         >
           <HeartCrack className="h-5 w-5" />
-          <span className="text-[10px] font-semibold uppercase tracking-wide">Unmatch</span>
+          <span className="text-[11px] font-semibold tracking-wide">Unmatch</span>
         </button>
       </motion.div>
 
@@ -230,13 +206,9 @@ export function SwipeableConversationItem({
       <AlertDialog open={confirmKind !== null} onOpenChange={(o) => !o && setConfirmKind(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {confirmKind === "block" ? `Bloquear ${name}?` : `Desfazer match com ${name}?`}
-            </AlertDialogTitle>
+            <AlertDialogTitle>Desfazer match com {name}?</AlertDialogTitle>
             <AlertDialogDescription>
-              {confirmKind === "block"
-                ? "Não vão poder ver-se nem enviar mensagens. O match será removido."
-                : "A conversa será apagada e não voltam a ser sugeridos um ao outro num like."}
+              A conversa será apagada e não voltam a ser sugeridos um ao outro num like.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -245,7 +217,7 @@ export function SwipeableConversationItem({
               disabled={busy}
               onClick={(e) => {
                 e.preventDefault();
-                confirmKind === "block" ? handleBlock() : handleUnmatch();
+                handleUnmatch();
               }}
             >
               Confirmar
