@@ -37,7 +37,7 @@ function Discover() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
   const { items, loading, swipe, rewind, reload } = useDiscovery({ filters });
-  const { credits, reload: reloadCredits } = useCredits();
+  const { credits, reload: reloadCredits, syncCredits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
   const boost = useBoost(goShop);
   const [index, setIndex] = useState(0);
@@ -84,6 +84,9 @@ function Discover() {
         toast.error("Sem Super Likes — vai à loja");
         goShop();
         return;
+      }
+      if (typeof result.remainingSuperLikes === "number") {
+        syncCredits({ super_like_balance: result.remainingSuperLikes });
       }
       reloadCredits();
     }

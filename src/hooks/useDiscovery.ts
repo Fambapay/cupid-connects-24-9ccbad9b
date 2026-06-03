@@ -177,6 +177,20 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       return;
     }
 
+    const candidateOrder = new Map(candidates.map((r, i) => [r.id, i]));
+    const { data: activeBoosts } = await supabase
+      .from("boosts")
+      .select("profile_id,expires_at")
+      .in("profile_id", candidates.map((r) => r.id))
+      .gt("expires_at", new Date().toISOString());
+    const boostedIds = new Set((activeBoosts ?? []).map((b) => b.profile_id as string));
+    candidates = [...candidates].sort((a, b) => {
+      const boostedA = boostedIds.has(a.id) ? 1 : 0;
+      const boostedB = boostedIds.has(b.id) ? 1 : 0;
+      if (boostedA !== boostedB) return boostedB - boostedA;
+      return (candidateOrder.get(a.id) ?? 0) - (candidateOrder.get(b.id) ?? 0);
+    });
+
     const ids = candidates.map((r) => r.id);
     const { data: photos } = await supabase
       .from("profile_photos")
@@ -229,15 +243,18 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     async (
       targetId: string,
       direction: "like" | "pass" | "super",
-    ): Promise<{ matched: boolean; matchId?: string; reason?: string }> => {
+    ): Promise<{ matched: boolean; matchId?: string; reason?: string; remainingSuperLikes?: number }> => {
       if (!user) return { matched: false };
+      let remainingSuperLikes: number | undefined;
 
       if (direction === "super") {
         const { data } = await supabase.rpc("consume_super_like_credit");
-        const res = data as { success: boolean; reason?: string } | null;
+        const res = data as { success: boolean; reason?: string; remaining_balance?: number } | null;
         if (!res?.success) {
           return { matched: false, reason: res?.reason ?? "insufficient_credits" };
         }
+        remainingSuperLikes = res.remaining_balance;
+        window.dispatchEvent(new CustomEvent("hunie:credits-changed"));
       }
 
       await supabase
@@ -252,7 +269,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
         .eq("user_a", a)
         .eq("user_b", b)
         .maybeSingle();
-      return { matched: !!match, matchId: match?.id };
+      return { matched: !!match, matchId: match?.id, remainingSuperLikes };
     },
     [user],
   );

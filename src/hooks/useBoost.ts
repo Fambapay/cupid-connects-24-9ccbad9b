@@ -73,6 +73,7 @@ export function useBoost(onInsufficient?: () => void) {
         expiresAt: exp,
         remainingMinutes: Math.ceil((exp.getTime() - Date.now()) / 60_000),
       });
+      window.dispatchEvent(new CustomEvent("hunie:credits-changed"));
       toast.success("⚡ Boost ativado por 30 min!");
       return;
     }
