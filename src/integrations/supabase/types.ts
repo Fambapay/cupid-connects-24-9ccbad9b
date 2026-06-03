@@ -418,6 +418,24 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_contact: {
+        Row: {
+          phone: string | null
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          phone?: string | null
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          phone?: string | null
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profile_photos: {
         Row: {
           created_at: string
@@ -502,7 +520,6 @@ export type Database = {
           name: string | null
           onboarding_completed: boolean
           onboarding_step: number
-          phone: string | null
           seed_active: boolean
           updated_at: string
           welcome_bonus_granted_at: string | null
@@ -531,7 +548,6 @@ export type Database = {
           name?: string | null
           onboarding_completed?: boolean
           onboarding_step?: number
-          phone?: string | null
           seed_active?: boolean
           updated_at?: string
           welcome_bonus_granted_at?: string | null
@@ -560,7 +576,6 @@ export type Database = {
           name?: string | null
           onboarding_completed?: boolean
           onboarding_step?: number
-          phone?: string | null
           seed_active?: boolean
           updated_at?: string
           welcome_bonus_granted_at?: string | null
