@@ -58,7 +58,7 @@ function Discover() {
     age: p.age,
     city: p.city,
     country: (p.country as Profile["country"]) || "Portugal",
-    distance: 0,
+    distance: p.distance,
     bio: p.bio,
     photos: p.photos,
     gender: (p.gender as Profile["gender"]) || "feminino",
