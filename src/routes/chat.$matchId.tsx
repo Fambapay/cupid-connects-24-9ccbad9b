@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { TypingDots } from "@/components/chat/TypingDots";
 import { ChatActionsMenu } from "@/components/chat/ChatActionsMenu";
+import { PeerProfileSheet } from "@/components/chat/PeerProfileSheet";
 import { getActivityStatus } from "@/lib/activityStatus";
 
 import { requireMembership } from "@/lib/authGuard";
@@ -25,6 +26,7 @@ function ChatRoom() {
   const { messages, peer, loading, notFound, send } = useMessages(matchId);
   const [typing, setTyping] = useState(false);
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const typingTimerRef = useRef<number | null>(null);
   const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const lastSentTypingRef = useRef(0);
@@ -172,7 +174,12 @@ function ChatRoom() {
             <ChevronLeft className="h-6 w-6" />
           </Link>
 
-          <Link to="/chat" className="flex min-w-0 flex-1 items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setProfileOpen(true)}
+            className="flex min-w-0 flex-1 items-center gap-3 text-left active:opacity-80"
+            aria-label={`Ver perfil de ${peer.name}`}
+          >
             <div className="relative shrink-0">
               <div className="h-11 w-11 overflow-hidden rounded-full ring-2 ring-flame/50">
                 {peer.photo ? (
@@ -197,7 +204,7 @@ function ChatRoom() {
                 {activity?.label ?? "Inativa"}
               </p>
             </div>
-          </Link>
+          </button>
 
           <ChatActionsMenu matchId={matchId} otherUserId={peer.id} otherName={peer.name} />
         </div>
@@ -353,6 +360,14 @@ function ChatRoom() {
           </div>
         </form>
       </div>
+
+      <PeerProfileSheet
+        open={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        userId={peer.id}
+        fallbackName={peer.name}
+        fallbackPhoto={peer.photo}
+      />
     </div>
   );
 }
