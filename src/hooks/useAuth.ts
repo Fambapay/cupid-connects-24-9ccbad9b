@@ -33,12 +33,14 @@ export function useAuth() {
         email,
         password,
         options: {
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: `${window.location.origin}/onboarding?step=1`,
           data: name ? { name } : undefined,
         },
       }),
     signInWithGoogle: () =>
-      lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin }),
+      lovable.auth.signInWithOAuth("google", {
+        redirect_uri: `${window.location.origin}/discover`,
+      }),
     resetPasswordForEmail: (email: string) =>
       supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
