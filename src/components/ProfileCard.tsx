@@ -1625,3 +1625,43 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
 });
 
 ProfileCard.displayName = 'ProfileCard';
+
+function ProfileSheetSection({
+  icon, title, action, children,
+}: { icon: ReactNode; title: string; action?: boolean; children: ReactNode }) {
+  return (
+    <section style={{
+      background: '#fff',
+      borderRadius: 14,
+      padding: '18px 20px 20px',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {icon}
+          <span style={{ fontSize: 15, fontWeight: 500, color: '#7b7b80', letterSpacing: '-0.1px' }}>{title}</span>
+        </div>
+        {action && (
+          <MoreHorizontal className="w-5 h-5" strokeWidth={2} style={{ color: '#9b9ba1' }} />
+        )}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function EssentialList({ items }: { items: { icon: ReactNode; label: string }[] }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {items.map((item, i) => (
+        <div key={i} style={{
+          display: 'flex', alignItems: 'center', gap: 14,
+          padding: '12px 0',
+          borderTop: i === 0 ? 'none' : '1px solid rgba(0,0,0,0.06)',
+        }}>
+          {item.icon}
+          <span style={{ fontSize: 17, fontWeight: 500, color: '#111', letterSpacing: '-0.2px' }}>{item.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
