@@ -25,7 +25,7 @@ function ChatRoom() {
   const { user } = useAuth();
   const { messages, peer, loading, notFound, send } = useMessages(matchId);
   const [typing, setTyping] = useState(false);
-  const [emojiOpen, setEmojiOpen] = useState(false);
+  
   const [profileOpen, setProfileOpen] = useState(false);
   const typingTimerRef = useRef<number | null>(null);
   const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
