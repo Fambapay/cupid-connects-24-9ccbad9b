@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_emails: {
+        Row: {
+          created_at: string
+          email: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string
+          created_at: string
+          id: string
+          meta: Json
+          target_id: string | null
+          target_kind: string | null
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id: string
+          created_at?: string
+          id?: string
+          meta?: Json
+          target_id?: string | null
+          target_kind?: string | null
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string
+          created_at?: string
+          id?: string
+          meta?: Json
+          target_id?: string | null
+          target_kind?: string | null
+        }
+        Relationships: []
+      }
       blocked_users: {
         Row: {
           blocked_id: string
@@ -525,6 +573,7 @@ export type Database = {
         Args: { _pack_kind: string; _quantity: number; _user_id: string }
         Returns: Json
       }
+      is_admin: { Args: { _uid: string }; Returns: boolean }
       is_match_member: {
         Args: { _match_id: string; _user_id: string }
         Returns: boolean
