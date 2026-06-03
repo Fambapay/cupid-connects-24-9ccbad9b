@@ -100,7 +100,7 @@ export function usePhotoUpload() {
       const { data, error } = await supabase
         .from("profile_photos")
         .insert({
-          profile_id: user.id,
+          profile_id: currentUser.id,
           storage_path: path,
           position: tempPos,
         })
