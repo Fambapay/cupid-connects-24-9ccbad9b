@@ -79,10 +79,13 @@ function Discover() {
     if (!target) return;
     const direction = dir === "right" ? "like" : dir === "up" ? "super" : "pass";
     const result = await swipe(target.id, direction);
-    if (direction === "super" && result.reason === "insufficient_credits") {
-      toast.error("Sem Super Likes — vai à loja");
-      goShop();
-      return;
+    if (direction === "super") {
+      if (result.reason === "insufficient_credits") {
+        toast.error("Sem Super Likes — vai à loja");
+        goShop();
+        return;
+      }
+      reloadCredits();
     }
     if (result.matched) setMatched({ id: target.id, name: target.name, photo: target.photos?.[0] ?? null });
   };
