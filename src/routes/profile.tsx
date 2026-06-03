@@ -88,15 +88,34 @@ function ProfilePage() {
     }
   };
 
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    supabase.from('admin_emails').select('email').maybeSingle().then(({ data }) => {
+      setIsAdmin(!!data);
+    });
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
-      <Link
-        to="/settings"
-        className="fixed top-4 right-4 z-30 w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center backdrop-blur-md"
-        aria-label="Definições"
-      >
-        <SettingsIcon className="w-5 h-5 text-foreground" />
-      </Link>
+      <div className="fixed top-4 right-4 z-30 flex items-center gap-2">
+        {isAdmin && (
+          <Link
+            to="/admin"
+            className="w-10 h-10 rounded-full bg-gradient-flame text-flame-foreground flex items-center justify-center shadow-rose"
+            aria-label="Painel admin"
+          >
+            <Shield className="w-5 h-5" />
+          </Link>
+        )}
+        <Link
+          to="/settings"
+          className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center backdrop-blur-md"
+          aria-label="Definições"
+        >
+          <SettingsIcon className="w-5 h-5 text-foreground" />
+        </Link>
+      </div>
+
       <ProfileView
         profile={view}
         onAddFiles={handleAddFiles}
