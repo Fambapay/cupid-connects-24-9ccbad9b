@@ -262,18 +262,12 @@ function MembershipPage() {
           })}
         </div>
 
-        {/* Loss aversion comparison */}
-        <div className="mt-6 rounded-2xl border border-white/8 bg-white/[0.03] p-4">
-          <div className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-white/60">
-            <TrendingUp size={12} /> O que perdes no plano grátis
-          </div>
-          <ul className="space-y-1.5 text-xs text-white/70">
-            <li className="flex items-center gap-2"><span className="text-red-400">✕</span> Não vês quem te curtiu</li>
-            <li className="flex items-center gap-2"><span className="text-red-400">✕</span> Apenas 25 likes por dia</li>
-            <li className="flex items-center gap-2"><span className="text-red-400">✕</span> Sem Boost — perdes 90% da visibilidade</li>
-            <li className="flex items-center gap-2"><span className="text-red-400">✕</span> Sem rewind para corrigir erros</li>
-          </ul>
-        </div>
+        {isGated && (
+          <p className="mt-6 text-center text-[11px] text-white/45">
+            Hunie requer uma subscrição ativa. Escolhe um plano para começar a fazer match.
+          </p>
+        )}
+
 
         {/* Testimonial section removed (was placeholder content) */}
 
