@@ -574,18 +574,22 @@ function SettingsPage() {
         <motion.div className="mt-6" variants={itemVariants}>
           <SectionHeader icon={Bell} label="Notificações" />
           <div className="hunie-card overflow-hidden">
-            <div className="p-4 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => navigate({ to: '/settings/notifications' })}
+              className="w-full p-4 flex items-center justify-between hover:bg-muted/40 transition-colors text-left"
+            >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center">
                   <Bell className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-[15px] text-foreground font-medium">Notificações push</p>
-                  <p className="text-[13px] text-muted-foreground">Matches e mensagens</p>
+                  <p className="text-[15px] text-foreground font-medium">Notificações</p>
+                  <p className="text-[13px] text-muted-foreground">Push, email e preferências por evento</p>
                 </div>
               </div>
-              <Switch checked={settings?.notifications_enabled ?? true} onCheckedChange={handleNotificationsChange} />
-            </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </button>
           </div>
         </motion.div>
 
