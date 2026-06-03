@@ -229,15 +229,16 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     async (
       targetId: string,
       direction: "like" | "pass" | "super",
-    ): Promise<{ matched: boolean; matchId?: string; reason?: string }> => {
+    ): Promise<{ matched: boolean; matchId?: string; reason?: string; remainingSuperLikes?: number }> => {
       if (!user) return { matched: false };
 
       if (direction === "super") {
         const { data } = await supabase.rpc("consume_super_like_credit");
-        const res = data as { success: boolean; reason?: string } | null;
+        const res = data as { success: boolean; reason?: string; remaining_balance?: number } | null;
         if (!res?.success) {
           return { matched: false, reason: res?.reason ?? "insufficient_credits" };
         }
+        window.dispatchEvent(new CustomEvent("hunie:credits-changed"));
       }
 
       await supabase
