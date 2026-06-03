@@ -17,7 +17,7 @@ import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { BottomNav } from "@/components/BottomNav";
 import { useCredits } from "@/hooks/useCredits";
-import { requireAuthAndOnboarding } from "@/lib/authGuard";
+import { requireMembership } from "@/lib/authGuard";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 
 type PackKind = "boost" | "super_like";
@@ -69,7 +69,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/shop")({
   ssr: false,
-  beforeLoad: requireAuthAndOnboarding,
+  beforeLoad: requireMembership,
   validateSearch: searchSchema,
   head: () => ({
     meta: [
