@@ -821,6 +821,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_my_phone: { Args: never; Returns: string }
       grant_credits: {
         Args: { _pack_kind: string; _quantity: number; _user_id: string }
         Returns: Json
