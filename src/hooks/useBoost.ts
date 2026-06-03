@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { toast } from "sonner";
+import { BoostActivatedToast } from "@/components/BoostActivatedToast";
 
 interface BoostStatus {
   active: boolean;
@@ -74,7 +75,10 @@ export function useBoost(onInsufficient?: () => void) {
         remainingMinutes: Math.ceil((exp.getTime() - Date.now()) / 60_000),
       });
       window.dispatchEvent(new CustomEvent("hunie:credits-changed"));
-      toast.success("⚡ Boost ativado por 30 min!");
+      toast.custom(() => <BoostActivatedToast minutes={30} />, {
+        duration: 4000,
+        unstyled: true,
+      });
       return;
     }
     if (res.reason === "already_active") {
