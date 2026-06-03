@@ -92,15 +92,13 @@
               inset 0 1px 0 rgba(255,255,255,0.08);
 }
 .ll-logo {
-  display: inline-flex; align-items: center; gap: 10px;
+  display: inline-flex; align-items: center;
   color: var(--ll-ink); text-decoration: none;
-  font-weight: 700; letter-spacing: -0.02em; font-size: 17px;
 }
-.ll-logo-dot {
-  width: 26px; height: 26px; border-radius: 8px;
-  background: linear-gradient(135deg, var(--ll-pink), var(--ll-purple));
-  box-shadow: 0 4px 14px -4px rgba(255,79,163,0.6),
-              inset 0 1px 0 rgba(255,255,255,0.4);
+.ll-logo-img {
+  height: 26px;
+  width: auto;
+  display: block;
 }
 .ll-nav-links { display: none; gap: 26px; align-items: center; }
 .ll-nav-link {
