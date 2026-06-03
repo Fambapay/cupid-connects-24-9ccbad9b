@@ -313,7 +313,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     useMotionValueEvent(y, "change", recompute);
 
     return (
-      <div className="absolute inset-0 overflow-hidden" style={{ background: "#000" }}>
+      <div className="absolute inset-0 overflow-hidden" style={{ background: "#000", perspective: 1200 }}>
         {isTop && nextProfiles[1] && (
           <StackCard profile={nextProfiles[1]} topX={x} topY={y} stackIndex={2} />
         )}
