@@ -124,7 +124,7 @@ export function useMatches() {
           photo: path ? signedByPath[path] : "",
           lastMessage: last?.content ?? null,
           lastMessageAt: last?.at ?? (m.last_message_at as string),
-          unread: 0,
+          unread: unreadByMatch[m.id as string] ?? 0,
           hasMessages: !!last,
         };
       }),
