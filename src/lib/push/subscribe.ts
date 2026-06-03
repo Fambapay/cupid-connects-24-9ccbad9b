@@ -26,7 +26,6 @@ async function getCurrentVapidPublicKey(): Promise<string> {
     if (!res.ok) throw new Error('Failed to load VAPID key')
     const data = await res.json()
     if (typeof data.publicKey === 'string' && data.publicKey.length > 0) {
-      localStorage.setItem(VAPID_KEY_STORAGE, data.publicKey)
       return data.publicKey
     }
   } catch {
@@ -68,11 +67,11 @@ export async function subscribeToPush(): Promise<{ ok: boolean; reason?: string 
   const registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' })
   await navigator.serviceWorker.ready
 
-  const vapidPublicKey = await getCurrentVapidPublicKey()
   const previousKey = localStorage.getItem(VAPID_KEY_STORAGE)
+  const vapidPublicKey = await getCurrentVapidPublicKey()
 
   let sub = await registration.pushManager.getSubscription()
-  if (sub && previousKey && previousKey !== vapidPublicKey) {
+  if (sub && (!previousKey || previousKey !== vapidPublicKey)) {
     await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint)
     await sub.unsubscribe()
     sub = null
@@ -83,8 +82,9 @@ export async function subscribeToPush(): Promise<{ ok: boolean; reason?: string 
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(vapidPublicKey).buffer as ArrayBuffer,
     })
-    localStorage.setItem(VAPID_KEY_STORAGE, vapidPublicKey)
   }
+
+  localStorage.setItem(VAPID_KEY_STORAGE, vapidPublicKey)
 
   const p256dh = arrayBufferToBase64Url(sub.getKey('p256dh'))
   const auth = arrayBufferToBase64Url(sub.getKey('auth'))
