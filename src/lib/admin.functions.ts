@@ -402,3 +402,67 @@ export const exportUsersCsv = createServerFn({ method: "GET" })
     (rows ?? []).forEach((r: any) => lines.push(headers.map((h) => escape(r[h])).join(",")));
     return { csv: lines.join("\n"), filename: `users-${new Date().toISOString().slice(0, 10)}.csv` };
   });
+
+// ─── Reports ───────────────────────────────────────────────
+export const listReports = createServerFn({ method: "GET" })
+  .middleware([requireAdmin])
+  .inputValidator((input) =>
+    z
+      .object({
+        status: z.enum(["pending", "reviewed", "dismissed", "actioned", "all"]).optional().default("pending"),
+        limit: z.number().int().min(1).max(200).optional().default(100),
+      })
+      .parse(input ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = context.supabaseAdmin;
+    let q = sb
+      .from("reports")
+      .select("id, reporter_id, reported_id, match_id, reason, details, status, reviewed_at, reviewed_by, created_at")
+      .order("created_at", { ascending: false })
+      .limit(data.limit);
+    if (data.status !== "all") q = q.eq("status", data.status);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+
+    const ids = new Set<string>();
+    (rows ?? []).forEach((r: any) => {
+      ids.add(r.reporter_id);
+      ids.add(r.reported_id);
+    });
+    const { data: profs } = await sb
+      .from("profiles")
+      .select("id, name, is_paused, is_verified")
+      .in("id", Array.from(ids));
+    const profMap: Record<string, any> = {};
+    (profs ?? []).forEach((p: any) => (profMap[p.id] = p));
+
+    return {
+      reports: (rows ?? []).map((r: any) => ({
+        ...r,
+        reporter: profMap[r.reporter_id] ?? null,
+        reported: profMap[r.reported_id] ?? null,
+      })),
+    };
+  });
+
+export const updateReportStatus = createServerFn({ method: "POST" })
+  .middleware([requireAdmin])
+  .inputValidator((input) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        status: z.enum(["pending", "reviewed", "dismissed", "actioned"]),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = context.supabaseAdmin;
+    const { error } = await sb
+      .from("reports")
+      .update({ status: data.status, reviewed_at: new Date().toISOString(), reviewed_by: context.userId })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    await logAction(sb, context.userId, context.adminEmail, "report.update_status", data.id, "report", { status: data.status });
+    return { ok: true };
+  });
