@@ -196,14 +196,6 @@ export function ProfileView({
         </div>
       </div>
 
-      {/* STATS ROW — social validation */}
-      <div className="relative mx-5 mb-5 grid grid-cols-3 overflow-hidden rounded-2xl border border-border bg-card">
-        <StatCell Icon={Heart} color={PINK} value="—" label="Likes" />
-        <div className="border-x border-border">
-          <StatCell Icon={Eye} color="#5BB8FF" value="—" label="Visitas" />
-        </div>
-        <StatCell Icon={Flame} color="#FFA94D" value="—" label="Matches" />
-      </div>
 
       {/* PROGRESS */}
       <div className="relative px-5 pb-5">
