@@ -8,6 +8,7 @@ import { BottomNav } from '@/components/BottomNav';
 import { useProfile } from '@/hooks/useProfile';
 import { usePhotoUpload } from '@/hooks/usePhotoUpload';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useCredits } from '@/hooks/useCredits';
 import { supabase } from '@/integrations/supabase/client';
 
 import { requireAuthAndOnboarding } from '@/lib/authGuard';
@@ -29,6 +30,7 @@ function ProfilePage() {
   const { profile, updateProfile, reload } = useProfile();
   const { photos, upload, remove } = usePhotoUpload();
   const { isPremium } = useSubscription();
+  const { credits } = useCredits();
   const [editing, setEditing] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -99,6 +101,8 @@ function ProfilePage() {
     <div className="min-h-screen bg-background">
       <ProfileView
         profile={view}
+        superLikeBalance={credits.super_like_balance}
+        boostBalance={credits.boost_balance}
         onAddFiles={handleAddFiles}
         onEditProfile={() => setEditing(true)}
         onVerify={() => setVerifying(true)}
