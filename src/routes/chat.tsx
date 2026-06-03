@@ -80,30 +80,15 @@ function ChatList() {
         ) : (
           <ul className="mt-3 space-y-1">
             {conversations.map((m) => (
-              <li key={m.matchId}>
-                <Link
-                  to="/chat/$matchId"
-                  params={{ matchId: m.matchId }}
-                  className="flex items-center gap-3 rounded-2xl px-2 py-2.5 hover:bg-muted/60 active:bg-muted"
-                >
-                  <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full ring-2 ring-flame/40">
-                    {m.photo ? (
-                      <img src={m.photo} alt={m.name} className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="h-full w-full bg-gradient-flame" />
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <span className="truncate font-semibold">{m.name}</span>
-                      <span className="text-xs text-muted-foreground">{formatTime(m.lastMessageAt)}</span>
-                    </div>
-                    <p className="truncate text-sm text-muted-foreground">
-                      {m.lastMessage ?? "Diz olá 👋"}
-                    </p>
-                  </div>
-                </Link>
-              </li>
+              <SwipeableConversationItem
+                key={m.matchId}
+                matchId={m.matchId}
+                otherId={m.otherId}
+                name={m.name}
+                photo={m.photo}
+                lastMessage={m.lastMessage}
+                lastMessageAt={formatTime(m.lastMessageAt)}
+              />
             ))}
           </ul>
         )}
