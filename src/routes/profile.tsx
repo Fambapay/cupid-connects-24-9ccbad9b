@@ -1,6 +1,5 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Settings as SettingsIcon, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { ProfileView, type ProfileViewData } from '@/components/ProfileView';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
