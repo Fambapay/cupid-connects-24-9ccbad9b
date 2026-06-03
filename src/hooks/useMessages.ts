@@ -15,6 +15,7 @@ export interface MatchPeer {
   id: string;
   name: string;
   photo: string;
+  lastActiveAt: string | null;
 }
 
 export function useMessages(matchId: string | undefined) {
@@ -40,7 +41,7 @@ export function useMessages(matchId: string | undefined) {
     const otherId = (match.user_a === user.id ? match.user_b : match.user_a) as string;
 
     const [{ data: prof }, { data: photo }, { data: msgs }] = await Promise.all([
-      supabase.from("profiles").select("name").eq("id", otherId).maybeSingle(),
+      supabase.from("profiles").select("name,last_active_at").eq("id", otherId).maybeSingle(),
       supabase
         .from("profile_photos")
         .select("storage_path")
@@ -56,7 +57,12 @@ export function useMessages(matchId: string | undefined) {
     ]);
 
     const photoUrl = photo?.storage_path ? await signPhoto(photo.storage_path as string) : "";
-    setPeer({ id: otherId, name: (prof?.name as string) ?? "Alguém", photo: photoUrl });
+    setPeer({
+      id: otherId,
+      name: (prof?.name as string) ?? "Alguém",
+      photo: photoUrl,
+      lastActiveAt: (prof?.last_active_at as string | null) ?? null,
+    });
     setMessages((msgs ?? []) as ChatMessage[]);
     setLoading(false);
   }, [user, matchId]);

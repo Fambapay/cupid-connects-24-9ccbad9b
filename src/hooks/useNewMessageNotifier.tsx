@@ -30,6 +30,31 @@ export function useNewMessageNotifier() {
   useEffect(() => {
     if (!user) return;
 
+    let notificationsEnabled = true;
+    const checkSettings = async () => {
+      const { data } = await supabase
+        .from("user_settings")
+        .select("notifications_enabled")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      notificationsEnabled = (data?.notifications_enabled ?? true) as boolean;
+    };
+    checkSettings();
+    // Live-react to settings changes
+    const settingsCh = supabase
+      .channel(`settings-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "user_settings", filter: `user_id=eq.${user.id}` },
+        (p) => {
+          const row = (p.new ?? p.old) as { notifications_enabled?: boolean } | null;
+          if (row && typeof row.notifications_enabled === "boolean") {
+            notificationsEnabled = row.notifications_enabled;
+          }
+        },
+      )
+      .subscribe();
+
     const preloadImage = (url: string) => {
       if (!url || typeof window === "undefined") return;
       const img = new Image();
