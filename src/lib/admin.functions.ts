@@ -297,9 +297,10 @@ export const grantUserCredits = createServerFn({ method: "POST" })
     // Ensure row exists
     await sb.from("user_credits").upsert({ user_id: data.userId }, { onConflict: "user_id" });
     const { data: current } = await sb.from("user_credits").select("*").eq("user_id", data.userId).maybeSingle();
-    const col = data.kind === "boost" ? "boost_balance" : "super_like_balance";
-    const next = Math.max(0, ((current?.[col] as number | undefined) ?? 0) + data.quantity);
-    const { error } = await sb.from("user_credits").update({ [col]: next, updated_at: new Date().toISOString() }).eq("user_id", data.userId);
+    const col: "boost_balance" | "super_like_balance" = data.kind === "boost" ? "boost_balance" : "super_like_balance";
+    const next = Math.max(0, ((current as any)?.[col] ?? 0) + data.quantity);
+    const update: Record<string, number | string> = { [col]: next, updated_at: new Date().toISOString() };
+    const { error } = await sb.from("user_credits").update(update as any).eq("user_id", data.userId);
     if (error) throw new Error(error.message);
     await logAction(sb, context.userId, context.adminEmail, "user.grant_credits", data.userId, "user_credits", { kind: data.kind, quantity: data.quantity, new_balance: next });
     return { ok: true, new_balance: next };
