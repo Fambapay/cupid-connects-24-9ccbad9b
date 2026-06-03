@@ -339,6 +339,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
           }}
         >
           <div
+            ref={photoWrapRef}
             style={{
               position: "absolute",
               inset: 0,
@@ -408,6 +409,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             />
 
             <div
+              ref={likeLabelRef}
               style={{
                 position: "absolute",
                 top: 80,
@@ -427,6 +429,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               LIKE
             </div>
             <div
+              ref={nopeLabelRef}
               style={{
                 position: "absolute",
                 top: 80,
@@ -446,6 +449,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               NOPE
             </div>
             <div
+              ref={supLabelRef}
               style={{
                 position: "absolute",
                 top: 120,
@@ -467,6 +471,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
           </div>
 
           <div
+            ref={infoWrapRef}
             style={{
               position: "absolute",
               left: 0,
