@@ -116,32 +116,6 @@ export const DiscoverTopBar = ({
                   }}
                 />
 
-                {/* Countdown badge */}
-                {boostRemainingMinutes > 0 && (
-                  <span
-                    aria-hidden
-                    style={{
-                      position: 'absolute',
-                      bottom: -6,
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      padding: '2px 6px',
-                      borderRadius: 999,
-                      fontSize: 9,
-                      fontWeight: 800,
-                      lineHeight: 1,
-                      color: '#fff',
-                      background: 'linear-gradient(135deg, #ec4899, #a855f7)',
-                      boxShadow:
-                        '0 2px 8px rgba(236,72,153,0.55), 0 0 0 1.5px rgba(0,0,0,0.4)',
-                      whiteSpace: 'nowrap',
-                      letterSpacing: 0.2,
-                      pointerEvents: 'none',
-                    }}
-                  >
-                    {boostRemainingMinutes}m
-                  </span>
-                )}
               </>
             )}
 
