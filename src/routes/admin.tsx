@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, redirect, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutDashboard, Users, CreditCard, ScrollText, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Users, CreditCard, ScrollText, ArrowLeft, Flag } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -26,6 +26,7 @@ function AdminLayout() {
   const items = [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { to: "/admin/users", label: "Utilizadores", icon: Users },
+    { to: "/admin/reports", label: "Denúncias", icon: Flag },
     { to: "/admin/payments", label: "Pagamentos", icon: CreditCard },
     { to: "/admin/audit", label: "Audit log", icon: ScrollText },
   ];
