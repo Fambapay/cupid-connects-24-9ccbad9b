@@ -29,6 +29,24 @@ export type Database = {
         }
         Relationships: []
       }
+      app_config: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -353,6 +371,7 @@ export type Database = {
           interests: string[]
           is_incognito: boolean
           is_paused: boolean
+          is_seed: boolean
           is_verified: boolean
           last_active_at: string | null
           latitude: number | null
@@ -364,6 +383,7 @@ export type Database = {
           onboarding_completed: boolean
           onboarding_step: number
           phone: string | null
+          seed_active: boolean
           updated_at: string
           welcome_bonus_granted_at: string | null
         }
@@ -380,6 +400,7 @@ export type Database = {
           interests?: string[]
           is_incognito?: boolean
           is_paused?: boolean
+          is_seed?: boolean
           is_verified?: boolean
           last_active_at?: string | null
           latitude?: number | null
@@ -391,6 +412,7 @@ export type Database = {
           onboarding_completed?: boolean
           onboarding_step?: number
           phone?: string | null
+          seed_active?: boolean
           updated_at?: string
           welcome_bonus_granted_at?: string | null
         }
@@ -407,6 +429,7 @@ export type Database = {
           interests?: string[]
           is_incognito?: boolean
           is_paused?: boolean
+          is_seed?: boolean
           is_verified?: boolean
           last_active_at?: string | null
           latitude?: number | null
@@ -418,6 +441,7 @@ export type Database = {
           onboarding_completed?: boolean
           onboarding_step?: number
           phone?: string | null
+          seed_active?: boolean
           updated_at?: string
           welcome_bonus_granted_at?: string | null
         }
