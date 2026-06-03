@@ -254,12 +254,6 @@ function Landing() {
                 <Link to="/auth/register" className="ll-btn ll-btn-ghost">Criar conta grátis</Link>
               </div>
 
-              {/* Floating glass profile cards */}
-              <div className="ll-float-row" aria-hidden>
-                <FloatCard name="Andreia, 27" meta="Maputo · 2 km" tag="Novo" img="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&q=80" />
-                <FloatCard name="Tiago, 31" meta="Beira · online" tag="✓" img="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&q=80" />
-                <FloatCard name="Joana, 24" meta="Matola · hoje" tag="Match" img="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&q=80" />
-              </div>
             </div>
           </div>
         </header>
@@ -409,13 +403,3 @@ function Landing() {
   );
 }
 
-function FloatCard({ name, meta, tag, img }: { name: string; meta: string; tag: string; img: string }) {
-  return (
-    <div className="ll-float-card">
-      <span className="ll-fc-tag">{tag}</span>
-      <div className="ll-fc-avatar" style={{ backgroundImage: `url(${img})` }} />
-      <div className="ll-fc-name">{name}</div>
-      <div className="ll-fc-meta">{meta}</div>
-    </div>
-  );
-}
