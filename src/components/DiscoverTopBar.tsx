@@ -13,7 +13,6 @@ export const DiscoverTopBar = ({
   onOpenFilters,
   onBoost,
   boostActive = false,
-  boostRemainingMinutes = 0,
 }: DiscoverTopBarProps) => {
   return (
     <div
@@ -52,142 +51,125 @@ export const DiscoverTopBar = ({
           zIndex: 1,
         }}
       >
-      {/* Filters — dark glass round (36px) */}
-      <motion.button
-        onClick={() => { hapticTap(); onOpenFilters(); }}
-        className="flex-shrink-0 w-9 h-9 flex items-center justify-center text-white"
-        style={{ background: 'transparent', border: 'none' }}
-        whileTap={{ scale: 0.9 }}
-        aria-label="Filtros"
-      >
-        <SlidersHorizontal size={24} strokeWidth={1.8} color="#fff" />
-      </motion.button>
-
-      {/* Spacer */}
-      <div className="flex-1" />
-
-      {/* Boost — purple lightning */}
-      {onBoost && (
+        {/* Filters */}
         <motion.button
-          onClick={() => { hapticTap(); onBoost(); }}
-          className="relative flex-shrink-0 w-11 h-11 flex items-center justify-center"
-          style={{
-            background: 'transparent',
-            border: 'none',
-            filter: boostActive
-              ? 'drop-shadow(0 0 14px rgba(236,72,153,0.95)) drop-shadow(0 0 28px rgba(192,38,211,0.8))'
-              : 'drop-shadow(0 0 6px rgba(192,38,211,0.6))',
-          }}
-          whileTap={{ scale: 0.85 }}
-          aria-label="Boost"
+          onClick={() => { hapticTap(); onOpenFilters(); }}
+          className="flex-shrink-0 w-9 h-9 flex items-center justify-center text-white"
+          style={{ background: 'transparent', border: 'none' }}
+          whileTap={{ scale: 0.9 }}
+          aria-label="Filtros"
         >
-          <AnimatePresence>
-            {boostActive && (
-              <>
-                {/* Expanding shockwave rings */}
-                {[0, 1, 2].map((i) => (
+          <SlidersHorizontal size={24} strokeWidth={1.8} color="#fff" />
+        </motion.button>
+
+        <div className="flex-1" />
+
+        {/* Boost — premium animated lightning */}
+        {onBoost && (
+          <motion.button
+            onClick={() => { hapticTap(); onBoost(); }}
+            className="relative flex-shrink-0 flex items-center justify-center"
+            style={{
+              width: 36,
+              height: 36,
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+            }}
+            whileTap={{ scale: 0.88 }}
+            aria-label="Boost"
+          >
+            <AnimatePresence>
+              {boostActive && (
+                <>
+                  {/* Soft outer halo — slow breathe */}
                   <motion.span
-                    key={`ring-${i}`}
                     aria-hidden
-                    initial={{ scale: 0.5, opacity: 0.9 }}
-                    animate={{ scale: 2.8, opacity: 0 }}
-                    transition={{
-                      duration: 1.8,
-                      repeat: Infinity,
-                      ease: 'easeOut',
-                      delay: i * 0.6,
-                    }}
-                    className="absolute inset-0 rounded-full pointer-events-none"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0.5, 0.9, 0.5], scale: [0.95, 1.1, 0.95] }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                    className="absolute pointer-events-none"
                     style={{
-                      border: '2px solid rgba(236,72,153,0.85)',
-                      boxShadow: '0 0 12px rgba(236,72,153,0.6)',
+                      width: 56,
+                      height: 56,
+                      borderRadius: '50%',
+                      background:
+                        'radial-gradient(circle, rgba(236,72,153,0.55) 0%, rgba(168,85,247,0.3) 45%, transparent 72%)',
+                      filter: 'blur(6px)',
                     }}
                   />
-                ))}
 
-                {/* Radiating rays */}
-                {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => (
+                  {/* Single elegant shockwave ring */}
                   <motion.span
-                    key={`ray-${deg}`}
                     aria-hidden
-                    initial={{ opacity: 0.3, scaleY: 0.6 }}
-                    animate={{ opacity: [0.3, 1, 0.3], scaleY: [0.6, 1.2, 0.6] }}
+                    initial={{ scale: 0.7, opacity: 0.85 }}
+                    animate={{ scale: 1.9, opacity: 0 }}
                     transition={{
-                      duration: 1.4,
+                      duration: 2,
                       repeat: Infinity,
-                      ease: 'easeInOut',
-                      delay: i * 0.08,
+                      ease: [0.16, 1, 0.3, 1],
                     }}
                     className="absolute pointer-events-none"
                     style={{
-                      top: '50%',
-                      left: '50%',
-                      width: 2,
-                      height: 10,
-                      marginLeft: -1,
-                      marginTop: -5,
-                      background: 'linear-gradient(to top, transparent, #fff 60%, #fbbf24)',
-                      borderRadius: 2,
-                      transformOrigin: 'center 18px',
-                      transform: `rotate(${deg}deg)`,
+                      width: 36,
+                      height: 36,
+                      borderRadius: '50%',
+                      border: '1.5px solid rgba(236,72,153,0.9)',
+                      boxShadow:
+                        '0 0 16px rgba(236,72,153,0.55), inset 0 0 8px rgba(236,72,153,0.4)',
                     }}
                   />
-                ))}
 
-                {/* Soft pulsing glow halo */}
-                <motion.span
-                  aria-hidden
-                  animate={{ opacity: [0.4, 0.85, 0.4], scale: [0.9, 1.15, 0.9] }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute inset-0 rounded-full pointer-events-none"
-                  style={{
-                    background:
-                      'radial-gradient(circle, rgba(236,72,153,0.55) 0%, rgba(168,85,247,0.35) 40%, transparent 70%)',
-                    filter: 'blur(4px)',
-                  }}
-                />
-              </>
-            )}
-          </AnimatePresence>
+                  {/* Conic-gradient rotating accent ring */}
+                  <motion.span
+                    aria-hidden
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                    className="absolute pointer-events-none"
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: '50%',
+                      background:
+                        'conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.85) 40deg, rgba(236,72,153,0.9) 80deg, transparent 140deg, transparent 360deg)',
+                      WebkitMask:
+                        'radial-gradient(circle, transparent 14px, black 15px, black 17px, transparent 18px)',
+                      mask: 'radial-gradient(circle, transparent 14px, black 15px, black 17px, transparent 18px)',
+                    }}
+                  />
+                </>
+              )}
+            </AnimatePresence>
 
-          <motion.div
-            animate={
-              boostActive
-                ? { scale: [1, 1.18, 1], rotate: [0, -8, 8, 0] }
-                : { scale: 1, rotate: 0 }
-            }
-            transition={
-              boostActive
-                ? { duration: 1.2, repeat: Infinity, ease: 'easeInOut' }
-                : { duration: 0.2 }
-            }
-            style={{ position: 'relative', zIndex: 2 }}
-          >
-            <Zap
-              size={26}
-              fill={boostActive ? '#fff' : '#C026D3'}
-              stroke={boostActive ? '#fff' : 'none'}
-              strokeWidth={boostActive ? 1.5 : 0}
-            />
-          </motion.div>
-
-          {boostActive && boostRemainingMinutes > 0 && (
+            {/* Icon with subtle pulse when active */}
             <motion.div
-              initial={{ opacity: 0, y: -4, scale: 0.8 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-px rounded-full text-[9px] font-bold leading-none"
+              animate={
+                boostActive
+                  ? { scale: [1, 1.12, 1] }
+                  : { scale: 1 }
+              }
+              transition={
+                boostActive
+                  ? { duration: 1.6, repeat: Infinity, ease: 'easeInOut' }
+                  : { duration: 0.2 }
+              }
               style={{
-                background: 'linear-gradient(135deg, #ec4899, #a855f7)',
-                color: '#fff',
-                boxShadow: '0 2px 8px rgba(236,72,153,0.6)',
-                whiteSpace: 'nowrap',
+                position: 'relative',
+                zIndex: 2,
+                filter: boostActive
+                  ? 'drop-shadow(0 0 10px rgba(236,72,153,0.9)) drop-shadow(0 0 4px rgba(255,255,255,0.6))'
+                  : 'drop-shadow(0 0 6px rgba(192,38,211,0.55))',
               }}
             >
-              {boostRemainingMinutes}m
+              <Zap
+                size={26}
+                fill={boostActive ? '#fff' : '#C026D3'}
+                stroke="none"
+              />
             </motion.div>
-          )}
-        </motion.button>
-      )}
+          </motion.button>
+        )}
       </div>
     </div>
   );
