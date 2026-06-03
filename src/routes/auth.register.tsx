@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { AuthShell } from "@/components/AuthShell";
 import { cn } from "@/lib/utils";
 import { redirectIfAuthenticated } from "@/lib/authGuard";
+import { sendTransactionalEmail } from "@/lib/email/send";
 
 export const Route = createFileRoute("/auth/register")({
   ssr: false,
@@ -56,6 +57,12 @@ function RegisterPage() {
         setError(err.message);
         return;
       }
+      // Fire-and-forget welcome email; don't block navigation on failure.
+      sendTransactionalEmail({
+        templateName: "welcome",
+        recipientEmail: email,
+        idempotencyKey: `welcome-${email.toLowerCase()}`,
+      }).catch((e) => console.warn("welcome email failed", e));
       navigate({ to: "/auth/verify-email", search: { email } });
     } catch {
       setError("Sem ligação. Verifica a tua internet.");
