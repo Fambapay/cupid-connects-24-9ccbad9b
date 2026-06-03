@@ -50,7 +50,7 @@ export async function sendWebPush(
     const res = await fetch(sub.endpoint, {
       method: built.method,
       headers: built.headers as Record<string, string>,
-      body: built.body,
+      body: built.body as unknown as BodyInit,
     })
     return {
       ok: res.ok,
