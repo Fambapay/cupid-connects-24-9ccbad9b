@@ -1,14 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Heart, Instagram, Linkedin } from "lucide-react";
+import { Check, Plus, Sparkles, Crown, BadgeCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import "@/styles/landing.css";
-import { EditorialHero } from "@/components/landing/EditorialHero";
-import { ComoFunciona } from "@/components/landing/ComoFunciona";
-import { FaqSection } from "@/components/landing/FaqSection";
-import { CidadesSection } from "@/components/landing/CidadesSection";
+import "@/styles/liquid-landing.css";
 import { InstallModal } from "@/components/landing/InstallModal";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
+import { useTypewriter } from "@/hooks/useTypewriter";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -32,7 +29,12 @@ export const Route = createFileRoute("/")({
       { name: "twitter:description", content: "Comunidade verificada. Conversas em PT. Preços em MZN." },
       { name: "twitter:image", content: "https://hunie.app/og-image.jpg" },
     ],
-    links: [{ rel: "canonical", href: "https://hunie.app" }],
+    links: [
+      { rel: "canonical", href: "https://hunie.app" },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" },
+    ],
     scripts: [{
       type: "application/ld+json",
       children: JSON.stringify({
@@ -90,21 +92,85 @@ function Splash() {
   return (
     <div style={{ display: "grid", placeItems: "center", minHeight: "100dvh", background: "#07060a" }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-        <span style={{ width: 56, height: 56, borderRadius: 14, display: "grid", placeItems: "center", background: "linear-gradient(135deg,#FF4FA3,#FF7AB8)", fontSize: 28 }}>🍯</span>
-        <span style={{ color: "#fff", fontWeight: 800, fontSize: 22, letterSpacing: "-0.02em" }}>Hunie</span>
+        <span style={{ width: 56, height: 56, borderRadius: 14, display: "grid", placeItems: "center", background: "linear-gradient(135deg,#FF4FA3,#B13CFF)", fontSize: 28 }}>🍯</span>
+        <span style={{ color: "#fff", fontWeight: 700, fontSize: 22, letterSpacing: "-0.02em" }}>Hunie</span>
       </div>
     </div>
   );
 }
 
+/* ============================================================
+   New Landing — Apple liquid glass, dark, brand pink↔purple
+   ============================================================ */
+
+const TYPE_PHRASES = [
+  "em Maputo.",
+  "na Beira.",
+  "em Matola.",
+  "que vibra contigo.",
+  "à tua altura.",
+];
+
+const STEPS = [
+  { n: "01", title: "Cria o teu perfil", body: "Foto verificada, bio e o que procuras. Em menos de dois minutos estás dentro." },
+  { n: "02", title: "Descobre quem combina", body: "Algoritmo afinado para Moçambique. Sem swipes infinitos — só perfis que fazem sentido." },
+  { n: "03", title: "Conversa quando há match", body: "Mensagens diretas, áudios e fotos. Reais. Privados. Sem ruído de redes sociais." },
+];
+
+const CITIES = [
+  { name: "Maputo", count: "12.4k" },
+  { name: "Matola", count: "4.2k" },
+  { name: "Beira", count: "3.1k" },
+  { name: "Nampula", count: "1.8k" },
+  { name: "Chimoio", count: "980" },
+];
+
+const TIERS = [
+  {
+    name: "Select", price: "149", per: "MZN/mês",
+    icon: <BadgeCheck size={18} />,
+    perks: ["Comunidade verificada", "Likes diários", "Mensagens com matches", "Sem anúncios"],
+    cta: "Começar grátis",
+    featured: false,
+  },
+  {
+    name: "Plus", price: "499", per: "MZN/mês",
+    icon: <Sparkles size={18} />,
+    perks: ["Tudo do Select", "Likes ilimitados", "Vê quem te curtiu", "Modo Anónimo"],
+    cta: "Escolher Plus",
+    featured: true,
+  },
+  {
+    name: "Elite", price: "1.499", per: "MZN/mês",
+    icon: <Crown size={18} />,
+    perks: ["Tudo do Plus", "Prioridade na descoberta", "Boost semanal", "Acesso a eventos privados"],
+    cta: "Escolher Elite",
+    featured: false,
+  },
+];
+
+const QUOTES = [
+  { text: "Conheci o Mário aqui. Três meses depois ainda estamos juntos. Coisa rara, hoje em dia.", name: "Carla", meta: "Maputo · 28" },
+  { text: "Finalmente uma app feita para nós. Sem pessoas a fingir, sem perfis estranhos.", name: "Tiago", meta: "Matola · 31" },
+  { text: "Adoro que pago em MZN com M-Pesa. Tudo simples, tudo cá.", name: "Joana", meta: "Beira · 25" },
+];
+
+const FAQ = [
+  { q: "É só para Moçambique?", a: "Sim. Hunie foi pensada para Moçambique — preços em MZN, M-Pesa, perfis verificados nas principais cidades." },
+  { q: "Como funciona a verificação?", a: "Tiras uma selfie que comparamos com a tua foto de perfil. Demora menos de um minuto e recebes o ✓ verificado." },
+  { q: "Posso cancelar quando quiser?", a: "Sim. Cancelas no settings em dois toques. Mantens o acesso até ao fim do ciclo pago." },
+  { q: "Os meus dados estão seguros?", a: "Encriptação ponta-a-ponta nas conversas. Nunca vendemos dados. Nunca." },
+];
+
 function Landing() {
   const [installOpen, setInstallOpen] = useState(false);
-  const [scrollPct, setScrollPct] = useState(0);
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
   const { deferredPrompt, isStandalone } = usePWAInstall();
   const navigate = useNavigate();
-  const spotlightRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const typed = useTypewriter(TYPE_PHRASES, { typeMs: 70, deleteMs: 38, holdMs: 1900 });
 
-  // Body scroll unlock
+  // Body scroll unlock (landing page has its own scroll context)
   useEffect(() => {
     const root = document.documentElement;
     root.classList.add("landing-scroll-unlocked");
@@ -118,59 +184,16 @@ function Landing() {
     };
   }, []);
 
-  // Scroll progress
-  useEffect(() => {
-    let raf = 0;
-    let last = -1;
-    const tick = () => {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      const pct = max > 0 ? window.scrollY / max : 0;
-      const q = Math.round(pct * 200) / 200;
-      if (q !== last) { last = q; setScrollPct(q); }
-      raf = 0;
-    };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(tick); };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    tick();
-    return () => { window.removeEventListener("scroll", onScroll); if (raf) cancelAnimationFrame(raf); };
-  }, []);
-
   // Reveal observer
   useEffect(() => {
-    const els = document.querySelectorAll<HTMLElement>(".hunie-landing .reveal");
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("is-visible");
-            io.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -10% 0px" },
-    );
+    const els = rootRef.current?.querySelectorAll<HTMLElement>(".ll-reveal") ?? [];
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, []);
-
-  // Cursor spotlight
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!fine || reduced) return;
-    const el = spotlightRef.current;
-    if (!el) return;
-    let tx = -9999, ty = -9999, x = -9999, y = -9999, raf = 0;
-    const onMove = (e: MouseEvent) => { tx = e.clientX - 180; ty = e.clientY - 180; if (!raf) raf = requestAnimationFrame(tick); };
-    const tick = () => {
-      x += (tx - x) * 0.18; y += (ty - y) * 0.18;
-      el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      if (Math.abs(tx - x) > 0.5 || Math.abs(ty - y) > 0.5) raf = requestAnimationFrame(tick);
-      else raf = 0;
-    };
-    window.addEventListener("mousemove", onMove);
-    return () => { window.removeEventListener("mousemove", onMove); if (raf) cancelAnimationFrame(raf); };
   }, []);
 
   const handleInstallClick = () => {
@@ -179,124 +202,219 @@ function Landing() {
   };
 
   return (
-    <div className="hunie-landing">
-      <div className="scroll-progress" aria-hidden>
-        <div style={{ transform: `scaleX(${scrollPct})` }} />
+    <div className="ll-root" ref={rootRef}>
+      {/* Ambient */}
+      <div className="ll-ambient" aria-hidden>
+        <div className="ll-orb ll-orb-1" />
+        <div className="ll-orb ll-orb-2" />
+        <div className="ll-orb ll-orb-3" />
+        <div className="ll-grain" />
       </div>
-      <div className="cursor-spotlight" ref={spotlightRef} aria-hidden />
 
-      <nav className="hl-nav" aria-label="Navegação principal">
-        <div className="hl-container hl-nav-inner">
-          <Link to="/" className="hl-logo">
-            <span className="hl-logo-bee" aria-hidden>🍯</span>
-            <span>Hunie</span>
-          </Link>
-          <div className="hl-nav-links">
-            <a className="hl-nav-link" href="#como-funciona">Como funciona</a>
-            <a className="hl-nav-link" href="#faq">FAQ</a>
-            <a className="hl-nav-link" href="#cidades">Cidades</a>
-            <Link to="/auth/login" className="hl-nav-link">Entrar</Link>
-            <Link to="/auth/register" className="hl-btn-primary">Criar conta</Link>
+      <div className="ll-shell">
+        {/* Nav */}
+        <nav className="ll-nav" aria-label="Navegação principal">
+          <div className="ll-nav-inner">
+            <Link to="/" className="ll-logo">
+              <span className="ll-logo-dot" aria-hidden />
+              <span>Hunie</span>
+            </Link>
+            <div className="ll-nav-links">
+              <a className="ll-nav-link" href="#como-funciona">Como funciona</a>
+              <a className="ll-nav-link" href="#planos">Planos</a>
+              <a className="ll-nav-link" href="#cidades">Cidades</a>
+              <a className="ll-nav-link" href="#faq">FAQ</a>
+              <Link to="/auth/login" className="ll-nav-link">Entrar</Link>
+            </div>
+            <Link to="/auth/register" className="ll-btn ll-btn-primary" style={{ height: 38, padding: "0 18px", fontSize: 13.5 }}>
+              Criar conta
+            </Link>
           </div>
-          <Link to="/auth/register" className="hl-btn-primary hl-nav-mobile-cta" style={{ padding: "10px 18px", fontSize: 13 }}>
-            Criar conta
-          </Link>
-        </div>
-      </nav>
+        </nav>
 
-      <main>
-        <EditorialHero onOpenInstall={handleInstallClick} />
-        <ComoFunciona />
-        <FaqSection />
-        <CidadesSection />
+        {/* Hero */}
+        <header className="ll-hero">
+          <div className="ll-container">
+            <div className="ll-hero-inner">
+              <span className="ll-eyebrow ll-reveal">🇲🇿 Feito em Moçambique</span>
+              <h1 className="ll-h1 ll-reveal">
+                Encontra alguém
+                <br />
+                <span className="ll-tw-line">
+                  {typed}
+                  <span className="ll-caret" aria-hidden />
+                </span>
+              </h1>
+              <p className="ll-lead ll-reveal">
+                Hunie é a comunidade de encontros <span className="ll-italic">membership-only</span> de Moçambique. Perfis verificados, conversas em português, preços em MZN.
+              </p>
+              <div className="ll-hero-cta ll-reveal">
+                <button onClick={handleInstallClick} className="ll-btn ll-btn-primary">Instalar app</button>
+                <Link to="/auth/register" className="ll-btn ll-btn-ghost">Criar conta grátis</Link>
+              </div>
 
-        <section className="hl-section" style={{ paddingTop: 0 }}>
-          <div className="hl-container">
-            <div className="hl-final-card glass reveal">
-              <span className="hl-eyebrow">Conexões que ficam</span>
-              <h2 className="hl-h2" style={{ marginTop: 14 }}>
+              {/* Floating glass profile cards */}
+              <div className="ll-float-row" aria-hidden>
+                <FloatCard name="Andreia, 27" meta="Maputo · 2 km" tag="Novo" img="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&q=80" />
+                <FloatCard name="Tiago, 31" meta="Beira · online" tag="✓" img="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&q=80" />
+                <FloatCard name="Joana, 24" meta="Matola · hoje" tag="Match" img="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&q=80" />
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Como funciona */}
+        <section id="como-funciona" className="ll-section">
+          <div className="ll-container ll-section-center">
+            <span className="ll-eyebrow ll-reveal">Como funciona</span>
+            <h2 className="ll-h2 ll-reveal">Três passos. Zero <span className="ll-italic ll-grad-text">complicação.</span></h2>
+            <div className="ll-grid-3">
+              {STEPS.map((s) => (
+                <div key={s.n} className="ll-card ll-reveal" style={{ textAlign: "left" }}>
+                  <div className="ll-step-num">{s.n}</div>
+                  <div className="ll-step-title">{s.title}</div>
+                  <div className="ll-step-body">{s.body}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Tiers / Planos */}
+        <section id="planos" className="ll-section">
+          <div className="ll-container ll-section-center">
+            <span className="ll-eyebrow ll-reveal">Planos</span>
+            <h2 className="ll-h2 ll-reveal">Escolhe o teu <span className="ll-italic ll-grad-text">ritmo.</span></h2>
+            <p className="ll-lead ll-reveal">Sem letra pequena. Cancelas quando quiseres. Pagas em MZN com M-Pesa ou cartão.</p>
+            <div className="ll-tiers">
+              {TIERS.map((t) => (
+                <div key={t.name} className={`ll-card ll-tier ll-reveal ${t.featured ? "ll-tier-featured" : ""}`} style={{ textAlign: "left" }}>
+                  {t.featured && <span className="ll-tier-badge">POPULAR</span>}
+                  <div className="ll-tier-name" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    {t.icon} {t.name}
+                  </div>
+                  <div className="ll-tier-price">{t.price}<small>{t.per}</small></div>
+                  <ul className="ll-tier-list">
+                    {t.perks.map((p) => (
+                      <li key={p}><Check size={16} strokeWidth={2.5} /> <span>{p}</span></li>
+                    ))}
+                  </ul>
+                  <Link to="/auth/register" className={`ll-btn ${t.featured ? "ll-btn-primary" : "ll-btn-ghost"} ll-tier-cta`}>{t.cta}</Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Cities */}
+        <section id="cidades" className="ll-section">
+          <div className="ll-container ll-section-center">
+            <span className="ll-eyebrow ll-reveal">Onde estamos</span>
+            <h2 className="ll-h2 ll-reveal">Comunidade ativa em <span className="ll-italic ll-grad-text">cinco cidades.</span></h2>
+            <div className="ll-cities">
+              {CITIES.map((c) => (
+                <div key={c.name} className="ll-city ll-reveal">
+                  <div className="ll-city-name">{c.name}</div>
+                  <div className="ll-city-count">{c.count} pessoas</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials */}
+        <section className="ll-section">
+          <div className="ll-container ll-section-center">
+            <span className="ll-eyebrow ll-reveal">Histórias reais</span>
+            <h2 className="ll-h2 ll-reveal">Quem já <span className="ll-italic ll-grad-text">encontrou.</span></h2>
+            <div className="ll-quotes">
+              {QUOTES.map((q) => (
+                <div key={q.name} className="ll-card ll-quote ll-reveal" style={{ textAlign: "left" }}>
+                  <p>"{q.text}"</p>
+                  <div className="ll-quote-who">
+                    <div className="ll-quote-avatar" />
+                    <div>
+                      <div className="ll-quote-name">{q.name}</div>
+                      <div className="ll-quote-meta">{q.meta}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section id="faq" className="ll-section">
+          <div className="ll-container ll-section-center">
+            <span className="ll-eyebrow ll-reveal">FAQ</span>
+            <h2 className="ll-h2 ll-reveal">Perguntas <span className="ll-italic ll-grad-text">honestas.</span></h2>
+            <div className="ll-faq">
+              {FAQ.map((f, i) => (
+                <div key={f.q} className="ll-faq-item ll-reveal" data-open={openFaq === i}>
+                  <button className="ll-faq-q" onClick={() => setOpenFaq(openFaq === i ? null : i)} aria-expanded={openFaq === i}>
+                    <span>{f.q}</span>
+                    <Plus size={20} />
+                  </button>
+                  <div className="ll-faq-a">{f.a}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="ll-section" style={{ paddingTop: 0 }}>
+          <div className="ll-container">
+            <div className="ll-card ll-final ll-reveal">
+              <span className="ll-eyebrow">Pronto?</span>
+              <h2 className="ll-h2" style={{ marginTop: 18 }}>
                 Conhece alguém novo
                 <br />
-                em <span className="hl-italic hl-coral-grad">Maputo esta semana.</span>
+                <span className="ll-italic ll-grad-text">esta semana.</span>
               </h2>
-              <p className="hl-section-sub" style={{ margin: "20px auto 32px", maxWidth: 520 }}>
-                Junta-te à comunidade de solteiros em Moçambique. Acesso desde 149 MZN/mês.
-              </p>
-              <div style={{ display: "inline-flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-                <button onClick={handleInstallClick} className="hl-btn-primary">Instalar app</button>
-                <Link to="/auth/register" className="hl-btn-ghost">Criar conta</Link>
+              <p className="ll-lead">Junta-te aos solteiros de Moçambique. Acesso desde 149 MZN/mês.</p>
+              <div className="ll-hero-cta" style={{ marginTop: 28 }}>
+                <button onClick={handleInstallClick} className="ll-btn ll-btn-primary">Instalar app</button>
+                <Link to="/auth/register" className="ll-btn ll-btn-ghost">Criar conta</Link>
               </div>
             </div>
           </div>
         </section>
-      </main>
 
-      <Footer />
-
-      {scrollPct > 0.18 && (
-        <div className="hl-sticky-cta">
-          <button className="glass-brand-pill" onClick={handleInstallClick}>
-            Instalar app
-          </button>
-        </div>
-      )}
+        {/* Footer */}
+        <footer className="ll-footer">
+          <div className="ll-container">
+            <div className="ll-footer-inner">
+              <Link to="/" className="ll-logo" style={{ fontSize: 16 }}>
+                <span className="ll-logo-dot" aria-hidden />
+                <span>Hunie</span>
+              </Link>
+              <div className="ll-footer-links">
+                <a href="#como-funciona">Como funciona</a>
+                <a href="#planos">Planos</a>
+                <a href="#faq">FAQ</a>
+                <Link to="/auth/login">Entrar</Link>
+                <a href="mailto:ola@hunie.app">Contacto</a>
+              </div>
+              <span>© 2026 Hunie · Made in MZ</span>
+            </div>
+          </div>
+        </footer>
+      </div>
 
       <InstallModal open={installOpen} onClose={() => setInstallOpen(false)} deferredPrompt={deferredPrompt} />
     </div>
   );
 }
 
-function Footer() {
+function FloatCard({ name, meta, tag, img }: { name: string; meta: string; tag: string; img: string }) {
   return (
-    <footer className="hl-container">
-      <div className="hl-footer glass">
-        <div className="hl-footer-grid">
-          <div>
-            <Link to="/" className="hl-logo" style={{ fontSize: 20 }}>
-              <span className="hl-logo-bee" aria-hidden>🍯</span>
-              <span>Hunie</span>
-            </Link>
-            <p style={{ marginTop: 14, color: "rgba(255,255,255,0.6)", fontSize: 14, maxWidth: 320 }}>
-              Conexões reais, da tua terra. Feito para Moçambique, em Moçambique.
-            </p>
-            <span className="hl-made-pill">
-              <Heart size={12} fill="#FF7AB8" stroke="#FF7AB8" /> Made with love in NL &amp; MZ
-            </span>
-          </div>
-
-          <div>
-            <h4>App</h4>
-            <ul>
-              <li><a href="#como-funciona">Como funciona</a></li>
-              <li><a href="#faq">FAQ</a></li>
-              <li><a href="#cidades">Cidades</a></li>
-              <li><Link to="/auth/login">Entrar</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4>Legal &amp; contacto</h4>
-            <ul>
-              <li><a href="#">Termos</a></li>
-              <li><a href="#">Privacidade</a></li>
-              <li><a href="#">Cookies</a></li>
-              <li><a href="#">Diretrizes</a></li>
-              <li><a href="mailto:ola@hunie.app">Contacto</a></li>
-            </ul>
-            <div className="hl-socials">
-              <a href="#" aria-label="Instagram"><Instagram size={16} /></a>
-              <a href="#" aria-label="TikTok"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82A4.28 4.28 0 0115.54 3h-3.09v12.4a2.59 2.59 0 11-2.59-2.59c.27 0 .53.04.78.12V9.79a5.7 5.7 0 00-.78-.05A5.69 5.69 0 1015.55 15.4V9.01a7.34 7.34 0 004.29 1.38V7.3a4.28 4.28 0 01-3.24-1.48z"/></svg></a>
-              <a href="#" aria-label="X"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
-              <a href="#" aria-label="LinkedIn"><Linkedin size={16} /></a>
-            </div>
-          </div>
-        </div>
-
-        <div className="hl-copyright">
-          <span>© 2026 Hunie. Todos os direitos reservados.</span>
-          <span>🌐 PT</span>
-        </div>
-      </div>
-    </footer>
+    <div className="ll-float-card">
+      <span className="ll-fc-tag">{tag}</span>
+      <div className="ll-fc-avatar" style={{ backgroundImage: `url(${img})` }} />
+      <div className="ll-fc-name">{name}</div>
+      <div className="ll-fc-meta">{meta}</div>
+    </div>
   );
 }
