@@ -57,6 +57,10 @@ export async function signPhotos(
       results[i] = "";
       return;
     }
+    if (isExternalUrl(p)) {
+      results[i] = p;
+      return;
+    }
     const hit = cache.get(cacheKey(p, transform));
     if (hit && hit.expiresAt > Date.now() + 60_000) {
       results[i] = hit.url;
