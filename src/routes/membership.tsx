@@ -88,15 +88,20 @@ function MembershipPage() {
       />
 
       <header className="sticky top-0 z-30 flex items-center gap-2 px-4 pt-[max(env(safe-area-inset-top),12px)] pb-3 backdrop-blur-md">
-        <button
-          onClick={() => navigate({ to: "/profile" })}
-          className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.06] active:scale-95 transition"
-          aria-label="Voltar"
-        >
-          <ArrowLeft size={18} />
-        </button>
-        <h1 className="text-base font-extrabold">Hunie Membership</h1>
+        {!isGated && (
+          <button
+            onClick={() => navigate({ to: "/profile" })}
+            className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.06] active:scale-95 transition"
+            aria-label="Voltar"
+          >
+            <ArrowLeft size={18} />
+          </button>
+        )}
+        <h1 className="text-base font-extrabold">
+          {isGated ? "Escolhe o teu plano" : "Hunie Membership"}
+        </h1>
       </header>
+
 
       <div className="px-5 pb-40">
         {/* Hero with mental triggers */}
