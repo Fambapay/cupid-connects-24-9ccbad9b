@@ -108,6 +108,7 @@ function ChatList() {
                 photo={m.photo}
                 lastMessage={m.lastMessage}
                 lastMessageAt={formatTime(m.lastMessageAt)}
+                unread={m.unread}
               />
             ))}
           </ul>

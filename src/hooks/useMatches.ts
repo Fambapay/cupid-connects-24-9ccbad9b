@@ -53,7 +53,8 @@ export function useMatches() {
 
     const otherIds = list.map((m) => (m.user_a === user.id ? m.user_b : m.user_a) as string);
 
-    const [{ data: profiles }, { data: photos }, { data: lastMsgs }] = await Promise.all([
+    const matchIds = list.map((m) => m.id as string);
+    const [{ data: profiles }, { data: photos }, { data: lastMsgs }, { data: reads }, { data: unreadMsgs }] = await Promise.all([
       supabase.from("profiles").select("id,name").in("id", otherIds),
       supabase
         .from("profile_photos")
@@ -63,11 +64,18 @@ export function useMatches() {
       supabase
         .from("messages")
         .select("match_id,content,created_at,sender_id")
-        .in(
-          "match_id",
-          list.map((m) => m.id as string),
-        )
+        .in("match_id", matchIds)
         .order("created_at", { ascending: false }),
+      supabase
+        .from("match_reads")
+        .select("match_id,last_read_at")
+        .eq("user_id", user.id)
+        .in("match_id", matchIds),
+      supabase
+        .from("messages")
+        .select("match_id,created_at,sender_id")
+        .in("match_id", matchIds)
+        .neq("sender_id", user.id),
     ]);
 
     const firstPhotoByProfile: Record<string, string> = {};
@@ -91,6 +99,19 @@ export function useMatches() {
       }
     });
 
+    const readByMatch: Record<string, string> = {};
+    (reads ?? []).forEach((r) => (readByMatch[r.match_id as string] = r.last_read_at as string));
+
+    const unreadByMatch: Record<string, number> = {};
+    (unreadMsgs ?? []).forEach((m) => {
+      const mid = m.match_id as string;
+      const readAt = readByMatch[mid];
+      if (!readAt || new Date(m.created_at as string) > new Date(readAt)) {
+        unreadByMatch[mid] = (unreadByMatch[mid] ?? 0) + 1;
+      }
+    });
+
+
     setMatches(
       list.map((m) => {
         const otherId = (m.user_a === user.id ? m.user_b : m.user_a) as string;
@@ -103,7 +124,7 @@ export function useMatches() {
           photo: path ? signedByPath[path] : "",
           lastMessage: last?.content ?? null,
           lastMessageAt: last?.at ?? (m.last_message_at as string),
-          unread: 0,
+          unread: unreadByMatch[m.id as string] ?? 0,
           hasMessages: !!last,
         };
       }),

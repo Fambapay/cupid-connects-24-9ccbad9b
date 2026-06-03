@@ -46,6 +46,7 @@ interface Props {
   photo: string;
   lastMessage: string | null;
   lastMessageAt: string;
+  unread?: number;
   onActionTaken?: () => void;
 }
 
@@ -56,6 +57,7 @@ export function SwipeableConversationItem({
   photo,
   lastMessage,
   lastMessageAt,
+  unread = 0,
   onActionTaken,
 }: Props) {
   const x = useMotionValue(0);
@@ -193,12 +195,21 @@ export function SwipeableConversationItem({
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline justify-between gap-2">
-              <span className="truncate font-semibold">{name}</span>
-              <span className="text-xs text-muted-foreground">{lastMessageAt}</span>
+              <span className={`truncate ${unread > 0 ? "font-bold" : "font-semibold"}`}>{name}</span>
+              <span className={`text-xs ${unread > 0 ? "font-semibold text-flame" : "text-muted-foreground"}`}>
+                {lastMessageAt}
+              </span>
             </div>
-            <p className="truncate text-sm text-muted-foreground">
-              {lastMessage ?? "Diz olá 👋"}
-            </p>
+            <div className="flex items-center justify-between gap-2">
+              <p className={`truncate text-sm ${unread > 0 ? "font-medium text-foreground" : "text-muted-foreground"}`}>
+                {lastMessage ?? "Diz olá 👋"}
+              </p>
+              {unread > 0 && (
+                <span className="ml-2 inline-flex h-5 min-w-[20px] shrink-0 items-center justify-center rounded-full bg-gradient-flame px-1.5 text-[11px] font-bold text-flame-foreground shadow-sm">
+                  {unread > 99 ? "99+" : unread}
+                </span>
+              )}
+            </div>
           </div>
         </Link>
       </motion.div>
