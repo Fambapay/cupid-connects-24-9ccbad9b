@@ -7,17 +7,19 @@ export interface Credits {
   super_like_balance: number;
 }
 
+const EMPTY_CREDITS: Credits = {
+  boost_balance: 0,
+  super_like_balance: 0,
+};
+
 export function useCredits() {
   const { user } = useAuth();
-  const [credits, setCredits] = useState<Credits>({
-    boost_balance: 0,
-    super_like_balance: 0,
-  });
+  const [credits, setCredits] = useState<Credits>(EMPTY_CREDITS);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     if (!user) {
-      setCredits({ boost_balance: 0, super_like_balance: 0 });
+      setCredits(EMPTY_CREDITS);
       setLoading(false);
       return;
     }
@@ -26,12 +28,28 @@ export function useCredits() {
       .select("boost_balance, super_like_balance")
       .eq("user_id", user.id)
       .maybeSingle();
-    if (data) setCredits(data as Credits);
+    setCredits(data ? (data as Credits) : EMPTY_CREDITS);
     setLoading(false);
   }, [user]);
 
   useEffect(() => {
     load();
+  }, [load]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const reload = () => load();
+    const reloadWhenVisible = () => {
+      if (document.visibilityState === "visible") load();
+    };
+    window.addEventListener("hunie:credits-changed", reload);
+    window.addEventListener("focus", reload);
+    document.addEventListener("visibilitychange", reloadWhenVisible);
+    return () => {
+      window.removeEventListener("hunie:credits-changed", reload);
+      window.removeEventListener("focus", reload);
+      document.removeEventListener("visibilitychange", reloadWhenVisible);
+    };
   }, [load]);
 
   useEffect(() => {
@@ -60,5 +78,12 @@ export function useCredits() {
     };
   }, [user]);
 
-  return { credits, loading, reload: load };
+  const syncCredits = useCallback((next: Partial<Credits>) => {
+    setCredits((current) => ({
+      boost_balance: next.boost_balance ?? current.boost_balance,
+      super_like_balance: next.super_like_balance ?? current.super_like_balance,
+    }));
+  }, []);
+
+  return { credits, loading, reload: load, syncCredits };
 }
