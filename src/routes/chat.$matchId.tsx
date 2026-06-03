@@ -12,7 +12,7 @@ import { getActivityStatus } from "@/lib/activityStatus";
 
 import { requireMembership } from "@/lib/authGuard";
 
-const QUICK_EMOJIS = ["❤️", "😂", "😍", "🔥", "😘", "👀", "🙈", "😉", "🥰", "💋", "✨", "👋"];
+
 
 export const Route = createFileRoute("/chat/$matchId")({
   ssr: false,
