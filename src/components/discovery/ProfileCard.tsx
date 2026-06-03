@@ -255,7 +255,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       if (dy < -160 && Math.abs(dx) < 100) flyOut("up");
       else if (dx > swipeX) flyOut("right");
       else if (dx < -swipeX) flyOut("left");
-      else animateTo(0, 0, 240);
+      else animateTo(0, 0);
     };
 
     const onClickPhoto = (e: React.MouseEvent) => {
