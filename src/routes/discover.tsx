@@ -17,11 +17,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import type { Profile, SwipeDirection } from "@/types/dating";
 
-import { requireAuthAndOnboarding } from "@/lib/authGuard";
+import { requireMembership } from "@/lib/authGuard";
 
 export const Route = createFileRoute("/discover")({
   ssr: false,
-  beforeLoad: requireAuthAndOnboarding,
+  beforeLoad: requireMembership,
   head: () => ({
     meta: [
       { title: "Hunie — Descobrir" },

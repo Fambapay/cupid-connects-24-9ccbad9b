@@ -2,14 +2,19 @@ import { redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
 // ─── In-memory cache to avoid re-fetching on every navigation ──────────────
-// getUser() hits the network every call; getSession() reads from storage.
-// We also cache the onboarding flag per user, invalidated on auth changes.
 
-let onboardingCache: { userId: string; completed: boolean; step: number | null } | null = null;
+interface ProfileGate {
+  userId: string;
+  completed: boolean;
+  step: number | null;
+  membershipActive: boolean;
+}
+
+let profileCache: ProfileGate | null = null;
 
 supabase.auth.onAuthStateChange((_event, session) => {
-  if (!session || onboardingCache?.userId !== session.user.id) {
-    onboardingCache = null;
+  if (!session || profileCache?.userId !== session.user.id) {
+    profileCache = null;
   }
 });
 
@@ -18,52 +23,70 @@ async function getCurrentUser() {
   return data.session?.user ?? null;
 }
 
-async function getOnboarding(userId: string) {
-  if (onboardingCache?.userId === userId) return onboardingCache;
+async function getProfileGate(userId: string): Promise<ProfileGate> {
+  if (profileCache?.userId === userId) return profileCache;
   const { data: profile } = await supabase
     .from("profiles")
-    .select("onboarding_completed, onboarding_step")
+    .select("onboarding_completed, onboarding_step, membership_status, membership_expires_at")
     .eq("id", userId)
     .maybeSingle();
-  onboardingCache = {
+  const status = (profile as { membership_status?: string } | null)?.membership_status ?? "inactive";
+  const exp = (profile as { membership_expires_at?: string | null } | null)?.membership_expires_at;
+  const membershipActive =
+    status === "active" && (!exp || new Date(exp).getTime() > Date.now());
+  profileCache = {
     userId,
     completed: !!profile?.onboarding_completed,
     step: profile?.onboarding_step ?? null,
+    membershipActive,
   };
-  return onboardingCache;
+  return profileCache;
 }
 
-/** Call after onboarding completes to refresh the cached flag. */
+/** Call after onboarding or membership state changes to refresh the cached flag. */
 export function invalidateOnboardingCache() {
-  onboardingCache = null;
+  profileCache = null;
 }
 
-/** Protected routes: must be signed in AND have completed onboarding. */
+/** Auth + onboarding only — used by /membership, /profile, /settings. */
 export async function requireAuthAndOnboarding() {
   const user = await getCurrentUser();
   if (!user) throw redirect({ to: "/" });
   if (!user.email_confirmed_at) throw redirect({ to: "/auth/verify-email" });
 
-  const ob = await getOnboarding(user.id);
-  if (!ob.completed) {
+  const gate = await getProfileGate(user.id);
+  if (!gate.completed) {
     throw redirect({
       to: "/onboarding",
-      search: { step: ob.step ?? 1 },
+      search: { step: gate.step ?? 1 },
     });
   }
   return { user };
 }
 
-/** Public auth pages: if already signed in + complete, go to /discover. */
+/** Strict: auth + onboarding + active paid membership. Used by /discover, /chat, /matches, /shop. */
+export async function requireMembership() {
+  const { user } = await requireAuthAndOnboarding();
+  const gate = await getProfileGate(user.id);
+  if (!gate.membershipActive) {
+    throw redirect({ to: "/membership", search: { required: 1 } });
+  }
+  return { user };
+}
+
+/** Public auth pages: if already signed in + complete, route forward. */
 export async function redirectIfAuthenticated() {
   const user = await getCurrentUser();
   if (!user || !user.email_confirmed_at) return;
-  const ob = await getOnboarding(user.id);
-  if (ob.completed) {
-    throw redirect({ to: "/discover" });
+  const gate = await getProfileGate(user.id);
+  if (!gate.completed) {
+    throw redirect({
+      to: "/onboarding",
+      search: { step: gate.step ?? 1 },
+    });
   }
-  throw redirect({
-    to: "/onboarding",
-    search: { step: ob.step ?? 1 },
-  });
+  if (!gate.membershipActive) {
+    throw redirect({ to: "/membership", search: { required: 1 } });
+  }
+  throw redirect({ to: "/discover" });
 }

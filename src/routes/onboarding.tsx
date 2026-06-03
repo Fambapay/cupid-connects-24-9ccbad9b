@@ -53,11 +53,20 @@ export const Route = createFileRoute("/onboarding")({
     }
     const { data: p } = await supabase
       .from("profiles")
-      .select("onboarding_completed")
+      .select("onboarding_completed, membership_status, membership_expires_at")
       .eq("id", data.user.id)
       .maybeSingle();
-    if (p?.onboarding_completed) throw redirect({ to: "/discover" });
+    if (p?.onboarding_completed) {
+      const status = (p as { membership_status?: string }).membership_status ?? "inactive";
+      const exp = (p as { membership_expires_at?: string | null }).membership_expires_at;
+      const active = status === "active" && (!exp || new Date(exp).getTime() > Date.now());
+      throw redirect({
+        to: active ? "/discover" : "/membership",
+        search: active ? undefined : { required: 1 },
+      });
+    }
   },
+
   component: OnboardingPage,
 });
 
@@ -308,7 +317,7 @@ function OnboardingPage() {
     const { invalidateOnboardingCache } = await import("@/lib/authGuard");
     invalidateOnboardingCache();
     await reload();
-    navigate({ to: "/discover" });
+    navigate({ to: "/membership", search: { required: 1 } });
   }, [draft, user, navigate, reload, toast]);
 
   const showProgress = stepId !== "welcome" && !done;

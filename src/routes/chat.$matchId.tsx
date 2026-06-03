@@ -9,13 +9,13 @@ import { TypingDots } from "@/components/chat/TypingDots";
 import { ChatActionsMenu } from "@/components/chat/ChatActionsMenu";
 import { getActivityStatus } from "@/lib/activityStatus";
 
-import { requireAuthAndOnboarding } from "@/lib/authGuard";
+import { requireMembership } from "@/lib/authGuard";
 
 const QUICK_EMOJIS = ["❤️", "😂", "😍", "🔥", "😘", "👀", "🙈", "😉", "🥰", "💋", "✨", "👋"];
 
 export const Route = createFileRoute("/chat/$matchId")({
   ssr: false,
-  beforeLoad: requireAuthAndOnboarding,
+  beforeLoad: requireMembership,
   component: ChatRoom,
 });
 
