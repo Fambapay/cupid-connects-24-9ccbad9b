@@ -34,11 +34,25 @@ export function useUnreadChats() {
     ]);
     const readBy: Record<string, string> = {};
     (reads ?? []).forEach((r) => (readBy[r.match_id as string] = r.last_read_at as string));
+
+    // Backfill missing reads so legacy conversations don't show as unread.
+    const missing = matchIds.filter((id) => !readBy[id]);
+    if (missing.length) {
+      const nowIso = new Date().toISOString();
+      await supabase
+        .from("match_reads")
+        .upsert(
+          missing.map((mid) => ({ match_id: mid, user_id: user.id, last_read_at: nowIso })),
+          { onConflict: "match_id,user_id" },
+        );
+      missing.forEach((mid) => (readBy[mid] = nowIso));
+    }
+
     const unreadMatches = new Set<string>();
     (msgs ?? []).forEach((m) => {
       const mid = m.match_id as string;
       const r = readBy[mid];
-      if (!r || new Date(m.created_at as string) > new Date(r)) {
+      if (r && new Date(m.created_at as string) > new Date(r)) {
         unreadMatches.add(mid);
       }
     });

@@ -102,11 +102,25 @@ export function useMatches() {
     const readByMatch: Record<string, string> = {};
     (reads ?? []).forEach((r) => (readByMatch[r.match_id as string] = r.last_read_at as string));
 
+    // Backfill: for matches without a read record, seed one now so old
+    // conversations don't show as unread retroactively.
+    const missingReads = matchIds.filter((id) => !readByMatch[id]);
+    if (missingReads.length) {
+      const nowIso = new Date().toISOString();
+      await supabase
+        .from("match_reads")
+        .upsert(
+          missingReads.map((mid) => ({ match_id: mid, user_id: user.id, last_read_at: nowIso })),
+          { onConflict: "match_id,user_id" },
+        );
+      missingReads.forEach((mid) => (readByMatch[mid] = nowIso));
+    }
+
     const unreadByMatch: Record<string, number> = {};
     (unreadMsgs ?? []).forEach((m) => {
       const mid = m.match_id as string;
       const readAt = readByMatch[mid];
-      if (!readAt || new Date(m.created_at as string) > new Date(readAt)) {
+      if (readAt && new Date(m.created_at as string) > new Date(readAt)) {
         unreadByMatch[mid] = (unreadByMatch[mid] ?? 0) + 1;
       }
     });
