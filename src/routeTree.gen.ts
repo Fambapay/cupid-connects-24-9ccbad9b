@@ -29,6 +29,7 @@ import { Route as AuthRegisterRouteImport } from './routes/auth.register'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminSeedsRouteImport } from './routes/admin.seeds'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
@@ -135,6 +136,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSeedsRoute = AdminSeedsRouteImport.update({
+  id: '/seeds',
+  path: '/seeds',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/seeds': typeof AdminSeedsRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/seeds': typeof AdminSeedsRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -238,6 +246,7 @@ export interface FileRoutesById {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/seeds': typeof AdminSeedsRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -267,6 +276,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/payments'
     | '/admin/reports'
+    | '/admin/seeds'
     | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -293,6 +303,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/payments'
     | '/admin/reports'
+    | '/admin/seeds'
     | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -321,6 +332,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/payments'
     | '/admin/reports'
+    | '/admin/seeds'
     | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -491,6 +503,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/seeds': {
+      id: '/admin/seeds'
+      path: '/seeds'
+      fullPath: '/admin/seeds'
+      preLoaderRoute: typeof AdminSeedsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/reports': {
       id: '/admin/reports'
       path: '/reports'
@@ -564,6 +583,7 @@ interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminReportsRoute: typeof AdminReportsRoute
+  AdminSeedsRoute: typeof AdminSeedsRoute
   AdminUsersRoute: typeof AdminUsersRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -572,6 +592,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminReportsRoute: AdminReportsRoute,
+  AdminSeedsRoute: AdminSeedsRoute,
   AdminUsersRoute: AdminUsersRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
 }

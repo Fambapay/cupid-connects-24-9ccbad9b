@@ -115,10 +115,11 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     let q = supabase
       .from("profiles")
       .select(
-        "id,name,age,birthdate,city,country,bio,interests,is_verified,gender,latitude,longitude,last_active_at",
+        "id,name,age,birthdate,city,country,bio,interests,is_verified,gender,latitude,longitude,last_active_at,is_seed",
       )
       .eq("onboarding_completed", true)
       .eq("is_paused", false)
+      .order("is_seed", { ascending: true }) // real users first, seeds fill the rest
       .limit(100);
 
     // Gender: explicit filter overrides profile preference.

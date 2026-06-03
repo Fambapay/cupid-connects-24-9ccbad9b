@@ -18,12 +18,17 @@ function cacheKey(path: string, t?: TransformOpts) {
   return `${path}|${t.width ?? ""}x${t.height ?? ""}|${t.resize ?? ""}|${t.quality ?? ""}`;
 }
 
+function isExternalUrl(p: string): boolean {
+  return p.startsWith("http://") || p.startsWith("https://");
+}
+
 export async function signPhoto(
   path: string,
   expires = 3600,
   transform?: TransformOpts,
 ): Promise<string> {
   if (!path) return "";
+  if (isExternalUrl(path)) return path;
   const key = cacheKey(path, transform);
   const hit = cache.get(key);
   if (hit && hit.expiresAt > Date.now() + 60_000) return hit.url;
@@ -50,6 +55,10 @@ export async function signPhotos(
   paths.forEach((p, i) => {
     if (!p) {
       results[i] = "";
+      return;
+    }
+    if (isExternalUrl(p)) {
+      results[i] = p;
       return;
     }
     const hit = cache.get(cacheKey(p, transform));
