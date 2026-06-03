@@ -61,14 +61,13 @@ export function SwipeableConversationItem({
   const x = useMotionValue(0);
   const bgOpacity = useTransform(x, [-ACTION_WIDTH, 0], [1, 0]);
   const [open, setOpen] = useState(false);
-  const [confirmKind, setConfirmKind] = useState<"unmatch" | "block" | null>(null);
+  const [confirmKind, setConfirmKind] = useState<"unmatch" | null>(null);
   const [reportOpen, setReportOpen] = useState(false);
   const [reason, setReason] = useState<ReportReason>("fake_profile");
   const [details, setDetails] = useState("");
   const [busy, setBusy] = useState(false);
   const containerRef = useRef<HTMLLIElement>(null);
   const unmatchFn = useServerFn(unmatchUser);
-  const blockFn = useServerFn(blockUser);
   const reportFn = useServerFn(reportUser);
 
   const snapOpen = useCallback(() => {
