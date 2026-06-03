@@ -115,6 +115,7 @@ export function DebitoCheckoutSheet({
       setReference(res.reference ?? null);
       if (res.status === "success") {
         setStage("success");
+        window.dispatchEvent(new CustomEvent("hunie:credits-changed"));
         onSuccess?.();
         toast.success("Pagamento confirmado");
       } else if (res.checkout_url) {
