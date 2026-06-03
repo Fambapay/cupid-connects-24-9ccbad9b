@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, createElement } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { toast } from "sonner";
@@ -75,7 +75,7 @@ export function useBoost(onInsufficient?: () => void) {
         remainingMinutes: Math.ceil((exp.getTime() - Date.now()) / 60_000),
       });
       window.dispatchEvent(new CustomEvent("hunie:credits-changed"));
-      toast.custom(() => <BoostActivatedToast minutes={30} />, {
+      toast.custom(() => createElement(BoostActivatedToast, { minutes: 30 }), {
         duration: 4000,
         unstyled: true,
       });
