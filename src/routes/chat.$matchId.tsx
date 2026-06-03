@@ -174,7 +174,12 @@ function ChatRoom() {
             <ChevronLeft className="h-6 w-6" />
           </Link>
 
-          <Link to="/chat" className="flex min-w-0 flex-1 items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setProfileOpen(true)}
+            className="flex min-w-0 flex-1 items-center gap-3 text-left active:opacity-80"
+            aria-label={`Ver perfil de ${peer.name}`}
+          >
             <div className="relative shrink-0">
               <div className="h-11 w-11 overflow-hidden rounded-full ring-2 ring-flame/50">
                 {peer.photo ? (
@@ -199,7 +204,7 @@ function ChatRoom() {
                 {activity?.label ?? "Inativa"}
               </p>
             </div>
-          </Link>
+          </button>
 
           <ChatActionsMenu matchId={matchId} otherUserId={peer.id} otherName={peer.name} />
         </div>
