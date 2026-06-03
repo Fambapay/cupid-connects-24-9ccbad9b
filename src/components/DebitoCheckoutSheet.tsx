@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, CheckCircle2, X, Smartphone, CreditCard, Lock, ShieldCheck, Sparkles } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
