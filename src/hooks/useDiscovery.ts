@@ -231,6 +231,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       direction: "like" | "pass" | "super",
     ): Promise<{ matched: boolean; matchId?: string; reason?: string; remainingSuperLikes?: number }> => {
       if (!user) return { matched: false };
+      let remainingSuperLikes: number | undefined;
 
       if (direction === "super") {
         const { data } = await supabase.rpc("consume_super_like_credit");
@@ -238,6 +239,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
         if (!res?.success) {
           return { matched: false, reason: res?.reason ?? "insufficient_credits" };
         }
+        remainingSuperLikes = res.remaining_balance;
         window.dispatchEvent(new CustomEvent("hunie:credits-changed"));
       }
 
@@ -253,7 +255,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
         .eq("user_a", a)
         .eq("user_b", b)
         .maybeSingle();
-      return { matched: !!match, matchId: match?.id };
+      return { matched: !!match, matchId: match?.id, remainingSuperLikes };
     },
     [user],
   );
