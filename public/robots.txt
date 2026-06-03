@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /auth
+Disallow: /chat
+Disallow: /matches
+Disallow: /discover
+Disallow: /profile
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /unsubscribe
+Disallow: /lovable
+
+Sitemap: https://hunie.app/sitemap.xml
