@@ -10,6 +10,7 @@ import {
 import { User, Heart, MessageCircle, Compass, type LucideIcon } from "lucide-react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { hapticTap } from "@/hooks/useNativePlatform";
+import { useLikesCount } from "@/hooks/useLikesCount";
 
 type Tab = "discover" | "likes" | "chat" | "profile";
 
