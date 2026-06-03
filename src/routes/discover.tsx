@@ -37,7 +37,7 @@ function Discover() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
   const { items, loading, swipe, rewind, reload } = useDiscovery({ filters });
-  const { credits } = useCredits();
+  const { credits, reload: reloadCredits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
   const boost = useBoost(goShop);
   const [index, setIndex] = useState(0);
