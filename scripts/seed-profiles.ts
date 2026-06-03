@@ -271,11 +271,24 @@ async function insertProfile(p: Profile, idx: number, total: number) {
     return;
   }
 
-  // Generate a uuid for the profile (no auth.users row exists for seeds)
-  const id = crypto.randomUUID();
+  // Create an auth user (profiles.id has a FK to auth.users.id).
+  // Email is deterministic so re-runs hit the same user.
+  const slug = `${p.name}-${p.city}`.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g, "-");
+  const email = `seed-${slug}@seeds.hunie.local`;
+  const { data: userRes, error: uErr } = await sb.auth.admin.createUser({
+    email,
+    email_confirm: true,
+    password: crypto.randomUUID(),
+    user_metadata: { is_seed: true, name: p.name },
+  });
+  if (uErr) {
+    console.error(`[${idx}/${total}] AUTH ERROR ${p.name}, ${p.city}:`, uErr.message);
+    return;
+  }
+  const id = userRes.user!.id;
 
-  const { error: pErr } = await sb.from("profiles").insert({
-    id,
+  // The handle_new_user trigger may have already created a profile row; update instead of insert.
+  const profilePayload = {
     name: p.name,
     age: p.age,
     birthdate: p.birthdate,
@@ -288,6 +301,20 @@ async function insertProfile(p: Profile, idx: number, total: number) {
     interests: p.interests,
     interested_in: [],
     is_verified: true,
+    is_paused: false,
+    is_incognito: false,
+    membership_tier: "free",
+    membership_status: "inactive",
+    onboarding_completed: true,
+    onboarding_step: 99,
+    is_seed: true,
+    seed_active: true,
+    last_active_at: p.last_active_at,
+  };
+
+  const { error: pErr } = await sb
+    .from("profiles")
+    .upsert({ id, ...profilePayload }, { onConflict: "id" });
     is_paused: false,
     is_incognito: false,
     membership_tier: "free",
