@@ -6,8 +6,11 @@ import { useMessages, type ChatMessage } from "@/hooks/useMessages";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { TypingDots } from "@/components/chat/TypingDots";
+import { getActivityStatus } from "@/lib/activityStatus";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
+
+const QUICK_EMOJIS = ["❤️", "😂", "😍", "🔥", "😘", "👀", "🙈", "😉", "🥰", "💋", "✨", "👋"];
 
 export const Route = createFileRoute("/chat/$matchId")({
   ssr: false,
@@ -20,12 +23,15 @@ function ChatRoom() {
   const { user } = useAuth();
   const { messages, peer, loading, notFound, send } = useMessages(matchId);
   const [typing, setTyping] = useState(false);
+  const [emojiOpen, setEmojiOpen] = useState(false);
   const typingTimerRef = useRef<number | null>(null);
   const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const lastSentTypingRef = useRef(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const inputHasTextRef = useRef(false);
+
+  const activity = peer ? getActivityStatus(true, peer.lastActiveAt) : null;
 
   const scrollToLatest = useCallback((behavior: ScrollBehavior = "auto") => {
     const el = scrollRef.current;
@@ -162,12 +168,20 @@ function ChatRoom() {
                 )}
               </div>
               <span className="absolute -bottom-0.5 -right-0.5 grid h-3.5 w-3.5 place-items-center rounded-full bg-background">
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                <span
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{ background: activity?.dot ?? "#6b6f76" }}
+                />
               </span>
             </div>
             <div className="min-w-0">
               <p className="truncate text-[15px] font-semibold leading-tight">{peer.name}</p>
-              <p className="truncate text-xs text-emerald-600 dark:text-emerald-400">online agora</p>
+              <p
+                className="truncate text-xs"
+                style={{ color: activity?.isLive ? "rgb(16 185 129)" : "rgb(148 163 184)" }}
+              >
+                {activity?.label ?? "Inativa"}
+              </p>
             </div>
           </Link>
         </div>
