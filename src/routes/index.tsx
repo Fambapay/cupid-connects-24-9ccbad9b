@@ -6,6 +6,8 @@ import "@/styles/liquid-landing.css";
 import { InstallModal } from "@/components/landing/InstallModal";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useTypewriter } from "@/hooks/useTypewriter";
+import hunieWordmark from "@/assets/hunie-wordmark.png.asset.json";
+import hunieMark from "@/assets/hunie-mark.png.asset.json";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -92,7 +94,7 @@ function Splash() {
   return (
     <div style={{ display: "grid", placeItems: "center", minHeight: "100dvh", background: "#07060a" }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-        <span style={{ width: 56, height: 56, borderRadius: 14, display: "grid", placeItems: "center", background: "linear-gradient(135deg,#FF4FA3,#B13CFF)", fontSize: 28 }}>🍯</span>
+        <img src={hunieMark.url} alt="Hunie" style={{ width: 56, height: 56, borderRadius: 14, display: "block" }} />
         <span style={{ color: "#fff", fontWeight: 700, fontSize: 22, letterSpacing: "-0.02em" }}>Hunie</span>
       </div>
     </div>
@@ -216,8 +218,7 @@ function Landing() {
         <nav className="ll-nav" aria-label="Navegação principal">
           <div className="ll-nav-inner">
             <Link to="/" className="ll-logo">
-              <span className="ll-logo-dot" aria-hidden />
-              <span>Hunie</span>
+              <img src={hunieWordmark.url} alt="Hunie" className="ll-logo-img" />
             </Link>
             <div className="ll-nav-links">
               <a className="ll-nav-link" href="#como-funciona">Como funciona</a>
