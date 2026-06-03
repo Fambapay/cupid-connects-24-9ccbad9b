@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { signPhoto } from "@/lib/photos";
 import { useAuth } from "./useAuth";
 
 export interface PhotoRow {
@@ -13,11 +14,10 @@ const BUCKET = "profile-photos";
 const MAX_DIM = 1600;
 const JPEG_QUALITY = 0.82;
 
+// Resize on the edge so the profile page doesn't pull full 1600px JPEGs
+// when we only render small thumbnails / a 68px avatar.
 async function signUrl(path: string) {
-  const { data } = await supabase.storage
-    .from(BUCKET)
-    .createSignedUrl(path, 60 * 60);
-  return data?.signedUrl;
+  return signPhoto(path, 3600, { width: 480, quality: 75, resize: "cover" });
 }
 
 async function compressImage(file: File): Promise<Blob> {

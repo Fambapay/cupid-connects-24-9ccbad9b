@@ -129,6 +129,11 @@ export function ProfileView({
                 <img
                   src={photos[0]}
                   alt={name}
+                  width={68}
+                  height={68}
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
                   className="h-[68px] w-[68px] rounded-full object-cover"
                 />
               ) : (
