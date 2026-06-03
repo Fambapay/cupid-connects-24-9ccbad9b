@@ -70,7 +70,6 @@ function MembershipPage() {
 
   return (
     <div className="min-h-[100dvh] bg-black text-white">
-      <SocialProofToasts />
       {/* radial glow */}
       <div
         aria-hidden
@@ -147,6 +146,9 @@ function MembershipPage() {
             </div>
           </motion.div>
         )}
+
+        <SocialProofToasts />
+
 
         {isPremium && (
           <div className="mt-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-center text-xs">
