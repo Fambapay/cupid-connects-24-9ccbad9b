@@ -11,6 +11,7 @@ import {
   motion,
   useMotionValue,
   useMotionValueEvent,
+  animate,
   type MotionValue,
 } from "framer-motion";
 import { MapPin, ChevronDown, BadgeCheck } from "lucide-react";
