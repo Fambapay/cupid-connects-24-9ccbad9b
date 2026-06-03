@@ -8,6 +8,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useProfile } from "@/hooks/useProfile";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 import { toast } from "sonner";
+import { SocialProofToasts } from "@/components/membership/SocialProofToasts";
 
 export const Route = createFileRoute("/membership")({
   ssr: false,
@@ -69,6 +70,7 @@ function MembershipPage() {
 
   return (
     <div className="min-h-[100dvh] bg-black text-white">
+      <SocialProofToasts />
       {/* radial glow */}
       <div
         aria-hidden
