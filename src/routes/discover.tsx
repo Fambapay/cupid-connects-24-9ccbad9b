@@ -121,18 +121,6 @@ function Discover() {
               sharedX={x}
               sharedY={y}
             />
-            {boost.active && (
-              <div
-                className="absolute left-1/2 z-30 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-semibold text-white shadow-lg"
-                style={{
-                  top: "calc(max(var(--sat, 54px), 54px) + 8px)",
-                  background: "linear-gradient(135deg,#a855f7,#ec4899)",
-                  boxShadow: "0 0 16px rgba(168,85,247,0.55)",
-                }}
-              >
-                ⚡ Boost ativo · {boost.remainingMinutes} min
-              </div>
-            )}
             <div
               data-swipe-actions
               className="absolute inset-x-0 z-30"
