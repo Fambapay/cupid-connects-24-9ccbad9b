@@ -1470,14 +1470,16 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                   onClick={(e) => { e.stopPropagation(); setIsInfoOpen(false); }}
                   style={{
                     position: 'absolute',
-                    bottom: 24,
+                    bottom: 22,
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    width: 48, height: 48, borderRadius: '50%',
-                    background: '#fff',
-                    border: 'none',
-                    color: '#FF4FA3', fontSize: 24, fontWeight: 700,
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+                    width: 52, height: 52, borderRadius: '50%',
+                    background: 'rgba(255,255,255,0.96)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255,255,255,0.6)',
+                    color: 'hsl(var(--primary))', fontSize: 24, fontWeight: 700,
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.25)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     cursor: 'pointer', padding: 0, zIndex: 5,
                   }}
@@ -1487,34 +1489,39 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 </button>
                 {profile.photos && profile.photos.length > 1 && (
                   <div style={{
-                    position: 'absolute', bottom: 12, left: 16, right: 16,
+                    position: 'absolute', top: 12, left: 16, right: 16,
                     display: 'flex', gap: 4,
                   }}>
                     {profile.photos.map((_, i) => (
                       <div key={i} style={{
                         flex: 1, height: 3, borderRadius: 2,
-                        background: i === currentSlide ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.3)',
+                        background: i === currentSlide ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.28)',
+                        transition: 'background 200ms',
                       }} />
                     ))}
                   </div>
                 )}
               </div>
 
-              <div style={{ padding: '16px 20px 8px' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 28, fontWeight: 400, letterSpacing: '-0.8px', color: '#fff' }}>
+              <div style={{ padding: '20px 22px 8px' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 8, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 30, fontWeight: 500, letterSpacing: '-1px', color: '#fff', lineHeight: 1.05 }}>
                     {profile.name}
                   </span>
-                  <span style={{ fontSize: 26, fontWeight: 300, letterSpacing: '-0.5px', color: 'rgba(255,255,255,0.85)' }}>
+                  <span style={{ fontSize: 26, fontWeight: 300, letterSpacing: '-0.6px', color: 'rgba(255,255,255,0.7)' }}>
                     {profile.age}
                   </span>
                   {profile.is_verified && <VerifiedBadge size="sm" />}
                   {profile.is_premium && <PremiumBadge size="sm" />}
                 </div>
                 {profile.city && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 16 }}>
-                    <MapPin className="w-[14px] h-[14px]" strokeWidth={2.2} style={{ color: 'rgba(255,255,255,0.45)' }} />
-                    <span style={{ fontSize: 14, fontWeight: 400, color: 'rgba(255,255,255,0.45)' }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 20,
+                    padding: '5px 10px 5px 8px', borderRadius: 999,
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                  }}>
+                    <MapPin className="w-[13px] h-[13px]" strokeWidth={2.2} style={{ color: 'rgba(255,255,255,0.55)' }} />
+                    <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.75)', letterSpacing: '-0.1px' }}>
                       {profile.city}
                       {profile.distance !== undefined && profile.distance > 0
                         ? ` · ${profile.distance < 10 ? profile.distance.toFixed(1) : Math.round(profile.distance)} km`
@@ -1524,42 +1531,45 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 )}
 
                 {(panelActions || actions) && (
-                  <div onPointerDownCapture={(e) => e.stopPropagation()} style={{ marginBottom: 32 }}>
+                  <div onPointerDownCapture={(e) => e.stopPropagation()} style={{ marginBottom: 28 }}>
                     {panelActions || actions}
                   </div>
                 )}
               </div>
 
-              <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '0 20px' }} />
+              <div style={{ height: 1, background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.08), transparent)', margin: '0 20px' }} />
 
-              <div style={{ padding: '0 20px 40px' }}>
+              <div style={{ padding: '0 22px 40px' }}>
                 {profile.bio && (
-                  <div style={{ padding: '20px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div style={{ padding: '22px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                     <p style={{
-                      fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.3)',
-                      textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8, marginTop: 0,
+                      fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)',
+                      textTransform: 'uppercase', letterSpacing: 1.4, marginBottom: 10, marginTop: 0,
                     }}>Sobre mim</p>
                     <p style={{
-                      fontSize: 16, fontWeight: 400, color: 'rgba(255,255,255,0.85)',
-                      lineHeight: 1.6, margin: 0, letterSpacing: '-0.1px', whiteSpace: 'pre-wrap',
+                      fontSize: 16, fontWeight: 400, color: 'rgba(255,255,255,0.92)',
+                      lineHeight: 1.55, margin: 0, letterSpacing: '-0.1px', whiteSpace: 'pre-wrap',
                     }}>{profile.bio}</p>
                   </div>
                 )}
 
                 {profile.interests && profile.interests.length > 0 && (
-                  <div style={{ padding: '20px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div style={{ padding: '22px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                     <p style={{
-                      fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.3)',
-                      textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12, marginTop: 0,
+                      fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)',
+                      textTransform: 'uppercase', letterSpacing: 1.4, marginBottom: 14, marginTop: 0,
                     }}>Interesses</p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                       {profile.interests.map((interest, i) => (
                         <span key={interest} style={{
-                          padding: '6px 14px', borderRadius: 20,
-                          fontSize: 14, fontWeight: 500, letterSpacing: '-0.1px',
-                          background: i < 3 ? 'hsl(var(--primary))' : 'rgba(255,255,255,0.08)',
-                          border: i < 3 ? 'none' : '1px solid rgba(255,255,255,0.12)',
+                          padding: '8px 14px', borderRadius: 999,
+                          fontSize: 13, fontWeight: 500, letterSpacing: '-0.1px',
+                          background: i < 3
+                            ? 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.85))'
+                            : 'rgba(255,255,255,0.06)',
+                          border: i < 3 ? '1px solid rgba(255,255,255,0.18)' : '1px solid rgba(255,255,255,0.1)',
                           color: '#fff',
+                          boxShadow: i < 3 ? '0 4px 12px hsl(var(--primary) / 0.25)' : 'none',
                         }}>{interest}</span>
                       ))}
                     </div>
