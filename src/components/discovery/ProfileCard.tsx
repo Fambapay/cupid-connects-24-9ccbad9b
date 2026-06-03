@@ -165,7 +165,14 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       const dy = y.get();
       const w = getVW();
       const rot = (dx / w) * 30;
-      el.style.transform = `translate3d(${dx}px,${dy}px,0) rotate(${rot.toFixed(2)}deg)`;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const progress = Math.min(1, dist / (w * 0.4));
+      const scale = 1 + progress * 0.025;
+      const shadowY = 12 + progress * 24;
+      const shadowBlur = 30 + progress * 30;
+      const shadowAlpha = 0.25 + progress * 0.35;
+      el.style.transform = `translate3d(${dx}px,${dy}px,0) rotate(${rot.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+      el.style.boxShadow = `0 ${shadowY.toFixed(0)}px ${shadowBlur.toFixed(0)}px rgba(0,0,0,${shadowAlpha.toFixed(2)})`;
     }, [x, y]);
     useEffect(() => {
       apply();
