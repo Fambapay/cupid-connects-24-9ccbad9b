@@ -70,7 +70,6 @@ function MembershipPage() {
 
   return (
     <div className="min-h-[100dvh] bg-black text-white">
-      <SocialProofToasts />
       {/* radial glow */}
       <div
         aria-hidden
