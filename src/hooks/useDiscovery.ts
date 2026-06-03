@@ -185,7 +185,8 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       .order("position", { ascending: true });
 
     const paths = (photos ?? []).map((p) => p.storage_path as string);
-    const signed = await signPhotos(paths);
+    // Edge-resize discovery cards (full-bleed, ~390px @ dpr 2 = 780px).
+    const signed = await signPhotos(paths, 3600, { width: 800, quality: 72, resize: "cover" });
     const byProfile: Record<string, string[]> = {};
     (photos ?? []).forEach((p, i) => {
       const url = signed[i];

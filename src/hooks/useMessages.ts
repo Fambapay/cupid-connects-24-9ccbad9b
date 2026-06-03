@@ -56,7 +56,9 @@ export function useMessages(matchId: string | undefined) {
         .order("created_at", { ascending: true }),
     ]);
 
-    const photoUrl = photo?.storage_path ? await signPhoto(photo.storage_path as string) : "";
+    const photoUrl = photo?.storage_path
+      ? await signPhoto(photo.storage_path as string, 3600, { width: 96, height: 96, resize: "cover", quality: 70 })
+      : "";
     setPeer({
       id: otherId,
       name: (prof?.name as string) ?? "Alguém",

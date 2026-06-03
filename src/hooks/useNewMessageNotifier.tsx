@@ -84,7 +84,7 @@ export function useNewMessageNotifier() {
       ]);
 
       const photoUrl = photo?.storage_path
-        ? await signPhoto(photo.storage_path as string)
+        ? await signPhoto(photo.storage_path as string, 3600, { width: 96, height: 96, resize: "cover", quality: 70 })
         : "";
       const info: PeerInfo = { name: (prof?.name as string) ?? "Alguém", photo: photoUrl };
       peerCache.current.set(matchId, info);
