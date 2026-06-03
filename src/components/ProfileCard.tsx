@@ -16,7 +16,7 @@ import {
   useMotionValueEvent,
   type MotionValue,
 } from 'framer-motion';
-import { ArrowUp, MapPin, ChevronDown } from 'lucide-react';
+import { ArrowUp, MapPin, ChevronDown, Search, Quote, IdCard, Ruler, Briefcase, User as UserIcon, Heart as HeartIcon, Languages, MoreHorizontal, GraduationCap } from 'lucide-react';
 import { Profile, SwipeDirection } from '@/types/dating';
 import { VerifiedBadge } from './VerifiedBadge';
 import { PremiumBadge } from './PremiumBadge';
