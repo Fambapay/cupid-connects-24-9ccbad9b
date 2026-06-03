@@ -6,11 +6,14 @@ import { LayoutDashboard, Users, CreditCard, ScrollText, ArrowLeft, Flag, Sparkl
 export const Route = createFileRoute("/admin")({
   ssr: false,
   beforeLoad: async () => {
-    const { data: sess } = await supabase.auth.getSession();
-    if (!sess.session) throw redirect({ to: "/auth/login" });
+    const { data: userData, error: userErr } = await supabase.auth.getUser();
+    if (userErr || !userData.user) throw redirect({ to: "/auth/login" });
+    const email = userData.user.email?.toLowerCase() ?? "";
+    if (!email) throw redirect({ to: "/discover" });
     const { data: row } = await supabase
       .from("admin_emails")
       .select("email")
+      .eq("email", email)
       .maybeSingle();
     if (!row) throw redirect({ to: "/discover" });
     return { adminEmail: row.email };
