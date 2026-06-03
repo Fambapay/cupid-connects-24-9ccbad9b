@@ -13,10 +13,14 @@ import { template as welcomeTemplate } from './welcome'
 import { template as newMatchTemplate } from './new-match'
 import { template as orderConfirmationTemplate } from './order-confirmation'
 import { template as notificationTemplate } from './notification'
+import { template as newMessageTemplate } from './new-message'
+import { template as newLikeTemplate } from './new-like'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   welcome: welcomeTemplate,
   'new-match': newMatchTemplate,
+  'new-message': newMessageTemplate,
+  'new-like': newLikeTemplate,
   'order-confirmation': orderConfirmationTemplate,
   notification: notificationTemplate,
 }

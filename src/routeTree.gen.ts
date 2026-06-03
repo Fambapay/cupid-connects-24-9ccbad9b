@@ -37,6 +37,7 @@ import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPublicNotifyRouteImport } from './routes/api/public/notify'
 import { Route as ApiPublicDebitoWebhookRouteImport } from './routes/api/public/debito-webhook'
 import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
@@ -184,6 +185,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicNotifyRoute = ApiPublicNotifyRouteImport.update({
+  id: '/api/public/notify',
+  path: '/api/public/notify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicDebitoWebhookRoute = ApiPublicDebitoWebhookRouteImport.update({
   id: '/api/public/debito-webhook',
   path: '/api/public/debito-webhook',
@@ -252,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
+  '/api/public/notify': typeof ApiPublicNotifyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -287,6 +294,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
+  '/api/public/notify': typeof ApiPublicNotifyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -325,6 +333,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
+  '/api/public/notify': typeof ApiPublicNotifyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -363,6 +372,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
+    | '/api/public/notify'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -398,6 +408,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
+    | '/api/public/notify'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -435,6 +446,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
+    | '/api/public/notify'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -460,6 +472,7 @@ export interface RootRouteChildren {
   WelcomeRoute: typeof WelcomeRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ApiPublicDebitoWebhookRoute: typeof ApiPublicDebitoWebhookRoute
+  ApiPublicNotifyRoute: typeof ApiPublicNotifyRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -666,6 +679,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/notify': {
+      id: '/api/public/notify'
+      path: '/api/public/notify'
+      fullPath: '/api/public/notify'
+      preLoaderRoute: typeof ApiPublicNotifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/debito-webhook': {
       id: '/api/public/debito-webhook'
       path: '/api/public/debito-webhook'
@@ -805,6 +825,7 @@ const rootRouteChildren: RootRouteChildren = {
   WelcomeRoute: WelcomeRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ApiPublicDebitoWebhookRoute: ApiPublicDebitoWebhookRoute,
+  ApiPublicNotifyRoute: ApiPublicNotifyRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
@@ -815,3 +836,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
