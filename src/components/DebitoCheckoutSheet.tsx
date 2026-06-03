@@ -4,6 +4,7 @@ import { Loader2, CheckCircle2, X, Smartphone, CreditCard, Lock, ShieldCheck, Sp
 import { useServerFn } from "@tanstack/react-start";
 import { createDebitoPayment } from "@/lib/debito.functions";
 import { MOBILE_MONEY_METHODS, type PaymentMethod } from "@/lib/pricing";
+import { useProfile } from "@/hooks/useProfile";
 import { toast } from "sonner";
 
 type Stage = "form" | "submitting" | "pending" | "success" | "error";
@@ -39,6 +40,9 @@ export function DebitoCheckoutSheet({
   onSuccess,
 }: DebitoCheckoutSheetProps) {
   const create = useServerFn(createDebitoPayment);
+  const { profile } = useProfile();
+  const welcomeBonusActive =
+    !(profile as { welcome_bonus_granted_at?: string | null } | null)?.welcome_bonus_granted_at;
   const [stage, setStage] = useState<Stage>("form");
   const [method, setMethod] = useState<PaymentMethod>("mpesa");
   const [phone, setPhone] = useState("");
@@ -139,10 +143,12 @@ export function DebitoCheckoutSheet({
                 <span>Subscrição</span>
                 <span>{amountMzn.toLocaleString("pt-PT")} MZN</span>
               </div>
-              <div className="mt-1 flex items-baseline justify-between text-xs text-emerald-300">
-                <span>Bónus de boas-vindas</span>
-                <span className="font-semibold">+1 Boost grátis</span>
-              </div>
+              {welcomeBonusActive && (
+                <div className="mt-1 flex items-baseline justify-between text-xs text-emerald-300">
+                  <span>Bónus de boas-vindas</span>
+                  <span className="font-semibold">+1 Boost grátis</span>
+                </div>
+              )}
               <div className="my-2 h-px bg-white/8" />
               <div className="flex items-baseline justify-between">
                 <span className="text-xs font-semibold">Total hoje</span>
