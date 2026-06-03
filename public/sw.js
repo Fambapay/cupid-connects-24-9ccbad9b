@@ -17,22 +17,23 @@ self.addEventListener('push', (event) => {
     payload = { title: 'Hunie', body: event.data ? event.data.text() : '' }
   }
 
-  // iOS Web Push adds a "from <app>" subtitle whenever the notification title
-  // differs from the PWA name. To match native-style notifications (bold title
-  // + body only), we use the real title as the notification title and put the
-  // body underneath. The PWA name ("hunie") already appears as the group header.
-  const realTitle = payload.title || 'hunie'
+  // iOS Web Push always adds a "from <app>" subtitle when the notification
+  // title differs from the PWA name. To get the clean native look (bold title
+  // + body), we set the notification title to the PWA name so iOS suppresses
+  // the "from hunie" line, and put the real title as the first line of the
+  // body — iOS renders the first body line slightly emphasised.
+  const headline = payload.title || ''
   const body = payload.body || ''
+  const combinedBody = headline && body ? `${headline}\n${body}` : (headline || body)
   const options = {
-    body,
+    body: combinedBody,
     icon: payload.icon || '/icon-192.png',
     badge: payload.badge || '/icon-192.png',
     tag: payload.tag,
     data: { url: payload.url || '/', ...payload.data },
     requireInteraction: false,
-    silent: false,
   }
-  event.waitUntil(self.registration.showNotification(realTitle, options))
+  event.waitUntil(self.registration.showNotification('hunie', options))
 })
 
 self.addEventListener('notificationclick', (event) => {
