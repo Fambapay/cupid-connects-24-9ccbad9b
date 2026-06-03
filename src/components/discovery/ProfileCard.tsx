@@ -155,8 +155,33 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     const x = sharedX ?? localX;
     const y = sharedY ?? localY;
     const cardRef = useRef<HTMLDivElement>(null);
+    const photoWrapRef = useRef<HTMLDivElement>(null);
+    const infoWrapRef = useRef<HTMLDivElement>(null);
+    const likeLabelRef = useRef<HTMLDivElement>(null);
+    const nopeLabelRef = useRef<HTMLDivElement>(null);
+    const supLabelRef = useRef<HTMLDivElement>(null);
     const draggingRef = useRef(false);
     const startRef = useRef({ x: 0, y: 0 });
+
+    const applyParallax = useCallback(() => {
+      const dx = x.get();
+      const dy = y.get();
+      if (photoWrapRef.current) {
+        photoWrapRef.current.style.transform = `translate3d(${dx * -0.06}px, ${dy * -0.04}px, 0) scale(1.04)`;
+      }
+      if (infoWrapRef.current) {
+        infoWrapRef.current.style.transform = `translate3d(${dx * 0.04}px, ${dy * 0.02}px, 0)`;
+      }
+      if (likeLabelRef.current) {
+        likeLabelRef.current.style.transform = `translate3d(${dx * 0.12}px, ${dy * 0.08}px, 0) rotate(-18deg)`;
+      }
+      if (nopeLabelRef.current) {
+        nopeLabelRef.current.style.transform = `translate3d(${dx * -0.12}px, ${dy * 0.08}px, 0) rotate(18deg)`;
+      }
+      if (supLabelRef.current) {
+        supLabelRef.current.style.transform = `translate3d(${dx * 0.08}px, ${dy * 0.12}px, 0) translateX(-50%) rotate(-6deg)`;
+      }
+    }, [x, y]);
 
     const apply = useCallback(() => {
       const el = cardRef.current;
@@ -164,16 +189,20 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       const dx = x.get();
       const dy = y.get();
       const w = getVW();
+      const h = getVH();
       const rot = (dx / w) * 30;
+      const rotY = (dx / w) * 7;
+      const rotX = -(dy / h) * 5;
       const dist = Math.sqrt(dx * dx + dy * dy);
       const progress = Math.min(1, dist / (w * 0.4));
       const scale = 1 + progress * 0.025;
       const shadowY = 12 + progress * 24;
       const shadowBlur = 30 + progress * 30;
       const shadowAlpha = 0.25 + progress * 0.35;
-      el.style.transform = `translate3d(${dx}px,${dy}px,0) rotate(${rot.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+      el.style.transform = `translate3d(${dx}px,${dy}px,0) rotate(${rot.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) rotateX(${rotX.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
       el.style.boxShadow = `0 ${shadowY.toFixed(0)}px ${shadowBlur.toFixed(0)}px rgba(0,0,0,${shadowAlpha.toFixed(2)})`;
-    }, [x, y]);
+      applyParallax();
+    }, [x, y, applyParallax]);
     useEffect(() => {
       apply();
     }, [apply]);
@@ -284,7 +313,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     useMotionValueEvent(y, "change", recompute);
 
     return (
-      <div className="absolute inset-0 overflow-hidden" style={{ background: "#000" }}>
+      <div className="absolute inset-0 overflow-hidden" style={{ background: "#000", perspective: 1200 }}>
         {isTop && nextProfiles[1] && (
           <StackCard profile={nextProfiles[1]} topX={x} topY={y} stackIndex={2} />
         )}
@@ -306,9 +335,11 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             touchAction: "pan-y",
             willChange: "transform",
             userSelect: "none",
+            transformStyle: "preserve-3d",
           }}
         >
           <div
+            ref={photoWrapRef}
             style={{
               position: "absolute",
               inset: 0,
@@ -378,6 +409,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             />
 
             <div
+              ref={likeLabelRef}
               style={{
                 position: "absolute",
                 top: 80,
@@ -397,6 +429,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               LIKE
             </div>
             <div
+              ref={nopeLabelRef}
               style={{
                 position: "absolute",
                 top: 80,
@@ -416,6 +449,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               NOPE
             </div>
             <div
+              ref={supLabelRef}
               style={{
                 position: "absolute",
                 top: 120,
@@ -437,6 +471,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
           </div>
 
           <div
+            ref={infoWrapRef}
             style={{
               position: "absolute",
               left: 0,
