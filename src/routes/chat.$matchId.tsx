@@ -53,6 +53,19 @@ function ChatRoom() {
     scrollToLatest("auto");
   }, [messages.length, typing, scrollToLatest]);
 
+  // Mark conversation as read on open and whenever new messages arrive
+  useEffect(() => {
+    if (!user || !matchId) return;
+    supabase
+      .from("match_reads")
+      .upsert(
+        { match_id: matchId, user_id: user.id, last_read_at: new Date().toISOString() },
+        { onConflict: "match_id,user_id" },
+      )
+      .then(() => undefined);
+  }, [user, matchId, messages.length]);
+
+
   useEffect(() => {
     const vv = window.visualViewport;
     const root = document.documentElement;
