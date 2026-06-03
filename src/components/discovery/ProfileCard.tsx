@@ -335,6 +335,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             touchAction: "pan-y",
             willChange: "transform",
             userSelect: "none",
+            transformStyle: "preserve-3d",
           }}
         >
           <div
