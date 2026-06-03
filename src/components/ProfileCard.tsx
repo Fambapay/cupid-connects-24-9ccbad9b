@@ -1445,7 +1445,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 position: 'fixed',
                 inset: 0,
                 top: 0, left: 0, right: 0, bottom: 0,
-                background: '#0a0a0a',
+                background: '#f2f2f4',
                 borderRadius: 0,
                 zIndex: 50,
                 overflowY: 'auto',
@@ -1453,55 +1453,60 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 WebkitOverflowScrolling: 'touch',
               }}
             >
-              <div style={{ width: '100%', height: '55vh', position: 'relative', flexShrink: 0, overflow: 'hidden', background: '#000' }}>
-                <img
-                  src={transformImage(profile.photos[currentSlide] || profile.photos[0], { width: 1080, quality: 80 })}
-                  alt={profile.name}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transform: 'scale(1.05)' }}
-                  draggable={false}
-                />
-                {/* Cinematic gradient masking into the dark sheet */}
-                <div style={{
-                  position: 'absolute', bottom: 0, left: 0, right: 0,
-                  height: '55%',
-                  background: 'linear-gradient(to top, #0a0a0a 0%, rgba(10,10,10,0.55) 35%, transparent 100%)',
-                  pointerEvents: 'none',
-                }} />
-
-                {/* Top grabber */}
-                <div style={{ position: 'absolute', top: 12, left: 0, right: 0, display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}>
-                  <div style={{ width: 44, height: 4, borderRadius: 999, background: 'rgba(255,255,255,0.45)' }} />
+              {/* Sticky header: name + verified + close */}
+              <div style={{
+                position: 'sticky', top: 0, zIndex: 10,
+                background: '#fff',
+                padding: '14px 20px',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                borderBottom: '1px solid rgba(0,0,0,0.04)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                  <h1 style={{
+                    fontSize: 28, fontWeight: 800, letterSpacing: '-0.5px',
+                    color: '#111', margin: 0, lineHeight: 1,
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>
+                    {profile.name} <span style={{ fontWeight: 400 }}>{profile.age}</span>
+                  </h1>
+                  {profile.is_verified && (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                      <path d="M12 1.5l2.4 2 3.1-.4.9 3 2.7 1.6-1.2 2.9 1.2 2.9-2.7 1.6-.9 3-3.1-.4-2.4 2-2.4-2-3.1.4-.9-3L3 13.5l1.2-2.9L3 7.7l2.7-1.6.9-3 3.1.4 2.4-2z" fill="#1d9bf0"/>
+                      <path d="M9.5 12.3l1.9 1.9 3.6-4.2" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
                 </div>
-
-                {/* Close — top-left glass chevron */}
                 <button
                   onClick={(e) => { e.stopPropagation(); setIsInfoOpen(false); }}
                   style={{
-                    position: 'absolute',
-                    top: 22, left: 22,
-                    width: 40, height: 40, borderRadius: '50%',
-                    background: 'rgba(0,0,0,0.22)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255,255,255,0.12)',
-                    color: '#fff',
+                    width: 44, height: 44, borderRadius: '50%',
+                    background: '#111', color: '#fff',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    cursor: 'pointer', padding: 0, zIndex: 6,
+                    cursor: 'pointer', padding: 0, border: 'none', flexShrink: 0,
                   }}
                   aria-label="Fechar"
                 >
                   <ChevronDown className="w-5 h-5" strokeWidth={2.5} />
                 </button>
+              </div>
 
+              {/* Photo */}
+              <div style={{ width: '100%', aspectRatio: '1 / 1', position: 'relative', overflow: 'hidden', background: '#e5e5e7' }}>
+                <img
+                  src={transformImage(profile.photos[currentSlide] || profile.photos[0], { width: 1080, quality: 85 })}
+                  alt={profile.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  draggable={false}
+                />
                 {profile.photos && profile.photos.length > 1 && (
                   <div style={{
-                    position: 'absolute', top: 24, left: 72, right: 16,
+                    position: 'absolute', top: 12, left: 12, right: 12,
                     display: 'flex', gap: 4, zIndex: 5,
                   }}>
                     {profile.photos.map((_, i) => (
                       <div key={i} style={{
-                        flex: 1, height: 2.5, borderRadius: 2,
-                        background: i === currentSlide ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.22)',
+                        flex: 1, height: 3, borderRadius: 2,
+                        background: i === currentSlide ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.35)',
                         transition: 'background 200ms',
                       }} />
                     ))}
@@ -1509,143 +1514,100 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 )}
               </div>
 
-              {/* Detail sheet overlapping the photo */}
-              <div style={{
-                marginTop: -48,
-                background: '#0a0a0a',
-                borderTopLeftRadius: 40,
-                borderTopRightRadius: 40,
-                position: 'relative',
-                zIndex: 2,
-                padding: '36px 28px 140px',
-              }}>
-                {/* Header: serif italic name + light age */}
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 10, flexWrap: 'wrap' }}>
-                  <h1 style={{
-                    fontFamily: 'var(--font-serif, "Playfair Display", serif)',
-                    fontStyle: 'italic',
-                    fontWeight: 700,
-                    fontSize: 38,
-                    letterSpacing: '-1.2px',
-                    color: '#fff',
-                    margin: 0,
-                    lineHeight: 1,
-                  }}>
-                    {profile.name}
-                  </h1>
-                  <span style={{
-                    fontFamily: 'var(--font-sans, "Manrope", sans-serif)',
-                    fontSize: 24,
-                    fontWeight: 300,
-                    color: 'rgba(255,255,255,0.55)',
-                    letterSpacing: '-0.4px',
-                  }}>
-                    {profile.age}
-                  </span>
-                </div>
+              {/* Card sections */}
+              <div style={{ padding: '14px 14px 140px', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-                {/* Meta row: location · divider · verified pill */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32, flexWrap: 'wrap' }}>
-                  {profile.city && (
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                      <MapPin className="w-[13px] h-[13px]" strokeWidth={2} style={{ color: 'rgba(255,255,255,0.4)' }} />
-                      <span style={{
-                        fontSize: 11, fontWeight: 600, textTransform: 'uppercase',
-                        letterSpacing: '0.12em', color: 'rgba(255,255,255,0.55)',
-                      }}>
-                        {profile.city}
-                        {profile.distance !== undefined && profile.distance > 0
-                          ? ` · ${profile.distance < 10 ? profile.distance.toFixed(1) : Math.round(profile.distance)}km`
-                          : ''}
-                      </span>
+                {profile.lookingForType && (
+                  <ProfileSheetSection icon={<Search className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: '#7b7b80' }} />} title="Looking for">
+                    <p style={{ fontSize: 22, fontWeight: 700, color: '#111', margin: 0, letterSpacing: '-0.4px', lineHeight: 1.2 }}>
+                      {profile.lookingForType}
+                    </p>
+                    <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '16px 0' }} />
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '8px 14px', borderRadius: 999,
+                      background: '#ececef', color: '#111',
+                      fontSize: 14, fontWeight: 500,
+                    }}>Aberta a explorar</span>
+                  </ProfileSheetSection>
+                )}
+
+                {profile.bio && (
+                  <ProfileSheetSection icon={<Quote className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: '#7b7b80' }} />} title="Sobre mim" action>
+                    <p style={{
+                      fontSize: 18, fontWeight: 400,
+                      color: '#111', lineHeight: 1.45, margin: 0,
+                      whiteSpace: 'pre-wrap', letterSpacing: '-0.2px',
+                    }}>{profile.bio}</p>
+                  </ProfileSheetSection>
+                )}
+
+                <ProfileSheetSection icon={<IdCard className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: '#7b7b80' }} />} title="Essenciais" action>
+                  <EssentialList items={[
+                    profile.distance !== undefined && {
+                      icon: <MapPin className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: '#9b9ba1' }} />,
+                      label: `${profile.distance < 10 ? profile.distance.toFixed(1) : Math.round(profile.distance)} km de distância`,
+                    },
+                    profile.height ? {
+                      icon: <Ruler className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: '#9b9ba1' }} />,
+                      label: `${profile.height} cm`,
+                    } : null,
+                    profile.job ? {
+                      icon: <Briefcase className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: '#9b9ba1' }} />,
+                      label: profile.job,
+                    } : null,
+                    profile.education ? {
+                      icon: <GraduationCap className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: '#9b9ba1' }} />,
+                      label: profile.education,
+                    } : null,
+                    profile.gender ? {
+                      icon: <UserIcon className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: '#9b9ba1' }} />,
+                      label: profile.gender === 'feminino' ? 'Mulher' : 'Homem',
+                    } : null,
+                    profile.lookingFor ? {
+                      icon: <HeartIcon className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: '#9b9ba1' }} />,
+                      label: profile.lookingFor === 'ambos' ? 'Ambos' : (profile.lookingFor === 'feminino' ? 'Mulheres' : 'Homens'),
+                    } : null,
+                  ].filter(Boolean) as { icon: ReactNode; label: string }[]} />
+                </ProfileSheetSection>
+
+                {profile.interests && profile.interests.length > 0 && (
+                  <ProfileSheetSection icon={<HeartIcon className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: '#7b7b80' }} />} title="Interesses">
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      {profile.interests.map((interest) => (
+                        <span key={interest} style={{
+                          padding: '9px 14px', borderRadius: 999,
+                          fontSize: 14, fontWeight: 500,
+                          background: '#ececef', color: '#111',
+                        }}>{interest}</span>
+                      ))}
                     </div>
-                  )}
-                  {profile.is_verified && (
-                    <>
-                      <div style={{ width: 1, height: 12, background: 'rgba(255,255,255,0.12)' }} />
-                      <span style={{
-                        fontSize: 10, fontWeight: 800,
-                        background: '#fff', color: '#0a0a0a',
-                        padding: '3px 8px', borderRadius: 4,
-                        letterSpacing: '0.04em', textTransform: 'uppercase',
-                      }}>Verificada</span>
-                    </>
-                  )}
-                  {profile.is_premium && (
-                    <>
-                      <div style={{ width: 1, height: 12, background: 'rgba(255,255,255,0.12)' }} />
-                      <span style={{
-                        fontSize: 10, fontWeight: 800,
-                        background: 'linear-gradient(135deg, #f5d488, #c8973f)',
-                        color: '#0a0a0a',
-                        padding: '3px 8px', borderRadius: 4,
-                        letterSpacing: '0.04em', textTransform: 'uppercase',
-                      }}>Premium</span>
-                    </>
-                  )}
-                </div>
+                  </ProfileSheetSection>
+                )}
 
                 {(panelActions || actions) && (
-                  <div onPointerDownCapture={(e) => e.stopPropagation()} style={{ marginBottom: 36 }}>
+                  <div onPointerDownCapture={(e) => e.stopPropagation()} style={{ marginTop: 4 }}>
                     {panelActions || actions}
                   </div>
                 )}
 
-                {/* Bio */}
-                {profile.bio && (
-                  <section style={{ marginBottom: 40 }}>
-                    <p style={{
-                      fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)',
-                      textTransform: 'uppercase', letterSpacing: '0.25em', marginBottom: 14, marginTop: 0,
-                    }}>Sobre mim</p>
-                    <p style={{
-                      fontSize: 15, fontWeight: 300,
-                      color: 'rgba(255,255,255,0.82)',
-                      lineHeight: 1.65, margin: 0, letterSpacing: '0.1px',
-                      whiteSpace: 'pre-wrap',
-                    }}>{profile.bio}</p>
-                  </section>
-                )}
-
-                {/* Interests */}
-                {profile.interests && profile.interests.length > 0 && (
-                  <section style={{ marginBottom: 40 }}>
-                    <p style={{
-                      fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)',
-                      textTransform: 'uppercase', letterSpacing: '0.25em', marginBottom: 14, marginTop: 0,
-                    }}>Interesses</p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                      {profile.interests.map((interest) => (
-                        <span key={interest} style={{
-                          padding: '8px 14px', borderRadius: 999,
-                          fontSize: 12, fontWeight: 500, letterSpacing: '0.02em',
-                          background: '#161616',
-                          border: '1px solid rgba(255,255,255,0.06)',
-                          color: 'rgba(255,255,255,0.78)',
-                        }}>{interest}</span>
-                      ))}
-                    </div>
-                  </section>
-                )}
-
                 {/* Secondary actions */}
-                <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {[
-                    { label: 'Partilhar perfil', color: 'rgba(255,255,255,0.65)' },
-                    { label: `Bloquear ${profile.name}`, color: 'rgba(255,255,255,0.65)' },
+                    { label: 'Partilhar perfil', color: '#5a5a60' },
+                    { label: `Bloquear ${profile.name}`, color: '#5a5a60' },
                     { label: `Denunciar ${profile.name}`, color: 'hsl(var(--primary))' },
                   ].map((action) => (
                     <button
                       key={action.label}
                       onClick={(e) => e.stopPropagation()}
                       style={{
-                        width: '100%', height: 50,
-                        background: 'rgba(255,255,255,0.03)',
-                        border: '1px solid rgba(255,255,255,0.05)',
+                        width: '100%', height: 52,
+                        background: '#fff',
+                        border: 'none',
                         borderRadius: 14,
                         color: action.color,
-                        fontSize: 14, fontWeight: 500,
-                        letterSpacing: '-0.1px',
+                        fontSize: 15, fontWeight: 600,
                         cursor: 'pointer',
                       }}
                     >{action.label}</button>
@@ -1655,6 +1617,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             </motion.div>
           )}
         </AnimatePresence>
+
 
       </div>
     </div>
