@@ -14,13 +14,30 @@ interface Props {
   profile: ProfileViewData;
   onClose: () => void;
   onSave: (next: ProfileViewData) => void;
+  /** When provided, photo add/remove persist immediately via parent. */
+  onAddFiles?: (files: File[]) => Promise<void> | void;
+  onRemovePhoto?: (index: number) => Promise<void> | void;
+  photoBusy?: boolean;
 }
 
-export function EditProfileSheet({ open, profile, onClose, onSave }: Props) {
+export function EditProfileSheet({
+  open,
+  profile,
+  onClose,
+  onSave,
+  onAddFiles,
+  onRemovePhoto,
+  photoBusy = false,
+}: Props) {
   const [draft, setDraft] = useState(profile);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { if (open) setDraft(profile); }, [open, profile]);
+
+  // Keep photos in sync with parent (uploads happen immediately).
+  useEffect(() => {
+    setDraft((d) => ({ ...d, photos: profile.photos }));
+  }, [profile.photos]);
 
   useEffect(() => {
     if (!open) return;
@@ -40,6 +57,12 @@ export function EditProfileSheet({ open, profile, onClose, onSave }: Props) {
   const addPhotos = async (files: FileList) => {
     const slots = Math.max(0, 6 - draft.photos.length);
     const arr = Array.from(files).slice(0, slots);
+    if (arr.length === 0) return;
+    if (onAddFiles) {
+      await onAddFiles(arr);
+      return;
+    }
+    // Fallback (no parent handler): data URL preview only.
     const urls = await Promise.all(arr.map(f => new Promise<string>((res, rej) => {
       const r = new FileReader();
       r.onload = () => res(r.result as string);
@@ -47,6 +70,14 @@ export function EditProfileSheet({ open, profile, onClose, onSave }: Props) {
       r.readAsDataURL(f);
     })));
     setDraft(d => ({ ...d, photos: [...d.photos, ...urls] }));
+  };
+
+  const removePhoto = async (i: number) => {
+    if (onRemovePhoto) {
+      await onRemovePhoto(i);
+      return;
+    }
+    setDraft(d => ({ ...d, photos: d.photos.filter((_, j) => j !== i) }));
   };
 
   const photoCount = draft.photos.length;
@@ -175,13 +206,9 @@ export function EditProfileSheet({ open, profile, onClose, onSave }: Props) {
                               </div>
                             )}
                             <button
-                              onClick={() =>
-                                setDraft(d => ({
-                                  ...d,
-                                  photos: d.photos.filter((_, j) => j !== i),
-                                }))
-                              }
-                              className="absolute right-1.5 top-1.5 grid h-7 w-7 place-items-center rounded-full backdrop-blur-md"
+                              onClick={() => removePhoto(i)}
+                              disabled={photoBusy}
+                              className="absolute right-1.5 top-1.5 grid h-7 w-7 place-items-center rounded-full backdrop-blur-md disabled:opacity-60"
                               style={{
                                 background: 'rgba(0,0,0,0.55)',
                                 border: '1px solid rgba(255,255,255,0.12)',

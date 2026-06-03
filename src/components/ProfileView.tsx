@@ -20,7 +20,10 @@ export interface ProfileViewData {
 
 interface Props {
   profile: ProfileViewData;
-  onPhotosChange: (photos: string[]) => void;
+  /** Legacy: receives the full updated photo list (data URLs). Prefer onAddFiles. */
+  onPhotosChange?: (photos: string[]) => void;
+  /** When provided, header file input uploads via this callback instead of local state. */
+  onAddFiles?: (files: File[]) => Promise<void> | void;
   onEditProfile: () => void;
   onOpenSettings?: () => void;
   onVerify?: () => void;
@@ -28,7 +31,14 @@ interface Props {
 
 const PINK = '#FF4FA3';
 
-export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSettings, onVerify }: Props) {
+export function ProfileView({
+  profile,
+  onPhotosChange,
+  onAddFiles,
+  onEditProfile,
+  onOpenSettings,
+  onVerify,
+}: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
@@ -51,13 +61,17 @@ export function ProfileView({ profile, onPhotosChange, onEditProfile, onOpenSett
     if (arr.length === 0) return;
     setBusy(true);
     try {
-      const urls = await Promise.all(arr.map(file => new Promise<string>((res, rej) => {
-        const r = new FileReader();
-        r.onload = () => res(r.result as string);
-        r.onerror = rej;
-        r.readAsDataURL(file);
-      })));
-      onPhotosChange([...photos, ...urls]);
+      if (onAddFiles) {
+        await onAddFiles(arr);
+      } else if (onPhotosChange) {
+        const urls = await Promise.all(arr.map(file => new Promise<string>((res, rej) => {
+          const r = new FileReader();
+          r.onload = () => res(r.result as string);
+          r.onerror = rej;
+          r.readAsDataURL(file);
+        })));
+        onPhotosChange([...photos, ...urls]);
+      }
     } finally { setBusy(false); }
   };
 

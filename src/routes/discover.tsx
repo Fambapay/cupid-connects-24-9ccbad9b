@@ -34,15 +34,15 @@ export const Route = createFileRoute("/discover")({
 function Discover() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { items, loading, swipe, rewind, reload } = useDiscovery();
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
+  const { items, loading, swipe, rewind, reload } = useDiscovery({ filters });
   const { credits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
   const boost = useBoost(goShop);
   const [index, setIndex] = useState(0);
   const [matched, setMatched] = useState<{ id: string; name: string; photo?: string | null } | null>(null);
   const [openingChat, setOpeningChat] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
   const cardRef = useRef<React.ComponentRef<typeof ProfileCard>>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -58,7 +58,7 @@ function Discover() {
     age: p.age,
     city: p.city,
     country: (p.country as Profile["country"]) || "Portugal",
-    distance: 0,
+    distance: p.distance,
     bio: p.bio,
     photos: p.photos,
     gender: (p.gender as Profile["gender"]) || "feminino",

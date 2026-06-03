@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Settings as SettingsIcon } from 'lucide-react';
+import { toast } from 'sonner';
 import { ProfileView, type ProfileViewData } from '@/components/ProfileView';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
 import { VerificationModal } from '@/components/VerificationModal';
 import { BottomNav } from '@/components/BottomNav';
 import { useProfile } from '@/hooks/useProfile';
+import { usePhotoUpload } from '@/hooks/usePhotoUpload';
+import { useSubscription } from '@/hooks/useSubscription';
 
 import { requireAuthAndOnboarding } from '@/lib/authGuard';
 
@@ -21,49 +24,68 @@ export const Route = createFileRoute('/profile')({
   component: ProfilePage,
 });
 
-const INITIAL: ProfileViewData = {
-  name: 'Você',
-  age: 27,
-  city: 'Lisboa',
-  bio: 'Curioso, café forte e boas histórias.',
-  interests: ['Surf', 'Viagens', 'Design'],
-  photos: [],
-  isVerified: false,
-  isPremium: false,
-};
-
-const STORAGE_KEY = 'hunie:profile:v1';
-
-function loadProfile(): ProfileViewData {
-  if (typeof window === 'undefined') return INITIAL;
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return INITIAL;
-    return { ...INITIAL, ...JSON.parse(raw) };
-  } catch {
-    return INITIAL;
-  }
-}
-
 function ProfilePage() {
-  const { profile: dbProfile } = useProfile();
-  const [profile, setProfile] = useState<ProfileViewData>(loadProfile);
+  const { profile, updateProfile, reload } = useProfile();
+  const { photos, upload, remove } = usePhotoUpload();
+  const { isPremium } = useSubscription();
   const [editing, setEditing] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
+  const view: ProfileViewData = useMemo(
+    () => ({
+      name: profile?.name ?? '',
+      age: profile?.age ?? 0,
+      city: profile?.city ?? '',
+      bio: profile?.bio ?? '',
+      interests: profile?.interests ?? [],
+      photos: photos.map((p) => p.url ?? '').filter(Boolean),
+      isVerified: !!profile?.is_verified,
+      isPremium,
+    }),
+    [profile, photos, isPremium],
+  );
+
+  const handleAddFiles = async (files: File[]) => {
+    for (const f of files) {
+      try {
+        await upload(f);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : 'Erro ao carregar foto';
+        toast.error(msg);
+      }
+    }
+  };
+
+  const handleRemovePhoto = async (index: number) => {
+    const row = photos[index];
+    if (!row) return;
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-    } catch {
-      /* quota exceeded or unavailable — ignore */
+      await remove(row.id);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Erro ao remover foto';
+      toast.error(msg);
     }
-  }, [profile]);
+  };
 
-  useEffect(() => {
-    if (dbProfile?.age != null && profile.age !== dbProfile.age) {
-      setProfile({ ...profile, age: dbProfile.age });
+  const handleSave = async (next: ProfileViewData) => {
+    if (saving) return;
+    setSaving(true);
+    try {
+      await updateProfile({
+        name: next.name.trim() || null,
+        city: next.city.trim() || null,
+        bio: next.bio.trim() || null,
+        interests: next.interests,
+      });
+      toast.success('Perfil atualizado');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Não foi possível guardar';
+      toast.error(msg);
+    } finally {
+      setSaving(false);
     }
-  }, [dbProfile?.age]);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,21 +97,26 @@ function ProfilePage() {
         <SettingsIcon className="w-5 h-5 text-foreground" />
       </Link>
       <ProfileView
-        profile={profile}
-        onPhotosChange={(photos) => setProfile(p => ({ ...p, photos }))}
+        profile={view}
+        onAddFiles={handleAddFiles}
         onEditProfile={() => setEditing(true)}
         onVerify={() => setVerifying(true)}
       />
       <EditProfileSheet
         open={editing}
-        profile={profile}
+        profile={view}
         onClose={() => setEditing(false)}
-        onSave={(next) => setProfile(next)}
+        onSave={handleSave}
+        onAddFiles={handleAddFiles}
+        onRemovePhoto={handleRemovePhoto}
       />
       <VerificationModal
         open={verifying}
         onOpenChange={setVerifying}
-        onConfirm={() => setProfile(p => ({ ...p, isVerified: true }))}
+        onConfirm={() => {
+          // Refresh from DB so is_verified reflects the real backend state.
+          reload();
+        }}
       />
       <BottomNav />
     </div>

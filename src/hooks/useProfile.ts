@@ -21,6 +21,9 @@ export interface Profile {
   birthdate: string | null;
   gender: string | null;
   interested_in: string[];
+  interests: string[];
+  latitude: number | null;
+  longitude: number | null;
 }
 
 export function useProfile() {

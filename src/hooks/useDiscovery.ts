@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { signPhotos } from "@/lib/photos";
+import type { DiscoveryFilters } from "@/components/FiltersSheet";
 
 export interface DailyLimits {
   likesUsed: number;
@@ -24,6 +25,12 @@ export interface DiscoverProfile {
   is_verified: boolean;
   gender: string | null;
   isOnline: boolean;
+  distance: number;
+}
+
+export interface DiscoveryOptions {
+  filters?: DiscoveryFilters;
+  userCoords?: { lat: number; lng: number } | null;
 }
 
 function computeAge(birthdate: string | null): number {
@@ -33,8 +40,41 @@ function computeAge(birthdate: string | null): number {
   return Math.max(0, Math.floor(diff / (365.25 * 24 * 3600 * 1000)));
 }
 
-export function useDiscovery() {
+/** Haversine distance in km between two lat/lng pairs. */
+function haversine(
+  a: { lat: number; lng: number },
+  b: { lat: number; lng: number },
+): number {
+  const R = 6371;
+  const toRad = (x: number) => (x * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const lat1 = toRad(a.lat);
+  const lat2 = toRad(b.lat);
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+  return Math.round(2 * R * Math.asin(Math.sqrt(s)));
+}
+
+/** Map FiltersSheet gender values → DB gender values. */
+function mapGenderFilter(g: DiscoveryFilters["gender"]): string[] | null {
+  switch (g) {
+    case "feminino":
+      return ["feminino"];
+    case "masculino":
+      return ["masculino"];
+    case "nao_binario":
+      return ["nao_binario", "outro"];
+    case "todos":
+    default:
+      return null;
+  }
+}
+
+export function useDiscovery(options: DiscoveryOptions = {}) {
   const { user } = useAuth();
+  const { filters, userCoords } = options;
   const [items, setItems] = useState<DiscoverProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -46,26 +86,74 @@ export function useDiscovery() {
     }
     setLoading(true);
 
-    const [{ data: mySwipes }, { data: me }] = await Promise.all([
+    const [
+      { data: mySwipes },
+      { data: me },
+      { data: blocksA },
+      { data: blocksB },
+    ] = await Promise.all([
       supabase.from("swipes").select("swiped_id").eq("swiper_id", user.id),
-      supabase.from("profiles").select("interested_in").eq("id", user.id).maybeSingle(),
+      supabase
+        .from("profiles")
+        .select("interested_in, latitude, longitude")
+        .eq("id", user.id)
+        .maybeSingle(),
+      supabase.from("blocked_users").select("blocked_id").eq("blocker_id", user.id),
+      supabase.from("blocked_users").select("blocker_id").eq("blocked_id", user.id),
     ]);
 
     const excluded = new Set<string>((mySwipes ?? []).map((s) => s.swiped_id as string));
     excluded.add(user.id);
+    (blocksA ?? []).forEach((b) => excluded.add(b.blocked_id as string));
+    (blocksB ?? []).forEach((b) => excluded.add(b.blocker_id as string));
 
     let q = supabase
       .from("profiles")
-      .select("id,name,age,birthdate,city,country,bio,interests,is_verified,gender")
+      .select(
+        "id,name,age,birthdate,city,country,bio,interests,is_verified,gender,latitude,longitude",
+      )
       .eq("onboarding_completed", true)
       .eq("is_paused", false)
-      .limit(50);
+      .limit(100);
 
-    const interestedIn = (me?.interested_in ?? []) as string[];
-    if (interestedIn.length) q = q.in("gender", interestedIn);
+    // Gender: explicit filter overrides profile preference.
+    const genderFilter = filters ? mapGenderFilter(filters.gender) : null;
+    if (genderFilter) {
+      q = q.in("gender", genderFilter);
+    } else {
+      const interestedIn = (me?.interested_in ?? []) as string[];
+      if (interestedIn.length) q = q.in("gender", interestedIn);
+    }
+
+    // Age range (column `age` is denormalised in profiles).
+    if (filters) {
+      if (filters.ageMin > 18) q = q.gte("age", filters.ageMin);
+      if (filters.ageMax < 80) q = q.lte("age", filters.ageMax);
+      if (filters.verifiedOnly) q = q.eq("is_verified", true);
+      if (filters.hasBio) q = q.not("bio", "is", null).neq("bio", "");
+    }
 
     const { data: rows } = await q;
-    const candidates = (rows ?? []).filter((r) => !excluded.has(r.id));
+    let candidates = (rows ?? []).filter((r) => !excluded.has(r.id));
+
+    // Distance filter (client-side haversine; requires both user + candidate coords).
+    const myCoords =
+      userCoords ??
+      (me?.latitude != null && me?.longitude != null
+        ? { lat: me.latitude as number, lng: me.longitude as number }
+        : null);
+    const withDistance = candidates.map((r) => {
+      const dist =
+        myCoords && r.latitude != null && r.longitude != null
+          ? haversine(myCoords, { lat: r.latitude as number, lng: r.longitude as number })
+          : 0;
+      return { ...r, _distance: dist };
+    });
+    candidates =
+      filters && myCoords
+        ? withDistance.filter((r) => r._distance <= filters.distance)
+        : withDistance;
+
     if (!candidates.length) {
       setItems([]);
       setLoading(false);
@@ -103,10 +191,11 @@ export function useDiscovery() {
           is_verified: !!r.is_verified,
           gender: r.gender as string | null,
           isOnline: false,
+          distance: (r as { _distance?: number })._distance ?? 0,
         })),
     );
     setLoading(false);
-  }, [user]);
+  }, [user, filters, userCoords]);
 
   useEffect(() => {
     load();
@@ -164,4 +253,3 @@ export function useDiscovery() {
 
   return { items, loading, swipe, rewind, reload: load };
 }
-
