@@ -38,11 +38,14 @@ function useCountdown(targetMinutes: number) {
 
 function MembershipPage() {
   const navigate = useNavigate();
+  const { required } = Route.useSearch();
   const { subscription, isPremium } = useSubscription();
   const { reload, profile } = useProfile();
   const [selected, setSelected] = useState<PlanCardConfig | null>(null);
   const [expanded, setExpanded] = useState<string>("plus");
   const countdown = useCountdown(14); // urgency: 14min flash offer
+  const isGated = required === 1;
+
 
   const currentTier = subscription.membershipTier;
   const expiresAt = subscription.expiresAt;
