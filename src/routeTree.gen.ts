@@ -37,8 +37,10 @@ import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPublicNotifyRouteImport } from './routes/api/public/notify'
 import { Route as ApiPublicDebitoWebhookRouteImport } from './routes/api/public/debito-webhook'
 import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
+import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated.settings.notifications'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -184,6 +186,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicNotifyRoute = ApiPublicNotifyRouteImport.update({
+  id: '/api/public/notify',
+  path: '/api/public/notify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicDebitoWebhookRoute = ApiPublicDebitoWebhookRouteImport.update({
   id: '/api/public/debito-webhook',
   path: '/api/public/debito-webhook',
@@ -194,6 +201,12 @@ const AdminUsersIdRoute = AdminUsersIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AdminUsersRoute,
 } as any)
+const AuthenticatedSettingsNotificationsRoute =
+  AuthenticatedSettingsNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -237,7 +250,7 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/welcome': typeof WelcomeRoute
-  '/settings': typeof AuthenticatedSettingsRoute
+  '/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/admin/audit': typeof AdminAuditRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -250,8 +263,10 @@ export interface FileRoutesByFullPath {
   '/chat/$matchId': typeof ChatMatchIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/admin/': typeof AdminIndexRoute
+  '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
+  '/api/public/notify': typeof ApiPublicNotifyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -272,7 +287,7 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/welcome': typeof WelcomeRoute
-  '/settings': typeof AuthenticatedSettingsRoute
+  '/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/admin/audit': typeof AdminAuditRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -285,8 +300,10 @@ export interface FileRoutesByTo {
   '/chat/$matchId': typeof ChatMatchIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/admin': typeof AdminIndexRoute
+  '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
+  '/api/public/notify': typeof ApiPublicNotifyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -310,7 +327,7 @@ export interface FileRoutesById {
   '/shop': typeof ShopRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/welcome': typeof WelcomeRoute
-  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/admin/audit': typeof AdminAuditRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -323,8 +340,10 @@ export interface FileRoutesById {
   '/chat/$matchId': typeof ChatMatchIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/admin/': typeof AdminIndexRoute
+  '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
+  '/api/public/notify': typeof ApiPublicNotifyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -361,8 +380,10 @@ export interface FileRouteTypes {
     | '/chat/$matchId'
     | '/email/unsubscribe'
     | '/admin/'
+    | '/settings/notifications'
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
+    | '/api/public/notify'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -396,8 +417,10 @@ export interface FileRouteTypes {
     | '/chat/$matchId'
     | '/email/unsubscribe'
     | '/admin'
+    | '/settings/notifications'
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
+    | '/api/public/notify'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -433,8 +456,10 @@ export interface FileRouteTypes {
     | '/chat/$matchId'
     | '/email/unsubscribe'
     | '/admin/'
+    | '/_authenticated/settings/notifications'
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
+    | '/api/public/notify'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -460,6 +485,7 @@ export interface RootRouteChildren {
   WelcomeRoute: typeof WelcomeRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ApiPublicDebitoWebhookRoute: typeof ApiPublicDebitoWebhookRoute
+  ApiPublicNotifyRoute: typeof ApiPublicNotifyRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -666,6 +692,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/notify': {
+      id: '/api/public/notify'
+      path: '/api/public/notify'
+      fullPath: '/api/public/notify'
+      preLoaderRoute: typeof ApiPublicNotifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/debito-webhook': {
       id: '/api/public/debito-webhook'
       path: '/api/public/debito-webhook'
@@ -679,6 +712,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/users/$id'
       preLoaderRoute: typeof AdminUsersIdRouteImport
       parentRoute: typeof AdminUsersRoute
+    }
+    '/_authenticated/settings/notifications': {
+      id: '/_authenticated/settings/notifications'
+      path: '/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof AuthenticatedSettingsNotificationsRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
     }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
@@ -718,12 +758,26 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedSettingsRouteChildren {
+  AuthenticatedSettingsNotificationsRoute: typeof AuthenticatedSettingsNotificationsRoute
+}
+
+const AuthenticatedSettingsRouteChildren: AuthenticatedSettingsRouteChildren = {
+  AuthenticatedSettingsNotificationsRoute:
+    AuthenticatedSettingsNotificationsRoute,
+}
+
+const AuthenticatedSettingsRouteWithChildren =
+  AuthenticatedSettingsRoute._addFileChildren(
+    AuthenticatedSettingsRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
-  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -805,6 +859,7 @@ const rootRouteChildren: RootRouteChildren = {
   WelcomeRoute: WelcomeRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ApiPublicDebitoWebhookRoute: ApiPublicDebitoWebhookRoute,
+  ApiPublicNotifyRoute: ApiPublicNotifyRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
