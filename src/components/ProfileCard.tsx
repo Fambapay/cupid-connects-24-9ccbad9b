@@ -1453,49 +1453,55 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 WebkitOverflowScrolling: 'touch',
               }}
             >
-              <div style={{ width: '100%', height: '55vh', position: 'relative', flexShrink: 0 }}>
+              <div style={{ width: '100%', height: '55vh', position: 'relative', flexShrink: 0, overflow: 'hidden', background: '#000' }}>
                 <img
                   src={transformImage(profile.photos[currentSlide] || profile.photos[0], { width: 1080, quality: 80 })}
                   alt={profile.name}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transform: 'scale(1.05)' }}
                   draggable={false}
                 />
+                {/* Cinematic gradient masking into the dark sheet */}
                 <div style={{
                   position: 'absolute', bottom: 0, left: 0, right: 0,
-                  height: '40%',
-                  background: 'linear-gradient(to top, #0a0a0a 0%, transparent 100%)',
+                  height: '55%',
+                  background: 'linear-gradient(to top, #0a0a0a 0%, rgba(10,10,10,0.55) 35%, transparent 100%)',
                   pointerEvents: 'none',
                 }} />
+
+                {/* Top grabber */}
+                <div style={{ position: 'absolute', top: 12, left: 0, right: 0, display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}>
+                  <div style={{ width: 44, height: 4, borderRadius: 999, background: 'rgba(255,255,255,0.45)' }} />
+                </div>
+
+                {/* Close — top-left glass chevron */}
                 <button
                   onClick={(e) => { e.stopPropagation(); setIsInfoOpen(false); }}
                   style={{
                     position: 'absolute',
-                    bottom: 22,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: 52, height: 52, borderRadius: '50%',
-                    background: 'rgba(255,255,255,0.96)',
+                    top: 22, left: 22,
+                    width: 40, height: 40, borderRadius: '50%',
+                    background: 'rgba(0,0,0,0.22)',
                     backdropFilter: 'blur(20px)',
                     WebkitBackdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255,255,255,0.6)',
-                    color: 'hsl(var(--primary))', fontSize: 24, fontWeight: 700,
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.25)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    color: '#fff',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    cursor: 'pointer', padding: 0, zIndex: 5,
+                    cursor: 'pointer', padding: 0, zIndex: 6,
                   }}
                   aria-label="Fechar"
                 >
-                  <ChevronDown className="w-6 h-6" strokeWidth={2.5} />
+                  <ChevronDown className="w-5 h-5" strokeWidth={2.5} />
                 </button>
+
                 {profile.photos && profile.photos.length > 1 && (
                   <div style={{
-                    position: 'absolute', top: 12, left: 16, right: 16,
-                    display: 'flex', gap: 4,
+                    position: 'absolute', top: 24, left: 72, right: 16,
+                    display: 'flex', gap: 4, zIndex: 5,
                   }}>
                     {profile.photos.map((_, i) => (
                       <div key={i} style={{
-                        flex: 1, height: 3, borderRadius: 2,
-                        background: i === currentSlide ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.28)',
+                        flex: 1, height: 2.5, borderRadius: 2,
+                        background: i === currentSlide ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.22)',
                         transition: 'background 200ms',
                       }} />
                     ))}
@@ -1503,83 +1509,130 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 )}
               </div>
 
-              <div style={{ padding: '20px 22px 8px' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 8, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 30, fontWeight: 500, letterSpacing: '-1px', color: '#fff', lineHeight: 1.05 }}>
+              {/* Detail sheet overlapping the photo */}
+              <div style={{
+                marginTop: -48,
+                background: '#0a0a0a',
+                borderTopLeftRadius: 40,
+                borderTopRightRadius: 40,
+                position: 'relative',
+                zIndex: 2,
+                padding: '36px 28px 140px',
+              }}>
+                {/* Header: serif italic name + light age */}
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 10, flexWrap: 'wrap' }}>
+                  <h1 style={{
+                    fontFamily: 'var(--font-serif, "Playfair Display", serif)',
+                    fontStyle: 'italic',
+                    fontWeight: 700,
+                    fontSize: 38,
+                    letterSpacing: '-1.2px',
+                    color: '#fff',
+                    margin: 0,
+                    lineHeight: 1,
+                  }}>
                     {profile.name}
-                  </span>
-                  <span style={{ fontSize: 26, fontWeight: 300, letterSpacing: '-0.6px', color: 'rgba(255,255,255,0.7)' }}>
+                  </h1>
+                  <span style={{
+                    fontFamily: 'var(--font-sans, "Manrope", sans-serif)',
+                    fontSize: 24,
+                    fontWeight: 300,
+                    color: 'rgba(255,255,255,0.55)',
+                    letterSpacing: '-0.4px',
+                  }}>
                     {profile.age}
                   </span>
-                  {profile.is_verified && <VerifiedBadge size="sm" />}
-                  {profile.is_premium && <PremiumBadge size="sm" />}
                 </div>
-                {profile.city && (
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 20,
-                    padding: '5px 10px 5px 8px', borderRadius: 999,
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                  }}>
-                    <MapPin className="w-[13px] h-[13px]" strokeWidth={2.2} style={{ color: 'rgba(255,255,255,0.55)' }} />
-                    <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.75)', letterSpacing: '-0.1px' }}>
-                      {profile.city}
-                      {profile.distance !== undefined && profile.distance > 0
-                        ? ` · ${profile.distance < 10 ? profile.distance.toFixed(1) : Math.round(profile.distance)} km`
-                        : ''}
-                    </span>
-                  </div>
-                )}
+
+                {/* Meta row: location · divider · verified pill */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32, flexWrap: 'wrap' }}>
+                  {profile.city && (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <MapPin className="w-[13px] h-[13px]" strokeWidth={2} style={{ color: 'rgba(255,255,255,0.4)' }} />
+                      <span style={{
+                        fontSize: 11, fontWeight: 600, textTransform: 'uppercase',
+                        letterSpacing: '0.12em', color: 'rgba(255,255,255,0.55)',
+                      }}>
+                        {profile.city}
+                        {profile.distance !== undefined && profile.distance > 0
+                          ? ` · ${profile.distance < 10 ? profile.distance.toFixed(1) : Math.round(profile.distance)}km`
+                          : ''}
+                      </span>
+                    </div>
+                  )}
+                  {profile.is_verified && (
+                    <>
+                      <div style={{ width: 1, height: 12, background: 'rgba(255,255,255,0.12)' }} />
+                      <span style={{
+                        fontSize: 10, fontWeight: 800,
+                        background: '#fff', color: '#0a0a0a',
+                        padding: '3px 8px', borderRadius: 4,
+                        letterSpacing: '0.04em', textTransform: 'uppercase',
+                      }}>Verificada</span>
+                    </>
+                  )}
+                  {profile.is_premium && (
+                    <>
+                      <div style={{ width: 1, height: 12, background: 'rgba(255,255,255,0.12)' }} />
+                      <span style={{
+                        fontSize: 10, fontWeight: 800,
+                        background: 'linear-gradient(135deg, #f5d488, #c8973f)',
+                        color: '#0a0a0a',
+                        padding: '3px 8px', borderRadius: 4,
+                        letterSpacing: '0.04em', textTransform: 'uppercase',
+                      }}>Premium</span>
+                    </>
+                  )}
+                </div>
 
                 {(panelActions || actions) && (
-                  <div onPointerDownCapture={(e) => e.stopPropagation()} style={{ marginBottom: 28 }}>
+                  <div onPointerDownCapture={(e) => e.stopPropagation()} style={{ marginBottom: 36 }}>
                     {panelActions || actions}
                   </div>
                 )}
-              </div>
 
-              <div style={{ height: 1, background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.08), transparent)', margin: '0 20px' }} />
-
-              <div style={{ padding: '0 22px 40px' }}>
+                {/* Bio */}
                 {profile.bio && (
-                  <div style={{ padding: '22px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <section style={{ marginBottom: 40 }}>
                     <p style={{
-                      fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)',
-                      textTransform: 'uppercase', letterSpacing: 1.4, marginBottom: 10, marginTop: 0,
+                      fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)',
+                      textTransform: 'uppercase', letterSpacing: '0.25em', marginBottom: 14, marginTop: 0,
                     }}>Sobre mim</p>
                     <p style={{
-                      fontSize: 16, fontWeight: 400, color: 'rgba(255,255,255,0.92)',
-                      lineHeight: 1.55, margin: 0, letterSpacing: '-0.1px', whiteSpace: 'pre-wrap',
+                      fontSize: 15, fontWeight: 300,
+                      color: 'rgba(255,255,255,0.82)',
+                      lineHeight: 1.65, margin: 0, letterSpacing: '0.1px',
+                      whiteSpace: 'pre-wrap',
                     }}>{profile.bio}</p>
-                  </div>
+                  </section>
                 )}
 
+                {/* Interests */}
                 {profile.interests && profile.interests.length > 0 && (
-                  <div style={{ padding: '22px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <section style={{ marginBottom: 40 }}>
                     <p style={{
-                      fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)',
-                      textTransform: 'uppercase', letterSpacing: 1.4, marginBottom: 14, marginTop: 0,
+                      fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)',
+                      textTransform: 'uppercase', letterSpacing: '0.25em', marginBottom: 14, marginTop: 0,
                     }}>Interesses</p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                      {profile.interests.map((interest, i) => (
+                      {profile.interests.map((interest) => (
                         <span key={interest} style={{
                           padding: '8px 14px', borderRadius: 999,
-                          fontSize: 13, fontWeight: 500, letterSpacing: '-0.1px',
-                          background: i < 3
-                            ? 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.85))'
-                            : 'rgba(255,255,255,0.06)',
-                          border: i < 3 ? '1px solid rgba(255,255,255,0.18)' : '1px solid rgba(255,255,255,0.1)',
-                          color: '#fff',
-                          boxShadow: i < 3 ? '0 4px 12px hsl(var(--primary) / 0.25)' : 'none',
+                          fontSize: 12, fontWeight: 500, letterSpacing: '0.02em',
+                          background: '#161616',
+                          border: '1px solid rgba(255,255,255,0.06)',
+                          color: 'rgba(255,255,255,0.78)',
                         }}>{interest}</span>
                       ))}
                     </div>
-                  </div>
+                  </section>
                 )}
 
-                <div style={{ padding: '20px 0' }}>
+                {/* Secondary actions */}
+                <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {[
-                    { label: 'Partilhar perfil', color: 'rgba(255,255,255,0.7)' },
-                    { label: `Bloquear ${profile.name}`, color: 'rgba(255,255,255,0.7)' },
+                    { label: 'Partilhar perfil', color: 'rgba(255,255,255,0.65)' },
+                    { label: `Bloquear ${profile.name}`, color: 'rgba(255,255,255,0.65)' },
                     { label: `Denunciar ${profile.name}`, color: 'hsl(var(--primary))' },
                   ].map((action) => (
                     <button
@@ -1587,13 +1640,12 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                       onClick={(e) => e.stopPropagation()}
                       style={{
                         width: '100%', height: 50,
-                        background: 'rgba(255,255,255,0.04)',
-                        border: '1px solid rgba(255,255,255,0.06)',
-                        borderRadius: 12,
+                        background: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.05)',
+                        borderRadius: 14,
                         color: action.color,
-                        fontSize: 16, fontWeight: 400,
-                        letterSpacing: '-0.2px',
-                        marginBottom: 8,
+                        fontSize: 14, fontWeight: 500,
+                        letterSpacing: '-0.1px',
                         cursor: 'pointer',
                       }}
                     >{action.label}</button>
