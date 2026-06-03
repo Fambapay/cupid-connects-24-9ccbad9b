@@ -360,6 +360,14 @@ function ChatRoom() {
           </div>
         </form>
       </div>
+
+      <PeerProfileSheet
+        open={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        userId={peer.id}
+        fallbackName={peer.name}
+        fallbackPhoto={peer.photo}
+      />
     </div>
   );
 }
