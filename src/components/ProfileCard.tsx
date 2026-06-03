@@ -1470,14 +1470,16 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                   onClick={(e) => { e.stopPropagation(); setIsInfoOpen(false); }}
                   style={{
                     position: 'absolute',
-                    bottom: 24,
+                    bottom: 22,
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    width: 48, height: 48, borderRadius: '50%',
-                    background: '#fff',
-                    border: 'none',
-                    color: '#FF4FA3', fontSize: 24, fontWeight: 700,
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+                    width: 52, height: 52, borderRadius: '50%',
+                    background: 'rgba(255,255,255,0.96)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255,255,255,0.6)',
+                    color: 'hsl(var(--primary))', fontSize: 24, fontWeight: 700,
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.25)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     cursor: 'pointer', padding: 0, zIndex: 5,
                   }}
@@ -1487,13 +1489,14 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 </button>
                 {profile.photos && profile.photos.length > 1 && (
                   <div style={{
-                    position: 'absolute', bottom: 12, left: 16, right: 16,
+                    position: 'absolute', top: 12, left: 16, right: 16,
                     display: 'flex', gap: 4,
                   }}>
                     {profile.photos.map((_, i) => (
                       <div key={i} style={{
                         flex: 1, height: 3, borderRadius: 2,
-                        background: i === currentSlide ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.3)',
+                        background: i === currentSlide ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.28)',
+                        transition: 'background 200ms',
                       }} />
                     ))}
                   </div>
