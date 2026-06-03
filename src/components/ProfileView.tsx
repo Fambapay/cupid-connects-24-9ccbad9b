@@ -170,13 +170,25 @@ export function ProfileView({
           </div>
         </div>
 
-        <button
-          onClick={onOpenSettings}
-          className="h-10 w-10 rounded-full border border-border bg-card grid place-items-center shrink-0 active:scale-95 transition-transform"
-          aria-label="Definições"
-        >
-          <Settings size={18} className="text-muted-foreground" />
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          {isAdmin && (
+            <button
+              onClick={onOpenAdmin}
+              className="h-10 w-10 rounded-full grid place-items-center active:scale-95 transition-transform shadow-rose"
+              style={{ background: 'linear-gradient(135deg,#F0468C,#C9A84C)' }}
+              aria-label="Painel admin"
+            >
+              <ShieldCheck size={18} className="text-white" />
+            </button>
+          )}
+          <button
+            onClick={onOpenSettings}
+            className="h-10 w-10 rounded-full border border-border bg-card grid place-items-center active:scale-95 transition-transform"
+            aria-label="Definições"
+          >
+            <Settings size={18} className="text-muted-foreground" />
+          </button>
+        </div>
       </div>
 
       {/* STATS ROW — social validation */}
