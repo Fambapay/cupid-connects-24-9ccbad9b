@@ -341,21 +341,16 @@ function ChatRoom() {
   );
 }
 
-function Bubble({
-  msg,
-  me,
-  isFirstOfGroup,
-  isLastOfGroup,
-  avatar,
-  name,
-}: {
+type BubbleProps = {
   msg: ChatMessage;
   me: boolean;
   isFirstOfGroup: boolean;
   isLastOfGroup: boolean;
   avatar: string;
   name: string;
-}) {
+};
+
+function Bubble({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name }: BubbleProps) {
   return (
     <motion.li
       initial={{ opacity: 0, y: 6 }}
