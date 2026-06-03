@@ -11,6 +11,7 @@ import { User, Heart, MessageCircle, Compass, type LucideIcon } from "lucide-rea
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { hapticTap } from "@/hooks/useNativePlatform";
 import { useLikesCount } from "@/hooks/useLikesCount";
+import { useUnreadChats } from "@/hooks/useUnreadChats";
 
 type Tab = "discover" | "likes" | "chat" | "profile";
 
@@ -18,6 +19,7 @@ interface BottomNavProps {
   activeTab: Tab;
   onTabChange: (tab: Tab) => void;
   likesCount?: number;
+  unreadChats?: number;
   /** Docks the nav flush to the viewport bottom, removing the floating gap. */
   dockToBottom?: boolean;
   /** Additional bottom offset in px (used to lift the nav above other floating bars) */
@@ -30,6 +32,7 @@ export const BottomNavBase = ({
   activeTab,
   onTabChange,
   likesCount = 0,
+  unreadChats = 0,
   dockToBottom = false,
   bottomOffsetPx = 0,
 }: BottomNavProps) => {
@@ -49,7 +52,7 @@ export const BottomNavBase = ({
   const tabs = [
     { id: "discover" as Tab, icon: Compass, label: "Descobrir" },
     { id: "likes" as Tab, icon: Heart, label: "Likes", badge: likesCount },
-    { id: "chat" as Tab, icon: MessageCircle, label: "Chat" },
+    { id: "chat" as Tab, icon: MessageCircle, label: "Chat", badge: unreadChats },
     { id: "profile" as Tab, icon: User, label: "Perfil" },
   ];
 
@@ -309,9 +312,11 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
   const navigate = useNavigate();
   const activeTab = pathToTab(pathname) ?? "profile";
   const likesCount = useLikesCount();
+  const unreadChats = useUnreadChats();
   return (
     <BottomNavBase
       likesCount={likesCount}
+      unreadChats={unreadChats}
       {...props}
       activeTab={activeTab}
       onTabChange={(t) => navigate({ to: TAB_TO_PATH[t] })}
