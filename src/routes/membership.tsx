@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Check, Crown, Shield, Sparkles, Flame, Star, Lock, Clock, TrendingUp, Heart } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Check, Shield, Sparkles, Flame, Lock, Clock, TrendingUp, Heart } from "lucide-react";
+import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 import { PLAN_CARDS, formatPrice, type PlanCardConfig } from "@/lib/plans";
@@ -21,16 +21,6 @@ export const Route = createFileRoute("/membership")({
   component: MembershipPage,
 });
 
-// ── Mental trigger: live social proof ticker ─────────────────────────────
-const TICKER_MESSAGES = [
-  { name: "Aida", city: "Maputo", action: "acabou de subscrever Plus", t: "agora" },
-  { name: "Bruno", city: "Matola", action: "começou um match Premium", t: "há 1 min" },
-  { name: "Carla", city: "Beira", action: "subscreveu Elite", t: "há 2 min" },
-  { name: "Dércio", city: "Maputo", action: "subscreveu Plus", t: "há 3 min" },
-  { name: "Eunice", city: "Nampula", action: "subscreveu Select", t: "há 4 min" },
-  { name: "Filipe", city: "Tete", action: "subscreveu Plus", t: "há 5 min" },
-];
-
 function useCountdown(targetMinutes: number) {
   const [secondsLeft, setSecondsLeft] = useState(targetMinutes * 60);
   useEffect(() => {
@@ -45,20 +35,15 @@ function useCountdown(targetMinutes: number) {
 function MembershipPage() {
   const navigate = useNavigate();
   const { subscription, isPremium } = useSubscription();
-  const { reload } = useProfile();
+  const { reload, profile } = useProfile();
   const [selected, setSelected] = useState<PlanCardConfig | null>(null);
   const [expanded, setExpanded] = useState<string>("plus");
-  const [tickerIdx, setTickerIdx] = useState(0);
   const countdown = useCountdown(14); // urgency: 14min flash offer
-
-  useEffect(() => {
-    const i = setInterval(() => setTickerIdx((x) => (x + 1) % TICKER_MESSAGES.length), 3200);
-    return () => clearInterval(i);
-  }, []);
 
   const currentTier = subscription.membershipTier;
   const expiresAt = subscription.expiresAt;
-  const ticker = TICKER_MESSAGES[tickerIdx];
+  const welcomeBonusAvailable =
+    !(profile as { welcome_bonus_granted_at?: string | null } | null)?.welcome_bonus_granted_at;
 
   const handleSelect = (plan: PlanCardConfig) => {
     if (isPremium && currentTier === plan.tier) {
