@@ -58,11 +58,23 @@ export function useProfile() {
 
   const updateProfile = async (patch: Partial<Profile>) => {
     if (!user) throw new Error("Not authenticated");
-    const { error } = await supabase
-      .from("profiles")
-      .update(patch)
-      .eq("id", user.id);
-    if (error) throw error;
+    const { phone, ...profilePatch } = patch;
+
+    if (Object.keys(profilePatch).length > 0) {
+      const { error } = await supabase
+        .from("profiles")
+        .update(profilePatch)
+        .eq("id", user.id);
+      if (error) throw error;
+    }
+
+    if (phone !== undefined) {
+      const { error } = await supabase
+        .from("profile_contact")
+        .upsert({ profile_id: user.id, phone });
+      if (error) throw error;
+    }
+
     await load();
     return patch as Profile;
   };
