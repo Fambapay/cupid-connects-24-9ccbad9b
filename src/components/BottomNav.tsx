@@ -307,8 +307,10 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const activeTab = pathToTab(pathname) ?? "profile";
+  const likesCount = useLikesCount();
   return (
     <BottomNavBase
+      likesCount={likesCount}
       {...props}
       activeTab={activeTab}
       onTabChange={(t) => navigate({ to: TAB_TO_PATH[t] })}
