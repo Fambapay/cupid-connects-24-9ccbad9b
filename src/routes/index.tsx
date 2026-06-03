@@ -6,7 +6,6 @@ import "@/styles/liquid-landing.css";
 import { InstallModal } from "@/components/landing/InstallModal";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useTypewriter } from "@/hooks/useTypewriter";
-import hunieWordmark from "@/assets/hunie-wordmark.png.asset.json";
 import hunieMark from "@/assets/hunie-mark-transparent.png.asset.json";
 
 export const Route = createFileRoute("/")({
@@ -217,8 +216,9 @@ function Landing() {
         {/* Nav */}
         <nav className="ll-nav" aria-label="Navegação principal">
           <div className="ll-nav-inner">
-            <Link to="/" className="ll-logo">
-              <img src={hunieWordmark.url} alt="Hunie" className="ll-logo-img" />
+            <Link to="/" className="ll-logo" aria-label="Hunie">
+              <img src={hunieMark.url} alt="Hunie" className="ll-logo-img" />
+
             </Link>
             <div className="ll-nav-links">
               <a className="ll-nav-link" href="#como-funciona">Como funciona</a>
@@ -387,10 +387,10 @@ function Landing() {
         <footer className="ll-footer">
           <div className="ll-container">
             <div className="ll-footer-inner">
-              <Link to="/" className="ll-logo" style={{ fontSize: 16 }}>
-                <span className="ll-logo-dot" aria-hidden />
-                <span>Hunie</span>
+              <Link to="/" className="ll-logo" aria-label="Hunie">
+                <img src={hunieMark.url} alt="Hunie" className="ll-logo-img" />
               </Link>
+
               <div className="ll-footer-links">
                 <a href="#como-funciona">Como funciona</a>
                 <a href="#planos">Planos</a>
