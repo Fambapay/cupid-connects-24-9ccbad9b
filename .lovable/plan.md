@@ -1,125 +1,68 @@
-# Seed Profiles — 80 perfis fantasma no Discover
+# Push Notifications (Web Push) — Hunie
 
-Objetivo: encher o feed de Discover com 80 perfis moçambicanos credíveis. Aparecem como reais, mas nunca dão match nem mensagens. Painel admin para gerir.
+Vou implementar **Web Push** (browser/PWA, sem app nativa) com fallback por email para os 4 eventos: novo match, nova mensagem, alguém deu like, boost/promoções.
 
-## 1. Schema (migration)
+## Como vai funcionar (no fim)
 
-Adicionar à tabela `profiles`:
-- `is_seed boolean NOT NULL DEFAULT false`
-- `seed_active boolean NOT NULL DEFAULT true`
+1. Depois do onboarding, app pede permissão de notificações com um prompt suave ("Receber notificações de novos matches?").
+2. Se aceita → guardamos a subscrição (endpoint + chaves) na BD.
+3. Quando acontece um evento, o servidor envia push para todos os dispositivos do user.
+4. Se não tem push ativo (ou falha) → envia email usando os templates já criados.
 
-Adicionar tabela `app_config` (key/value, admin-only) para guardar:
-- `seeds_auto_disable_threshold` = `500`
-- `seeds_auto_disabled_at` (timestamp quando dispara)
+## O que vou criar
 
-**RLS profiles** (atualizar `profiles_select_others`): só mostra seeds se `seed_active = true`. Seeds nunca aparecem para outros seeds (irrelevante — não fazem queries).
+### 1. Base de dados (migration)
+- `push_subscriptions` — endpoint, p256dh, auth keys, user_id, user_agent, created_at. RLS por user.
+- `notification_preferences` — toggles por user para cada um dos 4 tipos (match/mensagem/like/boost) + master switch.
+- Trigger no `matches` e `messages` que chama `pg_net` → endpoint público `/api/public/notify` (HMAC verificado) para disparar push assincronamente.
 
-**Bloquear matches com seeds** — atualizar `create_match_on_reciprocal_like`: se `swiped_id` ou `swiper_id` for seed, `RETURN NEW` sem criar match. Garante que mesmo que o swipe seja gravado, nunca há match.
+### 2. Secrets
+- `VAPID_PUBLIC_KEY` (também em `VITE_` para o browser)
+- `VAPID_PRIVATE_KEY`
+- `VAPID_SUBJECT` (mailto:noreply@hunie.app)
+- `PUSH_WEBHOOK_SECRET` (HMAC para o trigger PG → server)
 
-**Auto-desativação** — função `check_seeds_auto_disable()`:
-- Conta `profiles WHERE is_seed = false AND onboarding_completed = true`.
-- Se ≥ threshold e `seeds_auto_disabled_at` é null → `UPDATE profiles SET seed_active = false WHERE is_seed = true` + marca timestamp + insere audit_log.
-- Trigger `AFTER INSERT ON profiles` (quando real user completa onboarding) chama a função.
+Eu gero as chaves VAPID e adiciono via `add_secret` (não precisas fazer nada).
 
-## 2. Discover query (`src/hooks/useDiscovery.ts`)
+### 3. Service Worker
+- `public/sw.js` — minimalista, **apenas** para receber `push` e `notificationclick`. Sem cache, sem offline.
+- Registo guardado: **não regista em iframe nem em domínios `id-preview--*`/`lovableproject.com`** — assim não parte o preview do Lovable. Só funciona no published (hunie.app) e quando a PWA está instalada.
 
-A RLS já filtra seeds inativos. Adicionar:
-- Reais primeiro: `.order('is_seed', { ascending: true })`. Seeds preenchem o fundo.
-- Seeds não aparecem em `useMatches`, `useLikedMe`, `useMessages` — já são filtrados pela ausência de matches/messages (não conseguem criar nenhum).
+### 4. Cliente
+- `src/lib/push/subscribe.ts` — pede permissão, subscreve, guarda na BD.
+- `src/components/PushPermissionPrompt.tsx` — banner suave que aparece depois do onboarding, com opção "Mais tarde".
+- Página `Definições → Notificações` para gerir os 4 toggles + desativar push.
 
-## 3. Swipe logic
+### 5. Servidor
+- `src/lib/push/send.server.ts` — envia Web Push usando uma implementação VAPID compatível com Cloudflare Workers (Web Crypto API, sem `web-push` Node).
+- Server route `/api/public/notify` — recebe webhook do Postgres (HMAC), enfileira push + email fallback.
+- Server fn `notifyUser({userId, kind, data})` para disparos internos (ex: boost/promo manual).
 
-- `swipe()` continua a inserir na tabela `swipes` (telemetria mantida, rewind funciona).
-- O trigger SQL atualizado já garante que match nunca é criado.
-- No frontend (`discover.tsx`) — nada muda. `result.matched` virá sempre `false` para seeds, MatchOverlay não abre.
-- Mensagens: impossível porque não há match. Sem trabalho extra.
+### 6. Templates de email novos
+Já temos `new-match` e `notification`. Adiciono:
+- `new-message` — "Tens uma nova mensagem"
+- `new-like` — "Alguém te deu like 👀" (revela nome só se for premium)
 
-## 4. Reports em seeds
+## Limitações importantes
 
-Atualizar `reports_insert_own` flow: quando um report é inserido contra um seed, trigger `auto_resolve_seed_reports`:
-- Marca report `status = 'auto_resolved'`.
-- `UPDATE profiles SET seed_active = false WHERE id = reported_id AND is_seed = true`.
+- **iOS**: só funciona se o user instalar a PWA no ecrã inicial (iOS 16.4+). Em Safari "normal" não há push.
+- **Preview do Lovable**: não vais ver as notificações no editor — só no `hunie.app` published.
+- **Boost/Promoções**: posso enviar mas requer cuidado para não parecer spam. Sugiro arrancar com max 1 push por semana neste canal.
 
-## 5. Seed data — geração
+## Detalhes técnicos
 
-**Onde:** `scripts/seed-profiles.ts` (Node script standalone, usa service role key via env).
+- Web Push usa o protocolo VAPID standard (RFC 8292). Não depende de Firebase/FCM, não precisa de conta Google.
+- A biblioteca `web-push` (npm) é Node-only — vou usar uma implementação inline com Web Crypto API (compatível com Cloudflare Workers que correm os server fns do TanStack Start).
+- O trigger PG usa a extensão `pg_net` (já está disponível em Lovable Cloud) para chamar o webhook sem bloquear a inserção.
 
-**Idempotência:** chave natural = `(name, city, is_seed=true)`. Antes de inserir, query `.select('id').eq('name', n).eq('city', c).eq('is_seed', true)` — skip se existe.
+## Ordem de execução
 
-**Distribuição:**
-- 40 mulheres (18–32), 30 homens (20–35), 10 não-binário (19–30)
-- Cidades: 30 Maputo, 20 Beira, 15 Nampula, 8 Quelimane, 7 Tete
+1. Migration (tabelas + trigger)
+2. Gerar e adicionar VAPID secrets
+3. Service worker + cliente subscribe
+4. Server: VAPID sender + notify endpoint
+5. UI: prompt + página de definições
+6. Templates de email novos
+7. Teste end-to-end (subscrever no hunie.app published → forçar evento → confirmar push + email)
 
-**Para cada perfil:**
-- `name`: lista moçambicana fornecida (sem repetir dentro da mesma cidade quando possível)
-- `birthdate` calculado a partir da idade
-- `bio`: pool de 30+ templates naturais com pequenas variações (atividades, comida local — matapa, xima, Polana, Costa do Sol, Inhambane, etc.)
-- `interests`: 2–4 da pool
-- `is_verified: true` (como pediste — perfis verificados)
-- `last_active_at`: random entre 1h e 3 dias atrás
-- `latitude/longitude`: coords da cidade ±0.05° de jitter
-- `onboarding_completed: true`, `is_paused: false`, `membership_tier: 'free'`
-- `is_seed: true`, `seed_active: true`
-
-**Fotos (3 por perfil):**
-Estratégia mix para naturalidade:
-- Foto 1 (rosto): `https://randomuser.me/api/portraits/{women|men}/{N}.jpg` — IDs reservados por género para não duplicar
-- Para não-binário: alterna entre `women` e `men`
-- Fotos 2–3: Unsplash curated collections por interesse/cidade (ex: `https://images.unsplash.com/photo-...`) — usar um pool fixo de ~60 URLs categorizadas (lifestyle, praia, cidade, comida) escolhidas à mão para parecerem aut. africanas/lusófonas quando possível
-
-As fotos NÃO vão para storage — guardadas como URLs externas. Adaptar `signPhotos`/loader para passar URLs http(s) directas sem tentar assinar via Supabase Storage. Detectar por prefixo `http`.
-
-## 6. Painel admin — `src/routes/admin.seeds.tsx`
-
-Nova tab no admin (`admin.tsx` nav). Conteúdo:
-
-**Header stats:**
-- "X / 80 seeds ativos"
-- "Y likes recebidos esta semana (descartados)" — `COUNT(swipes WHERE swiped_id IN (seeds) AND direction IN ('like','super') AND created_at > now()-7d)`
-- "Threshold auto-desativação: 500 utilizadores reais (atual: Z)"
-
-**Controles:**
-- Botão "Desativar todos" / "Ativar todos"
-- Input numérico para alterar threshold
-
-**Tabela:**
-- Colunas: foto, nome, idade, cidade, género, último ativo, `seed_active` (switch)
-- Filtros: cidade (select), género (select), search por nome
-- Paginação 20/página
-
-**Server fns** em `src/lib/seeds.functions.ts` (todas com `requireSupabaseAuth` + check `is_admin`):
-- `listSeeds({ city, gender, search, page })`
-- `toggleSeed({ id, active })`
-- `toggleAllSeeds({ active })`
-- `getSeedStats()`
-- `setAutoDisableThreshold({ value })`
-
-## 7. Ficheiros tocados
-
-```
-supabase/migrations/<ts>_seed_profiles.sql      (schema + triggers + app_config)
-scripts/seed-profiles.ts                        (gerador idempotente)
-scripts/seed-data/names.ts                      (listas de nomes)
-scripts/seed-data/bios.ts                       (pool de bios)
-scripts/seed-data/photos.ts                     (pool URLs)
-src/hooks/useDiscovery.ts                       (order is_seed asc)
-src/lib/photos.ts                               (passthrough URLs externas)
-src/lib/seeds.functions.ts                      (admin server fns)
-src/routes/admin.seeds.tsx                      (UI painel)
-src/routes/admin.tsx                            (adicionar tab "Seeds")
-```
-
-## 8. Ordem de execução
-
-1. Migration (schema + triggers + app_config) — espera aprovação
-2. Após approval: gerar dados (`scripts/seed-data/*`) + script + correr inserção
-3. Ajustar `useDiscovery` + `photos.ts` (passthrough URL externo)
-4. Server fns + página admin + tab
-5. Verificar: abrir `/discover` (deve aparecer mix), `/admin/seeds` (tabela + stats)
-
-## Notas técnicas
-
-- Service role key necessária para o script — já existe (`SUPABASE_SERVICE_ROLE_KEY`). Script lê de `process.env` directamente, corre via `bun run scripts/seed-profiles.ts`.
-- Seeds não têm `auth.users` correspondente. IDs são uuids gerados; FK não existe na tabela `profiles` (id é PK sem FK para auth). Confirmado pelo schema atual.
-- `is_verified: true` faz seeds passarem o filtro "Apenas verificados" — alinhado com pedido.
-- Likes em seeds: o swipe **é** gravado (telemetria/rewind) mas o trigger atualizado nunca cria match. Frontend não precisa de mudança.
+Posso seguir?
