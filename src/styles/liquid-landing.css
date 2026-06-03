@@ -96,10 +96,12 @@
   color: var(--ll-ink); text-decoration: none;
 }
 .ll-logo-img {
-  height: 26px;
+  height: 36px;
   width: auto;
   display: block;
+  filter: drop-shadow(0 6px 18px rgba(236, 72, 153, 0.35));
 }
+
 .ll-nav-links { display: none; gap: 26px; align-items: center; }
 .ll-nav-link {
   color: var(--ll-ink-dim); text-decoration: none; font-size: 14px;
