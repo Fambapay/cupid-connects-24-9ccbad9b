@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
-import { Settings as SettingsIcon } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Settings as SettingsIcon, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { ProfileView, type ProfileViewData } from '@/components/ProfileView';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
@@ -9,6 +9,7 @@ import { BottomNav } from '@/components/BottomNav';
 import { useProfile } from '@/hooks/useProfile';
 import { usePhotoUpload } from '@/hooks/usePhotoUpload';
 import { useSubscription } from '@/hooks/useSubscription';
+import { supabase } from '@/integrations/supabase/client';
 
 import { requireAuthAndOnboarding } from '@/lib/authGuard';
 
