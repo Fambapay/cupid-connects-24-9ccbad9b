@@ -1,6 +1,5 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Settings as SettingsIcon, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { ProfileView, type ProfileViewData } from '@/components/ProfileView';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
@@ -26,6 +25,7 @@ export const Route = createFileRoute('/profile')({
 });
 
 function ProfilePage() {
+  const navigate = useNavigate();
   const { profile, updateProfile, reload } = useProfile();
   const { photos, upload, remove } = usePhotoUpload();
   const { isPremium } = useSubscription();
@@ -97,30 +97,14 @@ function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="fixed top-4 right-4 z-30 flex items-center gap-2">
-        {isAdmin && (
-          <Link
-            to="/admin"
-            className="w-10 h-10 rounded-full bg-gradient-flame text-flame-foreground flex items-center justify-center shadow-rose"
-            aria-label="Painel admin"
-          >
-            <Shield className="w-5 h-5" />
-          </Link>
-        )}
-        <Link
-          to="/settings"
-          className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center backdrop-blur-md"
-          aria-label="Definições"
-        >
-          <SettingsIcon className="w-5 h-5 text-foreground" />
-        </Link>
-      </div>
-
       <ProfileView
         profile={view}
         onAddFiles={handleAddFiles}
         onEditProfile={() => setEditing(true)}
         onVerify={() => setVerifying(true)}
+        onOpenSettings={() => navigate({ to: '/settings' })}
+        isAdmin={isAdmin}
+        onOpenAdmin={() => navigate({ to: '/admin' })}
       />
       <EditProfileSheet
         open={editing}
