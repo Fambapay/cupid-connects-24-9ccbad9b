@@ -128,16 +128,38 @@ export function ChatActionsMenu({
             <MoreVertical className="h-5 w-5" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem onClick={() => setReportOpen(true)} className="gap-2">
-            <Flag className="h-4 w-4" /> Denunciar
+        <DropdownMenuContent
+          align="end"
+          sideOffset={8}
+          className="w-60 overflow-hidden rounded-2xl border border-border/60 bg-popover/95 p-1.5 shadow-2xl backdrop-blur-xl"
+        >
+          <DropdownMenuItem
+            onClick={() => setReportOpen(true)}
+            className="gap-3 rounded-xl px-3 py-2.5 text-sm font-medium"
+          >
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-amber-500/15 text-amber-500">
+              <Flag className="h-4 w-4" />
+            </span>
+            Denunciar
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setConfirmKind("block")} className="gap-2 text-destructive focus:text-destructive">
-            <Ban className="h-4 w-4" /> Bloquear
+          <DropdownMenuItem
+            onClick={() => setConfirmKind("block")}
+            className="gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-destructive focus:text-destructive"
+          >
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-destructive/15 text-destructive">
+              <Ban className="h-4 w-4" />
+            </span>
+            Bloquear
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setConfirmKind("unmatch")} className="gap-2">
-            <HeartCrack className="h-4 w-4" /> Desfazer match
+          <DropdownMenuSeparator className="my-1 bg-border/60" />
+          <DropdownMenuItem
+            onClick={() => setConfirmKind("unmatch")}
+            className="gap-3 rounded-xl px-3 py-2.5 text-sm font-medium"
+          >
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-muted text-foreground/70">
+              <HeartCrack className="h-4 w-4" />
+            </span>
+            Desfazer match
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
