@@ -10,6 +10,7 @@ import {
 import { User, Heart, MessageCircle, Compass, type LucideIcon } from "lucide-react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { hapticTap } from "@/hooks/useNativePlatform";
+import { useLikesCount } from "@/hooks/useLikesCount";
 
 type Tab = "discover" | "likes" | "chat" | "profile";
 
@@ -307,8 +308,10 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const activeTab = pathToTab(pathname) ?? "profile";
+  const likesCount = useLikesCount();
   return (
     <BottomNavBase
+      likesCount={likesCount}
       {...props}
       activeTab={activeTab}
       onTabChange={(t) => navigate({ to: TAB_TO_PATH[t] })}

@@ -23,7 +23,8 @@ export const Route = createFileRoute("/matches")({
 
 function LikesPage() {
   const { likers, loading } = useLikedMe();
-  const { isPremium } = useSubscription();
+  const { entitlements } = useSubscription();
+  const isPremium = entitlements.canSeeWhoLiked;
   const navigate = useNavigate();
   const isEmpty = !loading && likers.length === 0;
 
