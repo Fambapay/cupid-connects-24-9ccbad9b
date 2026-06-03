@@ -78,11 +78,10 @@ function LikesPage() {
                 <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between gap-2">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-white">
-                      {isPremium ? p.name : "Alguém"}
-                      {isPremium && p.age ? `, ${p.age}` : ""}
+                      {isPremium ? `${p.name}${p.age ? `, ${p.age}` : ""}` : p.age ? `${p.age} anos` : "Nova pessoa"}
                     </p>
                     <p className="truncate text-xs text-white/80">
-                      {isPremium ? p.city : "Toca para desbloquear"}
+                      {isPremium ? p.city : "Toca para revelar"}
                     </p>
                   </div>
                   <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-flame text-flame-foreground shadow-lg">
