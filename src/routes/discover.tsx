@@ -37,7 +37,7 @@ function Discover() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
   const { items, loading, swipe, rewind, reload } = useDiscovery({ filters });
-  const { credits } = useCredits();
+  const { credits, reload: reloadCredits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
   const boost = useBoost(goShop);
   const [index, setIndex] = useState(0);
@@ -79,10 +79,13 @@ function Discover() {
     if (!target) return;
     const direction = dir === "right" ? "like" : dir === "up" ? "super" : "pass";
     const result = await swipe(target.id, direction);
-    if (direction === "super" && result.reason === "insufficient_credits") {
-      toast.error("Sem Super Likes — vai à loja");
-      goShop();
-      return;
+    if (direction === "super") {
+      if (result.reason === "insufficient_credits") {
+        toast.error("Sem Super Likes — vai à loja");
+        goShop();
+        return;
+      }
+      reloadCredits();
     }
     if (result.matched) setMatched({ id: target.id, name: target.name, photo: target.photos?.[0] ?? null });
   };
