@@ -72,7 +72,11 @@ export function usePhotoUpload() {
   }, [load]);
 
   const upload = async (file: File) => {
-    if (!user) throw new Error("Not authenticated");
+    // Fetch the current user directly from supabase to avoid race conditions
+    // where the local `useAuth` state hasn't hydrated yet on mount.
+    const { data: authData } = await supabase.auth.getUser();
+    const currentUser = authData.user ?? user;
+    if (!currentUser) throw new Error("Not authenticated");
     setLoading(true);
 
     // Optimistic preview using local object URL
@@ -86,7 +90,8 @@ export function usePhotoUpload() {
 
     try {
       const compressed = await compressImage(file);
-      const path = `${user.id}/${crypto.randomUUID()}.jpg`;
+      const path = `${currentUser.id}/${crypto.randomUUID()}.jpg`;
+
       const { error: upErr } = await supabase.storage
         .from(BUCKET)
         .upload(path, compressed, { upsert: false, contentType: "image/jpeg" });
@@ -95,7 +100,7 @@ export function usePhotoUpload() {
       const { data, error } = await supabase
         .from("profile_photos")
         .insert({
-          profile_id: user.id,
+          profile_id: currentUser.id,
           storage_path: path,
           position: tempPos,
         })
