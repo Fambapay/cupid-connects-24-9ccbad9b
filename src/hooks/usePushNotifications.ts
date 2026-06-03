@@ -106,9 +106,8 @@ export function usePushNotifications() {
     setPrefs((p) => ({ ...p, [key]: value }))
     const { data: u } = await supabase.auth.getUser()
     if (!u.user) return
-    await supabase
-      .from('notification_preferences')
-      .upsert({ user_id: u.user.id, [key]: value }, { onConflict: 'user_id' })
+    const row: any = { user_id: u.user.id, [key]: value }
+    await supabase.from('notification_preferences').upsert(row, { onConflict: 'user_id' })
   }, [])
 
   return { supported, permission, subscribed, prefs, loading, busy, enable, disable, updatePref, refresh }
