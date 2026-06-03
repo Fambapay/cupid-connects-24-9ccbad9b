@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Check, Shield, Sparkles, Flame, Lock, Clock, TrendingUp, Heart } from "lucide-react";
+import { ArrowLeft, Check, Shield, Sparkles, Flame, Lock, Clock, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
-import { requireAuthAndOnboarding } from "@/lib/authGuard";
+import { requireAuthAndOnboarding, invalidateOnboardingCache } from "@/lib/authGuard";
 import { PLAN_CARDS, formatPrice, type PlanCardConfig } from "@/lib/plans";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useProfile } from "@/hooks/useProfile";
@@ -12,6 +12,9 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/membership")({
   ssr: false,
   beforeLoad: requireAuthAndOnboarding,
+  validateSearch: (s: Record<string, unknown>) => ({
+    required: s.required === 1 || s.required === "1" ? 1 : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Hunie Membership — Desbloqueia tudo" },
@@ -20,6 +23,7 @@ export const Route = createFileRoute("/membership")({
   }),
   component: MembershipPage,
 });
+
 
 function useCountdown(targetMinutes: number) {
   const [secondsLeft, setSecondsLeft] = useState(targetMinutes * 60);
