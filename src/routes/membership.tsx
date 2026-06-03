@@ -147,6 +147,9 @@ function MembershipPage() {
           </motion.div>
         )}
 
+        <SocialProofToasts />
+
+
         {isPremium && (
           <div className="mt-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-center text-xs">
             <span className="font-semibold text-emerald-300">
