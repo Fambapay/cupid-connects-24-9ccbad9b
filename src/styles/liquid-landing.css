@@ -315,15 +315,6 @@
 .ll-reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
 .ll-reveal.is-in { opacity: 1; transform: none; }
 
-/* ---------- Mobile floats: stack tighter ---------- */
-@media (max-width: 720px) {
-  .ll-float-row { grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 56px; }
-  .ll-float-card { padding: 10px; border-radius: 18px; }
-  .ll-fc-avatar { border-radius: 12px; margin-bottom: 8px; }
-  .ll-fc-name { font-size: 12.5px; }
-  .ll-fc-meta { font-size: 10.5px; }
-  .ll-fc-tag { font-size: 9px; padding: 3px 7px; top: 8px; right: 8px; }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .ll-orb, .ll-float-card { animation: none !important; }
