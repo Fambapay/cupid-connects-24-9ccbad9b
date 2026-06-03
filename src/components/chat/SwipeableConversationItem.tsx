@@ -26,8 +26,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
-const SWIPE_THRESHOLD = -80;
-const ACTION_WIDTH = 160;
+const SWIPE_THRESHOLD = -90;
+const ACTION_WIDTH = 180;
 
 const REASONS: { value: ReportReason; label: string }[] = [
   { value: "fake_profile", label: "Perfil falso" },
