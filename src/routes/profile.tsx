@@ -97,30 +97,14 @@ function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="fixed top-4 right-4 z-30 flex items-center gap-2">
-        {isAdmin && (
-          <Link
-            to="/admin"
-            className="w-10 h-10 rounded-full bg-gradient-flame text-flame-foreground flex items-center justify-center shadow-rose"
-            aria-label="Painel admin"
-          >
-            <Shield className="w-5 h-5" />
-          </Link>
-        )}
-        <Link
-          to="/settings"
-          className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center backdrop-blur-md"
-          aria-label="Definições"
-        >
-          <SettingsIcon className="w-5 h-5 text-foreground" />
-        </Link>
-      </div>
-
       <ProfileView
         profile={view}
         onAddFiles={handleAddFiles}
         onEditProfile={() => setEditing(true)}
         onVerify={() => setVerifying(true)}
+        onOpenSettings={() => navigate({ to: '/settings' })}
+        isAdmin={isAdmin}
+        onOpenAdmin={() => navigate({ to: '/admin' })}
       />
       <EditProfileSheet
         open={editing}
