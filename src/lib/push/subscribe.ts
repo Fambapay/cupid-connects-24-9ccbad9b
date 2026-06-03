@@ -58,11 +58,14 @@ export async function getPushPermission(): Promise<NotificationPermission> {
 export async function subscribeToPush(): Promise<{ ok: boolean; reason?: string }> {
   if (!isPushSupported()) return { ok: false, reason: 'unsupported' }
 
-  const { data: userData } = await supabase.auth.getUser()
-  if (!userData.user) return { ok: false, reason: 'unauthenticated' }
-
+  // IMPORTANT: Notification.requestPermission() must be called synchronously
+  // inside the user gesture on iOS Safari / PWA. Any awaited call before it
+  // breaks the gesture chain and the prompt silently never appears.
   const permission = await Notification.requestPermission()
   if (permission !== 'granted') return { ok: false, reason: 'denied' }
+
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) return { ok: false, reason: 'unauthenticated' }
 
   const registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' })
   await navigator.serviceWorker.ready
