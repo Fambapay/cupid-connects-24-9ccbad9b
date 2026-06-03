@@ -1,10 +1,10 @@
 import { useState, useRef, useCallback } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { Flag, Ban, HeartCrack } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "@/hooks/use-toast";
-import { unmatchUser, blockUser } from "@/lib/moderation.functions";
+import { unmatchUser, blockUser, reportUser, type ReportReason } from "@/lib/moderation.functions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,10 +15,29 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ReportDialog } from "./ReportDialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 const SWIPE_THRESHOLD = -80;
 const ACTION_WIDTH = 160;
+
+const REASONS: { value: ReportReason; label: string }[] = [
+  { value: "fake_profile", label: "Perfil falso" },
+  { value: "inappropriate_photos", label: "Fotos inapropriadas" },
+  { value: "harassment", label: "Assédio ou ameaças" },
+  { value: "spam_scam", label: "Spam ou burla" },
+  { value: "minor", label: "Suspeita de menor de idade" },
+  { value: "offensive_behavior", label: "Comportamento ofensivo" },
+  { value: "other", label: "Outro" },
+];
 
 interface Props {
   matchId: string;
@@ -39,16 +58,18 @@ export function SwipeableConversationItem({
   lastMessageAt,
   onActionTaken,
 }: Props) {
-  const navigate = useNavigate();
   const x = useMotionValue(0);
   const bgOpacity = useTransform(x, [-ACTION_WIDTH, 0], [1, 0]);
   const [open, setOpen] = useState(false);
   const [confirmKind, setConfirmKind] = useState<"unmatch" | "block" | null>(null);
   const [reportOpen, setReportOpen] = useState(false);
+  const [reason, setReason] = useState<ReportReason>("fake_profile");
+  const [details, setDetails] = useState("");
   const [busy, setBusy] = useState(false);
   const containerRef = useRef<HTMLLIElement>(null);
   const unmatchFn = useServerFn(unmatchUser);
   const blockFn = useServerFn(blockUser);
+  const reportFn = useServerFn(reportUser);
 
   const snapOpen = useCallback(() => {
     animate(x, -ACTION_WIDTH, { type: "spring", stiffness: 300, damping: 30 });
@@ -111,9 +132,26 @@ export function SwipeableConversationItem({
     }
   };
 
-  const handleReportDone = () => {
-    setReportOpen(false);
-    onActionTaken?.();
+  const handleReport = async () => {
+    setBusy(true);
+    try {
+      await reportFn({
+        data: {
+          userId: otherId,
+          matchId,
+          reason,
+          details: details.trim() || undefined,
+          alsoBlock: true,
+        },
+      });
+      toast.success("Denúncia enviada", { description: "Obrigado. A nossa equipa vai rever." });
+      setReportOpen(false);
+      onActionTaken?.();
+    } catch (e) {
+      toast.error("Erro", { description: String((e as Error).message) });
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -216,14 +254,60 @@ export function SwipeableConversationItem({
         </AlertDialogContent>
       </AlertDialog>
 
-      <ReportDialog
-        open={reportOpen}
-        onOpenChange={setReportOpen}
-        matchId={matchId}
-        userId={otherId}
-        userName={name}
-        onReported={handleReportDone}
-      />
+      <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Denunciar {name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <Label>Motivo</Label>
+              <div className="grid gap-1.5">
+                {REASONS.map((r) => (
+                  <label
+                    key={r.value}
+                    className={`flex cursor-pointer items-center gap-2 rounded-lg border p-2.5 text-sm transition ${
+                      reason === r.value ? "border-flame bg-flame/10" : "border-border"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="reason"
+                      value={r.value}
+                      checked={reason === r.value}
+                      onChange={() => setReason(r.value)}
+                      className="sr-only"
+                    />
+                    <span>{r.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="details">Detalhes (opcional)</Label>
+              <Textarea
+                id="details"
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                placeholder="Conta-nos mais, se quiseres"
+                maxLength={1000}
+                rows={3}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Após a denúncia, este utilizador será também bloqueado.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setReportOpen(false)} disabled={busy}>
+              Cancelar
+            </Button>
+            <Button onClick={handleReport} disabled={busy}>
+              Enviar denúncia
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </li>
   );
 }
