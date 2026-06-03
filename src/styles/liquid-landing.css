@@ -317,6 +317,6 @@
 
 
 @media (prefers-reduced-motion: reduce) {
-  .ll-orb, .ll-float-card { animation: none !important; }
+  .ll-orb { animation: none !important; }
   .ll-reveal { opacity: 1; transform: none; transition: none; }
 }
