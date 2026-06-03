@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { useSubscription } from "./useSubscription";
 import { signPhotos } from "@/lib/photos";
 
 export interface Liker {
@@ -20,6 +21,8 @@ function computeAge(birthdate: string | null): number {
 
 export function useLikedMe() {
   const { user } = useAuth();
+  const { entitlements } = useSubscription();
+  const canSeeWhoLiked = entitlements.canSeeWhoLiked;
   const [likers, setLikers] = useState<Liker[]>([]);
   const [loading, setLoading] = useState(true);
 
