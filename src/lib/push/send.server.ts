@@ -25,8 +25,16 @@ export async function sendWebPush(
   sub: StoredSubscription,
   payload: PushPayload
 ): Promise<{ ok: boolean; status: number; expired: boolean; error?: string }> {
+  // Apple Web Push is strict about the `sub` JWT claim format.
+  // Strip whitespace and angle brackets (e.g. "mailto: <a@b.com>" -> "mailto:a@b.com").
+  const rawSubject = process.env.VAPID_SUBJECT || 'mailto:noreply@hunie.app'
+  const cleanSubject = rawSubject.replace(/[<>\s]/g, '')
+  const subject = /^(mailto:|https:\/\/)/i.test(cleanSubject)
+    ? cleanSubject
+    : `mailto:${cleanSubject}`
+
   const vapid = {
-    subject: process.env.VAPID_SUBJECT || 'mailto:noreply@hunie.app',
+    subject,
     publicKey: process.env.VAPID_PUBLIC_KEY,
     privateKey: process.env.VAPID_PRIVATE_KEY,
   }
