@@ -177,6 +177,20 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       return;
     }
 
+    const candidateOrder = new Map(candidates.map((r, i) => [r.id, i]));
+    const { data: activeBoosts } = await supabase
+      .from("boosts")
+      .select("profile_id,expires_at")
+      .in("profile_id", candidates.map((r) => r.id))
+      .gt("expires_at", new Date().toISOString());
+    const boostedIds = new Set((activeBoosts ?? []).map((b) => b.profile_id as string));
+    candidates = [...candidates].sort((a, b) => {
+      const boostedA = boostedIds.has(a.id) ? 1 : 0;
+      const boostedB = boostedIds.has(b.id) ? 1 : 0;
+      if (boostedA !== boostedB) return boostedB - boostedA;
+      return (candidateOrder.get(a.id) ?? 0) - (candidateOrder.get(b.id) ?? 0);
+    });
+
     const ids = candidates.map((r) => r.id);
     const { data: photos } = await supabase
       .from("profile_photos")
