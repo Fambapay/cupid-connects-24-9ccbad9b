@@ -24,7 +24,7 @@ const requireAdmin = createMiddleware({ type: "function" })
   });
 
 async function logAction(
-  supabaseAdmin: Awaited<ReturnType<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"] extends infer T ? T : never> | any,
+  supabaseAdmin: any,
   actorId: string,
   actorEmail: string,
   action: string,
