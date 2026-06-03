@@ -60,11 +60,13 @@ export async function sendWebPush(
       headers: built.headers as Record<string, string>,
       body: built.body as unknown as BodyInit,
     })
+    const error = res.ok ? undefined : await res.text().catch(() => res.statusText)
+    const vapidKeyMismatch = !!error && error.includes('VapidPkHashMismatch')
     return {
       ok: res.ok,
       status: res.status,
-      expired: res.status === 404 || res.status === 410,
-      error: res.ok ? undefined : await res.text().catch(() => res.statusText),
+      expired: res.status === 404 || res.status === 410 || vapidKeyMismatch,
+      error,
     }
   } catch (e: any) {
     return { ok: false, status: 0, expired: false, error: e?.message || String(e) }
