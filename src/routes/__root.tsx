@@ -7,18 +7,36 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { useNewMessageNotifier } from "@/hooks/useNewMessageNotifier";
 import { useHeartbeat } from "@/hooks/useHeartbeat";
+import { PushPermissionPrompt } from "@/components/PushPermissionPrompt";
+import { supabase } from "@/integrations/supabase/client";
 
 function GlobalNotifiers() {
   useNewMessageNotifier();
   useHeartbeat();
   return null;
+}
+
+function PushPromptGate() {
+  const [authed, setAuthed] = useState(false);
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getUser().then(({ data }) => mounted && setAuthed(!!data.user));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (mounted) setAuthed(!!session?.user);
+    });
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+  return authed ? <PushPermissionPrompt /> : null;
 }
 
 function NotFoundComponent() {
@@ -139,6 +157,7 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <GlobalNotifiers />
+      <PushPromptGate />
       <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );
