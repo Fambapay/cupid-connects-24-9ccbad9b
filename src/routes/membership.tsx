@@ -330,9 +330,12 @@ function MembershipPage() {
           amountMzn={selected.priceMzn}
           planTier={selected.tier}
           onSuccess={async () => {
+            invalidateOnboardingCache();
             await reload();
             toast.success(`Bem-vindo ao Hunie ${selected.label}!`);
+            setTimeout(() => navigate({ to: "/discover" }), 600);
           }}
+
         />
       )}
     </div>
