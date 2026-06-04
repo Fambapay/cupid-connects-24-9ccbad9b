@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { signPhotos } from "@/lib/photos";
+import { getEntitlements, type MembershipTier } from "@/lib/plans";
 import type { DiscoveryFilters } from "@/components/FiltersSheet";
 
 export interface DailyLimits {
