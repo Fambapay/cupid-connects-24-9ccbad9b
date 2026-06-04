@@ -188,7 +188,7 @@ function Discover() {
         onClose={() => setFiltersOpen(false)}
         value={filters}
         onChange={setFilters}
-        isPremium={false}
+        isPremium={isPremium}
         onUpgrade={goShop}
       />
 
