@@ -435,6 +435,7 @@ function Bubble({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showRead
               hour: "2-digit",
               minute: "2-digit",
             })}
+            {me && showReadReceipt && <span className="ml-1.5 text-flame font-medium">· Lido</span>}
           </span>
         )}
       </div>
