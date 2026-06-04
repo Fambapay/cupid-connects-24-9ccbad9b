@@ -12,6 +12,7 @@ interface PeerProfile {
   interests: string[];
   isVerified: boolean;
   isPremium: boolean;
+  isElite: boolean;
   photos: string[];
 }
 
