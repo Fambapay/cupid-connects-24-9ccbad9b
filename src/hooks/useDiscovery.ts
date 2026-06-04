@@ -77,6 +77,14 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
   const { filters, userCoords } = options;
   const [items, setItems] = useState<DiscoverProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dailyLimits, setDailyLimits] = useState<DailyLimits>({
+    likesUsed: 0,
+    likesLimit: 25,
+    likesRemaining: 25,
+    superLikesUsed: 0,
+    superLikesLimit: 0,
+    superLikesRemaining: 0,
+  });
 
   const load = useCallback(async () => {
     if (!user) {
@@ -86,17 +94,21 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     }
     setLoading(true);
 
+    const todayStart = new Date();
+    todayStart.setUTCHours(0, 0, 0, 0);
+
     const [
       { data: mySwipes },
       { data: me },
       { data: mySettings },
       { data: blocksA },
       { data: blocksB },
+      { data: todaySwipes },
     ] = await Promise.all([
       supabase.from("swipes").select("swiped_id").eq("swiper_id", user.id),
       supabase
         .from("profiles")
-        .select("interested_in, latitude, longitude")
+        .select("interested_in, latitude, longitude, membership_tier, membership_status, membership_expires_at")
         .eq("id", user.id)
         .maybeSingle(),
       supabase
@@ -106,12 +118,48 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
         .maybeSingle(),
       supabase.from("blocked_users").select("blocked_id").eq("blocker_id", user.id),
       supabase.from("blocked_users").select("blocker_id").eq("blocked_id", user.id),
+      supabase
+        .from("swipes")
+        .select("direction")
+        .eq("swiper_id", user.id)
+        .gte("created_at", todayStart.toISOString()),
     ]);
+
+    // Compute daily limits based on viewer's tier
+    const myTier = (me?.membership_tier ?? "free") as MembershipTier;
+    const myStatus = (me as { membership_status?: string } | null)?.membership_status ?? "inactive";
+    const myExp = (me as { membership_expires_at?: string | null } | null)?.membership_expires_at;
+    const myActive = myStatus === "active" && (!myExp || new Date(myExp).getTime() > Date.now());
+    const ent = getEntitlements(myActive ? myTier : "free");
+    const likesUsedToday = (todaySwipes ?? []).filter(
+      (s) => s.direction === "like" || s.direction === "super",
+    ).length;
+    const superUsedToday = (todaySwipes ?? []).filter((s) => s.direction === "super").length;
+    const likesLimit = ent.dailyLikes; // -1 unlimited
+    const likesRemaining = likesLimit < 0 ? Infinity : Math.max(0, likesLimit - likesUsedToday);
+    setDailyLimits({
+      likesUsed: likesUsedToday,
+      likesLimit,
+      likesRemaining: Number.isFinite(likesRemaining) ? likesRemaining : 9999,
+      superLikesUsed: superUsedToday,
+      superLikesLimit: ent.dailySuperLikes,
+      superLikesRemaining: Math.max(0, ent.dailySuperLikes - superUsedToday),
+    });
 
     const excluded = new Set<string>((mySwipes ?? []).map((s) => s.swiped_id as string));
     excluded.add(user.id);
     (blocksA ?? []).forEach((b) => excluded.add(b.blocked_id as string));
     (blocksB ?? []).forEach((b) => excluded.add(b.blocker_id as string));
+
+    // Invisible mode: hide candidates with is_incognito = true UNLESS they
+    // already liked me (then they consented to appear in my feed).
+    const { data: likedMeRows } = await supabase
+      .from("swipes")
+      .select("swiper_id")
+      .eq("swiped_id", user.id)
+      .in("direction", ["like", "super"]);
+    const likedMe = new Set<string>((likedMeRows ?? []).map((r) => r.swiper_id as string));
+
 
     let q = supabase
       .from("profiles")
