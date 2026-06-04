@@ -146,6 +146,7 @@ function Discover() {
                 photoUrl={current.photos[0]}
                 cardKey={current.id}
                 purchasedSuperLikes={credits.super_like_balance}
+                dailyLimits={dailyLimits}
               />
             </div>
           </>
