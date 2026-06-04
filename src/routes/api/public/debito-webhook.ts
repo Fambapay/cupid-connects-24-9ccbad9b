@@ -1,5 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { timingSafeEqual } from "crypto";
 import { sanitizePayload } from "@/lib/pricing";
+
+function safeEqual(a: string, b: string) {
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false;
+  return timingSafeEqual(ab, bb);
+}
 
 export const Route = createFileRoute("/api/public/debito-webhook")({
   server: {
@@ -12,8 +20,9 @@ export const Route = createFileRoute("/api/public/debito-webhook")({
 
         const provided =
           request.headers.get("x-webhook-secret") ??
-          request.headers.get("x-debito-signature");
-        if (provided !== secret) {
+          request.headers.get("x-debito-signature") ??
+          "";
+        if (!safeEqual(provided, secret)) {
           return new Response("Unauthorized", { status: 401 });
         }
 

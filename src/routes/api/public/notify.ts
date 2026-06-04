@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { timingSafeEqual } from 'crypto'
 import { dispatchNotification } from '@/lib/push/notify.server'
-import { supabaseAdmin } from '@/integrations/supabase/client.server'
 
 function safeEqual(a: string, b: string) {
   const ab = Buffer.from(a)
@@ -18,7 +17,10 @@ export const Route = createFileRoute('/api/public/notify')({
         const envSecret = process.env.PUSH_WEBHOOK_SECRET || ''
         let ok = !!envSecret && safeEqual(secret, envSecret)
         if (!ok) {
-          // Fallback: compare against app_config (kept in sync by DB triggers)
+          // Fallback: compare against app_config (kept in sync by DB triggers).
+          // Import admin client lazily so the server-only module is never
+          // referenced before the request reaches this handler.
+          const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
           const { data } = await supabaseAdmin
             .from('app_config')
             .select('value')
