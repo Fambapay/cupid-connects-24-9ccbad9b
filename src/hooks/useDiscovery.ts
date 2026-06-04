@@ -164,7 +164,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     let q = supabase
       .from("profiles")
       .select(
-        "id,name,age,birthdate,city,country,bio,interests,is_verified,gender,latitude,longitude,last_active_at,is_seed,membership_tier,membership_status,membership_expires_at",
+        "id,name,age,birthdate,city,country,bio,interests,is_verified,gender,latitude,longitude,last_active_at,is_seed,is_incognito,membership_tier,membership_status,membership_expires_at",
       )
       .eq("onboarding_completed", true)
       .eq("is_paused", false)
