@@ -23,6 +23,15 @@ const requireAdmin = createMiddleware({ type: "function" })
     });
   });
 
+// Server-side admin gate for the /admin route shell.
+// Returns the admin email if allowed; throws otherwise.
+export const verifyAdminAccess = createServerFn({ method: "GET" })
+  .middleware([requireAdmin])
+  .handler(async ({ context }) => {
+    return { email: context.adminEmail as string };
+  });
+
+
 async function logAction(
   supabaseAdmin: any,
   actorId: string,
