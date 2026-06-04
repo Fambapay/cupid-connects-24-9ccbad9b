@@ -35,6 +35,7 @@ export const Route = createFileRoute("/discover")({
 function Discover() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isPremium, entitlements } = useSubscription();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
   const { items, loading, swipe, rewind, reload } = useDiscovery({ filters });
