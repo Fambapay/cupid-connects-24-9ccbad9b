@@ -52,6 +52,7 @@ export function PeerProfileSheet({ open, onClose, userId, fallbackName, fallback
       const urls = await signPhotos(paths, 3600, { width: 900, height: 1200, resize: "cover", quality: 75 });
 
       if (!alive) return;
+      const isActivePremium = prof?.membership_status === "active" && prof?.membership_tier !== "free";
       setProfile({
         name: (prof?.name as string) ?? fallbackName,
         age: (prof?.age as number | null) ?? null,
@@ -59,7 +60,8 @@ export function PeerProfileSheet({ open, onClose, userId, fallbackName, fallback
         bio: (prof?.bio as string | null) ?? null,
         interests: ((prof?.interests as string[] | null) ?? []) as string[],
         isVerified: Boolean(prof?.is_verified),
-        isPremium: prof?.membership_status === "active" && prof?.membership_tier !== "free",
+        isPremium: isActivePremium,
+        isElite: isActivePremium && prof?.membership_tier === "elite",
         photos: urls.filter(Boolean),
       });
       setLoading(false);
