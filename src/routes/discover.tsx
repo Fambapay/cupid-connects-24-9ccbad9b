@@ -135,7 +135,7 @@ function Discover() {
                   else cardRef.current?.flyUp?.();
                 }}
                 onRewind={handleRewind}
-                canRewind
+                canRewind={entitlements.canRewind}
                 cardX={x}
                 photoUrl={current.photos[0]}
                 cardKey={current.id}
