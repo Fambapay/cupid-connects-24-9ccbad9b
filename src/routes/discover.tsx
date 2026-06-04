@@ -38,7 +38,7 @@ function Discover() {
   const { isPremium, entitlements } = useSubscription();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
-  const { items, loading, swipe, rewind, reload } = useDiscovery({ filters });
+  const { items, loading, swipe, rewind, reload, dailyLimits } = useDiscovery({ filters });
   const { credits, reload: reloadCredits, syncCredits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
   const boost = useBoost(goShop);
