@@ -66,7 +66,7 @@ function SettingsPage() {
   const { signOut, user } = useAuth();
   const { profile, updateProfile, deleteAccount } = useProfile();
   const { settings, updateSettings, loading } = useSettings();
-  const { isPremium, subscription } = useSubscription();
+  const { isPremium, entitlements, subscription } = useSubscription();
   const membershipTier = subscription.membershipTier;
   const {
     permissionState: locationPermission,
