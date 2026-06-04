@@ -15,7 +15,7 @@ export interface PlanEntitlements {
   priorityDiscovery: boolean;
   eliteBadge: boolean;
   invisibleMode: boolean;
-  curatedMatches: boolean;
+  
   profileAnalytics: boolean;
   earlyAccess: boolean;
 }
@@ -33,7 +33,7 @@ export const NO_TIER_ENTITLEMENTS: PlanEntitlements = {
   priorityDiscovery: false,
   eliteBadge: false,
   invisibleMode: false,
-  curatedMatches: false,
+  
   profileAnalytics: false,
   earlyAccess: false,
 };
@@ -63,7 +63,7 @@ const ELITE: PlanEntitlements = {
   priorityDiscovery: true,
   eliteBadge: true,
   invisibleMode: true,
-  curatedMatches: true,
+  
   profileAnalytics: true,
   earlyAccess: true,
 };
@@ -135,7 +135,7 @@ export const PLAN_CARDS: PlanCardConfig[] = [
       { label: "Prioridade no discovery", bold: true },
       { label: "Boost diário" },
       { label: "Modo invisível" },
-      { label: "Matches curados" },
+      
       { label: "Analytics de perfil" },
       { label: "Badge Elite" },
       { label: "10 Super Likes / dia" },
