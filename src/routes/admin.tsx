@@ -1,22 +1,26 @@
 import { createFileRoute, Link, Outlet, redirect, useLocation } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { verifyAdminAccess } from "@/lib/admin.functions";
 import { LayoutDashboard, Users, CreditCard, ScrollText, ArrowLeft, Flag, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
   beforeLoad: async () => {
-    const { data: userData, error: userErr } = await supabase.auth.getUser();
-    if (userErr || !userData.user) throw redirect({ to: "/auth/login" });
-    const email = userData.user.email?.toLowerCase() ?? "";
-    if (!email) throw redirect({ to: "/discover" });
-    const { data: row } = await supabase
-      .from("admin_emails")
-      .select("email")
-      .eq("email", email)
-      .maybeSingle();
-    if (!row) throw redirect({ to: "/discover" });
-    return { adminEmail: row.email };
+    // Cheap client check first so unauthenticated users go straight to login
+    // without an unnecessary 401 round-trip.
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) throw redirect({ to: "/auth/login" });
+
+    // Authoritative check happens server-side: requireSupabaseAuth +
+    // admin_emails lookup via service role. The admin shell will not render
+    // unless this passes — bypassing client routing no longer leaks the UI.
+    try {
+      const { email } = await verifyAdminAccess();
+      return { adminEmail: email };
+    } catch {
+      throw redirect({ to: "/discover" });
+    }
   },
   component: AdminLayout,
 });
