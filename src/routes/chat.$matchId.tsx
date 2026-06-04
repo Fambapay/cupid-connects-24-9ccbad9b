@@ -268,28 +268,44 @@ function ChatRoom() {
 
         <ul className="space-y-1.5">
           <AnimatePresence initial={false}>
-            {messages.map((m, i) => {
-              const prev = messages[i - 1];
-              const next = messages[i + 1];
-              const me = m.sender_id === user?.id;
-              const prevMe = prev ? prev.sender_id === user?.id : null;
-              const nextMe = next ? next.sender_id === user?.id : null;
-              const isFirstOfGroup = prevMe === null || prevMe !== me;
-              const isLastOfGroup = nextMe === null || nextMe !== me;
-              return (
-                <Bubble
-                  key={m.id}
-                  msg={m}
-                  me={me}
-                  isFirstOfGroup={isFirstOfGroup}
-                  isLastOfGroup={isLastOfGroup}
-                  avatar={peer.photo}
-                  name={peer.name}
-                />
-              );
-            })}
+            {(() => {
+              const peerReadMs = peerLastReadAt ? new Date(peerLastReadAt).getTime() : 0;
+              // Find the last of MY messages that the peer has already read
+              // so we can show a single "Lido" indicator under it.
+              let lastReadOwnIdx = -1;
+              for (let i = messages.length - 1; i >= 0; i--) {
+                const m = messages[i];
+                if (m.sender_id !== user?.id) continue;
+                if (peerReadMs && new Date(m.created_at).getTime() <= peerReadMs) {
+                  lastReadOwnIdx = i;
+                  break;
+                }
+              }
+              return messages.map((m, i) => {
+                const prev = messages[i - 1];
+                const next = messages[i + 1];
+                const me = m.sender_id === user?.id;
+                const prevMe = prev ? prev.sender_id === user?.id : null;
+                const nextMe = next ? next.sender_id === user?.id : null;
+                const isFirstOfGroup = prevMe === null || prevMe !== me;
+                const isLastOfGroup = nextMe === null || nextMe !== me;
+                return (
+                  <Bubble
+                    key={m.id}
+                    msg={m}
+                    me={me}
+                    isFirstOfGroup={isFirstOfGroup}
+                    isLastOfGroup={isLastOfGroup}
+                    avatar={peer.photo}
+                    name={peer.name}
+                    showReadReceipt={entitlements.canReadReceipts && me && i === lastReadOwnIdx}
+                  />
+                );
+              });
+            })()}
           </AnimatePresence>
         </ul>
+
 
         <AnimatePresence>
           {typing && (
