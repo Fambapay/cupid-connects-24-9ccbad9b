@@ -371,7 +371,7 @@ function SettingsPage() {
               <EyeOff className={`w-6 h-6 ${profile?.is_incognito ? 'text-background' : 'text-foreground'}`} />
             </div>
             <span className="text-[14px] font-semibold text-foreground flex items-center gap-1">
-              Modo Anónimo {!isPremium && <Crown className="w-3 h-3 text-brand-purple" />}
+              Modo Anónimo {!entitlements.invisibleMode && <Crown className="w-3 h-3 text-brand-purple" />}
             </span>
             {profile?.is_incognito && <span className="text-[11px] text-brand-purple font-semibold">Ativo</span>}
           </motion.button>
