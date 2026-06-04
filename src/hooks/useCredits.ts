@@ -23,6 +23,8 @@ export function useCredits() {
       setLoading(false);
       return;
     }
+    // Lazy daily/weekly refill for active members — no-op if already refilled today.
+    await supabase.rpc("refill_my_credits");
     const { data } = await supabase
       .from("user_credits")
       .select("boost_balance, super_like_balance")
