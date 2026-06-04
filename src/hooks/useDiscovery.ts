@@ -247,19 +247,42 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       if (!user) return { matched: false };
       let remainingSuperLikes: number | undefined;
 
+      // For Super Like, verify the user has at least one credit BEFORE
+      // attempting the insert (cheap read; consume happens only after a
+      // successful insert so a failed swipe never burns a credit).
+      if (direction === "super") {
+        const { data: balance } = await supabase
+          .from("user_credits")
+          .select("super_like_balance")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (!balance || (balance.super_like_balance ?? 0) <= 0) {
+          return { matched: false, reason: "insufficient_credits" };
+        }
+      }
+
+      const { error: insertError } = await supabase
+        .from("swipes")
+        .insert({ swiper_id: user.id, swiped_id: targetId, direction });
+      if (insertError) {
+        console.error("swipe insert failed", insertError);
+        return { matched: false, reason: "insert_failed" };
+      }
+
+      // Insert succeeded — now atomically consume the credit. If this fails
+      // (race with concurrent consume, network blip), the user got one free
+      // Super Like; we surface a warning but do not roll back the swipe.
       if (direction === "super") {
         const { data } = await supabase.rpc("consume_super_like_credit");
-        const res = data as { success: boolean; reason?: string; remaining_balance?: number } | null;
-        if (!res?.success) {
-          return { matched: false, reason: res?.reason ?? "insufficient_credits" };
+        const res = data as { success: boolean; remaining_balance?: number } | null;
+        if (res?.success) {
+          remainingSuperLikes = res.remaining_balance;
+        } else {
+          console.warn("super_like credit consume failed after insert", res);
         }
-        remainingSuperLikes = res.remaining_balance;
         window.dispatchEvent(new CustomEvent("hunie:credits-changed"));
       }
 
-      await supabase
-        .from("swipes")
-        .insert({ swiper_id: user.id, swiped_id: targetId, direction });
       if (direction === "pass") return { matched: false };
       const a = user.id < targetId ? user.id : targetId;
       const b = user.id < targetId ? targetId : user.id;
