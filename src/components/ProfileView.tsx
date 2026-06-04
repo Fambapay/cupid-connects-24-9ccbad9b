@@ -18,6 +18,7 @@ export interface ProfileViewData {
   photos: string[];
   isVerified: boolean;
   isPremium: boolean;
+  tier?: 'free' | 'select' | 'plus' | 'elite';
 }
 
 interface Props {
