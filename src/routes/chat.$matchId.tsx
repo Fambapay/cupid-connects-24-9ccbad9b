@@ -9,6 +9,7 @@ import { TypingDots } from "@/components/chat/TypingDots";
 import { ChatActionsMenu } from "@/components/chat/ChatActionsMenu";
 import { PeerProfileSheet } from "@/components/chat/PeerProfileSheet";
 import { getActivityStatus } from "@/lib/activityStatus";
+import { useSubscription } from "@/hooks/useSubscription";
 
 import { requireMembership } from "@/lib/authGuard";
 
