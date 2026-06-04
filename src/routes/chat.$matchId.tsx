@@ -70,6 +70,45 @@ function ChatRoom() {
       .then(() => undefined);
   }, [user, matchId, messages.length]);
 
+  // Read receipts: track peer's last_read_at so we can render "Lido" indicators
+  // on our own messages. Only fetched/subscribed when the viewer has the
+  // entitlement — otherwise we don't even know peer ever read.
+  useEffect(() => {
+    if (!user || !matchId || !peer?.id || !entitlements.canReadReceipts) {
+      setPeerLastReadAt(null);
+      return;
+    }
+    let cancelled = false;
+    supabase
+      .from("match_reads")
+      .select("last_read_at")
+      .eq("match_id", matchId)
+      .eq("user_id", peer.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled) setPeerLastReadAt((data?.last_read_at as string | null) ?? null);
+      });
+    const ch = supabase
+      .channel(`reads-${matchId}-${peer.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "match_reads", filter: `match_id=eq.${matchId}` },
+        (payload) => {
+          const row = (payload.new ?? payload.old) as { user_id?: string; last_read_at?: string } | null;
+          if (row?.user_id === peer.id && row.last_read_at) {
+            setPeerLastReadAt(row.last_read_at);
+          }
+        },
+      )
+      .subscribe();
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(ch);
+    };
+  }, [user, matchId, peer?.id, entitlements.canReadReceipts]);
+
+
+
 
   useEffect(() => {
     const vv = window.visualViewport;
