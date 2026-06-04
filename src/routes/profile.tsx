@@ -29,7 +29,7 @@ function ProfilePage() {
   const navigate = useNavigate();
   const { profile, updateProfile, reload } = useProfile();
   const { photos, upload, remove } = usePhotoUpload();
-  const { isPremium } = useSubscription();
+  const { isPremium, subscription } = useSubscription();
   const { credits } = useCredits();
   const [editing, setEditing] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -45,8 +45,9 @@ function ProfilePage() {
       photos: photos.map((p) => p.url ?? '').filter(Boolean),
       isVerified: !!profile?.is_verified,
       isPremium,
+      tier: subscription.membershipTier,
     }),
-    [profile, photos, isPremium],
+    [profile, photos, isPremium, subscription.membershipTier],
   );
 
   const handleAddFiles = async (files: File[]) => {

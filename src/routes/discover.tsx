@@ -14,6 +14,7 @@ import { useDiscovery } from "@/hooks/useDiscovery";
 import { useCredits } from "@/hooks/useCredits";
 import { useBoost } from "@/hooks/useBoost";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import type { Profile, SwipeDirection } from "@/types/dating";
 
@@ -34,6 +35,7 @@ export const Route = createFileRoute("/discover")({
 function Discover() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isPremium, entitlements } = useSubscription();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
   const { items, loading, swipe, rewind, reload } = useDiscovery({ filters });
@@ -133,7 +135,7 @@ function Discover() {
                   else cardRef.current?.flyUp?.();
                 }}
                 onRewind={handleRewind}
-                canRewind
+                canRewind={entitlements.canRewind}
                 cardX={x}
                 photoUrl={current.photos[0]}
                 cardKey={current.id}
@@ -186,7 +188,7 @@ function Discover() {
         onClose={() => setFiltersOpen(false)}
         value={filters}
         onChange={setFilters}
-        isPremium={false}
+        isPremium={isPremium}
         onUpgrade={goShop}
       />
 

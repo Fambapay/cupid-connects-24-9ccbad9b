@@ -12,6 +12,7 @@ interface PeerProfile {
   interests: string[];
   isVerified: boolean;
   isPremium: boolean;
+  isElite: boolean;
   photos: string[];
 }
 
@@ -51,6 +52,7 @@ export function PeerProfileSheet({ open, onClose, userId, fallbackName, fallback
       const urls = await signPhotos(paths, 3600, { width: 900, height: 1200, resize: "cover", quality: 75 });
 
       if (!alive) return;
+      const isActivePremium = prof?.membership_status === "active" && prof?.membership_tier !== "free";
       setProfile({
         name: (prof?.name as string) ?? fallbackName,
         age: (prof?.age as number | null) ?? null,
@@ -58,7 +60,8 @@ export function PeerProfileSheet({ open, onClose, userId, fallbackName, fallback
         bio: (prof?.bio as string | null) ?? null,
         interests: ((prof?.interests as string[] | null) ?? []) as string[],
         isVerified: Boolean(prof?.is_verified),
-        isPremium: prof?.membership_status === "active" && prof?.membership_tier !== "free",
+        isPremium: isActivePremium,
+        isElite: isActivePremium && prof?.membership_tier === "elite",
         photos: urls.filter(Boolean),
       });
       setLoading(false);
@@ -174,6 +177,14 @@ export function PeerProfileSheet({ open, onClose, userId, fallbackName, fallback
                   ) : null}
                   {profile?.isVerified && (
                     <BadgeCheck className="mb-1.5 h-5 w-5" fill="#5BB8FF" color="#fff" />
+                  )}
+                  {profile?.isElite && (
+                    <span
+                      className="mb-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider"
+                      style={{ background: 'linear-gradient(135deg,#FFD66B,#C9A84C)', color: '#000' }}
+                    >
+                      Elite
+                    </span>
                   )}
                 </div>
                 {profile?.city && (

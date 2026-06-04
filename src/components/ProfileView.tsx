@@ -18,6 +18,7 @@ export interface ProfileViewData {
   photos: string[];
   isVerified: boolean;
   isPremium: boolean;
+  tier?: 'free' | 'select' | 'plus' | 'elite';
 }
 
 interface Props {
@@ -52,7 +53,8 @@ export function ProfileView({
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
-  const { name, age, city, bio, interests, photos, isVerified, isPremium } = profile;
+  const { name, age, city, bio, interests, photos, isVerified, isPremium, tier } = profile;
+  const isElite = tier === 'elite';
 
   const completion = computeProfileCompletion({
     photosCount: photos.length, bio, interests, city, isVerified,
@@ -171,6 +173,14 @@ export function ProfileView({
                 </span>
               )}
               {isVerified && <BadgeCheck size={20} color="#5BB8FF" fill="#5BB8FF" stroke="#000" />}
+              {isElite && (
+                <span
+                  className="rounded-full px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider"
+                  style={{ background: 'linear-gradient(135deg,#FFD66B,#C9A84C)', color: '#000' }}
+                >
+                  Elite
+                </span>
+              )}
             </div>
             <button
               onClick={() => { hapticTap(); onEditProfile(); }}
