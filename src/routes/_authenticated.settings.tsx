@@ -209,8 +209,8 @@ function SettingsPage() {
   };
 
   const handleIncognitoChange = async (enabled: boolean) => {
-    if (enabled && !isPremium) {
-      toast({ title: 'Modo Anónimo é Premium', description: 'Faz upgrade para controlar quem te vê.' });
+    if (enabled && !entitlements.invisibleMode) {
+      toast({ title: 'Modo Anónimo é exclusivo Elite', description: 'Faz upgrade para Hunie Elite para controlar quem te vê.' });
       return;
     }
     try {
