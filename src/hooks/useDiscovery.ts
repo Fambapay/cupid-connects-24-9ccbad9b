@@ -184,10 +184,22 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       .in("profile_id", candidates.map((r) => r.id))
       .gt("expires_at", new Date().toISOString());
     const boostedIds = new Set((activeBoosts ?? []).map((b) => b.profile_id as string));
+    // Priority discovery score: active boost > Elite > Plus > everyone else.
+    // Within each tier, preserve the original (recency-biased) order.
+    const nowMs = Date.now();
+    const tierRank = (r: typeof candidates[number]) => {
+      if (boostedIds.has(r.id)) return 3;
+      const expires = r.membership_expires_at ? new Date(r.membership_expires_at as string).getTime() : 0;
+      const active = r.membership_status === "active" && (!expires || expires > nowMs);
+      if (!active) return 0;
+      if (r.membership_tier === "elite") return 2;
+      if (r.membership_tier === "plus") return 1;
+      return 0;
+    };
     candidates = [...candidates].sort((a, b) => {
-      const boostedA = boostedIds.has(a.id) ? 1 : 0;
-      const boostedB = boostedIds.has(b.id) ? 1 : 0;
-      if (boostedA !== boostedB) return boostedB - boostedA;
+      const rA = tierRank(a);
+      const rB = tierRank(b);
+      if (rA !== rB) return rB - rA;
       return (candidateOrder.get(a.id) ?? 0) - (candidateOrder.get(b.id) ?? 0);
     });
 
