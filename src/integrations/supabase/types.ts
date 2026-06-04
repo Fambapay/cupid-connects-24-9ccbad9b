@@ -732,6 +732,8 @@ export type Database = {
         Row: {
           boost_balance: number
           created_at: string
+          last_boost_refill_date: string | null
+          last_super_refill_date: string | null
           super_like_balance: number
           updated_at: string
           user_id: string
@@ -739,6 +741,8 @@ export type Database = {
         Insert: {
           boost_balance?: number
           created_at?: string
+          last_boost_refill_date?: string | null
+          last_super_refill_date?: string | null
           super_like_balance?: number
           updated_at?: string
           user_id: string
@@ -746,6 +750,8 @@ export type Database = {
         Update: {
           boost_balance?: number
           created_at?: string
+          last_boost_refill_date?: string | null
+          last_super_refill_date?: string | null
           super_like_balance?: number
           updated_at?: string
           user_id?: string
@@ -889,6 +895,9 @@ export type Database = {
           read_ct: number
         }[]
       }
+      refill_all_active_memberships: { Args: never; Returns: number }
+      refill_membership_credits: { Args: { _user_id: string }; Returns: Json }
+      refill_my_credits: { Args: never; Returns: Json }
       rewind_last_swipe: { Args: never; Returns: Json }
       touch_last_active: { Args: never; Returns: undefined }
     }
