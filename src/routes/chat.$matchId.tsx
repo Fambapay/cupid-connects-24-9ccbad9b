@@ -388,9 +388,10 @@ type BubbleProps = {
   isLastOfGroup: boolean;
   avatar: string;
   name: string;
+  showReadReceipt?: boolean;
 };
 
-function Bubble({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name }: BubbleProps) {
+function Bubble({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showReadReceipt }: BubbleProps) {
   return (
     <motion.li
       initial={{ opacity: 0, y: 6 }}
