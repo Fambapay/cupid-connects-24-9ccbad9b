@@ -9,6 +9,7 @@ import { TypingDots } from "@/components/chat/TypingDots";
 import { ChatActionsMenu } from "@/components/chat/ChatActionsMenu";
 import { PeerProfileSheet } from "@/components/chat/PeerProfileSheet";
 import { getActivityStatus } from "@/lib/activityStatus";
+import { useSubscription } from "@/hooks/useSubscription";
 
 import { requireMembership } from "@/lib/authGuard";
 
@@ -23,8 +24,10 @@ export const Route = createFileRoute("/chat/$matchId")({
 function ChatRoom() {
   const { matchId } = useParams({ from: "/chat/$matchId" });
   const { user } = useAuth();
+  const { entitlements } = useSubscription();
   const { messages, peer, loading, notFound, send } = useMessages(matchId);
   const [typing, setTyping] = useState(false);
+  const [peerLastReadAt, setPeerLastReadAt] = useState<string | null>(null);
   
   const [profileOpen, setProfileOpen] = useState(false);
   const typingTimerRef = useRef<number | null>(null);
@@ -66,6 +69,45 @@ function ChatRoom() {
       )
       .then(() => undefined);
   }, [user, matchId, messages.length]);
+
+  // Read receipts: track peer's last_read_at so we can render "Lido" indicators
+  // on our own messages. Only fetched/subscribed when the viewer has the
+  // entitlement — otherwise we don't even know peer ever read.
+  useEffect(() => {
+    if (!user || !matchId || !peer?.id || !entitlements.canReadReceipts) {
+      setPeerLastReadAt(null);
+      return;
+    }
+    let cancelled = false;
+    supabase
+      .from("match_reads")
+      .select("last_read_at")
+      .eq("match_id", matchId)
+      .eq("user_id", peer.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled) setPeerLastReadAt((data?.last_read_at as string | null) ?? null);
+      });
+    const ch = supabase
+      .channel(`reads-${matchId}-${peer.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "match_reads", filter: `match_id=eq.${matchId}` },
+        (payload) => {
+          const row = (payload.new ?? payload.old) as { user_id?: string; last_read_at?: string } | null;
+          if (row?.user_id === peer.id && row.last_read_at) {
+            setPeerLastReadAt(row.last_read_at);
+          }
+        },
+      )
+      .subscribe();
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(ch);
+    };
+  }, [user, matchId, peer?.id, entitlements.canReadReceipts]);
+
+
 
 
   useEffect(() => {
@@ -226,28 +268,44 @@ function ChatRoom() {
 
         <ul className="space-y-1.5">
           <AnimatePresence initial={false}>
-            {messages.map((m, i) => {
-              const prev = messages[i - 1];
-              const next = messages[i + 1];
-              const me = m.sender_id === user?.id;
-              const prevMe = prev ? prev.sender_id === user?.id : null;
-              const nextMe = next ? next.sender_id === user?.id : null;
-              const isFirstOfGroup = prevMe === null || prevMe !== me;
-              const isLastOfGroup = nextMe === null || nextMe !== me;
-              return (
-                <Bubble
-                  key={m.id}
-                  msg={m}
-                  me={me}
-                  isFirstOfGroup={isFirstOfGroup}
-                  isLastOfGroup={isLastOfGroup}
-                  avatar={peer.photo}
-                  name={peer.name}
-                />
-              );
-            })}
+            {(() => {
+              const peerReadMs = peerLastReadAt ? new Date(peerLastReadAt).getTime() : 0;
+              // Find the last of MY messages that the peer has already read
+              // so we can show a single "Lido" indicator under it.
+              let lastReadOwnIdx = -1;
+              for (let i = messages.length - 1; i >= 0; i--) {
+                const m = messages[i];
+                if (m.sender_id !== user?.id) continue;
+                if (peerReadMs && new Date(m.created_at).getTime() <= peerReadMs) {
+                  lastReadOwnIdx = i;
+                  break;
+                }
+              }
+              return messages.map((m, i) => {
+                const prev = messages[i - 1];
+                const next = messages[i + 1];
+                const me = m.sender_id === user?.id;
+                const prevMe = prev ? prev.sender_id === user?.id : null;
+                const nextMe = next ? next.sender_id === user?.id : null;
+                const isFirstOfGroup = prevMe === null || prevMe !== me;
+                const isLastOfGroup = nextMe === null || nextMe !== me;
+                return (
+                  <Bubble
+                    key={m.id}
+                    msg={m}
+                    me={me}
+                    isFirstOfGroup={isFirstOfGroup}
+                    isLastOfGroup={isLastOfGroup}
+                    avatar={peer.photo}
+                    name={peer.name}
+                    showReadReceipt={entitlements.canReadReceipts && me && i === lastReadOwnIdx}
+                  />
+                );
+              });
+            })()}
           </AnimatePresence>
         </ul>
+
 
         <AnimatePresence>
           {typing && (
@@ -330,9 +388,10 @@ type BubbleProps = {
   isLastOfGroup: boolean;
   avatar: string;
   name: string;
+  showReadReceipt?: boolean;
 };
 
-function Bubble({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name }: BubbleProps) {
+function Bubble({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showReadReceipt }: BubbleProps) {
   return (
     <motion.li
       initial={{ opacity: 0, y: 6 }}
@@ -376,6 +435,7 @@ function Bubble({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name }: Bubble
               hour: "2-digit",
               minute: "2-digit",
             })}
+            {me && showReadReceipt && <span className="ml-1.5 text-flame font-medium">· Lido</span>}
           </span>
         )}
       </div>

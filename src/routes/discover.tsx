@@ -38,7 +38,7 @@ function Discover() {
   const { isPremium, entitlements } = useSubscription();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
-  const { items, loading, swipe, rewind, reload } = useDiscovery({ filters });
+  const { items, loading, swipe, rewind, reload, dailyLimits } = useDiscovery({ filters });
   const { credits, reload: reloadCredits, syncCredits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
   const boost = useBoost(goShop);
@@ -75,11 +75,17 @@ function Discover() {
 
   const handleSwipe = async (dir: SwipeDirection) => {
     const target = current;
+    const direction = dir === "right" ? "like" : dir === "up" ? "super" : "pass";
+    // Daily likes cap for free users (Select+ have unlimited via dailyLimits.likesLimit === -1)
+    if ((direction === "like" || direction === "super") && dailyLimits.likesLimit >= 0 && dailyLimits.likesRemaining <= 0) {
+      toast.error("Atingiste o limite diário de likes. Faz upgrade para likes ilimitados.");
+      navigate({ to: "/membership" });
+      return;
+    }
     x.set(0);
     y.set(0);
     setIndex((i) => i + 1);
     if (!target) return;
-    const direction = dir === "right" ? "like" : dir === "up" ? "super" : "pass";
     const result = await swipe(target.id, direction);
     if (direction === "super") {
       if (result.reason === "insufficient_credits") {
@@ -140,6 +146,7 @@ function Discover() {
                 photoUrl={current.photos[0]}
                 cardKey={current.id}
                 purchasedSuperLikes={credits.super_like_balance}
+                dailyLimits={dailyLimits}
               />
             </div>
           </>

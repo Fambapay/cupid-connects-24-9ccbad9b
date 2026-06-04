@@ -66,7 +66,7 @@ function SettingsPage() {
   const { signOut, user } = useAuth();
   const { profile, updateProfile, deleteAccount } = useProfile();
   const { settings, updateSettings, loading } = useSettings();
-  const { isPremium, subscription } = useSubscription();
+  const { isPremium, entitlements, subscription } = useSubscription();
   const membershipTier = subscription.membershipTier;
   const {
     permissionState: locationPermission,
@@ -209,8 +209,8 @@ function SettingsPage() {
   };
 
   const handleIncognitoChange = async (enabled: boolean) => {
-    if (enabled && !isPremium) {
-      toast({ title: 'Modo Anónimo é Premium', description: 'Faz upgrade para controlar quem te vê.' });
+    if (enabled && !entitlements.invisibleMode) {
+      toast({ title: 'Modo Anónimo é exclusivo Elite', description: 'Faz upgrade para Hunie Elite para controlar quem te vê.' });
       return;
     }
     try {
@@ -371,7 +371,7 @@ function SettingsPage() {
               <EyeOff className={`w-6 h-6 ${profile?.is_incognito ? 'text-background' : 'text-foreground'}`} />
             </div>
             <span className="text-[14px] font-semibold text-foreground flex items-center gap-1">
-              Modo Anónimo {!isPremium && <Crown className="w-3 h-3 text-brand-purple" />}
+              Modo Anónimo {!entitlements.invisibleMode && <Crown className="w-3 h-3 text-brand-purple" />}
             </span>
             {profile?.is_incognito && <span className="text-[11px] text-brand-purple font-semibold">Ativo</span>}
           </motion.button>
