@@ -192,7 +192,10 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     if (requireBio) q = q.not("bio", "is", null).neq("bio", "");
 
     const { data: rows } = await q;
-    let candidates = (rows ?? []).filter((r) => !excluded.has(r.id));
+    let candidates = (rows ?? [])
+      .filter((r) => !excluded.has(r.id))
+      // Invisible mode: only show incognito candidates that already liked me.
+      .filter((r) => !r.is_incognito || likedMe.has(r.id));
 
     const myCoords =
       userCoords ??
