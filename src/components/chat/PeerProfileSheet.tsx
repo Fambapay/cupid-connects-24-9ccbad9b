@@ -178,6 +178,14 @@ export function PeerProfileSheet({ open, onClose, userId, fallbackName, fallback
                   {profile?.isVerified && (
                     <BadgeCheck className="mb-1.5 h-5 w-5" fill="#5BB8FF" color="#fff" />
                   )}
+                  {profile?.isElite && (
+                    <span
+                      className="mb-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider"
+                      style={{ background: 'linear-gradient(135deg,#FFD66B,#C9A84C)', color: '#000' }}
+                    >
+                      Elite
+                    </span>
+                  )}
                 </div>
                 {profile?.city && (
                   <div className="mt-1 flex items-center gap-1.5 text-sm text-white/85">
