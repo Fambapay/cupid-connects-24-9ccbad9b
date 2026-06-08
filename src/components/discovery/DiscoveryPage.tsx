@@ -33,19 +33,33 @@ export const DiscoveryPage = ({
   const next2 = profiles[index + 2];
   const next3 = profiles[index + 3];
 
-  // Aggressively preload the next 3 cards' first photos so the stack behind
-  // the top card never flashes black during a swipe. Uses Image() + decode()
-  // to push the decode work off the main thread before the user sees the card.
+  // Preload next cards' first photos so the stack behind the top card never
+  // flashes black. Defer to idle time so it never competes with swipe rendering.
   useEffect(() => {
-    [next1, next2, next3].forEach((p) => {
-      const url = p?.photos?.[0];
-      if (!url) return;
-      const img = new Image();
-      img.decoding = "async";
-      img.src = url;
-      img.decode?.().catch(() => {});
-    });
+    const urls = [next1, next2, next3]
+      .map((p) => p?.photos?.[0])
+      .filter(Boolean) as string[];
+    if (!urls.length) return;
+    const run = () => {
+      urls.forEach((url) => {
+        const img = new Image();
+        img.decoding = "async";
+        img.src = url;
+        img.decode?.().catch(() => {});
+      });
+    };
+    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback;
+    if (ric) {
+      const id = ric(run, { timeout: 500 });
+      return () => {
+        const cic = (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback;
+        cic?.(id);
+      };
+    }
+    const t = window.setTimeout(run, 50);
+    return () => window.clearTimeout(t);
   }, [next1, next2, next3]);
+
 
   const handle = useCallback(
     (dir: SwipeDirection) => {

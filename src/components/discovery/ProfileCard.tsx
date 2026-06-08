@@ -57,7 +57,9 @@ const StackCard = ({
   stackIndex: 1 | 2;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
   const apply = useCallback(() => {
+    rafRef.current = null;
     const el = ref.current;
     if (!el) return;
     const dx = topX.get();
@@ -78,11 +80,20 @@ const StackCard = ({
     }
   }, [stackIndex, topX, topY]);
 
+  const schedule = useCallback(() => {
+    if (rafRef.current != null) return;
+    rafRef.current = requestAnimationFrame(apply);
+  }, [apply]);
+
   useEffect(() => {
     apply();
+    return () => {
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+    };
   }, [apply]);
-  useMotionValueEvent(topX, "change", apply);
-  useMotionValueEvent(topY, "change", apply);
+  useMotionValueEvent(topX, "change", schedule);
+  useMotionValueEvent(topY, "change", schedule);
+
 
   const photo = profile.photos[0];
   return (
@@ -168,53 +179,68 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     const draggingRef = useRef(false);
     const startRef = useRef({ x: 0, y: 0 });
 
-    const applyParallax = useCallback(() => {
-      const dx = x.get();
-      const dy = y.get();
-      if (photoWrapRef.current) {
-        photoWrapRef.current.style.transform = `translate3d(${dx * -0.06}px, ${dy * -0.04}px, 0) scale(1.04)`;
-      }
-      if (infoWrapRef.current) {
-        infoWrapRef.current.style.transform = `translate3d(${dx * 0.04}px, ${dy * 0.02}px, 0)`;
-      }
-      if (likeLabelRef.current) {
-        likeLabelRef.current.style.transform = `translate3d(${dx * 0.12}px, ${dy * 0.08}px, 0) rotate(-18deg)`;
-      }
-      if (nopeLabelRef.current) {
-        nopeLabelRef.current.style.transform = `translate3d(${dx * -0.12}px, ${dy * 0.08}px, 0) rotate(18deg)`;
-      }
-      if (supLabelRef.current) {
-        supLabelRef.current.style.transform = `translate3d(${dx * 0.08}px, ${dy * 0.12}px, 0) translateX(-50%) rotate(-6deg)`;
-      }
-    }, [x, y]);
-
-    const apply = useCallback(() => {
+    const tickRef = useRef<number | null>(null);
+    const tick = useCallback(() => {
+      tickRef.current = null;
       const el = cardRef.current;
       if (!el) return;
       const dx = x.get();
       const dy = y.get();
       const w = getVW();
       const h = getVH();
+      // Card transform
       const rot = (dx / w) * 30;
       const rotY = (dx / w) * 7;
       const rotX = -(dy / h) * 5;
       const dist = Math.sqrt(dx * dx + dy * dy);
       const progress = Math.min(1, dist / (w * 0.4));
       const dragScale = 1 + progress * 0.025;
-      // Entry blend: at e=1 we mimic the stack-1 pose (y+10, scale 0.94)
       const e = entry.get();
       const entryY = e * 10;
       const entryScale = 1 - e * 0.06;
       const scale = dragScale * entryScale;
       el.style.transform = `translate3d(${dx}px,${dy + entryY}px,0) rotate(${rot.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) rotateX(${rotX.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
-      applyParallax();
-    }, [x, y, entry, applyParallax]);
+      // Parallax layers
+      if (photoWrapRef.current) {
+        photoWrapRef.current.style.transform = `translate3d(${dx * -0.06}px, ${dy * -0.04}px, 0) scale(1.04)`;
+      }
+      if (infoWrapRef.current) {
+        infoWrapRef.current.style.transform = `translate3d(${dx * 0.04}px, ${dy * 0.02}px, 0)`;
+      }
+      // Labels — opacity + transform combined
+      const t = w * 0.25;
+      const like = Math.max(0, Math.min(1, dx / t));
+      const nope = Math.max(0, Math.min(1, -dx / t));
+      const sup = Math.max(0, Math.min(1, -dy / 180));
+      if (likeLabelRef.current) {
+        likeLabelRef.current.style.opacity = String(like);
+        likeLabelRef.current.style.transform = `translate3d(${dx * 0.12}px, ${dy * 0.08}px, 0) rotate(-18deg)`;
+      }
+      if (nopeLabelRef.current) {
+        nopeLabelRef.current.style.opacity = String(nope);
+        nopeLabelRef.current.style.transform = `translate3d(${dx * -0.12}px, ${dy * 0.08}px, 0) rotate(18deg)`;
+      }
+      if (supLabelRef.current) {
+        supLabelRef.current.style.opacity = String(sup);
+        supLabelRef.current.style.transform = `translate3d(${dx * 0.08}px, ${dy * 0.12}px, 0) translateX(-50%) rotate(-6deg)`;
+      }
+    }, [x, y, entry]);
+
+    const schedule = useCallback(() => {
+      if (tickRef.current != null) return;
+      tickRef.current = requestAnimationFrame(tick);
+    }, [tick]);
+
     useEffect(() => {
-      apply();
-    }, [apply]);
-    useMotionValueEvent(x, "change", apply);
-    useMotionValueEvent(y, "change", apply);
-    useMotionValueEvent(entry, "change", apply);
+      tick();
+      return () => {
+        if (tickRef.current != null) cancelAnimationFrame(tickRef.current);
+      };
+    }, [tick]);
+    useMotionValueEvent(x, "change", schedule);
+    useMotionValueEvent(y, "change", schedule);
+    useMotionValueEvent(entry, "change", schedule);
+
 
     // Spring the card up from the stacked pose into place on mount
     useEffect(() => {
@@ -320,23 +346,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       else setPhotoIdx((i) => Math.min(photos.length - 1, i + 1));
     };
 
-    // Direct DOM mutation for label opacity — avoids re-rendering the
-    // entire card 60+ times per drag (huge perf win on lower-end devices).
-    const recompute = useCallback(() => {
-      const w = getVW();
-      const dx = x.get();
-      const dy = y.get();
-      const t = w * 0.25;
-      const like = Math.max(0, Math.min(1, dx / t));
-      const nope = Math.max(0, Math.min(1, -dx / t));
-      const sup = Math.max(0, Math.min(1, -dy / 180));
-      if (likeLabelRef.current) likeLabelRef.current.style.opacity = String(like);
-      if (nopeLabelRef.current) nopeLabelRef.current.style.opacity = String(nope);
-      if (supLabelRef.current) supLabelRef.current.style.opacity = String(sup);
-    }, [x, y]);
-    useEffect(() => { recompute(); }, [recompute]);
-    useMotionValueEvent(x, "change", recompute);
-    useMotionValueEvent(y, "change", recompute);
+
 
     return (
       <div className="absolute inset-0 overflow-hidden" style={{ background: "#000", perspective: 1200 }}>
