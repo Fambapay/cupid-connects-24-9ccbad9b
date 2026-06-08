@@ -127,9 +127,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
-      { rel: "icon", type: "image/png", sizes: "192x192", href: "/icon-192.png" },
-      { rel: "icon", type: "image/png", sizes: "512x512", href: "/icon-512.png" },
+      { rel: "icon", type: "image/png", href: "/__l5e/assets-v1/b15315d5-1e63-456c-9b1b-b7a23fd3a92d/favicon.png" },
+      { rel: "apple-touch-icon", href: "/__l5e/assets-v1/b15315d5-1e63-456c-9b1b-b7a23fd3a92d/favicon.png" },
+      { rel: "icon", type: "image/png", sizes: "192x192", href: "/__l5e/assets-v1/b15315d5-1e63-456c-9b1b-b7a23fd3a92d/favicon.png" },
+      { rel: "icon", type: "image/png", sizes: "512x512", href: "/__l5e/assets-v1/b15315d5-1e63-456c-9b1b-b7a23fd3a92d/favicon.png" },
     ],
     scripts: [{
       type: "application/ld+json",
