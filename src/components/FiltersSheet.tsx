@@ -381,7 +381,7 @@ const SingleSlider = ({ min, max, value, onChange, disabled }: { min: number; ma
   return (
     <div className="px-1 pt-1.5">
       <div className="relative h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.12)' }}>
-        <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${pct}%`, background: 'linear-gradient(90deg, var(--brand-pink), var(--brand-purple))' }} />
+        <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${pct}%`, background: 'var(--brand-pink)' }} />
         <input
           type="range" min={min} max={max} value={value} disabled={disabled}
           onChange={(e) => onChange(Number(e.target.value))}
@@ -400,7 +400,7 @@ const RangeSlider = ({ min, max, valueMin, valueMax, onChange, disabled }: {
   return (
     <div className="px-1 pt-1.5">
       <div className="relative h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.12)' }}>
-        <div className="absolute inset-y-0 rounded-full" style={{ left: `${pctMin}%`, right: `${100 - pctMax}%`, background: 'linear-gradient(90deg, var(--brand-pink), var(--brand-purple))' }} />
+        <div className="absolute inset-y-0 rounded-full" style={{ left: `${pctMin}%`, right: `${100 - pctMax}%`, background: 'var(--brand-pink)' }} />
         <input
           type="range" min={min} max={max} value={valueMin} disabled={disabled}
           onChange={(e) => onChange(Math.min(Number(e.target.value), valueMax - 1), valueMax)}
@@ -429,7 +429,7 @@ const ChipGrid = ({ options, selected, onToggle, disabled }: { options: string[]
           disabled={disabled}
           className="rounded-full px-3.5 py-2 text-[13px] font-medium transition-all"
           style={{
-            background: on ? 'linear-gradient(135deg, var(--brand-pink), var(--brand-purple))' : 'rgba(255,255,255,0.08)',
+            background: on ? 'var(--brand-pink)' : 'rgba(255,255,255,0.08)',
             border: on ? '1px solid transparent' : '1px solid rgba(255,255,255,0.1)',
             color: '#fff',
           }}
@@ -465,7 +465,7 @@ const LifestyleRow = ({ label, value, onChange, disabled, last }: {
               className="rounded-full px-3 py-1 text-[12px] font-medium transition-all"
               style={{
                 background: on
-                  ? 'linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%)'
+                  ? 'var(--brand-pink)'
                   : 'rgba(255,255,255,0.08)',
                 border: on
                   ? '1px solid transparent'
@@ -502,7 +502,7 @@ const PremiumBanner = ({ isPremium, onUpgrade }: { isPremium: boolean; onUpgrade
           className="text-[13px] font-semibold"
           style={{
             backgroundImage:
-              'linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%)',
+              'var(--brand-pink)',
             WebkitBackgroundClip: 'text',
             backgroundClip: 'text',
             color: 'transparent',
@@ -529,7 +529,7 @@ const PremiumBanner = ({ isPremium, onUpgrade }: { isPremium: boolean; onUpgrade
       <div
         className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl"
         style={{
-          background: 'linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%)',
+          background: 'var(--brand-pink)',
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25)',
         }}
       >
