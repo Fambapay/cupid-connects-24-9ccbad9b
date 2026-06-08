@@ -32,6 +32,7 @@ interface BottomNavProps {
 export const BottomNavBase = ({
   activeTab,
   onTabChange,
+  onTabHover,
   likesCount = 0,
   unreadChats = 0,
   dockToBottom = false,
