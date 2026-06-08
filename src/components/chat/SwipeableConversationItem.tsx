@@ -184,34 +184,41 @@ export function SwipeableConversationItem({
           to="/chat/$matchId"
           params={{ matchId }}
           onClick={handleRowClick}
-          className="flex items-center gap-3 rounded-2xl bg-background px-2 py-2.5 hover:bg-muted/60 active:bg-muted"
+          className="flex items-center gap-3.5 border-b border-white/[0.06] bg-background px-1 py-3 active:bg-white/[0.03]"
         >
-          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full ring-2 ring-flame/40">
-            {photo ? (
-              <img src={photo} alt={name} className="h-full w-full object-cover" />
-            ) : (
-              <div className="h-full w-full bg-gradient-flame" />
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-baseline justify-between gap-2">
-              <span className={`truncate ${unread > 0 ? "font-bold" : "font-semibold"}`}>{name}</span>
-              <span className={`text-xs ${unread > 0 ? "font-semibold text-flame" : "text-muted-foreground"}`}>
-                {lastMessageAt}
-              </span>
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <p className={`truncate text-sm ${unread > 0 ? "font-medium text-foreground" : "text-muted-foreground"}`}>
-                {lastMessage ?? "Diz olá 👋"}
-              </p>
-              {unread > 0 && (
-                <span className="ml-2 inline-flex h-5 min-w-[20px] shrink-0 items-center justify-center rounded-full bg-gradient-flame px-1.5 text-[11px] font-bold text-flame-foreground shadow-sm">
-                  {unread > 99 ? "99+" : unread}
-                </span>
+          <div className="relative h-[62px] w-[62px] shrink-0">
+            <div className="h-full w-full overflow-hidden rounded-full">
+              {photo ? (
+                <img src={photo} alt={name} className="h-full w-full object-cover" />
+              ) : (
+                <div className="h-full w-full bg-gradient-flame" />
               )}
             </div>
           </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between gap-2">
+              <span
+                className="truncate text-[17px] text-white"
+                style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: unread > 0 ? 800 : 700 }}
+              >
+                {name}
+              </span>
+              {unread > 0 ? (
+                <span className="ml-2 inline-flex h-5 min-w-[20px] shrink-0 items-center justify-center rounded-full bg-gradient-flame px-1.5 text-[11px] font-bold text-flame-foreground shadow-sm">
+                  {unread > 99 ? "99+" : unread}
+                </span>
+              ) : (
+                <span className="text-xs text-white/40">{lastMessageAt}</span>
+              )}
+            </div>
+            <p
+              className={`mt-0.5 truncate text-[14px] ${unread > 0 ? "text-white/90" : "text-white/55"}`}
+            >
+              {lastMessage ?? "Diz olá 👋"}
+            </p>
+          </div>
         </Link>
+
       </motion.div>
 
       <AlertDialog open={confirmKind !== null} onOpenChange={(o) => !o && setConfirmKind(null)}>
