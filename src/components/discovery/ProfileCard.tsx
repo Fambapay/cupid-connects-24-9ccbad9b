@@ -476,17 +476,35 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               position: "absolute",
               left: 0,
               right: 0,
-              bottom: 110,
-              padding: "0 20px",
+              bottom: 96,
+              padding: "0 18px",
               color: "#fff",
               zIndex: 3,
               pointerEvents: "none",
             }}
           >
+            {/* Nearby pill */}
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                padding: "5px 12px",
+                borderRadius: 999,
+                background: "#fff",
+                color: "#0a0a0a",
+                fontSize: 13,
+                fontWeight: 700,
+                marginBottom: 10,
+              }}
+            >
+              Nearby
+            </div>
+
+            {/* Name + age */}
             <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
               <h2
                 style={{
-                  fontSize: 32,
+                  fontSize: 36,
                   fontWeight: 800,
                   letterSpacing: "-0.5px",
                   margin: 0,
@@ -495,93 +513,92 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               >
                 {profile.name}
               </h2>
-              <span style={{ fontSize: 26, fontWeight: 400, opacity: 0.95 }}>
+              <span style={{ fontSize: 30, fontWeight: 400, opacity: 0.95 }}>
                 {profile.age}
               </span>
-              {profile.isVerified && (
-                <BadgeCheck
-                  size={22}
-                  color="#1FB8FF"
-                  style={{ flexShrink: 0 }}
-                  fill="#1FB8FF20"
-                />
-              )}
               {profile.isOnline && (
                 <span
                   style={{
-                    width: 10,
-                    height: 10,
+                    width: 9,
+                    height: 9,
                     borderRadius: "50%",
                     background: "#19D27E",
                     boxShadow: "0 0 0 2px rgba(25,210,126,0.25)",
-                    marginLeft: 4,
+                    marginLeft: 2,
+                    alignSelf: "center",
                   }}
                 />
               )}
             </div>
-            {(profile.city || profile.distance) && (
-              <div
-                style={{
-                  marginTop: 6,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  fontSize: 14,
-                  opacity: 0.9,
-                }}
-              >
-                <MapPin size={14} />
-                <span>
-                  {profile.city}
-                  {profile.city && profile.distance ? " • " : ""}
-                  {formatDistance(profile.distance)}
-                </span>
-              </div>
-            )}
-            {profile.bio && (
-              <p
-                style={{
-                  marginTop: 10,
-                  fontSize: 14,
-                  lineHeight: 1.4,
-                  opacity: 0.9,
-                  maxWidth: 280,
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
-                  overflow: "hidden",
-                }}
-              >
-                {profile.bio}
-              </p>
-            )}
+
+            {/* Interests label */}
             {profile.interests && profile.interests.length > 0 && (
-              <div
-                style={{
-                  marginTop: 10,
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 6,
-                }}
-              >
-                {profile.interests.slice(0, 4).map((it) => (
+              <>
+                <div
+                  style={{
+                    marginTop: 12,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    fontSize: 15,
+                    fontWeight: 600,
+                    color: "#fff",
+                  }}
+                >
                   <span
-                    key={it}
+                    aria-hidden
                     style={{
-                      fontSize: 12,
-                      fontWeight: 600,
-                      padding: "5px 10px",
-                      borderRadius: 999,
-                      background: "rgba(255,255,255,0.18)",
-                      backdropFilter: "blur(8px)",
-                      WebkitBackdropFilter: "blur(8px)",
-                      color: "#fff",
+                      display: "inline-grid",
+                      gridTemplateColumns: "5px 5px",
+                      gridTemplateRows: "5px 5px",
+                      gap: 2,
                     }}
                   >
-                    {it}
+                    <span style={{ background: "#fff", borderRadius: 1 }} />
+                    <span style={{ background: "#fff", borderRadius: 1 }} />
+                    <span style={{ background: "#fff", borderRadius: 1 }} />
+                    <span style={{ background: "#fff", borderRadius: 1 }} />
                   </span>
-                ))}
-              </div>
+                  Interests
+                </div>
+
+                {/* Interest chips */}
+                <div
+                  style={{
+                    marginTop: 10,
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 8,
+                  }}
+                >
+                  {profile.interests.slice(0, 10).map((it, i) => {
+                    const highlighted = i === 0;
+                    return (
+                      <span
+                        key={it}
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 600,
+                          padding: "8px 14px",
+                          borderRadius: 999,
+                          background: highlighted
+                            ? "#F8B6D2"
+                            : "rgba(10,10,12,0.78)",
+                          color: highlighted ? "#1a0712" : "#fff",
+                          border: highlighted
+                            ? "1px solid rgba(255,255,255,0.15)"
+                            : "1px solid rgba(255,255,255,0.08)",
+                          backdropFilter: "blur(10px)",
+                          WebkitBackdropFilter: "blur(10px)",
+                          lineHeight: 1.1,
+                        }}
+                      >
+                        {it}
+                      </span>
+                    );
+                  })}
+                </div>
+              </>
             )}
           </div>
 
@@ -593,26 +610,24 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             style={{
               position: "absolute",
               right: 16,
-              bottom: 120,
-              width: 36,
-              height: 36,
+              bottom: 110,
+              width: 40,
+              height: 40,
               borderRadius: "50%",
-              border: "none",
-              background: "rgba(255,255,255,0.18)",
-              backdropFilter: "blur(10px)",
-              WebkitBackdropFilter: "blur(10px)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              background: "rgba(40,40,46,0.72)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
               color: "#fff",
               zIndex: 6,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
-              fontSize: 18,
-              fontWeight: 700,
             }}
             aria-label="Ver detalhes"
           >
-            i
+            <ArrowUp size={20} strokeWidth={2.6} />
           </button>
         </div>
 
