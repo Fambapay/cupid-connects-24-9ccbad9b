@@ -175,25 +175,47 @@ export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters }: Em
           : "Voltamos já com novos perfis para descobrires."}
       </motion.p>
 
-      {!isSearching && onRefresh && (
-        <motion.button
-          type="button"
-          onClick={handleRefresh}
-          whileTap={{ scale: 0.96 }}
+      {!isSearching && (onRefresh || onOpenFilters) && (
+        <motion.div
+          className="relative mt-7 flex items-center gap-2"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mt-7 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-semibold text-white"
-          style={{
-            backgroundImage:
-              "linear-gradient(135deg, #FF4FA3 0%, #B13CFF 100%)",
-            boxShadow:
-              "0 10px 28px -10px color-mix(in oklab, var(--brand-pink) 70%, transparent), inset 0 1px 0 rgba(255,255,255,0.22)",
-          }}
         >
-          <RefreshCw className="h-[14px] w-[14px]" strokeWidth={2.4} />
-          Atualizar
-        </motion.button>
+          {onRefresh && (
+            <motion.button
+              type="button"
+              onClick={handleRefresh}
+              whileTap={{ scale: 0.96 }}
+              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-semibold text-white"
+              style={{
+                backgroundImage:
+                  "linear-gradient(135deg, #FF4FA3 0%, #B13CFF 100%)",
+                boxShadow:
+                  "0 10px 28px -10px color-mix(in oklab, var(--brand-pink) 70%, transparent), inset 0 1px 0 rgba(255,255,255,0.22)",
+              }}
+            >
+              <RefreshCw className="h-[14px] w-[14px]" strokeWidth={2.4} />
+              Atualizar
+            </motion.button>
+          )}
+          {onOpenFilters && (
+            <motion.button
+              type="button"
+              onClick={onOpenFilters}
+              whileTap={{ scale: 0.96 }}
+              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-semibold text-white/90"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              <SlidersHorizontal className="h-[14px] w-[14px]" strokeWidth={2.4} />
+              Filtros
+            </motion.button>
+          )}
+        </motion.div>
       )}
     </div>
   );
