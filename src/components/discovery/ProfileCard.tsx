@@ -155,6 +155,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     const localY = useMotionValue(0);
     const x = sharedX ?? localX;
     const y = sharedY ?? localY;
+    const entry = useMotionValue(enterAnim ? 1 : 0); // 0 = settled, 1 = stacked pose
     const cardRef = useRef<HTMLDivElement>(null);
     const photoWrapRef = useRef<HTMLDivElement>(null);
     const infoWrapRef = useRef<HTMLDivElement>(null);
@@ -196,19 +197,41 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       const rotX = -(dy / h) * 5;
       const dist = Math.sqrt(dx * dx + dy * dy);
       const progress = Math.min(1, dist / (w * 0.4));
-      const scale = 1 + progress * 0.025;
+      const dragScale = 1 + progress * 0.025;
+      // Entry blend: at e=1 we mimic the stack-1 pose (y+10, scale 0.94)
+      const e = entry.get();
+      const entryY = e * 10;
+      const entryScale = 1 - e * 0.06;
+      const scale = dragScale * entryScale;
       const shadowY = 12 + progress * 24;
       const shadowBlur = 30 + progress * 30;
-      const shadowAlpha = 0.25 + progress * 0.35;
-      el.style.transform = `translate3d(${dx}px,${dy}px,0) rotate(${rot.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) rotateX(${rotX.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+      const shadowAlpha = (0.25 + progress * 0.35) * (1 - e * 0.6);
+      el.style.transform = `translate3d(${dx}px,${dy + entryY}px,0) rotate(${rot.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) rotateX(${rotX.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
       el.style.boxShadow = `0 ${shadowY.toFixed(0)}px ${shadowBlur.toFixed(0)}px rgba(0,0,0,${shadowAlpha.toFixed(2)})`;
       applyParallax();
-    }, [x, y, applyParallax]);
+    }, [x, y, entry, applyParallax]);
     useEffect(() => {
       apply();
     }, [apply]);
     useMotionValueEvent(x, "change", apply);
     useMotionValueEvent(y, "change", apply);
+    useMotionValueEvent(entry, "change", apply);
+
+    // Spring the card up from the stacked pose into place on mount
+    useEffect(() => {
+      if (enterAnim) return; // rewind handles its own entry
+      entry.set(1);
+      const controls = animate(entry, 0, {
+        type: "spring",
+        stiffness: 340,
+        damping: 30,
+        mass: 0.7,
+        restDelta: 0.001,
+      });
+      return () => controls.stop();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
 
     const snapSpring = { type: "spring" as const, stiffness: 320, damping: 28, mass: 0.9 };
     const flySpring = { type: "spring" as const, stiffness: 280, damping: 24, mass: 0.8 };
