@@ -279,8 +279,8 @@ const TabButton = ({
         </AnimatePresence>
       </div>
       <span
-        className="relative text-[10px] leading-none z-10 font-medium tracking-wide"
-        style={{ opacity: isActive ? 0.95 : 0.6 }}
+        className="relative text-[10px] leading-none z-10 tracking-wide"
+        style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900, opacity: isActive ? 0.95 : 0.6 }}
       >
         {label}
       </span>
