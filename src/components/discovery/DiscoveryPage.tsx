@@ -112,7 +112,14 @@ export const DiscoveryPage = ({
     setRewindUsed(true);
     setRewinding(true);
     try {
-      await onRewind();
+      const ok = await onRewind();
+      if (ok === false) {
+        // Roll back optimistic UI on RPC failure.
+        setHistory((h) => [...h, last]);
+        setIndex((i) => i + 1);
+        setEnterAnim(null);
+        setRewindUsed(false);
+      }
     } finally {
       setRewinding(false);
     }
