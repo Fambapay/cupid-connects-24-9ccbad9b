@@ -358,19 +358,56 @@ function MethodTile({
   active: boolean;
   onClick: () => void;
 }) {
+  const brand =
+    m === "mpesa"
+      ? { color: "#E30613", glow: "rgba(227,6,19,0.35)", initials: "M" }
+      : { color: "#F58220", glow: "rgba(245,130,32,0.35)", initials: "e" };
+
   return (
-    <button
+    <motion.button
+      whileTap={{ scale: 0.97 }}
       onClick={onClick}
       aria-pressed={active}
-      className={`flex flex-col items-center justify-center gap-1 rounded-xl border px-2 py-3 text-[11px] font-semibold ${
+      className={`relative flex items-center gap-3 overflow-hidden rounded-2xl border px-3 py-3 text-left transition-colors ${
         active
-          ? "border-fuchsia-500/60 bg-fuchsia-500/15 text-white"
-          : "border-white/10 bg-white/[0.04] text-white/70"
+          ? "border-white/20 bg-white/[0.06]"
+          : "border-white/[0.08] bg-white/[0.025] hover:bg-white/[0.04]"
       }`}
+      style={
+        active
+          ? {
+              boxShadow: `0 0 0 1px ${brand.color}55, 0 10px 24px -14px ${brand.glow}`,
+            }
+          : undefined
+      }
     >
-      <Smartphone size={14} className={active ? "text-fuchsia-300" : "text-white/60"} />
-      <span>{METHOD_LABEL[m]}</span>
-      <span className="text-[10px] text-white/50">{sub}</span>
-    </button>
+      {active && (
+        <span
+          className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full opacity-50 blur-2xl"
+          style={{ background: brand.color }}
+        />
+      )}
+      <span
+        className="relative grid h-9 w-9 shrink-0 place-items-center rounded-xl text-[13px] font-black text-white"
+        style={{ background: brand.color }}
+      >
+        {brand.initials}
+      </span>
+      <span className="relative min-w-0 flex-1">
+        <span className="block truncate text-[13px] font-bold text-white">
+          {METHOD_LABEL[m]}
+        </span>
+        <span className="block truncate text-[10px] font-medium text-white/55">
+          começa por {sub.replace(/\s/g, "")}
+        </span>
+      </span>
+      {active && (
+        <CheckCircle2
+          size={16}
+          className="relative shrink-0"
+          style={{ color: brand.color }}
+        />
+      )}
+    </motion.button>
   );
 }
