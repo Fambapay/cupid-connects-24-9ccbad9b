@@ -192,12 +192,9 @@ export function DebitoCheckoutSheet({
                   <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                     Método de pagamento
                   </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(["mpesa", "emola", "mkesh"] as PaymentMethod[]).map((m) => (
+                  <div className="grid grid-cols-2 gap-2">
+                    {(["mpesa", "emola"] as PaymentMethod[]).map((m) => (
                       <MethodTile key={m} m={m} active={method === m} onClick={() => setMethod(m)} icon={<Smartphone size={14} />} />
-                    ))}
-                    {(["visa_mastercard", "payfast"] as PaymentMethod[]).map((m) => (
-                      <MethodTile key={m} m={m} active={method === m} onClick={() => setMethod(m)} icon={<CreditCard size={14} />} />
                     ))}
                   </div>
                 </div>
