@@ -222,6 +222,7 @@ interface TabButtonProps {
   pillX: MotionValue<number>;
   pointerStartRef: React.MutableRefObject<{ x: number; y: number; time: number } | null>;
   onTap: () => void;
+  onHover?: () => void;
 }
 
 const TabButton = ({
