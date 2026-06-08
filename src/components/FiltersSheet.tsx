@@ -334,12 +334,7 @@ const IOSSwitch = ({ checked }: { checked: boolean }) => (
   <span
     className="relative inline-flex h-[30px] w-[50px] flex-shrink-0 rounded-full transition-colors"
     style={{
-      background: checked
-        ? 'linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%)'
-        : 'rgba(120,120,128,0.32)',
-      boxShadow: checked
-        ? '0 0 0 1px color-mix(in oklab, var(--brand-pink) 35%, transparent), 0 6px 16px -6px color-mix(in oklab, var(--brand-pink) 60%, transparent)'
-        : 'inset 0 0 0 1px rgba(255,255,255,0.04)',
+      background: checked ? 'var(--brand-pink)' : 'rgba(120,120,128,0.32)',
     }}
   >
     <motion.span
@@ -350,6 +345,7 @@ const IOSSwitch = ({ checked }: { checked: boolean }) => (
     />
   </span>
 );
+
 
 
 const SegmentedControl = <T extends string>({ options, value, onChange }: {
