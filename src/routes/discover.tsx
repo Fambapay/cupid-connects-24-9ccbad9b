@@ -195,7 +195,7 @@ function Discover() {
         onClose={() => setFiltersOpen(false)}
         value={filters}
         onChange={setFilters}
-        isPremium={isPremium}
+        isPremium={entitlements.canUseAdvancedFilters}
         onUpgrade={goShop}
       />
 
