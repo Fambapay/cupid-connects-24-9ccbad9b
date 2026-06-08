@@ -290,7 +290,7 @@ function SettingsPage() {
               <ArrowLeft className="h-5 w-5 text-white" />
             </motion.button>
             <h2
-              className="text-[20px] font-bold tracking-tight"
+              className="text-[20px] font-extrabold tracking-tight"
               style={{
                 backgroundImage:
                   'linear-gradient(135deg, #FFFFFF 0%, #FF4FA3 60%, #B13CFF 100%)',
