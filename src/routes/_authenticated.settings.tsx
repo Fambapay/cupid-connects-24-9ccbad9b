@@ -464,7 +464,7 @@ function SettingsPage() {
               </div>
             </div>
 
-            <button onClick={() => setInterestedSheet(true)} className="w-full p-4 flex items-center justify-between transition-colors hover:bg-accent">
+            <button onClick={() => setInterestedSheet(true)} className="w-full p-4 flex items-center justify-between transition-colors hover:bg-white/[0.02]">
               <div className="flex items-center gap-3">
                 <Heart className="w-5 h-5 text-muted-foreground" />
                 <span className="text-[15px] text-foreground font-medium">Interessado em</span>
