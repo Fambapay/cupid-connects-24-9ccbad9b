@@ -203,12 +203,10 @@ export function SwipeableConversationItem({
               >
                 {name}
               </span>
-              {unread > 0 ? (
+              {unread > 0 && (
                 <span className="ml-2 inline-flex h-5 min-w-[20px] shrink-0 items-center justify-center rounded-full bg-gradient-flame px-1.5 text-[11px] font-bold text-flame-foreground shadow-sm">
                   {unread > 99 ? "99+" : unread}
                 </span>
-              ) : (
-                <span className="text-xs text-white/40">{lastMessageAt}</span>
               )}
             </div>
             <p
