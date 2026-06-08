@@ -471,7 +471,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 fontWeight: 900,
                 fontSize: 36,
                 letterSpacing: 2,
-                opacity: labelOpacity.nope,
+                opacity: 0,
+                willChange: "opacity, transform",
                 zIndex: 5,
               }}
             >
