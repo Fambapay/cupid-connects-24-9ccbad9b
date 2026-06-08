@@ -117,6 +117,8 @@ export const DiscoveryPage = ({
                   else cardRef.current?.flyUp();
                 }}
                 onBoost={onBoost}
+                onRewind={handleRewind}
+                canRewind={canRewind}
               />
             }
             panelActions={
@@ -127,6 +129,8 @@ export const DiscoveryPage = ({
                   else cardRef.current?.flyUp();
                 }}
                 onBoost={onBoost}
+                onRewind={handleRewind}
+                canRewind={canRewind}
               />
             }
           />
