@@ -31,7 +31,7 @@ export function TopBar({ title }: { title: string }) {
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between bg-background/60 px-5 py-4 backdrop-blur-xl">
       <h1 className="text-2xl tracking-tight" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}>
-        <span className="text-gradient-sunset">{title}</span>
+        <span className="text-white">{title}</span>
       </h1>
     </header>
   );
