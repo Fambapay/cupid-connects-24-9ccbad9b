@@ -211,7 +211,7 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
         await supabaseAdmin.rpc("activate_membership_debito", {
           _user_id: userId,
           _plan_tier: plan_tier,
-          _days: 30,
+          _days: plan_days,
         });
       }
       await supabaseAdmin
