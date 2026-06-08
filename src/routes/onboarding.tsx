@@ -673,12 +673,22 @@ function BirthdateStep({
   const [open, setOpen] = useState<null | "day" | "month" | "year">(null);
   const thisYear = new Date().getFullYear();
 
+  const daysInMonth = (m: number | null, y: number | null) => {
+    if (!m) return 31;
+    if (m === 2) {
+      const leap = y ? (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)) : true;
+      return leap ? 29 : 28;
+    }
+    return [4, 6, 9, 11].includes(m) ? 30 : 31;
+  };
+  const maxDay = daysInMonth(month, year);
+  const dayValid = day ? day <= maxDay : true;
   const iso =
-    day && month && year
+    day && month && year && dayValid
       ? `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
       : null;
   const age = iso ? computeAge(iso) : null;
-  const complete = day && month && year;
+  const complete = day && month && year && dayValid;
   const underage = age !== null && age < 18;
   const canNext = !!complete && !underage;
 
