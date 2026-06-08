@@ -251,16 +251,16 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
               <motion.button
                 whileTap={{ scale: 0.97 }}
                 onClick={apply}
-                className="w-full rounded-full py-4 text-[16px] font-semibold text-white"
+                className="w-full rounded-full py-3.5 text-[16px] font-semibold text-white"
                 style={{
-                  background: 'linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-magenta) 50%, var(--brand-purple) 100%)',
-                  boxShadow:
-                    '0 14px 34px -10px color-mix(in oklab, var(--brand-pink) 70%, transparent), 0 8px 22px -10px color-mix(in oklab, var(--brand-purple) 55%, transparent), inset 0 1px 0 rgba(255,255,255,0.22)',
+                  background: 'var(--brand-pink)',
+                  boxShadow: '0 10px 24px -12px color-mix(in oklab, var(--brand-pink) 70%, transparent)',
                   letterSpacing: '0.01em',
                 }}
               >
                 Aplicar filtros
               </motion.button>
+
 
             </div>
           </motion.div>
