@@ -8,7 +8,7 @@ import {
   type MotionValue,
 } from "framer-motion";
 import { User, Heart, MessageCircle, Compass, type LucideIcon } from "lucide-react";
-import { useLocation, useNavigate } from "@tanstack/react-router";
+import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { hapticTap } from "@/hooks/useNativePlatform";
 import { useLikesCount } from "@/hooks/useLikesCount";
 import { useUnreadChats } from "@/hooks/useUnreadChats";
