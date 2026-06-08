@@ -338,7 +338,7 @@ function SettingsPage() {
                 )}
                 <div className="flex items-center gap-2">
                   {icon}
-                  <span className="text-[22px] font-bold text-foreground tracking-tight">Hunie</span>
+                  <span className="text-[28px] tracking-tight text-foreground" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}>Hunie</span>
                   <span className="px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider"
                     style={{ backgroundColor: accent, color: tier === 'select' ? 'var(--background)' : '#fff' }}>
                     {name.toUpperCase()}
