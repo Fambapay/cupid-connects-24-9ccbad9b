@@ -330,7 +330,12 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
       unreadChats={unreadChats}
       {...props}
       activeTab={activeTab}
-      onTabChange={(t) => navigate({ to: TAB_TO_PATH[t] })}
+      onTabChange={(t) => {
+        // Warm the target route synchronously on tap so beforeLoad/component
+        // chunks are ready before navigate() commits.
+        router.preloadRoute({ to: TAB_TO_PATH[t] }).catch(() => {});
+        navigate({ to: TAB_TO_PATH[t] });
+      }}
     />
   );
 }
