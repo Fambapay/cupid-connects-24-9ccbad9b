@@ -202,76 +202,66 @@ function ChatRoom() {
 
   return (
     <div
-      className="fixed left-0 right-0 z-50 flex flex-col overflow-hidden overscroll-none bg-background"
-      style={{ top: "var(--chat-top, 0px)", height: "var(--chat-vh, 100dvh)" }}
+      className="fixed left-0 right-0 z-50 flex flex-col overflow-hidden overscroll-none"
+      style={{
+        top: "var(--chat-top, 0px)",
+        height: "var(--chat-vh, 100dvh)",
+        background: "#000",
+        color: "#fff",
+      }}
     >
-      <header className="relative z-10 shrink-0 border-b border-border/60 bg-background/85 backdrop-blur-xl">
-        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-sunset opacity-80" />
-        <div className="flex items-center gap-3 px-3 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2.5">
+      <header className="relative z-10 shrink-0">
+        <div className="flex items-start justify-between px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3">
           <Link
             to="/chat"
             aria-label="Voltar"
-            className="grid h-10 w-10 place-items-center rounded-full text-foreground/80 hover:bg-muted active:scale-95"
+            className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.06] text-white/90 active:scale-95"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-5 w-5" />
           </Link>
 
           <button
             type="button"
             onClick={() => setProfileOpen(true)}
-            className="flex min-w-0 flex-1 items-center gap-3 text-left active:opacity-80"
+            className="flex flex-col items-center gap-2 active:opacity-80"
             aria-label={`Ver perfil de ${peer.name}`}
           >
-            <div className="relative shrink-0">
-              <div className="h-11 w-11 overflow-hidden rounded-full ring-2 ring-flame/50">
+            <div className="relative">
+              <div className="h-14 w-14 overflow-hidden rounded-full">
                 {peer.photo ? (
                   <img src={peer.photo} alt={peer.name} className="h-full w-full object-cover" />
                 ) : (
                   <div className="h-full w-full bg-gradient-flame" />
                 )}
               </div>
-              <span className="absolute -bottom-0.5 -right-0.5 grid h-3.5 w-3.5 place-items-center rounded-full bg-background">
+              <span className="absolute -bottom-0.5 -right-0.5 grid h-3.5 w-3.5 place-items-center rounded-full bg-black">
                 <span
                   className="h-2.5 w-2.5 rounded-full"
                   style={{ background: activity?.dot ?? "#6b6f76" }}
                 />
               </span>
             </div>
-            <div className="min-w-0 flex items-center">
-              <p className="truncate text-[15px] font-semibold leading-tight">{peer.name}</p>
+            <div
+              className="rounded-full bg-black px-4 py-1 text-[15px] font-bold text-white"
+              style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 800 }}
+            >
+              {peer.name}
             </div>
           </button>
 
-          <ChatActionsMenu matchId={matchId} otherUserId={peer.id} otherName={peer.name} />
+          <div className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.06]">
+            <ChatActionsMenu matchId={matchId} otherUserId={peer.id} otherName={peer.name} />
+          </div>
         </div>
       </header>
 
-      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5">
-        <div className="mb-6 flex flex-col items-center text-center">
-          <div className="relative h-20 w-20">
-            <div className="absolute inset-0 rounded-full bg-gradient-sunset blur-xl opacity-60" />
-            <div className="relative h-full w-full overflow-hidden rounded-full ring-4 ring-background">
-              {peer.photo ? (
-                <img src={peer.photo} alt={peer.name} className="h-full w-full object-cover" />
-              ) : (
-                <div className="h-full w-full bg-gradient-flame" />
-              )}
-            </div>
-          </div>
-          <p className="mt-3 text-sm font-semibold">
-            Vocês deram match <span className="text-base">🔥</span>
-          </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">Diz olá a {peer.name}</p>
-        </div>
-
-        <DateSeparator label="Hoje" />
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">
+        <DateSeparator label={formatDateLabel(messages[0]?.created_at)} />
 
         <ul className="space-y-1.5">
           <AnimatePresence initial={false}>
             {(() => {
               const peerReadMs = peerLastReadAt ? new Date(peerLastReadAt).getTime() : 0;
-              // Find the last of MY messages that the peer has already read
-              // so we can show a single "Lido" indicator under it.
               let lastReadOwnIdx = -1;
               for (let i = messages.length - 1; i >= 0; i--) {
                 const m = messages[i];
@@ -306,7 +296,6 @@ function ChatRoom() {
           </AnimatePresence>
         </ul>
 
-
         <AnimatePresence>
           {typing && (
             <motion.div
@@ -320,7 +309,7 @@ function ChatRoom() {
               ) : (
                 <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-flame" />
               )}
-              <div className="rounded-2xl rounded-bl-md bg-muted px-4 py-3">
+              <div className="rounded-3xl rounded-bl-md bg-[#101010] px-4 py-3">
                 <TypingDots />
               </div>
             </motion.div>
@@ -331,10 +320,19 @@ function ChatRoom() {
       <div className="relative shrink-0">
         <form
           onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-          className="overflow-hidden border-t border-border/60 bg-background/95 px-3 pt-2.5 pb-3 backdrop-blur-xl"
+          className="overflow-hidden px-3 pt-2 pb-3"
+          style={{ background: "#000" }}
         >
           <div className="flex w-full items-center gap-2">
-            <div className="flex h-12 min-w-0 flex-1 items-center gap-1 rounded-full bg-muted px-3 focus-within:ring-2 focus-within:ring-flame">
+            <button
+              type="button"
+              aria-label="GIF"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/15 text-[11px] font-bold tracking-wide text-white/80"
+            >
+              GIF
+            </button>
+
+            <div className="flex h-11 min-w-0 flex-1 items-center rounded-full border border-white/10 bg-white/[0.04] px-4">
               <input
                 ref={inputRef}
                 type="text"
@@ -347,25 +345,23 @@ function ChatRoom() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
                 }}
-                placeholder={`Mensagem para ${peer.name}…`}
+                placeholder="Type a message"
                 autoCapitalize="sentences"
                 spellCheck={false}
                 enterKeyHint="send"
-                className="block h-10 min-w-0 flex-1 appearance-none bg-transparent px-2 py-0 text-[16px] outline-none placeholder:text-muted-foreground [-webkit-appearance:none]"
+                className="block h-10 min-w-0 flex-1 appearance-none bg-transparent px-1 py-0 text-[16px] text-white outline-none placeholder:text-white/40 [-webkit-appearance:none]"
                 style={{ lineHeight: "40px", WebkitTextFillColor: "currentColor" }}
               />
+              <motion.button
+                type="submit"
+                whileTap={{ scale: 0.9 }}
+                onMouseDown={(e) => e.preventDefault()}
+                aria-label="Enviar"
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-white/70"
+              >
+                <Send className="h-4 w-4 translate-x-[1px]" />
+              </motion.button>
             </div>
-
-
-          <motion.button
-            type="submit"
-            whileTap={{ scale: 0.9 }}
-            onMouseDown={(e) => e.preventDefault()}
-            aria-label="Enviar"
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-gradient-flame text-flame-foreground shadow-glow transition-opacity"
-          >
-            <Send className="h-5 w-5 translate-x-[1px]" />
-          </motion.button>
           </div>
         </form>
       </div>
@@ -380,6 +376,19 @@ function ChatRoom() {
     </div>
   );
 }
+
+function formatDateLabel(iso?: string) {
+  if (!iso) return "Hoje";
+  const d = new Date(iso);
+  return d.toLocaleString("en-GB", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  }).replace(",", " at");
+}
+
 
 type BubbleProps = {
   msg: ChatMessage;
