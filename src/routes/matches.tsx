@@ -193,7 +193,7 @@ function EmptyLikes({ onDiscover, onBoost }: { onDiscover: () => void; onBoost: 
       />
 
       <motion.h2
-        className="relative mt-3 text-[24px] font-bold tracking-tight"
+        className="relative mt-3 text-[24px] font-extrabold tracking-tight"
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.25 }}
