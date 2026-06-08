@@ -21,10 +21,12 @@ export const DiscoveryPage = ({
   onSwipe,
   onOpenFilters,
   onBoost,
+  onRewind,
   onEnd,
   showTopBar = true,
 }: DiscoveryPageProps) => {
   const [index, setIndex] = useState(0);
+  const [rewinding, setRewinding] = useState(false);
   const cardRef = useRef<ProfileCardHandle>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -33,6 +35,12 @@ export const DiscoveryPage = ({
   const next1 = profiles[index + 1];
   const next2 = profiles[index + 2];
   const next3 = profiles[index + 3];
+
+  // Reset stack to top when the parent feed reference changes (e.g. after rewind/reload).
+  const firstId = profiles[0]?.id;
+  useEffect(() => {
+    setIndex(0);
+  }, [firstId]);
 
   // Preload next cards' first photos so the stack behind the top card never
   // flashes black. Defer to idle time so it never competes with swipe rendering.
