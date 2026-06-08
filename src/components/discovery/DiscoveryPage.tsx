@@ -11,6 +11,7 @@ interface DiscoveryPageProps {
   onSwipe?: (profile: DiscoveryProfile, dir: SwipeDirection) => void;
   onOpenFilters?: () => void;
   onBoost?: () => void;
+  onRewind?: () => void | Promise<unknown>;
   onEnd?: () => void;
   showTopBar?: boolean;
 }
