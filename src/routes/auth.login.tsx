@@ -17,7 +17,7 @@ export const Route = createFileRoute("/auth/login")({
 });
 
 function LoginPage() {
-  const { signInWithPassword } = useAuth();
+  const { signInWithPassword, signInWithGoogle } = useAuth();
   const router = useRouter();
   const navigate = useNavigate();
 
@@ -25,6 +25,7 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [needsVerify, setNeedsVerify] = useState(false);
 
@@ -69,6 +70,21 @@ function LoginPage() {
   const resend = async () => {
     if (!email) return;
     await supabase.auth.resend({ type: "signup", email });
+  };
+
+  const handleGoogle = async () => {
+    setGoogleBusy(true);
+    setError(null);
+    try {
+      const result = await signInWithGoogle();
+      if (result.error) {
+        setError(result.error.message);
+      }
+    } catch {
+      setError("Erro ao iniciar sessão com Google");
+    } finally {
+      setGoogleBusy(false);
+    }
   };
 
   return (
