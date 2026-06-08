@@ -20,7 +20,7 @@ export const Route = createFileRoute("/auth/register")({
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function RegisterPage() {
-  const { signUp } = useAuth();
+  const { signUp, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const [step, setStep] = useState<1 | 2>(1);
@@ -29,6 +29,7 @@ function RegisterPage() {
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const reqLen = password.length >= 8;
