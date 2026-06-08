@@ -413,7 +413,7 @@ function SettingsPage() {
           <SectionHeader icon={Compass} label="Descoberta" />
           <div className="hunie-card overflow-hidden">
             <button onClick={handleEnableLocation} disabled={locationLoading}
-              className="w-full p-4 border-b border-white/[0.06] flex items-center justify-between transition-colors hover:bg-accent disabled:opacity-60">
+              className="w-full p-4 border-b border-white/[0.06] flex items-center justify-between transition-colors hover:bg-white/[0.02] disabled:opacity-60">
               <div className="flex items-center gap-3">
                 <MapPin className="w-5 h-5 text-muted-foreground" />
                 <div className="text-left">
@@ -464,7 +464,7 @@ function SettingsPage() {
               </div>
             </div>
 
-            <button onClick={() => setInterestedSheet(true)} className="w-full p-4 flex items-center justify-between transition-colors hover:bg-accent">
+            <button onClick={() => setInterestedSheet(true)} className="w-full p-4 flex items-center justify-between transition-colors hover:bg-white/[0.02]">
               <div className="flex items-center gap-3">
                 <Heart className="w-5 h-5 text-muted-foreground" />
                 <span className="text-[15px] text-foreground font-medium">Interessado em</span>
@@ -507,7 +507,7 @@ function SettingsPage() {
             </div>
             {['Interesses', 'À procura de', 'Idiomas', 'Signo', 'Educação', 'Planos de família'].map((label, i, arr) => (
               <button key={label} onClick={() => (isPremium ? soon() : goUpgrade())}
-                className={`w-full p-4 flex items-center justify-between transition-colors hover:bg-accent ${i < arr.length - 1 ? 'border-b border-white/[0.06]' : ''}`}>
+                className={`w-full p-4 flex items-center justify-between transition-colors hover:bg-white/[0.02] ${i < arr.length - 1 ? 'border-b border-white/[0.06]' : ''}`}>
                 <span className="text-[15px] text-foreground font-medium">{label}</span>
                 <div className="flex items-center gap-1 text-muted-foreground">
                   <span className="text-[14px]">Selecionar</span>
@@ -533,7 +533,7 @@ function SettingsPage() {
           <SectionHeader icon={Eye} label="Quem te vê" />
           <div className="hunie-card overflow-hidden">
             <motion.button onClick={() => handleVisibilityChange('standard')} disabled={saving}
-              className="w-full p-4 flex items-center justify-between border-b border-white/[0.06] transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between border-b border-white/[0.06] transition-colors hover:bg-white/[0.02]" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${visibilityMode === 'standard' ? 'bg-brand-purple' : 'bg-card border border-border'}`}>
                   <Eye className={`w-5 h-5 ${visibilityMode === 'standard' ? 'text-white' : 'text-muted-foreground'}`} />
@@ -550,7 +550,7 @@ function SettingsPage() {
               )}
             </motion.button>
             <motion.button onClick={() => handleVisibilityChange('hidden')} disabled={saving}
-              className="w-full p-4 flex items-center justify-between transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between transition-colors hover:bg-white/[0.02]" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${visibilityMode === 'hidden' ? 'bg-brand-purple' : 'bg-card border border-border'}`}>
                   <EyeOff className={`w-5 h-5 ${visibilityMode === 'hidden' ? 'text-white' : 'text-muted-foreground'}`} />
@@ -630,7 +630,7 @@ function SettingsPage() {
           <SectionHeader icon={Ban} label="Conexões" />
           <div className="hunie-card overflow-hidden">
             <motion.button onClick={() => setShowBlockedUsers(true)}
-              className="w-full p-4 flex items-center justify-between transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between transition-colors hover:bg-white/[0.02]" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
                   <Ban className="w-5 h-5 text-destructive" />
@@ -645,7 +645,7 @@ function SettingsPage() {
           </div>
           <motion.div className="mt-3" variants={itemVariants}>
             <motion.button onClick={handleInstallApp}
-              className="w-full p-4 flex items-center justify-between hunie-card transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between hunie-card transition-colors hover:bg-white/[0.02]" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
                   <Download className="w-5 h-5 text-success" />
@@ -665,7 +665,7 @@ function SettingsPage() {
           <SectionHeader icon={Crown} label="Conta" />
           <div className="hunie-card overflow-hidden">
             <motion.button onClick={() => navigate({ to: '/membership' })}
-              className="w-full p-4 flex items-center justify-between border-b border-white/[0.06] transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between border-b border-white/[0.06] transition-colors hover:bg-white/[0.02]" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isPremium ? 'bg-amber-500' : 'bg-amber-500/10'}`}>
                   <Crown className={`w-5 h-5 ${isPremium ? 'text-white' : 'text-amber-500'}`} />
@@ -684,7 +684,7 @@ function SettingsPage() {
             </motion.button>
 
             <motion.button onClick={handleLogout}
-              className="w-full p-4 flex items-center justify-between border-b border-white/[0.06] transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between border-b border-white/[0.06] transition-colors hover:bg-white/[0.02]" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center">
                   <LogOut className="w-5 h-5 text-muted-foreground" />
@@ -696,7 +696,7 @@ function SettingsPage() {
 
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <motion.button className="w-full p-4 flex items-center justify-between transition-colors hover:bg-accent" whileTap={{ scale: 0.99 }}>
+                <motion.button className="w-full p-4 flex items-center justify-between transition-colors hover:bg-white/[0.02]" whileTap={{ scale: 0.99 }}>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
                       <Trash2 className="w-5 h-5 text-destructive" />
@@ -714,7 +714,7 @@ function SettingsPage() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel className="bg-card border-border text-foreground hover:bg-accent rounded-xl">Cancelar</AlertDialogCancel>
+                  <AlertDialogCancel className="bg-card border-border text-foreground hover:bg-white/[0.02] rounded-xl">Cancelar</AlertDialogCancel>
                   <AlertDialogAction onClick={handleDeleteAccount} disabled={deleting}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl">
                     {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Eliminar'}
@@ -747,7 +747,7 @@ function SettingsPage() {
               { key: 'everyone' as const, label: 'Todos' },
             ]).map(({ key, label }) => (
               <button key={key} onClick={() => setInterested(key)}
-                className="w-full p-4 rounded-xl bg-background border border-border flex items-center justify-between hover:bg-accent transition-colors">
+                className="w-full p-4 rounded-xl bg-background border border-border flex items-center justify-between hover:bg-white/[0.02] transition-colors">
                 <span className="text-[15px] text-foreground font-medium">{label}</span>
                 {interestedKey === key && <Check className="w-5 h-5 text-brand-purple" />}
               </button>
