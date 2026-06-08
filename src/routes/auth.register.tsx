@@ -90,32 +90,57 @@ function RegisterPage() {
   return (
     <AuthShell title="Criar conta">
       {step === 1 ? (
-        <form onSubmit={onEmailNext} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label className="text-xs">Email</Label>
-            <Input
-              type="email"
-              autoFocus
-              value={email}
-              onBlur={() => {
-                if (email && !emailRe.test(email)) setEmailError("Email inválido");
-              }}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setEmailError(null);
-              }}
-              required
-              className="h-12 rounded-xl bg-white/5"
-            />
-            {emailError && <p className="text-sm text-destructive">{emailError}</p>}
-          </div>
-          <Button
-            type="submit"
-            className="h-14 w-full rounded-2xl bg-gradient-sunset text-base font-semibold text-white shadow-glow active:scale-[0.98]"
+        <div className="space-y-4">
+          <button
+            type="button"
+            onClick={handleGoogle}
+            disabled={googleBusy}
+            className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-white font-semibold text-foreground shadow-md transition-transform active:scale-[0.98] disabled:opacity-60"
           >
-            Continuar
-          </Button>
-        </form>
+            {googleBusy ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <>
+                <GoogleIcon />
+                Continuar com Google
+              </>
+            )}
+          </button>
+
+          <div className="flex items-center gap-3 py-2">
+            <div className="h-px flex-1 bg-white/10" />
+            <span className="text-xs text-muted-foreground">ou</span>
+            <div className="h-px flex-1 bg-white/10" />
+          </div>
+
+          <form onSubmit={onEmailNext} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Email</Label>
+              <Input
+                type="email"
+                autoFocus
+                value={email}
+                onBlur={() => {
+                  if (email && !emailRe.test(email)) setEmailError("Email inválido");
+                }}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setEmailError(null);
+                }}
+                required
+                className="h-12 rounded-xl bg-white/5"
+              />
+              {emailError && <p className="text-sm text-destructive">{emailError}</p>}
+            </div>
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            <Button
+              type="submit"
+              className="h-14 w-full rounded-2xl bg-gradient-sunset text-base font-semibold text-white shadow-glow active:scale-[0.98]"
+            >
+              Continuar
+            </Button>
+          </form>
+        </div>
       ) : (
         <form onSubmit={submit} className="space-y-4">
           <div className="space-y-1.5">
