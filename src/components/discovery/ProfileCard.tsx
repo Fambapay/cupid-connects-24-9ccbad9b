@@ -321,18 +321,21 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       else setPhotoIdx((i) => Math.min(photos.length - 1, i + 1));
     };
 
-    const [labelOpacity, setLabelOpacity] = useState({ like: 0, nope: 0, sup: 0 });
-    const recompute = () => {
+    // Direct DOM mutation for label opacity — avoids re-rendering the
+    // entire card 60+ times per drag (huge perf win on lower-end devices).
+    const recompute = useCallback(() => {
       const w = getVW();
       const dx = x.get();
       const dy = y.get();
       const t = w * 0.25;
-      setLabelOpacity({
-        like: Math.max(0, Math.min(1, dx / t)),
-        nope: Math.max(0, Math.min(1, -dx / t)),
-        sup: Math.max(0, Math.min(1, -dy / 180)),
-      });
-    };
+      const like = Math.max(0, Math.min(1, dx / t));
+      const nope = Math.max(0, Math.min(1, -dx / t));
+      const sup = Math.max(0, Math.min(1, -dy / 180));
+      if (likeLabelRef.current) likeLabelRef.current.style.opacity = String(like);
+      if (nopeLabelRef.current) nopeLabelRef.current.style.opacity = String(nope);
+      if (supLabelRef.current) supLabelRef.current.style.opacity = String(sup);
+    }, [x, y]);
+    useEffect(() => { recompute(); }, [recompute]);
     useMotionValueEvent(x, "change", recompute);
     useMotionValueEvent(y, "change", recompute);
 
