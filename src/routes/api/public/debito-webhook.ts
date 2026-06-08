@@ -100,10 +100,13 @@ export const Route = createFileRoute("/api/public/debito-webhook")({
               _debito_payment_id: row.debito_payment_id ?? paymentId ?? "",
             });
           } else if (row.kind === "plan" && row.plan_tier) {
+            const { PLAN_PRICES } = await import("@/lib/pricing");
+            const p = PLAN_PRICES[row.plan_tier as "select" | "plus" | "elite"];
+            const days = p && Number(row.amount) >= p.annualPriceMzn ? p.annualDays : p.monthlyDays;
             await supabaseAdmin.rpc("activate_membership_debito", {
               _user_id: row.user_id,
               _plan_tier: row.plan_tier,
-              _days: 30,
+              _days: days,
             });
           }
         }
