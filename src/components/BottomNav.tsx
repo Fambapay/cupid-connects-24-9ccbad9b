@@ -18,6 +18,7 @@ type Tab = "discover" | "likes" | "chat" | "profile";
 interface BottomNavProps {
   activeTab: Tab;
   onTabChange: (tab: Tab) => void;
+  onTabHover?: (tab: Tab) => void;
   likesCount?: number;
   unreadChats?: number;
   /** Docks the nav flush to the viewport bottom, removing the floating gap. */
