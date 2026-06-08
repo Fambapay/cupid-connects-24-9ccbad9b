@@ -137,7 +137,12 @@ function ShopPage() {
           </motion.button>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <h1 className="text-[26px] font-black leading-none tracking-tight">Hunie Store</h1>
+              <h1 className="text-[26px] font-black leading-none tracking-tight">
+                Hunie{" "}
+                <span style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontWeight: 400 }}>
+                  Store
+                </span>
+              </h1>
               <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-fuchsia-500 to-pink-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
                 <Sparkles size={10} /> Pro
               </span>
