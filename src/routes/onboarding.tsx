@@ -94,7 +94,6 @@ const STEPS: StepId[] = [
   "bio",
   "interests",
   "location",
-  "prompts",
 ];
 
 const AVAILABLE_INTERESTS = [
