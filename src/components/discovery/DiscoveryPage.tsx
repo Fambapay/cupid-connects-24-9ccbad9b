@@ -3,6 +3,7 @@ import { useMotionValue } from "framer-motion";
 import { ProfileCard, type ProfileCardHandle } from "./ProfileCard";
 import { SwipeActions } from "./SwipeActions";
 import { DiscoverTopBar } from "./DiscoverTopBar";
+import { EmptyDiscovery } from "./EmptyDiscovery";
 import type { DiscoveryProfile, SwipeDirection } from "./types";
 
 interface DiscoveryPageProps {
@@ -84,26 +85,7 @@ export const DiscoveryPage = ({
           )}
         </>
       ) : (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            textAlign: "center",
-            padding: "0 32px",
-          }}
-        >
-          <div style={{ fontSize: 64 }}>🍯</div>
-          <h2 style={{ fontSize: 28, fontWeight: 800, marginTop: 16 }}>
-            Voltamos já
-          </h2>
-          <p style={{ marginTop: 8, opacity: 0.7, maxWidth: 280 }}>
-            Não há mais perfis por agora. Volta mais tarde.
-          </p>
-        </div>
+        <EmptyDiscovery onRefresh={onEnd} />
       )}
     </div>
   );
