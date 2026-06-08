@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, CheckCircle2, X, Smartphone, CreditCard, Lock, ShieldCheck, Sparkles } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, X, Smartphone, Lock, ShieldCheck, Sparkles } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { createDebitoPayment } from "@/lib/debito.functions";
-import { MOBILE_MONEY_METHODS, type PaymentMethod } from "@/lib/pricing";
-import { useProfile } from "@/hooks/useProfile";
+import { MOBILE_MONEY_METHODS, type PaymentMethod, type BillingPeriod } from "@/lib/pricing";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 type Stage = "form" | "submitting" | "pending" | "success" | "error";
@@ -15,9 +15,9 @@ export interface DebitoCheckoutSheetProps {
   title: string;
   subtitle: string;
   amountMzn: number;
-  /** Pass exactly one of pack_id or plan_tier */
   packId?: string;
   planTier?: "select" | "plus" | "elite";
+  billingPeriod?: BillingPeriod;
   onSuccess?: () => void;
 }
 
@@ -25,6 +25,8 @@ const METHOD_LABEL: Record<PaymentMethod, string> = {
   mpesa: "M-Pesa",
   emola: "e-Mola",
 };
+
+const TIMEOUT_MS = 10 * 60 * 1000;
 
 export function DebitoCheckoutSheet({
   open,
@@ -34,53 +36,89 @@ export function DebitoCheckoutSheet({
   amountMzn,
   packId,
   planTier,
+  billingPeriod,
   onSuccess,
 }: DebitoCheckoutSheetProps) {
   const create = useServerFn(createDebitoPayment);
-  const { profile } = useProfile();
-  const welcomeBonusActive =
-    !(profile as { welcome_bonus_granted_at?: string | null } | null)?.welcome_bonus_granted_at;
   const [stage, setStage] = useState<Stage>("form");
   const [method, setMethod] = useState<PaymentMethod>("mpesa");
   const [phone, setPhone] = useState("");
   const [reference, setReference] = useState<string | null>(null);
+  const [paymentId, setPaymentId] = useState<string | null>(null);
   const [errMsg, setErrMsg] = useState<string | null>(null);
+  const [secondsLeft, setSecondsLeft] = useState(TIMEOUT_MS / 1000);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const isMobile = MOBILE_MONEY_METHODS.includes(method);
   const phoneOk = !isMobile || /^8[2-7]\d{7}$/.test(phone.replace(/\D/g, ""));
 
+  // Body scroll lock
   useEffect(() => {
     if (!open) return;
     const scrollY = window.scrollY;
     const body = document.body;
-    const prev = {
-      position: body.style.position,
-      top: body.style.top,
-      left: body.style.left,
-      right: body.style.right,
-      width: body.style.width,
-      overflow: body.style.overflow,
-    };
-    body.style.position = "fixed";
-    body.style.top = `-${scrollY}px`;
-    body.style.left = "0";
-    body.style.right = "0";
-    body.style.width = "100%";
-    body.style.overflow = "hidden";
+    const prev = body.style.cssText;
+    body.style.cssText = `position:fixed;top:-${scrollY}px;left:0;right:0;width:100%;overflow:hidden`;
     return () => {
-      body.style.position = prev.position;
-      body.style.top = prev.top;
-      body.style.left = prev.left;
-      body.style.right = prev.right;
-      body.style.width = prev.width;
-      body.style.overflow = prev.overflow;
+      body.style.cssText = prev;
       window.scrollTo(0, scrollY);
     };
   }, [open]);
 
+  // Realtime subscription on pending payment
+  useEffect(() => {
+    if (stage !== "pending" || !paymentId) return;
+    const channel = supabase
+      .channel(`payment-${paymentId}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "debito_payments", filter: `id=eq.${paymentId}` },
+        (payload) => {
+          const status = (payload.new as { status?: string }).status;
+          if (status === "success") {
+            setStage("success");
+            window.dispatchEvent(new CustomEvent("hunie:credits-changed"));
+            onSuccess?.();
+            toast.success("Pagamento confirmado");
+          } else if (status === "failed") {
+            setStage("error");
+            setErrMsg("O pedido foi cancelado ou expirou.");
+          }
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [stage, paymentId, onSuccess]);
+
+  // Countdown + timeout
+  useEffect(() => {
+    if (stage !== "pending") {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+    setSecondsLeft(TIMEOUT_MS / 1000);
+    const startedAt = Date.now();
+    timerRef.current = setInterval(() => {
+      const elapsed = Date.now() - startedAt;
+      const remaining = Math.max(0, Math.floor((TIMEOUT_MS - elapsed) / 1000));
+      setSecondsLeft(remaining);
+      if (remaining <= 0) {
+        if (timerRef.current) clearInterval(timerRef.current);
+        setStage("error");
+        setErrMsg("O pedido expirou. Tenta de novo.");
+      }
+    }, 1000);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [stage]);
+
   const reset = () => {
     setStage("form");
     setReference(null);
+    setPaymentId(null);
     setErrMsg(null);
   };
 
@@ -101,6 +139,7 @@ export function DebitoCheckoutSheet({
           phone: isMobile ? phone : undefined,
           pack_id: packId,
           plan_tier: planTier,
+          billing_period: billingPeriod,
           return_url: isMobile ? undefined : "https://hunie.lovable.app/app?subscription=success",
         },
       });
@@ -110,6 +149,7 @@ export function DebitoCheckoutSheet({
         return;
       }
       setReference(res.reference ?? null);
+      setPaymentId(res.payment_id ?? null);
       if (res.status === "success") {
         setStage("success");
         window.dispatchEvent(new CustomEvent("hunie:credits-changed"));
@@ -127,6 +167,10 @@ export function DebitoCheckoutSheet({
     }
   };
 
+  const mm = Math.floor(secondsLeft / 60);
+  const ss = secondsLeft % 60;
+  const countdown = `${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`;
+
   return (
     <AnimatePresence>
       {open && (
@@ -136,14 +180,14 @@ export function DebitoCheckoutSheet({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={handleClose}
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm touch-none"
+            className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm touch-none"
           />
           <motion.div
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 360, damping: 36 }}
-            className="fixed inset-x-0 bottom-0 z-50 max-h-[92dvh] overflow-y-auto overscroll-contain rounded-t-3xl border-t border-white/10 bg-gradient-to-b from-[#1a0a14] to-background p-5 pb-[max(env(safe-area-inset-bottom),24px)] text-foreground shadow-[0_-20px_60px_-10px_rgba(240,70,140,0.3)]"
+            className="fixed inset-x-0 bottom-0 z-[71] max-h-[92dvh] overflow-y-auto overscroll-contain rounded-t-3xl border-t border-white/10 bg-gradient-to-b from-[#1a0a14] to-background p-5 pb-[max(env(safe-area-inset-bottom),24px)] text-foreground shadow-[0_-20px_60px_-10px_rgba(240,70,140,0.3)]"
           >
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/15" />
             <div className="flex items-start justify-between gap-3">
@@ -164,35 +208,24 @@ export function DebitoCheckoutSheet({
               </button>
             </div>
 
-            {/* Order summary */}
             <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-3">
-              <div className="flex items-baseline justify-between text-xs text-muted-foreground">
-                <span>Subscrição</span>
-                <span>{amountMzn.toLocaleString("pt-PT")} MZN</span>
-              </div>
-              {welcomeBonusActive && (
-                <div className="mt-1 flex items-baseline justify-between text-xs text-emerald-300">
-                  <span>Bónus de boas-vindas</span>
-                  <span className="font-semibold">+1 Boost grátis</span>
-                </div>
-              )}
-              <div className="my-2 h-px bg-white/8" />
               <div className="flex items-baseline justify-between">
                 <span className="text-xs font-semibold">Total hoje</span>
-                <span className="text-xl font-extrabold">{amountMzn.toLocaleString("pt-PT")} <span className="text-xs font-bold text-white/60">MZN</span></span>
+                <span className="text-xl font-extrabold">
+                  {amountMzn.toLocaleString("pt-PT")} <span className="text-xs font-bold text-white/60">MZN</span>
+                </span>
               </div>
             </div>
 
-            {stage === "form" || stage === "submitting" ? (
+            {(stage === "form" || stage === "submitting") && (
               <>
                 <div className="mt-4">
                   <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                     Método de pagamento
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    {(["mpesa", "emola"] as PaymentMethod[]).map((m) => (
-                      <MethodTile key={m} m={m} active={method === m} onClick={() => setMethod(m)} icon={<Smartphone size={14} />} />
-                    ))}
+                    <MethodTile m="mpesa" sub="84 / 85" active={method === "mpesa"} onClick={() => setMethod("mpesa")} />
+                    <MethodTile m="emola" sub="86 / 87" active={method === "emola"} onClick={() => setMethod("emola")} />
                   </div>
                 </div>
 
@@ -212,9 +245,6 @@ export function DebitoCheckoutSheet({
                         className="w-full bg-transparent text-sm outline-none"
                       />
                     </div>
-                    <p className="mt-1.5 text-[11px] text-muted-foreground">
-                      Vamos enviar um pedido de pagamento para o teu telemóvel.
-                    </p>
                   </div>
                 )}
 
@@ -235,60 +265,77 @@ export function DebitoCheckoutSheet({
                   )}
                 </motion.button>
 
-                <div className="mt-3 grid grid-cols-3 gap-2 text-center text-[10px] text-white/60">
-                  <div className="flex flex-col items-center gap-1 rounded-lg bg-white/[0.03] py-2">
-                    <ShieldCheck size={13} className="text-emerald-400" />
-                    <span>Garantia 7 dias</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 rounded-lg bg-white/[0.03] py-2">
-                    <Lock size={13} className="text-sky-400" />
-                    <span>SSL · 256-bit</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 rounded-lg bg-white/[0.03] py-2">
-                    <Sparkles size={13} className="text-fuchsia-400" />
-                    <span>Ativação imediata</span>
-                  </div>
+                <div className="mt-3 flex items-center justify-center gap-2 text-[11px] text-white/60">
+                  <ShieldCheck size={12} className="text-emerald-400" />
+                  Pagamento encriptado
                 </div>
-                <p className="mt-2 text-center text-[10px] text-white/40">
-                  Renova automaticamente · Cancela quando quiseres
-                </p>
               </>
-            ) : stage === "pending" ? (
-              <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-center">
-                <Loader2 size={28} className="mx-auto animate-spin text-fuchsia-400" />
-                <p className="mt-3 text-sm font-semibold">Confirma no telemóvel</p>
+            )}
+
+            {stage === "pending" && (
+              <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center">
+                <div className="relative mx-auto h-16 w-16">
+                  <Loader2 size={64} className="animate-spin text-fuchsia-400" />
+                </div>
+                <p className="mt-3 text-base font-bold">⏳ A aguardar confirmação…</p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Introduz o teu PIN {METHOD_LABEL[method]} para concluir.
+                  Confirme o pagamento no seu telemóvel
                 </p>
                 {reference && (
                   <p className="mt-2 text-[11px] text-muted-foreground">
                     Referência: <span className="font-mono text-white">{reference}</span>
                   </p>
                 )}
-                <button onClick={handleClose} className="mt-4 text-xs text-muted-foreground underline">
-                  Fechar
-                </button>
+                <p className="mt-3 text-xs font-mono tabular-nums text-white/70">
+                  Tempo restante: {countdown}
+                </p>
               </div>
-            ) : stage === "success" ? (
-              <div className="mt-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-center">
-                <CheckCircle2 size={32} className="mx-auto text-emerald-400" />
-                <p className="mt-3 text-sm font-semibold">Pagamento confirmado!</p>
+            )}
+
+            {stage === "success" && (
+              <div className="mt-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5 text-center">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <CheckCircle2 size={56} className="mx-auto text-emerald-400" />
+                </motion.div>
+                <p className="mt-3 text-base font-bold">Pagamento confirmado! 🎉</p>
+                <p className="mt-1 text-xs text-muted-foreground">Bem-vindo ao Hunie</p>
                 <button
                   onClick={handleClose}
-                  className="mt-4 h-11 w-full rounded-xl bg-emerald-500 text-sm font-bold text-white"
+                  className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500 text-sm font-bold text-white"
                 >
-                  Continuar
+                  <Sparkles size={14} /> Começar a dar match
                 </button>
               </div>
-            ) : (
-              <div className="mt-5 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-center">
-                <p className="text-sm font-semibold text-red-300">{errMsg ?? "Erro"}</p>
-                <button
-                  onClick={() => setStage("form")}
-                  className="mt-3 h-11 w-full rounded-xl bg-white/[0.08] text-sm font-bold"
-                >
-                  Tentar de novo
-                </button>
+            )}
+
+            {stage === "error" && (
+              <div className="mt-5 rounded-2xl border border-red-500/30 bg-red-500/10 p-5 text-center">
+                <XCircle size={40} className="mx-auto text-red-400" />
+                <p className="mt-2 text-sm font-semibold text-red-300">
+                  ❌ Pagamento não confirmado
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">{errMsg ?? "Tenta novamente."}</p>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setStage("form")}
+                    className="h-11 rounded-xl bg-gradient-to-r from-fuchsia-500 to-pink-500 text-sm font-bold text-white"
+                  >
+                    Tentar novamente
+                  </button>
+                  <button
+                    onClick={() => {
+                      setStage("form");
+                      setMethod(method === "mpesa" ? "emola" : "mpesa");
+                    }}
+                    className="h-11 rounded-xl bg-white/[0.08] text-sm font-bold"
+                  >
+                    Outro método
+                  </button>
+                </div>
               </div>
             )}
           </motion.div>
@@ -300,14 +347,14 @@ export function DebitoCheckoutSheet({
 
 function MethodTile({
   m,
+  sub,
   active,
   onClick,
-  icon,
 }: {
   m: PaymentMethod;
+  sub: string;
   active: boolean;
   onClick: () => void;
-  icon: React.ReactNode;
 }) {
   return (
     <button
@@ -319,8 +366,9 @@ function MethodTile({
           : "border-white/10 bg-white/[0.04] text-white/70"
       }`}
     >
-      <span className={active ? "text-fuchsia-300" : "text-white/60"}>{icon}</span>
+      <Smartphone size={14} className={active ? "text-fuchsia-300" : "text-white/60"} />
       <span>{METHOD_LABEL[m]}</span>
+      <span className="text-[10px] text-white/50">{sub}</span>
     </button>
   );
 }
