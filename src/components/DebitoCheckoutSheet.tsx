@@ -24,9 +24,6 @@ export interface DebitoCheckoutSheetProps {
 const METHOD_LABEL: Record<PaymentMethod, string> = {
   mpesa: "M-Pesa",
   emola: "e-Mola",
-  mkesh: "mKesh",
-  visa_mastercard: "Cartão Visa / Mastercard",
-  payfast: "PayFast",
 };
 
 export function DebitoCheckoutSheet({
