@@ -162,17 +162,17 @@ export function ProfileView({
             )}
           </button>
 
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 mb-2">
-              <span className="text-[22px] font-semibold tracking-tight text-foreground truncate">
-                {name}
-              </span>
+          <div className="min-w-0 flex-1">
+            <span className="block text-[22px] font-semibold tracking-tight text-foreground truncate leading-tight">
+              {name}
+            </span>
+            <div className="flex items-center gap-1.5 mt-0.5 mb-2">
               {age > 0 && (
-                <span className="text-[15px] font-medium text-muted-foreground">
+                <span className="text-[14px] font-medium text-muted-foreground">
                   {age}
                 </span>
               )}
-              {isVerified && <BadgeCheck size={20} color="#5BB8FF" fill="#5BB8FF" stroke="#000" />}
+              {isVerified && <BadgeCheck size={16} color="#5BB8FF" fill="#5BB8FF" stroke="#000" />}
               {isElite && (
                 <span
                   className="rounded-full px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider"
