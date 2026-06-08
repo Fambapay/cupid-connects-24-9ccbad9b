@@ -326,10 +326,11 @@ function PlanCardView({
       )}
 
       <h3
-        className="mt-1 text-lg"
+        className="mt-1 text-2xl uppercase"
         style={{
-          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          fontFamily: "'Montserrat', sans-serif",
           fontWeight: 900,
+          letterSpacing: "-0.02em",
           color: plan.accent,
         }}
       >
