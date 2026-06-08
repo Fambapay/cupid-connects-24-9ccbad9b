@@ -85,16 +85,14 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
             onClick={onClose}
           />
           <motion.div
-            className="fixed inset-x-0 bottom-0 z-[61] flex flex-col overflow-hidden rounded-t-[32px] text-white"
+            className="fixed inset-x-0 bottom-0 z-[61] flex flex-col overflow-hidden rounded-t-[28px] text-white"
             style={{
               maxHeight: '92vh',
-              background:
-                'radial-gradient(120% 60% at 50% 0%, color-mix(in oklab, var(--brand-pink) 14%, transparent) 0%, transparent 55%), linear-gradient(180deg, rgba(22,20,28,0.96) 0%, rgba(14,12,18,0.985) 100%)',
+              background: 'rgba(18,16,22,0.985)',
               backdropFilter: 'blur(40px) saturate(180%)',
               WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-              boxShadow:
-                '0 -20px 60px -10px rgba(0,0,0,0.6), 0 -1px 0 0 color-mix(in oklab, var(--brand-pink) 18%, transparent) inset',
-              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 -20px 60px -10px rgba(0,0,0,0.55)',
+              border: '1px solid rgba(255,255,255,0.06)',
               borderBottom: 'none',
             }}
             initial={{ y: '100%' }}
@@ -104,7 +102,7 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
           >
             {/* Grabber */}
             <div className="flex justify-center pt-2.5 pb-1">
-              <div className="h-[5px] w-10 rounded-full bg-white/25" />
+              <div className="h-[5px] w-10 rounded-full bg-white/20" />
             </div>
 
             {/* Header */}
@@ -116,26 +114,18 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
               >
                 Cancelar
               </button>
-              <h2
-                className="text-[17px] font-semibold tracking-tight"
-                style={{
-                  backgroundImage:
-                    'linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%)',
-                  WebkitBackgroundClip: 'text',
-                  backgroundClip: 'text',
-                  color: 'transparent',
-                }}
-              >
+              <h2 className="text-[17px] font-semibold tracking-tight text-white">
                 Filtros
               </h2>
               <button
                 onClick={reset}
                 className="text-[15px] font-medium active:opacity-60"
-                style={{ minWidth: 56, textAlign: 'right', color: 'color-mix(in oklab, var(--brand-pink) 75%, white)' }}
+                style={{ minWidth: 56, textAlign: 'right', color: 'var(--brand-pink)' }}
               >
                 Repor
               </button>
             </div>
+
 
 
             {/* Scroll content */}
