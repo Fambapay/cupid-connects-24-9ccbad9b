@@ -137,8 +137,8 @@ function Discover() {
   };
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-black text-white" onClick={!isPremium ? openPaywall : undefined}>
-      <div className="absolute inset-0" style={{ top: "-20px" }} onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
+      <div className="absolute inset-0">
         <DiscoverTopBar onOpenFilters={() => isPremium ? setFiltersOpen(true) : openPaywall()} onBoost={isPremium ? boost.activate : openPaywall} boostActive={boost.active} boostRemainingMinutes={boost.remainingMinutes} />
         {current ? (
           <>
