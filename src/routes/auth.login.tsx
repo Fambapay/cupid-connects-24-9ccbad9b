@@ -89,6 +89,28 @@ function LoginPage() {
 
   return (
     <AuthShell title="Entrar">
+      <button
+        type="button"
+        onClick={handleGoogle}
+        disabled={googleBusy}
+        className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-white font-semibold text-foreground shadow-md transition-transform active:scale-[0.98] disabled:opacity-60"
+      >
+        {googleBusy ? (
+          <Loader2 className="h-5 w-5 animate-spin" />
+        ) : (
+          <>
+            <GoogleIcon />
+            Continuar com Google
+          </>
+        )}
+      </button>
+
+      <div className="flex items-center gap-3 py-2">
+        <div className="h-px flex-1 bg-white/10" />
+        <span className="text-xs text-muted-foreground">ou</span>
+        <div className="h-px flex-1 bg-white/10" />
+      </div>
+
       <form onSubmit={submit} className="space-y-4">
         <Field label="Email">
           <Input
