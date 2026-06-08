@@ -295,8 +295,8 @@ function SettingsPage() {
               <ArrowLeft className="h-5 w-5 text-white" />
             </motion.button>
             <h2
-              className="text-[28px] font-extrabold tracking-tight text-foreground"
-              style={{ fontWeight: 800 }}
+              className="text-[28px] tracking-tight text-foreground"
+              style={{ fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif', fontWeight: 900 }}
             >
               Definições
             </h2>
