@@ -45,7 +45,9 @@ export const SwipeActions = ({
   cardKey,
 }: SwipeActionsProps) => {
   const likesDisabled = disabled || (dailyLimits?.likesRemaining ?? 1) <= 0;
-  const totalSuperLikes = (dailyLimits?.superLikesRemaining ?? 0) + purchasedSuperLikes;
+  // super_like_balance já reflete refill diário + packs comprados.
+  // Não somar com dailyLimits.superLikesRemaining (era contado em dobro).
+  const totalSuperLikes = purchasedSuperLikes;
   const superLikesDisabled = disabled || totalSuperLikes <= 0;
 
   const fallbackX = useMotionValue(0);
