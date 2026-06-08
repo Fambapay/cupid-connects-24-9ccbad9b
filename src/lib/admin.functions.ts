@@ -155,7 +155,7 @@ export const getEngagementSeries = createServerFn({ method: "GET" })
 
     const [signups, matches, dauToday, dau7, dau30] = await Promise.all([
       sb.from("profiles").select("created_at").gte("created_at", since),
-      sb.from("matches").select("matched_at").gte("matched_at", since),
+      sb.from("matches").select("created_at").gte("created_at", since),
       sb.from("profiles").select("id", { head: true, count: "exact" }).gte("last_active_at", startOfDay),
       sb.from("profiles").select("id", { head: true, count: "exact" }).gte("last_active_at", d7),
       sb.from("profiles").select("id", { head: true, count: "exact" }).gte("last_active_at", d30),
@@ -172,7 +172,7 @@ export const getEngagementSeries = createServerFn({ method: "GET" })
       if (v) v.signups += 1;
     });
     (matches.data ?? []).forEach((r: any) => {
-      const k = String(r.matched_at).slice(0, 10);
+      const k = String(r.created_at).slice(0, 10);
       const v = byDay.get(k);
       if (v) v.matches += 1;
     });
@@ -182,7 +182,7 @@ export const getEngagementSeries = createServerFn({ method: "GET" })
       today: {
         dau: dauToday.count ?? 0,
         signups: (signups.data ?? []).filter((r: any) => String(r.created_at) >= startOfDay).length,
-        matches: (matches.data ?? []).filter((r: any) => String(r.matched_at) >= startOfDay).length,
+        matches: (matches.data ?? []).filter((r: any) => String(r.created_at) >= startOfDay).length,
       },
       dau: {
         d7: dau7.count ?? 0,
