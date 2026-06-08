@@ -14,7 +14,7 @@ import {
   animate,
   type MotionValue,
 } from "framer-motion";
-import { MapPin, ChevronDown, BadgeCheck } from "lucide-react";
+import { ChevronDown, ArrowUp } from "lucide-react";
 import type { DiscoveryProfile, SwipeDirection } from "./types";
 
 interface ProfileCardProps {
@@ -38,12 +38,7 @@ export interface ProfileCardHandle {
 const getVW = () => (typeof window !== "undefined" ? window.innerWidth : 390);
 const getVH = () => (typeof window !== "undefined" ? window.innerHeight : 800);
 
-function formatDistance(meters?: number) {
-  if (!meters || meters <= 0) return "";
-  if (meters < 1000) return `${Math.round(meters)} m`;
-  const km = meters / 1000;
-  return `${km < 10 ? km.toFixed(1) : Math.round(km)} km`;
-}
+// distance helper removed — not displayed on card front anymore
 
 const StackCard = ({
   profile,
