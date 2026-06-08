@@ -76,6 +76,9 @@ export const Route = createFileRoute("/shop")({
       { title: "Hunie Store — Boosts & Super Likes" },
       { name: "description", content: "Compra Boosts e Super Likes para apareceres mais e ter mais matches." },
     ],
+    links: [
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" },
+    ],
   }),
   component: ShopPage,
 });
@@ -134,7 +137,12 @@ function ShopPage() {
           </motion.button>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <h1 className="text-[26px] font-black leading-none tracking-tight">Hunie Store</h1>
+              <h1 className="text-[26px] font-black leading-none tracking-tight">
+                Hunie{" "}
+                <span style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontWeight: 400 }}>
+                  Store
+                </span>
+              </h1>
               <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-fuchsia-500 to-pink-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
                 <Sparkles size={10} /> Pro
               </span>
@@ -204,7 +212,22 @@ function ShopPage() {
                     <Star size={24} fill="#38BDF8" stroke="none" />
                   )}
                 </div>
-                <h2 className="text-[22px] font-extrabold leading-tight">{copy.hook}</h2>
+                <h2 className="text-[24px] font-extrabold leading-tight">
+                  {(() => {
+                    const text = copy.hook.replace(/\.$/, "");
+                    const parts = text.split(" ");
+                    const last = parts.pop() ?? "";
+                    const head = parts.join(" ");
+                    return (
+                      <>
+                        {head ? `${head} ` : ""}
+                        <span style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontWeight: 400 }}>
+                          {last}.
+                        </span>
+                      </>
+                    );
+                  })()}
+                </h2>
                 <p className="mt-1 text-[13px] text-muted-foreground">{copy.sub}</p>
 
                 <div className="mt-4 grid grid-cols-3 gap-2">
