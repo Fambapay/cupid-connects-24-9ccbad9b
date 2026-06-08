@@ -1,9 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Heart, Info, RotateCcw, SlidersHorizontal, Star, X, Zap } from "lucide-react";
 
 import { BottomNav } from "@/components/BottomNav";
+import { DiscoveryPage } from "@/components/discovery/DiscoveryPage";
 import { EmptyDiscovery } from "@/components/discovery/EmptyDiscovery";
 import { MatchOverlay } from "@/components/discovery/MatchOverlay";
 import { FiltersSheet, DEFAULT_FILTERS, type DiscoveryFilters } from "@/components/FiltersSheet";
@@ -15,7 +15,7 @@ import { useBoost } from "@/hooks/useBoost";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
-import type { Profile, SwipeDirection } from "@/types/dating";
+import type { DiscoveryProfile, SwipeDirection } from "@/components/discovery/types";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
