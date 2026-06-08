@@ -413,39 +413,27 @@ function Bubble({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showRead
       {!me &&
         (isLastOfGroup ? (
           avatar ? (
-            <img src={avatar} alt={name} className="h-7 w-7 shrink-0 rounded-full object-cover" />
+            <img src={avatar} alt={name} className="h-8 w-8 shrink-0 rounded-full object-cover" />
           ) : (
-            <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-flame" />
+            <div className="h-8 w-8 shrink-0 rounded-full bg-gradient-flame" />
           )
         ) : (
-          <div className="h-7 w-7 shrink-0" />
+          <div className="h-8 w-8 shrink-0" />
         ))}
 
       <div className={`flex w-fit max-w-[78%] flex-col ${me ? "ml-auto items-end" : "items-start"}`}>
         <div
-          className={[
-            "px-4 py-2.5 text-[15px] leading-snug break-words whitespace-pre-wrap",
-            me ? "bg-gradient-flame text-flame-foreground shadow-rose" : "bg-muted text-foreground",
-            "rounded-2xl",
+          className="px-4 py-2.5 text-[15px] leading-snug break-words whitespace-pre-wrap rounded-[22px]"
+          style={
             me
-              ? `${isFirstOfGroup ? "rounded-tr-2xl" : "rounded-tr-md"} ${
-                  isLastOfGroup ? "rounded-br-md" : "rounded-br-2xl"
-                }`
-              : `${isFirstOfGroup ? "rounded-tl-2xl" : "rounded-tl-md"} ${
-                  isLastOfGroup ? "rounded-bl-md" : "rounded-bl-2xl"
-                }`,
-          ].join(" ")}
+              ? { background: "#F3E7DD", color: "#0a0a0a", fontWeight: 500 }
+              : { background: "#000", color: "#fff", border: "1px solid rgba(255,255,255,0.06)", fontWeight: 500 }
+          }
         >
           {msg.content}
         </div>
-        {isLastOfGroup && (
-          <span className="mt-1 px-1 text-[10px] text-muted-foreground">
-            {new Date(msg.created_at).toLocaleTimeString("pt-PT", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-            {me && showReadReceipt && <span className="ml-1.5 text-flame font-medium">· Lido</span>}
-          </span>
+        {me && showReadReceipt && isLastOfGroup && (
+          <span className="mt-1 px-1 text-[11px] text-white/45">Sent</span>
         )}
       </div>
     </motion.li>
@@ -454,10 +442,9 @@ function Bubble({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showRead
 
 function DateSeparator({ label }: { label: string }) {
   return (
-    <div className="my-2 flex items-center gap-3 text-[11px] uppercase tracking-wider text-muted-foreground">
-      <div className="h-px flex-1 bg-border" />
-      <span className="font-semibold">{label}</span>
-      <div className="h-px flex-1 bg-border" />
+    <div className="my-4 flex items-center justify-center">
+      <span className="text-[12px] font-medium text-white/40">{label}</span>
     </div>
   );
 }
+
