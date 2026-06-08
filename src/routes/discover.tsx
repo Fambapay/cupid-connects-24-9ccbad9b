@@ -191,9 +191,9 @@ function Discover() {
                     </div>
                     {current.city && <p className="mt-2 text-sm font-medium text-white/75">{current.city}</p>}
                     {current.bio && <p className="mt-3 line-clamp-2 max-w-[32rem] text-sm text-white/80">{current.bio}</p>}
-                    {current.interests.length > 0 && (
+                    {(current.interests?.length ?? 0) > 0 && (
                       <div className="mt-4 flex flex-wrap gap-2">
-                        {current.interests.slice(0, 4).map((interest) => (
+                        {current.interests?.slice(0, 4).map((interest) => (
                           <span key={interest} className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
                             {interest}
                           </span>
