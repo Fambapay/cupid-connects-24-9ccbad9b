@@ -742,8 +742,8 @@ function BirthdateStep({
         open={open === "day"}
         onClose={() => setOpen(null)}
         title="Dia"
-        items={Array.from({ length: 31 }, (_, i) => ({ value: i + 1, label: String(i + 1) }))}
-        selected={day}
+        items={Array.from({ length: maxDay }, (_, i) => ({ value: i + 1, label: String(i + 1) }))}
+        selected={day && day <= maxDay ? day : null}
         onSelect={(v) => { onChange(v, month, year); setOpen(null); }}
       />
       <ScrollPickerSheet
@@ -752,7 +752,12 @@ function BirthdateStep({
         title="Mês"
         items={MONTHS_PT.map((m, i) => ({ value: i + 1, label: m }))}
         selected={month}
-        onSelect={(v) => { onChange(day, v, year); setOpen(null); }}
+        onSelect={(v) => {
+          const newMax = daysInMonth(v, year);
+          const newDay = day && day > newMax ? newMax : day;
+          onChange(newDay, v, year);
+          setOpen(null);
+        }}
       />
       <ScrollPickerSheet
         open={open === "year"}
@@ -763,8 +768,14 @@ function BirthdateStep({
           return { value: y, label: String(y) };
         })}
         selected={year}
-        onSelect={(v) => { onChange(day, month, v); setOpen(null); }}
+        onSelect={(v) => {
+          const newMax = daysInMonth(month, v);
+          const newDay = day && day > newMax ? newMax : day;
+          onChange(newDay, month, v);
+          setOpen(null);
+        }}
       />
+
     </div>
   );
 }
