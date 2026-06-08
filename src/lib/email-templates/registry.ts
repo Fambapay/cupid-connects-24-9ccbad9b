@@ -15,6 +15,7 @@ import { template as orderConfirmationTemplate } from './order-confirmation'
 import { template as notificationTemplate } from './notification'
 import { template as newMessageTemplate } from './new-message'
 import { template as newLikeTemplate } from './new-like'
+import { template as membershipExpiringTemplate } from './membership-expiring'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   welcome: welcomeTemplate,
@@ -23,4 +24,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'new-like': newLikeTemplate,
   'order-confirmation': orderConfirmationTemplate,
   notification: notificationTemplate,
+  'membership-expiring': membershipExpiringTemplate,
 }
