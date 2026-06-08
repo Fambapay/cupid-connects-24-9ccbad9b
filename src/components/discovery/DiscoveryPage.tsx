@@ -129,12 +129,13 @@ export const DiscoveryPage = ({
         <>
           <ProfileCard
             ref={cardRef}
-            key={current.id}
+            key={`${current.id}:${enterAnim ?? "n"}`}
             profile={current}
             nextProfiles={[next1, next2].filter(Boolean) as DiscoveryProfile[]}
             onSwipe={handle}
             sharedX={x}
             sharedY={y}
+            enterAnim={enterAnim}
             actions={
               <SwipeActions
                 onSwipe={(d) => {
