@@ -1,10 +1,11 @@
 import { createFileRoute, Link, Outlet, useMatchRoute } from "@tanstack/react-router";
-import { MessageCircle, Sparkles, Compass } from "lucide-react";
-import { AppShell, TopBar } from "@/components/AppShell";
+import { MessageCircle, Sparkles, Compass, Shield, MessagesSquare } from "lucide-react";
+import { AppShell } from "@/components/AppShell";
 import { useMatches } from "@/hooks/useMatches";
 import { SwipeableConversationItem } from "@/components/chat/SwipeableConversationItem";
 
 import { requireMembership } from "@/lib/authGuard";
+
 
 export const Route = createFileRoute("/chat")({
   ssr: false,
@@ -33,14 +34,32 @@ function ChatList() {
 
   return (
     <AppShell>
-      <TopBar title="Conversas" />
+      <header className="sticky top-0 z-30 flex items-center justify-between bg-background/70 px-5 pb-3 pt-5 backdrop-blur-xl">
+        <h1
+          className="text-[34px] leading-none tracking-tight text-white"
+          style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}
+        >
+          Chat
+        </h1>
+        <div className="flex items-center gap-1 rounded-full bg-white/[0.06] px-1.5 py-1.5 ring-1 ring-white/10">
+          <button className="flex h-8 w-8 items-center justify-center rounded-full text-white/90 active:bg-white/10">
+            <Shield className="h-[18px] w-[18px]" strokeWidth={2.2} />
+          </button>
+          <button className="flex h-8 w-8 items-center justify-center rounded-full text-white/90 active:bg-white/10">
+            <MessagesSquare className="h-[18px] w-[18px]" strokeWidth={2.2} />
+          </button>
+        </div>
+      </header>
 
       {newMatches.length > 0 && (
-        <section className="px-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            Novos matches
+        <section className="mt-2 px-5">
+          <h2
+            className="text-[15px] uppercase tracking-tight text-white"
+            style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 800 }}
+          >
+            New Matches
           </h2>
-          <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
+          <div className="mt-3 flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {newMatches.map((m) => (
               <Link
                 key={m.matchId}
@@ -48,26 +67,33 @@ function ChatList() {
                 params={{ matchId: m.matchId }}
                 className="relative shrink-0"
               >
-                <div className="rounded-2xl bg-gradient-sunset p-[2px]">
-                  <div className="h-24 w-20 overflow-hidden rounded-2xl bg-card">
-                    {m.photo ? (
-                      <img src={m.photo} alt={m.name} className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="h-full w-full bg-gradient-flame" />
-                    )}
-                  </div>
+                <div className="h-32 w-[104px] overflow-hidden rounded-[22px] bg-card ring-1 ring-white/5">
+                  {m.photo ? (
+                    <img src={m.photo} alt={m.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="h-full w-full bg-gradient-flame" />
+                  )}
                 </div>
-                <span className="mt-1.5 block text-center text-xs font-medium">{m.name}</span>
+                <span
+                  className="mt-2 block text-center text-[14px] text-white"
+                  style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
+                >
+                  {m.name}
+                </span>
               </Link>
             ))}
           </div>
         </section>
       )}
 
-      <section className={`${newMatches.length > 0 ? "mt-6" : ""} px-5`}>
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          Mensagens
+      <section className={`${newMatches.length > 0 ? "mt-5" : "mt-2"} px-5`}>
+        <h2
+          className="text-[15px] uppercase tracking-tight text-white"
+          style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 800 }}
+        >
+          Messages
         </h2>
+
 
         {loading && matches.length === 0 ? (
           <p className="mt-6 text-center text-sm text-muted-foreground">A carregar...</p>
