@@ -296,7 +296,7 @@ function SettingsPage() {
             </motion.button>
             <h2
               className="text-[28px] tracking-tight text-foreground"
-              style={{ fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif', fontWeight: 900 }}
+              style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}
             >
               Definições
             </h2>
