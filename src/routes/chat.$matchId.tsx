@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, Send } from "lucide-react";
 import { useMessages, type ChatMessage } from "@/hooks/useMessages";
@@ -42,12 +42,11 @@ function ChatRoom() {
   const scrollToLatest = useCallback((behavior: ScrollBehavior = "auto") => {
     const el = scrollRef.current;
     if (!el) return;
-    const pin = () => el.scrollTo({ top: el.scrollHeight, behavior });
-    pin();
-    requestAnimationFrame(pin);
-    requestAnimationFrame(() => requestAnimationFrame(pin));
-    window.setTimeout(pin, 90);
-    window.setTimeout(pin, 220);
+    el.scrollTo({ top: el.scrollHeight, behavior });
+    requestAnimationFrame(() => {
+      const e = scrollRef.current;
+      if (e) e.scrollTo({ top: e.scrollHeight, behavior });
+    });
   }, []);
 
   useLayoutEffect(() => {
@@ -58,16 +57,19 @@ function ChatRoom() {
     scrollToLatest("auto");
   }, [messages.length, typing, scrollToLatest]);
 
-  // Mark conversation as read on open and whenever new messages arrive
+  // Mark conversation as read on open and whenever new messages arrive (debounced)
   useEffect(() => {
     if (!user || !matchId) return;
-    supabase
-      .from("match_reads")
-      .upsert(
-        { match_id: matchId, user_id: user.id, last_read_at: new Date().toISOString() },
-        { onConflict: "match_id,user_id" },
-      )
-      .then(() => undefined);
+    const t = window.setTimeout(() => {
+      supabase
+        .from("match_reads")
+        .upsert(
+          { match_id: matchId, user_id: user.id, last_read_at: new Date().toISOString() },
+          { onConflict: "match_id,user_id" },
+        )
+        .then(() => undefined);
+    }, 400);
+    return () => window.clearTimeout(t);
   }, [user, matchId, messages.length]);
 
   // Read receipts: track peer's last_read_at so we can render "Lido" indicators
@@ -283,46 +285,44 @@ function ChatRoom() {
       </header>
 
 
-      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3" style={{ WebkitOverflowScrolling: "touch", contain: "layout paint" }}>
         <DateSeparator label={formatDateLabel(messages[0]?.created_at)} />
 
         <ul className="space-y-1.5">
-          <AnimatePresence initial={false}>
-            {(() => {
-              const peerReadMs = peerLastReadAt ? new Date(peerLastReadAt).getTime() : 0;
-              let lastReadOwnIdx = -1;
+          {(() => {
+            const peerReadMs = peerLastReadAt ? new Date(peerLastReadAt).getTime() : 0;
+            let lastReadOwnIdx = -1;
+            if (peerReadMs && entitlements.canReadReceipts) {
               for (let i = messages.length - 1; i >= 0; i--) {
                 const m = messages[i];
                 if (m.sender_id !== user?.id) continue;
-                if (peerReadMs && new Date(m.created_at).getTime() <= peerReadMs) {
-                  lastReadOwnIdx = i;
-                  break;
-                }
+                if (new Date(m.created_at).getTime() <= peerReadMs) { lastReadOwnIdx = i; break; }
               }
-              return messages.map((m, i) => {
-                const prev = messages[i - 1];
-                const next = messages[i + 1];
-                const me = m.sender_id === user?.id;
-                const prevMe = prev ? prev.sender_id === user?.id : null;
-                const nextMe = next ? next.sender_id === user?.id : null;
-                const isFirstOfGroup = prevMe === null || prevMe !== me;
-                const isLastOfGroup = nextMe === null || nextMe !== me;
-                return (
-                  <Bubble
-                    key={m.id}
-                    msg={m}
-                    me={me}
-                    isFirstOfGroup={isFirstOfGroup}
-                    isLastOfGroup={isLastOfGroup}
-                    avatar={peer.photo}
-                    name={peer.name}
-                    showReadReceipt={entitlements.canReadReceipts && me && i === lastReadOwnIdx}
-                  />
-                );
-              });
-            })()}
-          </AnimatePresence>
+            }
+            return messages.map((m, i) => {
+              const prev = messages[i - 1];
+              const next = messages[i + 1];
+              const me = m.sender_id === user?.id;
+              const prevMe = prev ? prev.sender_id === user?.id : null;
+              const nextMe = next ? next.sender_id === user?.id : null;
+              const isFirstOfGroup = prevMe === null || prevMe !== me;
+              const isLastOfGroup = nextMe === null || nextMe !== me;
+              return (
+                <Bubble
+                  key={m.id}
+                  msg={m}
+                  me={me}
+                  isFirstOfGroup={isFirstOfGroup}
+                  isLastOfGroup={isLastOfGroup}
+                  avatar={peer.photo}
+                  name={peer.name}
+                  showReadReceipt={entitlements.canReadReceipts && me && i === lastReadOwnIdx}
+                />
+              );
+            });
+          })()}
         </ul>
+
 
         <AnimatePresence>
           {typing && (
@@ -428,12 +428,13 @@ type BubbleProps = {
   showReadReceipt?: boolean;
 };
 
-function Bubble({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showReadReceipt }: BubbleProps) {
+function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showReadReceipt }: BubbleProps) {
   return (
     <motion.li
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.18, ease: "easeOut" }}
+      style={{ willChange: "transform, opacity", contain: "layout paint" }}
       className={`flex items-end gap-2 ${me ? "justify-end" : "justify-start"} ${
         isFirstOfGroup ? "mt-3" : "mt-0.5"
       }`}
@@ -441,7 +442,7 @@ function Bubble({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showRead
       {!me &&
         (isLastOfGroup ? (
           avatar ? (
-            <img src={avatar} alt={name} className="h-8 w-8 shrink-0 rounded-full object-cover" />
+            <img src={avatar} alt={name} width={32} height={32} loading="lazy" decoding="async" className="h-8 w-8 shrink-0 rounded-full object-cover" />
           ) : (
             <div className="h-8 w-8 shrink-0 rounded-full bg-gradient-flame" />
           )
@@ -467,6 +468,16 @@ function Bubble({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showRead
     </motion.li>
   );
 }
+
+const Bubble = memo(BubbleImpl, (a, b) =>
+  a.msg.id === b.msg.id &&
+  a.msg.content === b.msg.content &&
+  a.me === b.me &&
+  a.isFirstOfGroup === b.isFirstOfGroup &&
+  a.isLastOfGroup === b.isLastOfGroup &&
+  a.avatar === b.avatar &&
+  a.showReadReceipt === b.showReadReceipt,
+);
 
 function DateSeparator({ label }: { label: string }) {
   return (
