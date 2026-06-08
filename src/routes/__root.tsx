@@ -174,11 +174,12 @@ function RouteTransition() {
   // Re-key on the matched route id (not full URL) so query/hash changes
   // and param-only updates within the same screen don't trigger a transition.
   const routeKey = useRouterState({
-    select: (s) => {
+    select: (s: any) => {
       const last = s.matches[s.matches.length - 1];
-      return last?.routeId ?? s.location.pathname;
+      return (last?.routeId ?? s.location.pathname) as string;
     },
   });
+
   return (
     <AnimatePresence mode="wait" initial={false}>
       <motion.div
