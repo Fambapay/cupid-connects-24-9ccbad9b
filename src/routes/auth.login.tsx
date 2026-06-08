@@ -93,7 +93,8 @@ function LoginPage() {
         type="button"
         onClick={handleGoogle}
         disabled={googleBusy}
-        className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-white font-semibold text-[#1f1f1f] shadow-md transition-transform active:scale-[0.98] disabled:opacity-60"
+        style={{ color: "#1f1f1f" }}
+        className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-white font-semibold shadow-md transition-transform active:scale-[0.98] disabled:opacity-60"
       >
         {googleBusy ? (
           <Loader2 className="h-5 w-5 animate-spin" />
