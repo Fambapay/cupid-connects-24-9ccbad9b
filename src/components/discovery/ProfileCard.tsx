@@ -206,11 +206,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       const entryY = e * 10;
       const entryScale = 1 - e * 0.06;
       const scale = dragScale * entryScale;
-      const shadowY = 12 + progress * 24;
-      const shadowBlur = 30 + progress * 30;
-      const shadowAlpha = (0.25 + progress * 0.35) * (1 - e * 0.6);
       el.style.transform = `translate3d(${dx}px,${dy + entryY}px,0) rotate(${rot.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) rotateX(${rotX.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
-      el.style.boxShadow = `0 ${shadowY.toFixed(0)}px ${shadowBlur.toFixed(0)}px rgba(0,0,0,${shadowAlpha.toFixed(2)})`;
       applyParallax();
     }, [x, y, entry, applyParallax]);
     useEffect(() => {
