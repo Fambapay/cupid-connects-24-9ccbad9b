@@ -4,10 +4,13 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState, type ReactNode } from "react";
+
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -167,15 +170,42 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function RouteTransition() {
+  // Re-key on the matched route id (not full URL) so query/hash changes
+  // and param-only updates within the same screen don't trigger a transition.
+  const routeKey = useRouterState({
+    select: (s: any) => {
+      const last = s.matches[s.matches.length - 1];
+      return (last?.routeId ?? s.location.pathname) as string;
+    },
+  });
+
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={routeKey}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -4 }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        style={{ minHeight: "100%", willChange: "opacity, transform" }}
+      >
+        <Outlet />
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <RouteTransition />
       <GlobalNotifiers />
       <PushPromptGate />
       <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );
 }
+
