@@ -258,8 +258,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     }, []);
 
 
-    const snapSpring = { type: "spring" as const, stiffness: 320, damping: 28, mass: 0.9 };
-    const flySpring = { type: "spring" as const, stiffness: 280, damping: 24, mass: 0.8 };
+    const snapSpring = { type: "spring" as const, stiffness: 520, damping: 36, mass: 0.7, restDelta: 0.5 };
+    const flySpring = { type: "spring" as const, stiffness: 220, damping: 26, mass: 0.9 };
 
     const animXRef = useRef<ReturnType<typeof animate> | null>(null);
     const animYRef = useRef<ReturnType<typeof animate> | null>(null);
@@ -271,11 +271,11 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     };
 
     const animateTo = useCallback(
-      (tx: number, ty: number, isFly = false, onDone?: () => void) => {
+      (tx: number, ty: number, isFly = false, onDone?: () => void, velocity?: { x: number; y: number }) => {
         cancelAnim();
         const spring = isFly ? flySpring : snapSpring;
-        animXRef.current = animate(x, tx, { ...spring, onComplete: onDone });
-        animYRef.current = animate(y, ty, spring);
+        animXRef.current = animate(x, tx, { ...spring, velocity: velocity?.x, onComplete: onDone });
+        animYRef.current = animate(y, ty, { ...spring, velocity: velocity?.y });
       },
       [x, y],
     );
@@ -297,12 +297,12 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       requestAnimationFrame(() => animateTo(0, 0));
     }, [enterAnim, animateTo, x, y]);
 
-    const flyOut = (dir: SwipeDirection) => {
+    const flyOut = (dir: SwipeDirection, velocity?: { x: number; y: number }) => {
       const w = getVW();
       const h = getVH();
       const tx = dir === "left" ? -w * 1.4 : dir === "right" ? w * 1.4 : 0;
       const ty = dir === "up" ? -h * 1.4 : 0;
-      animateTo(tx, ty, true, () => onSwipe(dir));
+      animateTo(tx, ty, true, () => onSwipe(dir), velocity);
     };
 
     useImperativeHandle(ref, () => ({
@@ -311,30 +311,56 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       flyUp: () => flyOut("up"),
     }));
 
+    // Velocity tracking for fling detection
+    const sampleRef = useRef<{ x: number; y: number; t: number }>({ x: 0, y: 0, t: 0 });
+    const velocityRef = useRef<{ vx: number; vy: number }>({ vx: 0, vy: 0 });
+
     const onPointerDown = (e: React.PointerEvent) => {
       if (!isTop || detailOpen) return;
+      if (e.pointerType === "mouse" && e.button !== 0) return;
       cancelAnim();
       draggingRef.current = true;
       startRef.current = { x: e.clientX - x.get(), y: e.clientY - y.get() };
-      (e.target as Element).setPointerCapture?.(e.pointerId);
+      sampleRef.current = { x: e.clientX, y: e.clientY, t: performance.now() };
+      velocityRef.current = { vx: 0, vy: 0 };
+      (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
     };
     const onPointerMove = (e: React.PointerEvent) => {
       if (!draggingRef.current) return;
-      x.set(e.clientX - startRef.current.x);
-      y.set(Math.min(0, e.clientY - startRef.current.y) * 0.6);
+      const nx = e.clientX - startRef.current.x;
+      const rawY = e.clientY - startRef.current.y;
+      // Allow up freely (scaled), rubber-band downward
+      const ny = rawY <= 0 ? rawY * 0.7 : Math.pow(rawY, 0.7) * 0.5;
+      x.set(nx);
+      y.set(ny);
+      // Velocity sample (exponential smoothing)
+      const now = performance.now();
+      const dt = Math.max(1, now - sampleRef.current.t);
+      const vx = ((e.clientX - sampleRef.current.x) / dt) * 1000;
+      const vy = ((e.clientY - sampleRef.current.y) / dt) * 1000;
+      velocityRef.current.vx = velocityRef.current.vx * 0.4 + vx * 0.6;
+      velocityRef.current.vy = velocityRef.current.vy * 0.4 + vy * 0.6;
+      sampleRef.current = { x: e.clientX, y: e.clientY, t: now };
     };
     const onPointerUp = () => {
       if (!draggingRef.current) return;
       draggingRef.current = false;
       const dx = x.get();
       const dy = y.get();
+      const { vx, vy } = velocityRef.current;
       const w = getVW();
-      const swipeX = w * 0.28;
-      if (dy < -160 && Math.abs(dx) < 100) flyOut("up");
-      else if (dx > swipeX) flyOut("right");
-      else if (dx < -swipeX) flyOut("left");
-      else animateTo(0, 0);
+      const swipeX = w * 0.22;
+      const flingX = 650;
+      const flingY = -700;
+      const goUp = (dy < -120 && vy < -200 && Math.abs(vx) < Math.abs(vy)) || vy < flingY;
+      const goRight = dx > swipeX || vx > flingX;
+      const goLeft = dx < -swipeX || vx < -flingX;
+      if (goUp) flyOut("up", { x: vx, y: vy });
+      else if (goRight && vx >= -flingX) flyOut("right", { x: vx, y: vy });
+      else if (goLeft && vx <= flingX) flyOut("left", { x: vx, y: vy });
+      else animateTo(0, 0, false, undefined, { x: vx, y: vy });
     };
+
 
     const onClickPhoto = (e: React.MouseEvent) => {
       if (detailOpen) return;
