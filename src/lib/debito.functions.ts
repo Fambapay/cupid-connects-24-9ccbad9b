@@ -19,20 +19,16 @@ const ORCHESTRATOR_URL =
   "https://gyqoaningqhurhvdugne.supabase.co/functions/v1/payment-orchestrator";
 const DEFAULT_RETURN_URL = "https://hunie.lovable.app/app?subscription=success";
 
-const InputSchema = z
-  .object({
-    plan_tier: z.enum(["select", "plus", "elite"]).optional(),
-    billing_period: z.enum(["monthly", "annual"]).optional(),
-    pack_id: z.string().optional(),
-    payment_method: z.enum(PAYMENT_METHODS),
-    phone: z.string().optional(),
-    return_url: z.string().url().optional(),
-    customer_name: z.string().max(120).optional(),
-    customer_email: z.string().email().optional(),
-  })
-  .refine((v) => !!v.plan_tier || !!v.pack_id, {
-    message: "plan_tier or pack_id required",
-  });
+const InputSchema = z.object({
+  plan_tier: z.enum(["select", "plus", "elite"]).optional(),
+  billing_period: z.enum(["monthly", "annual"]).optional(),
+  pack_id: z.string().optional(),
+  payment_method: z.enum(PAYMENT_METHODS),
+  phone: z.string().optional(),
+  return_url: z.string().url().optional(),
+  customer_name: z.string().max(120).optional(),
+  customer_email: z.string().email().optional(),
+});
 
 async function sha256Hex(input: string): Promise<string> {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
@@ -43,7 +39,13 @@ async function sha256Hex(input: string): Promise<string> {
 
 export const createDebitoPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => InputSchema.parse(input))
+  .inputValidator((input) => {
+    const parsed = InputSchema.parse(input);
+    if (!parsed.plan_tier && !parsed.pack_id) {
+      throw new Error("plan_tier or pack_id required");
+    }
+    return parsed;
+  })
   .handler(async ({ data, context }) => {
     const { userId } = context;
 

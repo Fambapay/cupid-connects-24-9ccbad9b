@@ -4,12 +4,10 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
-  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -125,6 +123,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@hunieapp" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&display=swap" },
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", type: "image/png", href: "/__l5e/assets-v1/b15315d5-1e63-456c-9b1b-b7a23fd3a92d/favicon.png" },
@@ -171,37 +172,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <RouteTransition />
+      <Outlet />
       <GlobalNotifiers />
       <PushPromptGate />
       <Toaster position="top-center" richColors />
     </QueryClientProvider>
-  );
-}
-
-/**
- * Wraps <Outlet /> with a quick fade/slide keyed by the top-level route segment,
- * so transitions only fire when actually moving between tabs / screens.
- * Required: nested routes render here. Removing <Outlet /> breaks all child routes.
- */
-function RouteTransition() {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  // Key by first path segment so navigating within the same tab (e.g. /chat/:id)
-  // does not retrigger the transition.
-  const segment = pathname.split("/")[1] || "_root";
-
-  return (
-    <AnimatePresence mode="sync" initial={false}>
-      <motion.div
-        key={segment}
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -4 }}
-        transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
-        style={{ willChange: "transform, opacity" }}
-      >
-        <Outlet />
-      </motion.div>
-    </AnimatePresence>
   );
 }
