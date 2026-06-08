@@ -313,19 +313,29 @@ const GroupedList = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-const ToggleRow = ({ icon, label, value, onChange, last }: { icon: string; label: string; value: boolean; onChange: (v: boolean) => void; last?: boolean }) => (
+const ToggleRow = ({ icon, tint = 'var(--brand-pink)', label, value, onChange, last }: { icon: ReactNode; tint?: string; label: string; value: boolean; onChange: (v: boolean) => void; last?: boolean }) => (
   <button
     onClick={() => onChange(!value)}
-    className="flex w-full items-center justify-between px-4 py-3.5 active:bg-white/5"
+    className="flex w-full items-center justify-between px-3.5 py-3 active:bg-white/5 transition-colors"
     style={{ borderBottom: last ? 'none' : '1px solid rgba(255,255,255,0.06)' }}
   >
-    <span className="flex items-center gap-3 text-[16px]">
-      <span className="text-[18px]">{icon}</span>
+    <span className="flex items-center gap-3 text-[15.5px]">
+      <span
+        className="grid h-8 w-8 place-items-center rounded-lg text-white"
+        style={{
+          background: `color-mix(in oklab, ${tint} 22%, rgba(255,255,255,0.04))`,
+          border: `1px solid color-mix(in oklab, ${tint} 35%, transparent)`,
+          color: tint,
+        }}
+      >
+        {icon}
+      </span>
       <span>{label}</span>
     </span>
     <IOSSwitch checked={value} />
   </button>
 );
+
 
 const IOSSwitch = ({ checked }: { checked: boolean }) => (
   <span
