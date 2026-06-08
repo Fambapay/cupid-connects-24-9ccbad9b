@@ -57,7 +57,9 @@ const StackCard = ({
   stackIndex: 1 | 2;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
   const apply = useCallback(() => {
+    rafRef.current = null;
     const el = ref.current;
     if (!el) return;
     const dx = topX.get();
@@ -78,11 +80,20 @@ const StackCard = ({
     }
   }, [stackIndex, topX, topY]);
 
+  const schedule = useCallback(() => {
+    if (rafRef.current != null) return;
+    rafRef.current = requestAnimationFrame(apply);
+  }, [apply]);
+
   useEffect(() => {
     apply();
+    return () => {
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+    };
   }, [apply]);
-  useMotionValueEvent(topX, "change", apply);
-  useMotionValueEvent(topY, "change", apply);
+  useMotionValueEvent(topX, "change", schedule);
+  useMotionValueEvent(topY, "change", schedule);
+
 
   const photo = profile.photos[0];
   return (
