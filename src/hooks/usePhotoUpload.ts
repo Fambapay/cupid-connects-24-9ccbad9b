@@ -71,6 +71,20 @@ export function usePhotoUpload() {
     load();
   }, [load]);
 
+  useEffect(() => {
+    if (!user || typeof window === "undefined") return;
+    const reload = () => load();
+    const reloadWhenVisible = () => {
+      if (document.visibilityState === "visible") load();
+    };
+    window.addEventListener("focus", reload);
+    document.addEventListener("visibilitychange", reloadWhenVisible);
+    return () => {
+      window.removeEventListener("focus", reload);
+      document.removeEventListener("visibilitychange", reloadWhenVisible);
+    };
+  }, [user, load]);
+
   const upload = async (file: File) => {
     // Fetch the current user directly from supabase to avoid race conditions
     // where the local `useAuth` state hasn't hydrated yet on mount.
