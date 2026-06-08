@@ -372,12 +372,11 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       swiped_id?: string;
       error?: string;
     } | null;
-    if (res?.success) {
-      await load();
-      return { success: true, swipedId: res.swiped_id };
-    }
+    // Don't reload: caller manages the local card stack so the rewound card
+    // can animate back into place from where it flew off.
+    if (res?.success) return { success: true, swipedId: res.swiped_id };
     return { success: false, error: res?.error };
-  }, [load]);
+  }, []);
 
   return { items, loading, swipe, rewind, reload: load, dailyLimits };
 }

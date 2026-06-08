@@ -109,14 +109,16 @@ function Discover() {
     if (result.matched) setMatched({ id: target.id, name: target.name, photo: target.photos?.[0] ?? null });
   };
 
-  const onRewind = async () => {
-    if (!isPremium) { openPaywall(); return; }
+  const onRewind = async (): Promise<boolean> => {
+    if (!isPremium) { openPaywall(); return false; }
     const res = await rewind();
     if (!res.success) {
       if (res.error === "match_exists") toast.error("Já existe match — não dá para voltar atrás");
       else if (res.error === "no_swipe_found") toast.error("Não há swipe para reverter");
       else toast.error("Não foi possível reverter");
+      return false;
     }
+    return true;
   };
 
   const onBoost = () => {
