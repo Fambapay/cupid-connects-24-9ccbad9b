@@ -339,16 +339,25 @@ const ToggleRow = ({ icon, tint = 'var(--brand-pink)', label, value, onChange, l
 
 const IOSSwitch = ({ checked }: { checked: boolean }) => (
   <span
-    className="relative inline-flex h-[31px] w-[51px] flex-shrink-0 rounded-full transition-colors"
-    style={{ background: checked ? '#34c759' : 'rgba(120,120,128,0.32)' }}
+    className="relative inline-flex h-[30px] w-[50px] flex-shrink-0 rounded-full transition-colors"
+    style={{
+      background: checked
+        ? 'linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%)'
+        : 'rgba(120,120,128,0.32)',
+      boxShadow: checked
+        ? '0 0 0 1px color-mix(in oklab, var(--brand-pink) 35%, transparent), 0 6px 16px -6px color-mix(in oklab, var(--brand-pink) 60%, transparent)'
+        : 'inset 0 0 0 1px rgba(255,255,255,0.04)',
+    }}
   >
     <motion.span
-      className="absolute top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow"
+      className="absolute top-[2px] h-[26px] w-[26px] rounded-full bg-white"
+      style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.35), 0 0 0 0.5px rgba(0,0,0,0.04)' }}
       animate={{ left: checked ? 22 : 2 }}
       transition={{ type: 'spring', stiffness: 700, damping: 30 }}
     />
   </span>
 );
+
 
 const SegmentedControl = <T extends string>({ options, value, onChange }: {
   options: { value: T; label: string }[]; value: T; onChange: (v: T) => void;
