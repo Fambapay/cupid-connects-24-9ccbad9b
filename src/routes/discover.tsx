@@ -140,7 +140,7 @@ function Discover() {
             onEnd={reload}
           />
         ) : (
-          <EmptyDiscovery loading={loading} onRefresh={reload} />
+          <EmptyDiscovery loading={loading} onRefresh={reload} onOpenFilters={onOpenFilters} />
         )}
       </main>
 
