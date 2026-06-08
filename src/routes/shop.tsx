@@ -76,6 +76,9 @@ export const Route = createFileRoute("/shop")({
       { title: "Hunie Store — Boosts & Super Likes" },
       { name: "description", content: "Compra Boosts e Super Likes para apareceres mais e ter mais matches." },
     ],
+    links: [
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" },
+    ],
   }),
   component: ShopPage,
 });
