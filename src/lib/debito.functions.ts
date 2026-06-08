@@ -33,9 +33,6 @@ const InputSchema = z
   .refine((v) => !!v.plan_tier || !!v.pack_id, {
     message: "plan_tier or pack_id required",
   });
-  .refine((v) => !!v.plan_tier || !!v.pack_id, {
-    message: "plan_tier or pack_id required",
-  });
 
 async function sha256Hex(input: string): Promise<string> {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
