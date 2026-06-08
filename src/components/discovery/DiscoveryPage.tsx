@@ -27,6 +27,14 @@ export const DiscoveryPage = ({
 }: DiscoveryPageProps) => {
   const [index, setIndex] = useState(0);
   const [rewinding, setRewinding] = useState(false);
+  // Local stack of past swipes so rewind can restore the previous card and
+  // animate it back from the direction it flew off.
+  const [history, setHistory] = useState<{ id: string; dir: SwipeDirection }[]>([]);
+  // One rewind allowed until the next swipe.
+  const [rewindUsed, setRewindUsed] = useState(false);
+  const [enterAnim, setEnterAnim] = useState<
+    "rewind-left" | "rewind-right" | "rewind-up" | null
+  >(null);
   const cardRef = useRef<ProfileCardHandle>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -36,10 +44,13 @@ export const DiscoveryPage = ({
   const next2 = profiles[index + 2];
   const next3 = profiles[index + 3];
 
-  // Reset stack to top when the parent feed reference changes (e.g. after rewind/reload).
+  // Reset stack when the parent feed is replaced (e.g. filters / reload).
   const firstId = profiles[0]?.id;
   useEffect(() => {
     setIndex(0);
+    setHistory([]);
+    setRewindUsed(false);
+    setEnterAnim(null);
   }, [firstId]);
 
   // Preload next cards' first photos so the stack behind the top card never
@@ -74,6 +85,9 @@ export const DiscoveryPage = ({
     (dir: SwipeDirection) => {
       if (!current) return;
       onSwipe?.(current, dir);
+      setHistory((h) => [...h, { id: current.id, dir }]);
+      setRewindUsed(false);
+      setEnterAnim(null);
       if (index + 1 >= profiles.length) onEnd?.();
       x.set(0);
       y.set(0);
@@ -83,16 +97,28 @@ export const DiscoveryPage = ({
   );
 
   const handleRewind = useCallback(async () => {
-    if (rewinding || !onRewind) return;
+    if (rewinding || !onRewind || rewindUsed || history.length === 0 || index === 0) return;
+    const last = history[history.length - 1];
+    // Optimistic: restore the previous card and play reverse-direction entry.
+    setHistory((h) => h.slice(0, -1));
+    setIndex((i) => Math.max(0, i - 1));
+    setEnterAnim(
+      last.dir === "left"
+        ? "rewind-left"
+        : last.dir === "right"
+          ? "rewind-right"
+          : "rewind-up",
+    );
+    setRewindUsed(true);
     setRewinding(true);
     try {
       await onRewind();
     } finally {
       setRewinding(false);
     }
-  }, [onRewind, rewinding]);
+  }, [onRewind, rewinding, rewindUsed, history, index]);
 
-  const canRewind = !!onRewind && !rewinding;
+  const canRewind = !!onRewind && !rewinding && !rewindUsed && history.length > 0 && index > 0;
 
   return (
     <div
