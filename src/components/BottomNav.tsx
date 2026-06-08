@@ -197,6 +197,7 @@ export const BottomNavBase = ({
                 pillX={pillX}
                 pointerStartRef={pointerStartRef}
                 onTap={() => handleTabChange(tab.id)}
+                onHover={onTabHover ? () => onTabHover(tab.id) : undefined}
               />
             );
           })}
