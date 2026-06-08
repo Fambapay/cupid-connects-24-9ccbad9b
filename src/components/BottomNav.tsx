@@ -265,7 +265,7 @@ const TabButton = ({
             <motion.span
               key={`badge-${badge}`}
               className={`absolute -top-1.5 -right-2 min-w-[16px] h-[16px] text-[9px] rounded-full flex items-center justify-center font-bold px-1 ${
-                tabId === "likes" ? "bg-[#C89B0C] text-black" : "bg-primary text-primary-foreground"
+                tabId === "likes" ? "bg-[#C89B0C] text-black" : "bg-red-500 text-white"
               }`}
               style={{ boxShadow: "0 0 0 1.5px hsl(var(--background))" }}
               initial={{ scale: 0, opacity: 0 }}
