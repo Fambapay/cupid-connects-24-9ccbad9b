@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 const BUCKET = "profile-photos";
+const MIN_SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 7;
 
 type TransformOpts = {
   width?: number;
@@ -27,6 +28,7 @@ export async function signPhoto(
   expires = 3600,
   transform?: TransformOpts,
 ): Promise<string> {
+  const effectiveExpires = Math.max(expires, MIN_SIGNED_URL_TTL_SECONDS);
   if (!path) return "";
   if (isExternalUrl(path)) return path;
   const key = cacheKey(path, transform);
@@ -35,9 +37,9 @@ export async function signPhoto(
 
   const { data } = await supabase.storage
     .from(BUCKET)
-    .createSignedUrl(path, expires, transform ? { transform } : undefined);
+    .createSignedUrl(path, effectiveExpires, transform ? { transform } : undefined);
   const url = data?.signedUrl ?? "";
-  if (url) cache.set(key, { url, expiresAt: Date.now() + expires * 1000 });
+  if (url) cache.set(key, { url, expiresAt: Date.now() + effectiveExpires * 1000 });
   return url;
 }
 
@@ -46,6 +48,7 @@ export async function signPhotos(
   expires = 3600,
   transform?: TransformOpts,
 ): Promise<string[]> {
+  const effectiveExpires = Math.max(expires, MIN_SIGNED_URL_TTL_SECONDS);
   if (!paths.length) return [];
 
   const results = new Array<string>(paths.length);
@@ -75,7 +78,7 @@ export async function signPhotos(
       // createSignedUrls (plural) doesn't accept transform — fan out singular calls in parallel.
       const signed = await Promise.all(
         missingPaths.map((p) =>
-          supabase.storage.from(BUCKET).createSignedUrl(p, expires, { transform }),
+          supabase.storage.from(BUCKET).createSignedUrl(p, effectiveExpires, { transform }),
         ),
       );
       signed.forEach((res, j) => {
@@ -85,14 +88,14 @@ export async function signPhotos(
         if (url) {
           cache.set(cacheKey(missingPaths[j], transform), {
             url,
-            expiresAt: Date.now() + expires * 1000,
+            expiresAt: Date.now() + effectiveExpires * 1000,
           });
         }
       });
     } else {
       const { data } = await supabase.storage
         .from(BUCKET)
-        .createSignedUrls(missingPaths, expires);
+        .createSignedUrls(missingPaths, effectiveExpires);
       (data ?? []).forEach((d, j) => {
         const url = d.signedUrl ?? "";
         const idx = missingIdx[j];
@@ -100,7 +103,7 @@ export async function signPhotos(
         if (url) {
           cache.set(cacheKey(missingPaths[j], transform), {
             url,
-            expiresAt: Date.now() + expires * 1000,
+            expiresAt: Date.now() + effectiveExpires * 1000,
           });
         }
       });
