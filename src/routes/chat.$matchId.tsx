@@ -285,46 +285,44 @@ function ChatRoom() {
       </header>
 
 
-      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3" style={{ WebkitOverflowScrolling: "touch", contain: "layout paint" }}>
         <DateSeparator label={formatDateLabel(messages[0]?.created_at)} />
 
         <ul className="space-y-1.5">
-          <AnimatePresence initial={false}>
-            {(() => {
-              const peerReadMs = peerLastReadAt ? new Date(peerLastReadAt).getTime() : 0;
-              let lastReadOwnIdx = -1;
+          {(() => {
+            const peerReadMs = peerLastReadAt ? new Date(peerLastReadAt).getTime() : 0;
+            let lastReadOwnIdx = -1;
+            if (peerReadMs && entitlements.canReadReceipts) {
               for (let i = messages.length - 1; i >= 0; i--) {
                 const m = messages[i];
                 if (m.sender_id !== user?.id) continue;
-                if (peerReadMs && new Date(m.created_at).getTime() <= peerReadMs) {
-                  lastReadOwnIdx = i;
-                  break;
-                }
+                if (new Date(m.created_at).getTime() <= peerReadMs) { lastReadOwnIdx = i; break; }
               }
-              return messages.map((m, i) => {
-                const prev = messages[i - 1];
-                const next = messages[i + 1];
-                const me = m.sender_id === user?.id;
-                const prevMe = prev ? prev.sender_id === user?.id : null;
-                const nextMe = next ? next.sender_id === user?.id : null;
-                const isFirstOfGroup = prevMe === null || prevMe !== me;
-                const isLastOfGroup = nextMe === null || nextMe !== me;
-                return (
-                  <Bubble
-                    key={m.id}
-                    msg={m}
-                    me={me}
-                    isFirstOfGroup={isFirstOfGroup}
-                    isLastOfGroup={isLastOfGroup}
-                    avatar={peer.photo}
-                    name={peer.name}
-                    showReadReceipt={entitlements.canReadReceipts && me && i === lastReadOwnIdx}
-                  />
-                );
-              });
-            })()}
-          </AnimatePresence>
+            }
+            return messages.map((m, i) => {
+              const prev = messages[i - 1];
+              const next = messages[i + 1];
+              const me = m.sender_id === user?.id;
+              const prevMe = prev ? prev.sender_id === user?.id : null;
+              const nextMe = next ? next.sender_id === user?.id : null;
+              const isFirstOfGroup = prevMe === null || prevMe !== me;
+              const isLastOfGroup = nextMe === null || nextMe !== me;
+              return (
+                <Bubble
+                  key={m.id}
+                  msg={m}
+                  me={me}
+                  isFirstOfGroup={isFirstOfGroup}
+                  isLastOfGroup={isLastOfGroup}
+                  avatar={peer.photo}
+                  name={peer.name}
+                  showReadReceipt={entitlements.canReadReceipts && me && i === lastReadOwnIdx}
+                />
+              );
+            });
+          })()}
         </ul>
+
 
         <AnimatePresence>
           {typing && (
