@@ -504,11 +504,26 @@ const PremiumBanner = ({ isPremium, onUpgrade }: { isPremium: boolean; onUpgrade
   if (isPremium) {
     return (
       <div
-        className="mt-6 flex items-center gap-2 rounded-2xl px-4 py-3"
-        style={{ background: 'linear-gradient(135deg,rgba(251,191,36,0.15),rgba(245,158,11,0.08))', border: '1px solid rgba(251,191,36,0.25)' }}
+        className="mt-6 flex items-center gap-2.5 rounded-2xl px-4 py-3"
+        style={{
+          background:
+            'linear-gradient(135deg, color-mix(in oklab, var(--brand-pink) 14%, transparent), color-mix(in oklab, var(--brand-purple) 14%, transparent))',
+          border: '1px solid color-mix(in oklab, var(--brand-pink) 28%, transparent)',
+        }}
       >
-        <span className="text-base">⭐</span>
-        <span className="text-[13px] font-semibold text-amber-200">Filtros Premium ativos</span>
+        <Sparkles size={15} style={{ color: 'var(--brand-pink)' }} />
+        <span
+          className="text-[13px] font-semibold"
+          style={{
+            backgroundImage:
+              'linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%)',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent',
+          }}
+        >
+          Filtros Premium ativos
+        </span>
       </div>
     );
   }
@@ -518,15 +533,21 @@ const PremiumBanner = ({ isPremium, onUpgrade }: { isPremium: boolean; onUpgrade
       onClick={onUpgrade}
       className="mt-6 flex w-full items-center gap-3 rounded-2xl p-4 text-left"
       style={{
-        background: 'linear-gradient(135deg,rgba(251,191,36,0.18) 0%,rgba(236,72,153,0.18) 100%)',
-        border: '1px solid rgba(251,191,36,0.3)',
+        background:
+          'linear-gradient(135deg, color-mix(in oklab, var(--brand-pink) 18%, transparent) 0%, color-mix(in oklab, var(--brand-purple) 18%, transparent) 100%)',
+        border: '1px solid color-mix(in oklab, var(--brand-pink) 30%, transparent)',
+        boxShadow:
+          '0 10px 30px -16px color-mix(in oklab, var(--brand-pink) 60%, transparent)',
       }}
     >
       <div
-        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-lg"
-        style={{ background: 'linear-gradient(135deg,#fbbf24,#f59e0b)' }}
+        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl"
+        style={{
+          background: 'linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%)',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25)',
+        }}
       >
-        ⭐
+        <Sparkles size={18} className="text-white" />
       </div>
       <div className="flex-1">
         <div className="text-[15px] font-semibold text-white">Desbloquear filtros Premium</div>
@@ -536,3 +557,4 @@ const PremiumBanner = ({ isPremium, onUpgrade }: { isPremium: boolean; onUpgrade
     </motion.button>
   );
 };
+
