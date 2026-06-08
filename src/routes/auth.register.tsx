@@ -47,6 +47,21 @@ function RegisterPage() {
     setStep(2);
   };
 
+  const handleGoogle = async () => {
+    setGoogleBusy(true);
+    setError(null);
+    try {
+      const result = await signInWithGoogle();
+      if (result.error) {
+        setError(result.error.message);
+      }
+    } catch {
+      setError("Erro ao iniciar sessão com Google");
+    } finally {
+      setGoogleBusy(false);
+    }
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!passOk) return;
