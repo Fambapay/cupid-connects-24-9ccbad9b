@@ -352,13 +352,6 @@ function ChatRoom() {
           style={{ background: "#000" }}
         >
           <div className="flex w-full items-center gap-2">
-            <button
-              type="button"
-              aria-label="GIF"
-              className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/15 text-[11px] font-bold tracking-wide text-white/80"
-            >
-              GIF
-            </button>
 
             <div className="flex h-11 min-w-0 flex-1 items-center rounded-full border border-white/10 bg-white/[0.04] px-4">
               <input
