@@ -52,7 +52,7 @@ function ChatList() {
       </header>
 
       {newMatches.length > 0 && (
-        <section className="mt-2 px-5">
+        <section className="mt-2 px-4">
           <h2
             className="text-[15px] uppercase tracking-tight text-white"
             style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 800 }}
