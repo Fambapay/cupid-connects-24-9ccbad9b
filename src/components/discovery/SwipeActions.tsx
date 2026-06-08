@@ -54,10 +54,14 @@ export const SwipeActions = ({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        gap: 16,
-        padding: "14px 18px 22px",
+        gap: 14,
+        padding: "18px 18px calc(86px + env(safe-area-inset-bottom, 0px))",
+        background:
+          "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0) 100%)",
+        pointerEvents: "auto",
       }}
     >
+
       <button
         onClick={press(onRewind)}
         disabled={!canRewind}
