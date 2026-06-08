@@ -311,7 +311,7 @@ function OnboardingPage() {
     const { invalidateOnboardingCache } = await import("@/lib/authGuard");
     invalidateOnboardingCache();
     await reload();
-    navigate({ to: "/membership", search: { required: 1 } });
+    navigate({ to: "/discover" });
   }, [draft, user, navigate, reload, toast]);
 
   const showProgress = stepId !== "welcome" && !done;
