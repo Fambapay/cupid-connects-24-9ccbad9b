@@ -295,14 +295,8 @@ function SettingsPage() {
               <ArrowLeft className="h-5 w-5 text-white" />
             </motion.button>
             <h2
-              className="text-[20px] font-extrabold tracking-tight"
-              style={{
-                backgroundImage:
-                  'linear-gradient(135deg, #FFFFFF 0%, #FF4FA3 60%, #B13CFF 100%)',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                color: 'transparent',
-              }}
+              className="text-[28px] font-extrabold tracking-tight text-foreground"
+              style={{ fontWeight: 800 }}
             >
               Definições
             </h2>
