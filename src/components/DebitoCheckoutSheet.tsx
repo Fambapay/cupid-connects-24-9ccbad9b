@@ -59,8 +59,10 @@ export function DebitoCheckoutSheet({
     const body = document.body;
     const prev = body.style.cssText;
     body.style.cssText = `position:fixed;top:-${scrollY}px;left:0;right:0;width:100%;overflow:hidden`;
+    body.classList.add("sheet-open");
     return () => {
       body.style.cssText = prev;
+      body.classList.remove("sheet-open");
       window.scrollTo(0, scrollY);
     };
   }, [open]);
