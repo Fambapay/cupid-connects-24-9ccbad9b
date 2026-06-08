@@ -206,9 +206,9 @@ interface SeedSpec {
 }
 
 const SPECS: SeedSpec[] = [
-  { gender: "feminino",    ageMin: 18, ageMax: 32, count: 40 },
-  { gender: "masculino",   ageMin: 20, ageMax: 35, count: 30 },
-  { gender: "nao_binario", ageMin: 19, ageMax: 30, count: 10 },
+  { gender: "feminino",    ageMin: 18, ageMax: 35, count: 150 },
+  { gender: "masculino",   ageMin: 20, ageMax: 38, count: 120 },
+  { gender: "nao_binario", ageMin: 19, ageMax: 32, count: 30 },
 ];
 
 function namePool(gender: "feminino" | "masculino" | "nao_binario"): string[] {
