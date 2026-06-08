@@ -237,6 +237,7 @@ const TabButton = ({
   pillX,
   pointerStartRef,
   onTap,
+  onHover,
 }: TabButtonProps) => {
   return (
     <motion.button
@@ -245,7 +246,9 @@ const TabButton = ({
       type="button"
       onPointerDown={(e) => {
         pointerStartRef.current = { x: e.clientX, y: e.clientY, time: Date.now() };
+        onHover?.();
       }}
+      onPointerEnter={() => onHover?.()}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
