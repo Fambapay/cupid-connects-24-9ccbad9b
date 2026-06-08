@@ -673,12 +673,22 @@ function BirthdateStep({
   const [open, setOpen] = useState<null | "day" | "month" | "year">(null);
   const thisYear = new Date().getFullYear();
 
+  const daysInMonth = (m: number | null, y: number | null) => {
+    if (!m) return 31;
+    if (m === 2) {
+      const leap = y ? (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)) : true;
+      return leap ? 29 : 28;
+    }
+    return [4, 6, 9, 11].includes(m) ? 30 : 31;
+  };
+  const maxDay = daysInMonth(month, year);
+  const dayValid = day ? day <= maxDay : true;
   const iso =
-    day && month && year
+    day && month && year && dayValid
       ? `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
       : null;
   const age = iso ? computeAge(iso) : null;
-  const complete = day && month && year;
+  const complete = day && month && year && dayValid;
   const underage = age !== null && age < 18;
   const canNext = !!complete && !underage;
 
@@ -732,8 +742,8 @@ function BirthdateStep({
         open={open === "day"}
         onClose={() => setOpen(null)}
         title="Dia"
-        items={Array.from({ length: 31 }, (_, i) => ({ value: i + 1, label: String(i + 1) }))}
-        selected={day}
+        items={Array.from({ length: maxDay }, (_, i) => ({ value: i + 1, label: String(i + 1) }))}
+        selected={day && day <= maxDay ? day : null}
         onSelect={(v) => { onChange(v, month, year); setOpen(null); }}
       />
       <ScrollPickerSheet
@@ -742,7 +752,12 @@ function BirthdateStep({
         title="Mês"
         items={MONTHS_PT.map((m, i) => ({ value: i + 1, label: m }))}
         selected={month}
-        onSelect={(v) => { onChange(day, v, year); setOpen(null); }}
+        onSelect={(v) => {
+          const newMax = daysInMonth(v, year);
+          const newDay = day && day > newMax ? newMax : day;
+          onChange(newDay, v, year);
+          setOpen(null);
+        }}
       />
       <ScrollPickerSheet
         open={open === "year"}
@@ -753,8 +768,14 @@ function BirthdateStep({
           return { value: y, label: String(y) };
         })}
         selected={year}
-        onSelect={(v) => { onChange(day, month, v); setOpen(null); }}
+        onSelect={(v) => {
+          const newMax = daysInMonth(month, v);
+          const newDay = day && day > newMax ? newMax : day;
+          onChange(newDay, month, v);
+          setOpen(null);
+        }}
       />
+
     </div>
   );
 }
