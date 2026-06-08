@@ -476,11 +476,20 @@ const LifestyleRow = ({ label, value, onChange, disabled, last }: {
               key={o.v}
               disabled={disabled}
               onClick={() => onChange(on ? undefined : o.v)}
-              className="rounded-full px-3 py-1 text-[12px] font-medium"
+              className="rounded-full px-3 py-1 text-[12px] font-medium transition-all"
               style={{
-                background: on ? 'rgba(236,72,153,0.85)' : 'rgba(255,255,255,0.08)',
+                background: on
+                  ? 'linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%)'
+                  : 'rgba(255,255,255,0.08)',
+                border: on
+                  ? '1px solid transparent'
+                  : '1px solid rgba(255,255,255,0.08)',
+                boxShadow: on
+                  ? '0 6px 16px -8px color-mix(in oklab, var(--brand-pink) 70%, transparent)'
+                  : 'none',
                 color: '#fff',
               }}
+
             >
               {o.l}
             </button>
