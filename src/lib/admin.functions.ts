@@ -141,6 +141,56 @@ export const getRevenueSeries = createServerFn({ method: "GET" })
     return Array.from(byDay.entries()).map(([day, amount]) => ({ day, amount }));
   });
 
+// Engagement time series: new signups + matches per day + cumulative DAU stats.
+export const getEngagementSeries = createServerFn({ method: "GET" })
+  .middleware([requireAdmin])
+  .inputValidator((d: { days?: number }) => ({ days: Math.min(Math.max(d.days ?? 30, 7), 180) }))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabaseAdmin;
+    const now = new Date();
+    const since = new Date(now.getTime() - data.days * 86400000).toISOString();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    const d7 = new Date(now.getTime() - 7 * 86400000).toISOString();
+    const d30 = new Date(now.getTime() - 30 * 86400000).toISOString();
+
+    const [signups, matches, dauToday, dau7, dau30] = await Promise.all([
+      sb.from("profiles").select("created_at").gte("created_at", since),
+      sb.from("matches").select("created_at").gte("created_at", since),
+      sb.from("profiles").select("id", { head: true, count: "exact" }).gte("last_active_at", startOfDay),
+      sb.from("profiles").select("id", { head: true, count: "exact" }).gte("last_active_at", d7),
+      sb.from("profiles").select("id", { head: true, count: "exact" }).gte("last_active_at", d30),
+    ]);
+
+    const byDay = new Map<string, { signups: number; matches: number }>();
+    for (let i = data.days - 1; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 86400000);
+      byDay.set(d.toISOString().slice(0, 10), { signups: 0, matches: 0 });
+    }
+    (signups.data ?? []).forEach((r: any) => {
+      const k = String(r.created_at).slice(0, 10);
+      const v = byDay.get(k);
+      if (v) v.signups += 1;
+    });
+    (matches.data ?? []).forEach((r: any) => {
+      const k = String(r.created_at).slice(0, 10);
+      const v = byDay.get(k);
+      if (v) v.matches += 1;
+    });
+
+    return {
+      series: Array.from(byDay.entries()).map(([day, v]) => ({ day, signups: v.signups, matches: v.matches })),
+      today: {
+        dau: dauToday.count ?? 0,
+        signups: (signups.data ?? []).filter((r: any) => String(r.created_at) >= startOfDay).length,
+        matches: (matches.data ?? []).filter((r: any) => String(r.created_at) >= startOfDay).length,
+      },
+      dau: {
+        d7: dau7.count ?? 0,
+        d30: dau30.count ?? 0,
+      },
+    };
+  });
+
 // ─── Users ────────────────────────────────────────────────────────────────
 export const listUsers = createServerFn({ method: "GET" })
   .middleware([requireAdmin])
@@ -475,3 +525,112 @@ export const updateReportStatus = createServerFn({ method: "POST" })
     await logAction(sb, context.userId, context.adminEmail, "report.update_status", data.id, "report", { status: data.status });
     return { ok: true };
   });
+
+// ─── Photo moderation ─────────────────────────────────────
+// Queue: every profile photo that belongs to a profile with a pending
+// "inappropriate_photos" report. Returns photos with signed URLs so admins can
+// review and delete the offending one.
+export const getPhotoModerationQueue = createServerFn({ method: "GET" })
+  .middleware([requireAdmin])
+  .handler(async ({ context }) => {
+    const sb = context.supabaseAdmin;
+
+    const { data: pendingReports, error: repErr } = await sb
+      .from("reports")
+      .select("id, reported_id, reporter_id, reason, details, created_at")
+      .eq("status", "pending")
+      .eq("reason", "inappropriate_photos")
+      .order("created_at", { ascending: true })
+      .limit(200);
+    if (repErr) throw new Error(repErr.message);
+
+    const profileIds = Array.from(new Set((pendingReports ?? []).map((r: any) => r.reported_id)));
+    if (profileIds.length === 0) return { items: [] };
+
+    const [{ data: profiles }, { data: photos }] = await Promise.all([
+      sb.from("profiles").select("id, name, age, city, is_paused, is_verified").in("id", profileIds),
+      sb.from("profile_photos").select("id, profile_id, storage_path, position").in("profile_id", profileIds).order("position"),
+    ]);
+
+    const profMap = new Map<string, any>((profiles ?? []).map((p: any) => [p.id, p]));
+    const photosByProfile = new Map<string, any[]>();
+    for (const p of photos ?? []) {
+      const arr = photosByProfile.get(p.profile_id) ?? [];
+      arr.push(p);
+      photosByProfile.set(p.profile_id, arr);
+    }
+
+    // Sign URLs in parallel
+    const allPhotos = photos ?? [];
+    const signed = await Promise.all(
+      allPhotos.map(async (p: any) => {
+        const { data } = await sb.storage.from("profile-photos").createSignedUrl(p.storage_path, 60 * 60);
+        return [p.id, data?.signedUrl ?? null] as const;
+      }),
+    );
+    const urlMap = new Map(signed);
+
+    const reportsByProfile = new Map<string, any[]>();
+    for (const r of pendingReports ?? []) {
+      const arr = reportsByProfile.get(r.reported_id) ?? [];
+      arr.push(r);
+      reportsByProfile.set(r.reported_id, arr);
+    }
+
+    const items = profileIds.map((pid) => ({
+      profile: profMap.get(pid) ?? { id: pid, name: null },
+      reports: reportsByProfile.get(pid) ?? [],
+      photos: (photosByProfile.get(pid) ?? []).map((p) => ({ ...p, url: urlMap.get(p.id) ?? null })),
+    }));
+
+    return { items };
+  });
+
+// Delete a photo + close every pending photo-related report on that profile.
+export const moderatePhotoDelete = createServerFn({ method: "POST" })
+  .middleware([requireAdmin])
+  .inputValidator((d: { photoId: string; reportIds?: string[] }) =>
+    z.object({
+      photoId: z.string().uuid(),
+      reportIds: z.array(z.string().uuid()).max(50).optional(),
+    }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = context.supabaseAdmin;
+    const { data: row } = await sb.from("profile_photos").select("*").eq("id", data.photoId).maybeSingle();
+    if (!row) throw new Error("Photo not found");
+    await sb.storage.from("profile-photos").remove([row.storage_path]);
+    await sb.from("profile_photos").delete().eq("id", data.photoId);
+
+    if (data.reportIds?.length) {
+      await sb
+        .from("reports")
+        .update({ status: "actioned", reviewed_at: new Date().toISOString(), reviewed_by: context.userId })
+        .in("id", data.reportIds);
+    }
+    await logAction(sb, context.userId, context.adminEmail, "moderation.photo_delete", row.profile_id, "profile_photo", {
+      photo_id: data.photoId,
+      report_ids: data.reportIds ?? [],
+    });
+    return { ok: true };
+  });
+
+// Dismiss all listed reports as "no action" (photos look fine).
+export const moderatePhotoDismiss = createServerFn({ method: "POST" })
+  .middleware([requireAdmin])
+  .inputValidator((d: { reportIds: string[] }) =>
+    z.object({ reportIds: z.array(z.string().uuid()).min(1).max(50) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = context.supabaseAdmin;
+    const { error } = await sb
+      .from("reports")
+      .update({ status: "dismissed", reviewed_at: new Date().toISOString(), reviewed_by: context.userId })
+      .in("id", data.reportIds);
+    if (error) throw new Error(error.message);
+    await logAction(sb, context.userId, context.adminEmail, "moderation.photo_dismiss", null, "report", {
+      report_ids: data.reportIds,
+    });
+    return { ok: true };
+  });
+
