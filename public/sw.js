@@ -27,7 +27,17 @@ self.addEventListener('push', (event) => {
     data: { url: payload.url || '/', ...payload.data },
     requireInteraction: false,
   }
-  event.waitUntil(self.registration.showNotification(payload.title || 'hunie', options))
+  event.waitUntil((async () => {
+    // Suppress system push when the app is already open/focused.
+    // The in-app toast (useNewMessageNotifier) handles it instead,
+    // avoiding the duplicate-notification problem.
+    try {
+      const clientsArr = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      const appOpen = clientsArr.some((c) => c.visibilityState === 'visible' && c.focused)
+      if (appOpen) return
+    } catch (e) {}
+    await self.registration.showNotification(payload.title || 'hunie', options)
+  })())
 })
 
 self.addEventListener('notificationclick', (event) => {
