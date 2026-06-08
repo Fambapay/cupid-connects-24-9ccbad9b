@@ -85,13 +85,15 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
             onClick={onClose}
           />
           <motion.div
-            className="fixed inset-x-0 bottom-0 z-[61] flex flex-col overflow-hidden rounded-t-[28px] text-white"
+            className="fixed inset-x-0 bottom-0 z-[61] flex flex-col overflow-hidden rounded-t-[32px] text-white"
             style={{
               maxHeight: '92vh',
-              background: 'linear-gradient(180deg, rgba(28,28,30,0.96) 0%, rgba(18,18,20,0.98) 100%)',
+              background:
+                'radial-gradient(120% 60% at 50% 0%, color-mix(in oklab, var(--brand-pink) 14%, transparent) 0%, transparent 55%), linear-gradient(180deg, rgba(22,20,28,0.96) 0%, rgba(14,12,18,0.985) 100%)',
               backdropFilter: 'blur(40px) saturate(180%)',
               WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-              boxShadow: '0 -10px 40px rgba(0,0,0,0.5)',
+              boxShadow:
+                '0 -20px 60px -10px rgba(0,0,0,0.6), 0 -1px 0 0 color-mix(in oklab, var(--brand-pink) 18%, transparent) inset',
               border: '1px solid rgba(255,255,255,0.08)',
               borderBottom: 'none',
             }}
@@ -102,19 +104,39 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
           >
             {/* Grabber */}
             <div className="flex justify-center pt-2.5 pb-1">
-              <div className="h-[5px] w-9 rounded-full bg-white/25" />
+              <div className="h-[5px] w-10 rounded-full bg-white/25" />
             </div>
 
             {/* Header */}
             <div className="flex items-center justify-between px-5 pb-3 pt-1">
-              <button onClick={onClose} className="text-[15px] font-medium text-white/70 active:opacity-60" style={{ minWidth: 56 }}>
+              <button
+                onClick={onClose}
+                className="text-[15px] font-medium text-white/65 active:opacity-60"
+                style={{ minWidth: 56 }}
+              >
                 Cancelar
               </button>
-              <h2 className="text-[17px] font-semibold tracking-tight">Filtros</h2>
-              <button onClick={reset} className="text-[15px] font-medium text-white/70 active:opacity-60" style={{ minWidth: 56, textAlign: 'right' }}>
+              <h2
+                className="text-[17px] font-semibold tracking-tight"
+                style={{
+                  backgroundImage:
+                    'linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%)',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                }}
+              >
+                Filtros
+              </h2>
+              <button
+                onClick={reset}
+                className="text-[15px] font-medium active:opacity-60"
+                style={{ minWidth: 56, textAlign: 'right', color: 'color-mix(in oklab, var(--brand-pink) 75%, white)' }}
+              >
                 Repor
               </button>
             </div>
+
 
             {/* Scroll content */}
             <div className="flex-1 overflow-y-auto px-4 pb-6" style={{ WebkitOverflowScrolling: 'touch' }}>
