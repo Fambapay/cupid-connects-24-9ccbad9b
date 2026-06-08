@@ -1009,9 +1009,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             // First slide uses the dedicated decode gate (warmed by prefetch).
             // Other slides crossfade based on whether their bitmap is already
             // decoded — if not, show the skeleton until <img onLoad>.
-            const ready = isFirstSlide
-              ? topImageReady
-              : (slideLoadedSrc === optimizedSrc || isImageReady(optimizedSrc));
+            const ready =
+              isFirstSlide || slideLoadedSrc === optimizedSrc || isImageReady(optimizedSrc);
             // Show the previously-decoded slide underneath so the transition
             // never reveals the skeleton. Only render it if it's a different
             // src that has actually painted before.
@@ -1027,7 +1026,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                     position: 'absolute',
                     inset: 0,
                     zIndex: 1,
-                    background: '#0a0a0a',
+                      background:
+                        'linear-gradient(135deg, #FF4FA3 0%, #D946EF 46%, #B13CFF 100%)',
                     pointerEvents: 'none',
                     transform: 'translateZ(0)',
                   }}
@@ -1073,8 +1073,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                   zIndex: 3,
                   pointerEvents: 'none',
                   userSelect: 'none',
-                  opacity: ready ? 1 : 0,
-                  filter: ready ? 'blur(0.001px)' : 'blur(14px)',
+                  opacity: 1,
+                  filter: ready ? 'blur(0.001px)' : 'blur(10px)',
                   transform: ready
                     ? 'translateZ(0) scale(1)'
                     : 'translateZ(0) scale(1.04)',
