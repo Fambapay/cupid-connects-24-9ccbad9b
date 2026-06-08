@@ -215,7 +215,15 @@ function ChatRoom() {
           <Link
             to="/chat"
             aria-label="Voltar"
-            className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.06] text-white/90 active:scale-95"
+            className="grid h-10 w-10 place-items-center rounded-full text-white active:scale-95"
+            style={{
+              background: "rgba(255,255,255,0.08)",
+              backdropFilter: "blur(20px) saturate(180%)",
+              WebkitBackdropFilter: "blur(20px) saturate(180%)",
+              border: "1px solid rgba(255,255,255,0.14)",
+              boxShadow:
+                "inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.25), 0 6px 18px rgba(0,0,0,0.35)",
+            }}
           >
             <ChevronLeft className="h-5 w-5" />
           </Link>
@@ -242,18 +250,38 @@ function ChatRoom() {
               </span>
             </div>
             <div
-              className="rounded-full bg-black px-4 py-1 text-[15px] font-bold text-white"
-              style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 800 }}
+              className="rounded-full px-4 py-1.5 text-[15px] text-white"
+              style={{
+                fontFamily: "'Montserrat', sans-serif",
+                fontWeight: 800,
+                background: "rgba(255,255,255,0.08)",
+                backdropFilter: "blur(20px) saturate(180%)",
+                WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                border: "1px solid rgba(255,255,255,0.14)",
+                boxShadow:
+                  "inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.25), 0 6px 18px rgba(0,0,0,0.35)",
+              }}
             >
               {peer.name}
             </div>
           </button>
 
-          <div className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.06]">
+          <div
+            className="grid h-10 w-10 place-items-center rounded-full"
+            style={{
+              background: "rgba(255,255,255,0.08)",
+              backdropFilter: "blur(20px) saturate(180%)",
+              WebkitBackdropFilter: "blur(20px) saturate(180%)",
+              border: "1px solid rgba(255,255,255,0.14)",
+              boxShadow:
+                "inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.25), 0 6px 18px rgba(0,0,0,0.35)",
+            }}
+          >
             <ChatActionsMenu matchId={matchId} otherUserId={peer.id} otherName={peer.name} />
           </div>
         </div>
       </header>
+
 
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">
         <DateSeparator label={formatDateLabel(messages[0]?.created_at)} />
