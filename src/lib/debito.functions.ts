@@ -19,6 +19,7 @@ const DEFAULT_RETURN_URL = "https://hunie.lovable.app/app?subscription=success";
 const InputSchema = z
   .object({
     plan_tier: z.enum(["select", "plus", "elite"]).optional(),
+    billing_period: z.enum(["monthly", "annual"]).optional(),
     pack_id: z.string().optional(),
     payment_method: z.enum(PAYMENT_METHODS),
     phone: z.string().optional(),
@@ -26,6 +27,9 @@ const InputSchema = z
     customer_name: z.string().max(120).optional(),
     customer_email: z.string().email().optional(),
   })
+  .refine((v) => !!v.plan_tier || !!v.pack_id, {
+    message: "plan_tier or pack_id required",
+  });
   .refine((v) => !!v.plan_tier || !!v.pack_id, {
     message: "plan_tier or pack_id required",
   });
