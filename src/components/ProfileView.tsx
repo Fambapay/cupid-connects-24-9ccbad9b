@@ -221,7 +221,7 @@ export function ProfileView({
           <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-2">
               <Sparkles size={14} style={{ color: PINK }} />
-              <span className="text-[13px] font-semibold text-foreground tracking-tight">
+              <span className="text-[18px] text-foreground tracking-tight" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}>
                 Perfil completo
               </span>
             </div>
