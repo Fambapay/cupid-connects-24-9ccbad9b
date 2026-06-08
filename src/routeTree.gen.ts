@@ -42,6 +42,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicVapidKeyRouteImport } from './routes/api/public/vapid-key'
 import { Route as ApiPublicNotifyRouteImport } from './routes/api/public/notify'
+import { Route as ApiPublicMembershipExpiryCronRouteImport } from './routes/api/public/membership-expiry-cron'
 import { Route as ApiPublicDebitoWebhookRouteImport } from './routes/api/public/debito-webhook'
 import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated.settings.notifications'
@@ -215,6 +216,12 @@ const ApiPublicNotifyRoute = ApiPublicNotifyRouteImport.update({
   path: '/api/public/notify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicMembershipExpiryCronRoute =
+  ApiPublicMembershipExpiryCronRouteImport.update({
+    id: '/api/public/membership-expiry-cron',
+    path: '/api/public/membership-expiry-cron',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicDebitoWebhookRoute = ApiPublicDebitoWebhookRouteImport.update({
   id: '/api/public/debito-webhook',
   path: '/api/public/debito-webhook',
@@ -293,6 +300,7 @@ export interface FileRoutesByFullPath {
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
+  '/api/public/membership-expiry-cron': typeof ApiPublicMembershipExpiryCronRoute
   '/api/public/notify': typeof ApiPublicNotifyRoute
   '/api/public/vapid-key': typeof ApiPublicVapidKeyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -334,6 +342,7 @@ export interface FileRoutesByTo {
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
+  '/api/public/membership-expiry-cron': typeof ApiPublicMembershipExpiryCronRoute
   '/api/public/notify': typeof ApiPublicNotifyRoute
   '/api/public/vapid-key': typeof ApiPublicVapidKeyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -378,6 +387,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
+  '/api/public/membership-expiry-cron': typeof ApiPublicMembershipExpiryCronRoute
   '/api/public/notify': typeof ApiPublicNotifyRoute
   '/api/public/vapid-key': typeof ApiPublicVapidKeyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -422,6 +432,7 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
+    | '/api/public/membership-expiry-cron'
     | '/api/public/notify'
     | '/api/public/vapid-key'
     | '/lovable/email/suppression'
@@ -463,6 +474,7 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
+    | '/api/public/membership-expiry-cron'
     | '/api/public/notify'
     | '/api/public/vapid-key'
     | '/lovable/email/suppression'
@@ -506,6 +518,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/notifications'
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
+    | '/api/public/membership-expiry-cron'
     | '/api/public/notify'
     | '/api/public/vapid-key'
     | '/lovable/email/suppression'
@@ -536,6 +549,7 @@ export interface RootRouteChildren {
   LegalPrivacidadeRoute: typeof LegalPrivacidadeRoute
   LegalTermosRoute: typeof LegalTermosRoute
   ApiPublicDebitoWebhookRoute: typeof ApiPublicDebitoWebhookRoute
+  ApiPublicMembershipExpiryCronRoute: typeof ApiPublicMembershipExpiryCronRoute
   ApiPublicNotifyRoute: typeof ApiPublicNotifyRoute
   ApiPublicVapidKeyRoute: typeof ApiPublicVapidKeyRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -779,6 +793,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicNotifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/membership-expiry-cron': {
+      id: '/api/public/membership-expiry-cron'
+      path: '/api/public/membership-expiry-cron'
+      fullPath: '/api/public/membership-expiry-cron'
+      preLoaderRoute: typeof ApiPublicMembershipExpiryCronRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/debito-webhook': {
       id: '/api/public/debito-webhook'
       path: '/api/public/debito-webhook'
@@ -942,6 +963,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalPrivacidadeRoute: LegalPrivacidadeRoute,
   LegalTermosRoute: LegalTermosRoute,
   ApiPublicDebitoWebhookRoute: ApiPublicDebitoWebhookRoute,
+  ApiPublicMembershipExpiryCronRoute: ApiPublicMembershipExpiryCronRoute,
   ApiPublicNotifyRoute: ApiPublicNotifyRoute,
   ApiPublicVapidKeyRoute: ApiPublicVapidKeyRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
