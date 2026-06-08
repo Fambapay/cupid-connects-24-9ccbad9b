@@ -3,12 +3,31 @@
 
 export type PlanTier = "select" | "plus" | "elite";
 export type PackKind = "boost" | "super_like";
+export type BillingPeriod = "monthly" | "annual";
 
-export const PLAN_PRICES: Record<PlanTier, { priceMzn: number; days: number; label: string }> = {
-  select: { priceMzn: 199, days: 30, label: "Select" },
-  plus:   { priceMzn: 599, days: 30, label: "Plus" },
-  elite:  { priceMzn: 999, days: 30, label: "Elite" },
+export interface PlanPrice {
+  priceMzn: number;        // monthly price
+  annualPriceMzn: number;  // annual price (already discounted)
+  monthlyDays: number;
+  annualDays: number;
+  label: string;
+}
+
+export const PLAN_PRICES: Record<PlanTier, PlanPrice> = {
+  select: { priceMzn: 199, annualPriceMzn: 1590, monthlyDays: 30, annualDays: 365, label: "Select" },
+  plus:   { priceMzn: 599, annualPriceMzn: 4790, monthlyDays: 30, annualDays: 365, label: "Plus" },
+  elite:  { priceMzn: 999, annualPriceMzn: 7990, monthlyDays: 30, annualDays: 365, label: "Elite" },
 };
+
+export function getPlanAmount(tier: PlanTier, period: BillingPeriod): number {
+  const p = PLAN_PRICES[tier];
+  return period === "annual" ? p.annualPriceMzn : p.priceMzn;
+}
+
+export function getPlanDays(tier: PlanTier, period: BillingPeriod): number {
+  const p = PLAN_PRICES[tier];
+  return period === "annual" ? p.annualDays : p.monthlyDays;
+}
 
 export type Pack = {
   id: string;
@@ -18,23 +37,20 @@ export type Pack = {
 };
 
 export const PACKS: Record<string, Pack> = {
-  boost_1:        { id: "boost_1",        kind: "boost",      quantity: 1,  priceMzn: 199 },
-  boost_5:        { id: "boost_5",        kind: "boost",      quantity: 5,  priceMzn: 799 },
-  boost_15:       { id: "boost_15",       kind: "boost",      quantity: 15, priceMzn: 1899 },
-  super_like_5:   { id: "super_like_5",   kind: "super_like", quantity: 5,  priceMzn: 299 },
-  super_like_25:  { id: "super_like_25",  kind: "super_like", quantity: 25, priceMzn: 1299 },
-  super_like_60:  { id: "super_like_60",  kind: "super_like", quantity: 60, priceMzn: 2499 },
+  boost_1:        { id: "boost_1",        kind: "boost",      quantity: 1,  priceMzn: 99 },
+  boost_5:        { id: "boost_5",        kind: "boost",      quantity: 5,  priceMzn: 399 },
+  boost_15:       { id: "boost_15",       kind: "boost",      quantity: 15, priceMzn: 999 },
+  super_like_1:   { id: "super_like_1",   kind: "super_like", quantity: 1,  priceMzn: 49 },
+  super_like_5:   { id: "super_like_5",   kind: "super_like", quantity: 5,  priceMzn: 199 },
+  super_like_25:  { id: "super_like_25",  kind: "super_like", quantity: 25, priceMzn: 899 },
 };
 
 export const PAYMENT_METHODS = [
   "mpesa",
   "emola",
-  "mkesh",
-  "visa_mastercard",
-  "payfast",
 ] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
-export const MOBILE_MONEY_METHODS: PaymentMethod[] = ["mpesa", "emola", "mkesh"];
+export const MOBILE_MONEY_METHODS: PaymentMethod[] = ["mpesa", "emola"];
 
 const RETURN_URL_ALLOWLIST = [
   "https://hunie.app/",

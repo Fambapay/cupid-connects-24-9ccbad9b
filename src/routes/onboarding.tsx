@@ -57,13 +57,7 @@ export const Route = createFileRoute("/onboarding")({
       .eq("id", data.user.id)
       .maybeSingle();
     if (p?.onboarding_completed) {
-      const status = (p as { membership_status?: string }).membership_status ?? "inactive";
-      const exp = (p as { membership_expires_at?: string | null }).membership_expires_at;
-      const active = status === "active" && (!exp || new Date(exp).getTime() > Date.now());
-      throw redirect({
-        to: active ? "/discover" : "/membership",
-        search: active ? undefined : { required: 1 },
-      });
+      throw redirect({ to: "/discover" });
     }
   },
 
@@ -317,7 +311,7 @@ function OnboardingPage() {
     const { invalidateOnboardingCache } = await import("@/lib/authGuard");
     invalidateOnboardingCache();
     await reload();
-    navigate({ to: "/membership", search: { required: 1 } });
+    navigate({ to: "/discover" });
   }, [draft, user, navigate, reload, toast]);
 
   const showProgress = stepId !== "welcome" && !done;

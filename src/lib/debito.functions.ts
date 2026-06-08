@@ -9,7 +9,10 @@ import {
   isAllowedReturnUrl,
   normalizePhone,
   sanitizePayload,
+  getPlanAmount,
+  getPlanDays,
   type PaymentMethod,
+  type BillingPeriod,
 } from "./pricing";
 
 const ORCHESTRATOR_URL =
@@ -19,6 +22,7 @@ const DEFAULT_RETURN_URL = "https://hunie.lovable.app/app?subscription=success";
 const InputSchema = z
   .object({
     plan_tier: z.enum(["select", "plus", "elite"]).optional(),
+    billing_period: z.enum(["monthly", "annual"]).optional(),
     pack_id: z.string().optional(),
     payment_method: z.enum(PAYMENT_METHODS),
     phone: z.string().optional(),
@@ -72,11 +76,14 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
     let pack_kind: "boost" | "super_like" | null = null;
     let pack_quantity: number | null = null;
 
+    let plan_days = 30;
+    const period: BillingPeriod = (data.billing_period ?? "monthly") as BillingPeriod;
     if (kind === "plan") {
       const p = PLAN_PRICES[data.plan_tier!];
       if (!p) throw new Error("Invalid plan_tier");
       plan_tier = data.plan_tier!;
-      amount = p.priceMzn;
+      amount = getPlanAmount(data.plan_tier!, period);
+      plan_days = getPlanDays(data.plan_tier!, period);
     } else {
       const pack = PACKS[data.pack_id!];
       if (!pack) throw new Error("Invalid pack_id");
@@ -204,7 +211,7 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
         await supabaseAdmin.rpc("activate_membership_debito", {
           _user_id: userId,
           _plan_tier: plan_tier,
-          _days: 30,
+          _days: plan_days,
         });
       }
       await supabaseAdmin

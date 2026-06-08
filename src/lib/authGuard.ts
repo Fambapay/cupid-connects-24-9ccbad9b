@@ -64,12 +64,12 @@ export async function requireAuthAndOnboarding() {
   return { user };
 }
 
-/** Strict: auth + onboarding + active paid membership. Used by /discover, /chat, /matches, /shop. */
+/** Strict: auth + onboarding + active paid membership. Used by /chat, /matches. */
 export async function requireMembership() {
   const { user } = await requireAuthAndOnboarding();
   const gate = await getProfileGate(user.id);
   if (!gate.membershipActive) {
-    throw redirect({ to: "/membership", search: { required: 1 } });
+    throw redirect({ to: "/discover" });
   }
   return { user };
 }
@@ -85,8 +85,6 @@ export async function redirectIfAuthenticated() {
       search: { step: gate.step ?? 1 },
     });
   }
-  if (!gate.membershipActive) {
-    throw redirect({ to: "/membership", search: { required: 1 } });
-  }
   throw redirect({ to: "/discover" });
 }
+

@@ -10,6 +10,8 @@ import { DiscoverTopBar } from "@/components/DiscoverTopBar";
 import { EmptyDiscovery } from "@/components/discovery/EmptyDiscovery";
 import { MatchOverlay } from "@/components/discovery/MatchOverlay";
 import { FiltersSheet, DEFAULT_FILTERS, type DiscoveryFilters } from "@/components/FiltersSheet";
+import { PaywallFlow } from "@/components/paywall/PaywallFlow";
+import { BrowseBanner } from "@/components/discovery/BrowseBanner";
 import { useDiscovery } from "@/hooks/useDiscovery";
 import { useCredits } from "@/hooks/useCredits";
 import { useBoost } from "@/hooks/useBoost";
@@ -18,11 +20,11 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import type { Profile, SwipeDirection } from "@/types/dating";
 
-import { requireMembership } from "@/lib/authGuard";
+import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
 export const Route = createFileRoute("/discover")({
   ssr: false,
-  beforeLoad: requireMembership,
+  beforeLoad: requireAuthAndOnboarding,
   head: () => ({
     meta: [
       { title: "Hunie — Descobrir" },
@@ -45,14 +47,30 @@ function Discover() {
   const [index, setIndex] = useState(0);
   const [matched, setMatched] = useState<{ id: string; name: string; photo?: string | null } | null>(null);
   const [openingChat, setOpeningChat] = useState(false);
+  const [paywallOpen, setPaywallOpen] = useState(false);
+  const [bannerVisible, setBannerVisible] = useState(false);
   const cardRef = useRef<React.ComponentRef<typeof ProfileCard>>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  // Reset index when items reload
   useEffect(() => {
     setIndex(0);
   }, [items.length]);
+
+  // Show banner after 3s if not premium
+  useEffect(() => {
+    if (isPremium) {
+      setBannerVisible(false);
+      return;
+    }
+    const t = setTimeout(() => setBannerVisible(true), 3000);
+    return () => clearTimeout(t);
+  }, [isPremium]);
+
+  const openPaywall = () => {
+    setBannerVisible(false);
+    setPaywallOpen(true);
+  };
 
   const mapped: Profile[] = items.map((p) => ({
     id: p.id,
@@ -70,16 +88,20 @@ function Discover() {
     is_verified: p.is_verified,
   }));
 
-  const current = mapped[index];
-  const next = mapped.slice(index + 1, index + 3);
+  // Limit non-members to first 6 profiles
+  const visible = isPremium ? mapped : mapped.slice(0, 6);
+  const current = visible[index];
+  const next = visible.slice(index + 1, index + 3);
 
   const handleSwipe = async (dir: SwipeDirection) => {
+    if (!isPremium) {
+      openPaywall();
+      return;
+    }
     const target = current;
     const direction = dir === "right" ? "like" : dir === "up" ? "super" : "pass";
-    // Daily likes cap for free users (Select+ have unlimited via dailyLimits.likesLimit === -1)
     if ((direction === "like" || direction === "super") && dailyLimits.likesLimit >= 0 && dailyLimits.likesRemaining <= 0) {
-      toast.error("Atingiste o limite diário de likes. Faz upgrade para likes ilimitados.");
-      navigate({ to: "/membership" });
+      toast.error("Atingiste o limite diário de likes.");
       return;
     }
     x.set(0);
@@ -102,6 +124,7 @@ function Discover() {
   };
 
   const handleRewind = async () => {
+    if (!isPremium) { openPaywall(); return; }
     const res = await rewind();
     if (res.success) {
       toast.success("Voltaste atrás");
@@ -114,9 +137,9 @@ function Discover() {
   };
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-black text-white">
-      <div className="absolute inset-0" style={{ top: "-20px" }}>
-        <DiscoverTopBar onOpenFilters={() => setFiltersOpen(true)} onBoost={boost.activate} boostActive={boost.active} boostRemainingMinutes={boost.remainingMinutes} />
+    <div className="fixed inset-0 overflow-hidden bg-black text-white" onClick={!isPremium ? openPaywall : undefined}>
+      <div className="absolute inset-0" style={{ top: "-20px" }} onClick={(e) => e.stopPropagation()}>
+        <DiscoverTopBar onOpenFilters={() => isPremium ? setFiltersOpen(true) : openPaywall()} onBoost={isPremium ? boost.activate : openPaywall} boostActive={boost.active} boostRemainingMinutes={boost.remainingMinutes} />
         {current ? (
           <>
             <ProfileCard
@@ -129,31 +152,48 @@ function Discover() {
               sharedX={x}
               sharedY={y}
             />
-            <div
-              data-swipe-actions
-              className="absolute inset-x-0 z-30"
-              style={{ bottom: "calc(96px + env(safe-area-inset-bottom))" }}
-            >
-              <SwipeActions
-                onSwipe={(d) => {
-                  if (d === "left") cardRef.current?.flyLeft?.();
-                  else if (d === "right") cardRef.current?.flyRight?.();
-                  else cardRef.current?.flyUp?.();
-                }}
-                onRewind={handleRewind}
-                canRewind={entitlements.canRewind}
-                cardX={x}
-                photoUrl={current.photos[0]}
-                cardKey={current.id}
-                purchasedSuperLikes={credits.super_like_balance}
-                dailyLimits={dailyLimits}
-              />
-            </div>
+            {isPremium && (
+              <div
+                data-swipe-actions
+                className="absolute inset-x-0 z-30"
+                style={{ bottom: "calc(96px + env(safe-area-inset-bottom))" }}
+              >
+                <SwipeActions
+                  onSwipe={(d) => {
+                    if (d === "left") cardRef.current?.flyLeft?.();
+                    else if (d === "right") cardRef.current?.flyRight?.();
+                    else cardRef.current?.flyUp?.();
+                  }}
+                  onRewind={handleRewind}
+                  canRewind={entitlements.canRewind}
+                  cardX={x}
+                  photoUrl={current.photos[0]}
+                  cardKey={current.id}
+                  purchasedSuperLikes={credits.super_like_balance}
+                  dailyLimits={dailyLimits}
+                />
+              </div>
+            )}
           </>
         ) : (
           <EmptyDiscovery loading={loading} onRefresh={reload} />
         )}
       </div>
+
+      {!isPremium && bannerVisible && (
+        <div onClick={(e) => e.stopPropagation()}>
+          <BrowseBanner count={Math.max(3, Math.min(items.length, 12))} onActivate={openPaywall} />
+        </div>
+      )}
+
+      <PaywallFlow
+        open={paywallOpen}
+        onClose={() => setPaywallOpen(false)}
+        onSuccess={() => {
+          setPaywallOpen(false);
+          reload();
+        }}
+      />
 
       <MatchOverlay
         open={!!matched}
@@ -164,8 +204,6 @@ function Discover() {
         onSendMessage={async () => {
           if (!matched || !user) return;
           setOpeningChat(true);
-          // Try a few times — match row is created by a trigger that may
-          // race with the swipe insert response.
           let matchId: string | null = null;
           for (let i = 0; i < 5 && !matchId; i++) {
             const { data } = await supabase
