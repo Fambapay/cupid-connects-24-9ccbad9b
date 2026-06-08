@@ -26,17 +26,30 @@ const FEMALE_NAMES = [
   "Esperança","Felicidade","Glória","Inocência","Joaquina","Leonor","Marcelina","Noémia",
   "Orlanda","Paulina","Querida","Regina","Sandra","Teresa","Ualda","Vitória","Xénia",
   "Yasmina","Zulmira","Aldina","Berta","Carla","Dalila","Eduarda","Filomena","Hortência",
-  "Ivone","Júlia","Madalena","Natália",
+  "Ivone","Júlia","Madalena","Natália","Liliana","Cátia","Marlene","Diana","Elisa","Helena",
+  "Miriam","Nair","Olga","Priscila","Rute","Sofia","Tatiana","Vanessa","Wania","Yolanda",
+  "Zara","Aisha","Belmira","Cecília","Dora","Esther","Flor","Gina","Indira","Jéssica",
+  "Kátia","Lena","Marta","Neusa","Otilia","Patrícia","Quitéria","Rosa Maria","Sílvia",
+  "Telma","Úrsula","Vanda","Welmira","Xica","Zenaide","Ângela","Bárbara","Cristina",
+  "Dina","Elvira","Fernanda","Gorete","Henriqueta","Isabel","Joana","Kendra","Luisa",
 ];
 
 const MALE_NAMES = [
   "Arnaldo","Benedito","Carlos","Domingos","Eduardo","Filipe","Gilberto","Hélder","Ivan",
   "Jaime","Kaique","Lourenço","Manuel","Nélio","Osvaldo","Pedro","Quito","Rui","Sérgio",
   "Tomás","Ulisses","Valter","Wálter","Xavier","Yuri","Zacarias","Abílio","Bruno","César","Dário",
+  "Eusébio","Fernando","Gonçalo","Humberto","Inácio","Jorge","Kevin","Lázaro","Mário","Narciso",
+  "Orlando","Paulo","Quintino","Rodrigo","Salvador","Teodoro","Umberto","Vicente","William",
+  "Xisto","Yago","Zé","Adriano","Baltazar","Celso","Davi","Eli","Francisco","Gaspar",
+  "Horácio","Ismael","José","Lucas","Martinho","Nicolau","Octávio","Patrício","Renato",
+  "Simão","Tiago","Válter","Welson","Alexandre","Bento","Cândido","Daniel","Emílio",
+  "Frederico","Guilherme","Henrique","Igor","Joel","Leandro","Marco","Nando","Otávio",
 ];
 
 const NB_NAMES = [
-  "Sami","Alex","Kim","Noa","Yan","Sasha","Mika","Rumi","Toni","Lou",
+  "Sami","Alex","Kim","Noa","Yan","Sasha","Mika","Rumi","Toni","Lou","Riley","Quinn",
+  "Avery","Jordan","Casey","Jamie","Dakota","Skyler","Reese","Peyton","Morgan","Taylor",
+  "Cameron","Drew","Kai","Jaden","Rowan","Sage","Phoenix","Charlie",
 ];
 
 const BIOS = [
@@ -88,11 +101,18 @@ const INTERESTS = [
 ];
 
 const CITIES = [
-  { name: "Maputo",    count: 30, lat: -25.9692, lng: 32.5732 },
-  { name: "Beira",     count: 20, lat: -19.8437, lng: 34.8389 },
-  { name: "Nampula",   count: 15, lat: -15.1165, lng: 39.2666 },
-  { name: "Quelimane", count:  8, lat: -17.8786, lng: 36.8883 },
-  { name: "Tete",      count:  7, lat: -16.1564, lng: 33.5867 },
+  { name: "Maputo",       count: 60, lat: -25.9692, lng: 32.5732 },
+  { name: "Matola",       count: 30, lat: -25.9622, lng: 32.4589 },
+  { name: "Beira",        count: 40, lat: -19.8437, lng: 34.8389 },
+  { name: "Nampula",      count: 30, lat: -15.1165, lng: 39.2666 },
+  { name: "Quelimane",    count: 15, lat: -17.8786, lng: 36.8883 },
+  { name: "Tete",         count: 15, lat: -16.1564, lng: 33.5867 },
+  { name: "Xai-Xai",      count: 12, lat: -25.0519, lng: 33.6442 },
+  { name: "Inhambane",    count: 12, lat: -23.8650, lng: 35.3833 },
+  { name: "Chimoio",      count: 12, lat: -19.1164, lng: 33.4833 },
+  { name: "Lichinga",     count: 10, lat: -13.3128, lng: 35.2406 },
+  { name: "Pemba",        count: 10, lat: -12.9730, lng: 40.5178 },
+  { name: "Nacala",       count: 10, lat: -14.5626, lng: 40.6854 },
 ];
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -186,9 +206,9 @@ interface SeedSpec {
 }
 
 const SPECS: SeedSpec[] = [
-  { gender: "feminino",    ageMin: 18, ageMax: 32, count: 40 },
-  { gender: "masculino",   ageMin: 20, ageMax: 35, count: 30 },
-  { gender: "nao_binario", ageMin: 19, ageMax: 30, count: 10 },
+  { gender: "feminino",    ageMin: 18, ageMax: 35, count: 150 },
+  { gender: "masculino",   ageMin: 20, ageMax: 38, count: 120 },
+  { gender: "nao_binario", ageMin: 19, ageMax: 32, count: 30 },
 ];
 
 function namePool(gender: "feminino" | "masculino" | "nao_binario"): string[] {
