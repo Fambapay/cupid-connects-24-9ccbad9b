@@ -141,6 +141,56 @@ export const getRevenueSeries = createServerFn({ method: "GET" })
     return Array.from(byDay.entries()).map(([day, amount]) => ({ day, amount }));
   });
 
+// Engagement time series: new signups + matches per day + cumulative DAU stats.
+export const getEngagementSeries = createServerFn({ method: "GET" })
+  .middleware([requireAdmin])
+  .inputValidator((d: { days?: number }) => ({ days: Math.min(Math.max(d.days ?? 30, 7), 180) }))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabaseAdmin;
+    const now = new Date();
+    const since = new Date(now.getTime() - data.days * 86400000).toISOString();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    const d7 = new Date(now.getTime() - 7 * 86400000).toISOString();
+    const d30 = new Date(now.getTime() - 30 * 86400000).toISOString();
+
+    const [signups, matches, dauToday, dau7, dau30] = await Promise.all([
+      sb.from("profiles").select("created_at").gte("created_at", since),
+      sb.from("matches").select("matched_at").gte("matched_at", since),
+      sb.from("profiles").select("id", { head: true, count: "exact" }).gte("last_active_at", startOfDay),
+      sb.from("profiles").select("id", { head: true, count: "exact" }).gte("last_active_at", d7),
+      sb.from("profiles").select("id", { head: true, count: "exact" }).gte("last_active_at", d30),
+    ]);
+
+    const byDay = new Map<string, { signups: number; matches: number }>();
+    for (let i = data.days - 1; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 86400000);
+      byDay.set(d.toISOString().slice(0, 10), { signups: 0, matches: 0 });
+    }
+    (signups.data ?? []).forEach((r: any) => {
+      const k = String(r.created_at).slice(0, 10);
+      const v = byDay.get(k);
+      if (v) v.signups += 1;
+    });
+    (matches.data ?? []).forEach((r: any) => {
+      const k = String(r.matched_at).slice(0, 10);
+      const v = byDay.get(k);
+      if (v) v.matches += 1;
+    });
+
+    return {
+      series: Array.from(byDay.entries()).map(([day, v]) => ({ day, signups: v.signups, matches: v.matches })),
+      today: {
+        dau: dauToday.count ?? 0,
+        signups: (signups.data ?? []).filter((r: any) => String(r.created_at) >= startOfDay).length,
+        matches: (matches.data ?? []).filter((r: any) => String(r.matched_at) >= startOfDay).length,
+      },
+      dau: {
+        d7: dau7.count ?? 0,
+        d30: dau30.count ?? 0,
+      },
+    };
+  });
+
 // ─── Users ────────────────────────────────────────────────────────────────
 export const listUsers = createServerFn({ method: "GET" })
   .middleware([requireAdmin])
