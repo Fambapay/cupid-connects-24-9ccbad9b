@@ -101,6 +101,42 @@ export type Database = {
         }
         Relationships: []
       }
+      boost_audit_log: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event: string
+          id: number
+          meta: Json | null
+          reason: string | null
+          tier: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event: string
+          id?: number
+          meta?: Json | null
+          reason?: string | null
+          tier?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event?: string
+          id?: number
+          meta?: Json | null
+          reason?: string | null
+          tier?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       boosts: {
         Row: {
           created_at: string
@@ -841,6 +877,18 @@ export type Database = {
       activate_membership_debito: {
         Args: { _days: number; _plan_tier: string; _user_id: string }
         Returns: Json
+      }
+      boost_entitlement_discrepancies: {
+        Args: { _days?: number }
+        Returns: {
+          actual_refills: number
+          consumes: number
+          discrepancy: number
+          expected_refills: number
+          kind: string
+          tier: string
+          user_id: string
+        }[]
       }
       consume_boost_credit: { Args: never; Returns: Json }
       consume_super_like_credit: { Args: never; Returns: Json }
