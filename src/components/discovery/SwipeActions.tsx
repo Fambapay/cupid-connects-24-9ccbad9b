@@ -17,16 +17,17 @@ const baseBtn: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   borderRadius: "50%",
-  border: "none",
+  border: "1px solid rgba(255,255,255,0.10)",
   cursor: "pointer",
-  background: "rgba(20,20,20,0.85)",
-  backdropFilter: "blur(14px)",
-  WebkitBackdropFilter: "blur(14px)",
+  background: "rgba(18,18,22,0.55)",
+  backdropFilter: "blur(22px) saturate(160%)",
+  WebkitBackdropFilter: "blur(22px) saturate(160%)",
   boxShadow:
-    "0 6px 18px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.06)",
+    "0 10px 28px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 0 0 1px rgba(255,255,255,0.04)",
   transition: "transform 120ms cubic-bezier(0.22,1,0.36,1)",
   WebkitTapHighlightColor: "transparent",
 };
+
 
 export const SwipeActions = ({
   onSwipe,
@@ -53,10 +54,14 @@ export const SwipeActions = ({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        gap: 16,
-        padding: "14px 18px 22px",
+        gap: 14,
+        padding: "18px 18px calc(86px + env(safe-area-inset-bottom, 0px))",
+        background:
+          "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0) 100%)",
+        pointerEvents: "auto",
       }}
     >
+
       <button
         onClick={press(onRewind)}
         disabled={!canRewind}

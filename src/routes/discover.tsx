@@ -123,7 +123,7 @@ function Discover() {
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
-      <main className="relative h-[100svh] w-full overflow-hidden pb-[88px]">
+      <main className="relative h-[100svh] w-full overflow-hidden">
         {visible.length > 0 ? (
           <DiscoveryPage
             profiles={visible}
@@ -136,6 +136,7 @@ function Discover() {
           <EmptyDiscovery loading={loading} onRefresh={reload} />
         )}
       </main>
+
 
       {!isPremium && bannerVisible && (
         <div onClick={(e) => e.stopPropagation()}>
