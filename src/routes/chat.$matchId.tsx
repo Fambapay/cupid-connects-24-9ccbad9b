@@ -42,12 +42,11 @@ function ChatRoom() {
   const scrollToLatest = useCallback((behavior: ScrollBehavior = "auto") => {
     const el = scrollRef.current;
     if (!el) return;
-    const pin = () => el.scrollTo({ top: el.scrollHeight, behavior });
-    pin();
-    requestAnimationFrame(pin);
-    requestAnimationFrame(() => requestAnimationFrame(pin));
-    window.setTimeout(pin, 90);
-    window.setTimeout(pin, 220);
+    el.scrollTo({ top: el.scrollHeight, behavior });
+    requestAnimationFrame(() => {
+      const e = scrollRef.current;
+      if (e) e.scrollTo({ top: e.scrollHeight, behavior });
+    });
   }, []);
 
   useLayoutEffect(() => {
@@ -58,16 +57,19 @@ function ChatRoom() {
     scrollToLatest("auto");
   }, [messages.length, typing, scrollToLatest]);
 
-  // Mark conversation as read on open and whenever new messages arrive
+  // Mark conversation as read on open and whenever new messages arrive (debounced)
   useEffect(() => {
     if (!user || !matchId) return;
-    supabase
-      .from("match_reads")
-      .upsert(
-        { match_id: matchId, user_id: user.id, last_read_at: new Date().toISOString() },
-        { onConflict: "match_id,user_id" },
-      )
-      .then(() => undefined);
+    const t = window.setTimeout(() => {
+      supabase
+        .from("match_reads")
+        .upsert(
+          { match_id: matchId, user_id: user.id, last_read_at: new Date().toISOString() },
+          { onConflict: "match_id,user_id" },
+        )
+        .then(() => undefined);
+    }, 400);
+    return () => window.clearTimeout(t);
   }, [user, matchId, messages.length]);
 
   // Read receipts: track peer's last_read_at so we can render "Lido" indicators
