@@ -418,26 +418,32 @@ function PackCard({ pack, index }: { pack: Pack; index: number }) {
           </div>
 
           <motion.button
-            whileTap={{ scale: 0.97 }}
+            whileTap={{ scale: 0.98 }}
             onClick={handleBuy}
-            className={`relative mt-4 h-12 w-full overflow-hidden rounded-xl bg-gradient-to-r ${accent} text-sm font-bold text-white shadow-lg`}
+            className={`group relative mt-4 h-12 w-full overflow-hidden rounded-xl bg-gradient-to-r ${accent} text-sm font-bold text-white`}
+            style={{
+              boxShadow: `0 10px 24px -12px ${accentColor}99, inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.18)`,
+            }}
           >
             <motion.span
-              className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3"
+              className="pointer-events-none absolute inset-y-0 w-[28%] skew-x-[-18deg]"
               style={{
                 background:
-                  "linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%)",
+                  "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%)",
+                filter: "blur(2px)",
               }}
-              animate={{ x: ["0%", "400%"] }}
+              initial={{ x: "-120%" }}
+              animate={{ x: ["-120%", "420%"] }}
               transition={{
-                duration: 2.6,
+                duration: 2.4,
                 ease: "easeInOut",
                 repeat: Infinity,
-                repeatDelay: 1.2,
+                repeatDelay: 2.4,
               }}
             />
-            <span className="relative flex items-center justify-center gap-2">
-              ✨ Desbloquear agora
+            <span className="relative flex items-center justify-center gap-1.5">
+              <Sparkles size={14} className="opacity-90" />
+              Desbloquear agora
             </span>
           </motion.button>
         </div>
