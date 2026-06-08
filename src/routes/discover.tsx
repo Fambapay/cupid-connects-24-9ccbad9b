@@ -145,6 +145,7 @@ function Discover() {
             onSwipe={handleSwipe}
             onOpenFilters={onOpenFilters}
             onBoost={onBoost}
+            onRewind={onRewind}
             onEnd={reload}
           />
         ) : (
