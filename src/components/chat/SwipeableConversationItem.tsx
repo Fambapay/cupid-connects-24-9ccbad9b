@@ -206,7 +206,7 @@ export function SwipeableConversationItem({
               {unread > 0 && (
                 <span
                   aria-label={`${unread} novas mensagens`}
-                  className="ml-2 h-2.5 w-2.5 shrink-0 rounded-full bg-gradient-flame shadow-[0_0_10px_rgba(233,53,160,0.55)]"
+                  className="ml-2 h-2.5 w-2.5 shrink-0 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.55)]"
                 />
               )}
             </div>
