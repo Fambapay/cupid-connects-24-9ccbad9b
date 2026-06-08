@@ -52,19 +52,8 @@ export const DiscoverTopBar = ({
 
       {logoSrc ? (
         <img src={logoSrc} alt="" style={{ height: 28, pointerEvents: "auto" }} />
-      ) : (
-        <div
-          style={{
-            fontSize: 22,
-            fontWeight: 900,
-            color: "#fff",
-            letterSpacing: "-0.5px",
-            pointerEvents: "auto",
-          }}
-        >
-          🍯
-        </div>
-      )}
+      ) : null}
+
 
       <button
         onClick={onBoost}
