@@ -52,8 +52,13 @@ const itemVariants = {
 function SectionHeader({ icon: Icon, label, accessory }: { icon?: any; label: string; accessory?: React.ReactNode }) {
   return (
     <div className="mb-3 flex items-center gap-2 px-1">
-      {Icon && <Icon className="h-3.5 w-3.5 text-flame" />}
-      <span className="hunie-section-label">{label}</span>
+      {Icon && <Icon className="h-5 w-5 text-flame" />}
+      <span
+        className="text-[22px] font-extrabold tracking-tight text-foreground"
+        style={{ fontWeight: 800 }}
+      >
+        {label}
+      </span>
       {accessory}
     </div>
   );
