@@ -295,7 +295,7 @@ function TabButton({
       role="tab"
       aria-selected={active}
       onClick={onClick}
-      className="relative flex items-center justify-center gap-2 rounded-xl text-sm font-semibold"
+      className="relative flex min-w-0 items-center justify-center rounded-xl text-sm font-semibold"
     >
       {active && (
         <motion.span
@@ -304,11 +304,11 @@ function TabButton({
           className={`absolute inset-0 rounded-xl bg-gradient-to-br ${gradient} shadow-lg`}
         />
       )}
-      <span className={`relative z-10 flex items-center gap-2 ${active ? "text-white" : "text-white/70"}`}>
-        {icon}
-        <span>{label}</span>
+      <span className={`relative z-10 flex min-w-0 items-center gap-1.5 px-2 ${active ? "text-white" : "text-white/70"}`}>
+        <span className="shrink-0">{icon}</span>
+        <span className="truncate text-[13px]">{label}</span>
         <span
-          className={`grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[10px] font-bold ${
+          className={`ml-0.5 grid h-[18px] min-w-[18px] shrink-0 place-items-center rounded-full px-1 text-[10px] font-bold leading-none ${
             active ? "bg-white/25 text-white" : "bg-white/10 text-white/80"
           }`}
         >
