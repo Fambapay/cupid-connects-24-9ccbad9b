@@ -349,10 +349,10 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       const dy = y.get();
       const { vx, vy } = velocityRef.current;
       const w = getVW();
-      const swipeX = w * 0.22;
-      const flingX = 650;
-      const flingY = -700;
-      const goUp = (dy < -120 && vy < -200 && Math.abs(vx) < Math.abs(vy)) || vy < flingY;
+      const swipeX = w * 0.32;
+      const flingX = 950;
+      const flingY = -950;
+      const goUp = (dy < -180 && vy < -350 && Math.abs(vx) < Math.abs(vy)) || vy < flingY;
       const goRight = dx > swipeX || vx > flingX;
       const goLeft = dx < -swipeX || vx < -flingX;
       if (goUp) flyOut("up", { x: vx, y: vy });
