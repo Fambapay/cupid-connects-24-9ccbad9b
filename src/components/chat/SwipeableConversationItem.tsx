@@ -199,7 +199,7 @@ export function SwipeableConversationItem({
             <div className="flex items-center justify-between gap-2">
               <span
                 className="truncate text-[22px] leading-none tracking-tight text-white"
-                style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}
+                style={{ fontFamily: "-apple-system, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif", fontWeight: 800 }}
               >
                 {name}
               </span>
