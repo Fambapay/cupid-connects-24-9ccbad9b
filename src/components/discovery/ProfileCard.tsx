@@ -107,6 +107,9 @@ const StackCard = ({
         <img
           src={photo}
           alt=""
+          loading="eager"
+          decoding="async"
+          fetchPriority={stackIndex === 1 ? "high" : "low"}
           style={{
             position: "absolute",
             inset: 0,
