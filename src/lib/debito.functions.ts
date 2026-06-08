@@ -76,11 +76,14 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
     let pack_kind: "boost" | "super_like" | null = null;
     let pack_quantity: number | null = null;
 
+    let plan_days = 30;
+    const period: BillingPeriod = (data.billing_period ?? "monthly") as BillingPeriod;
     if (kind === "plan") {
       const p = PLAN_PRICES[data.plan_tier!];
       if (!p) throw new Error("Invalid plan_tier");
       plan_tier = data.plan_tier!;
-      amount = p.priceMzn;
+      amount = getPlanAmount(data.plan_tier!, period);
+      plan_days = getPlanDays(data.plan_tier!, period);
     } else {
       const pack = PACKS[data.pack_id!];
       if (!pack) throw new Error("Invalid pack_id");
