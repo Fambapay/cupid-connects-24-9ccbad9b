@@ -26,17 +26,30 @@ const FEMALE_NAMES = [
   "Esperança","Felicidade","Glória","Inocência","Joaquina","Leonor","Marcelina","Noémia",
   "Orlanda","Paulina","Querida","Regina","Sandra","Teresa","Ualda","Vitória","Xénia",
   "Yasmina","Zulmira","Aldina","Berta","Carla","Dalila","Eduarda","Filomena","Hortência",
-  "Ivone","Júlia","Madalena","Natália",
+  "Ivone","Júlia","Madalena","Natália","Liliana","Cátia","Marlene","Diana","Elisa","Helena",
+  "Miriam","Nair","Olga","Priscila","Rute","Sofia","Tatiana","Vanessa","Wania","Yolanda",
+  "Zara","Aisha","Belmira","Cecília","Dora","Esther","Flor","Gina","Indira","Jéssica",
+  "Kátia","Lena","Marta","Neusa","Otilia","Patrícia","Quitéria","Rosa Maria","Sílvia",
+  "Telma","Úrsula","Vanda","Welmira","Xica","Zenaide","Ângela","Bárbara","Cristina",
+  "Dina","Elvira","Fernanda","Gorete","Henriqueta","Isabel","Joana","Kendra","Luisa",
 ];
 
 const MALE_NAMES = [
   "Arnaldo","Benedito","Carlos","Domingos","Eduardo","Filipe","Gilberto","Hélder","Ivan",
   "Jaime","Kaique","Lourenço","Manuel","Nélio","Osvaldo","Pedro","Quito","Rui","Sérgio",
   "Tomás","Ulisses","Valter","Wálter","Xavier","Yuri","Zacarias","Abílio","Bruno","César","Dário",
+  "Eusébio","Fernando","Gonçalo","Humberto","Inácio","Jorge","Kevin","Lázaro","Mário","Narciso",
+  "Orlando","Paulo","Quintino","Rodrigo","Salvador","Teodoro","Umberto","Vicente","William",
+  "Xisto","Yago","Zé","Adriano","Baltazar","Celso","Davi","Eli","Francisco","Gaspar",
+  "Horácio","Ismael","José","Lucas","Martinho","Nicolau","Octávio","Patrício","Renato",
+  "Simão","Tiago","Válter","Welson","Alexandre","Bento","Cândido","Daniel","Emílio",
+  "Frederico","Guilherme","Henrique","Igor","Joel","Leandro","Marco","Nando","Otávio",
 ];
 
 const NB_NAMES = [
-  "Sami","Alex","Kim","Noa","Yan","Sasha","Mika","Rumi","Toni","Lou",
+  "Sami","Alex","Kim","Noa","Yan","Sasha","Mika","Rumi","Toni","Lou","Riley","Quinn",
+  "Avery","Jordan","Casey","Jamie","Dakota","Skyler","Reese","Peyton","Morgan","Taylor",
+  "Cameron","Drew","Kai","Jaden","Rowan","Sage","Phoenix","Charlie",
 ];
 
 const BIOS = [
