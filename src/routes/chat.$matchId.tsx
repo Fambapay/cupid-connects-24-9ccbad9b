@@ -428,12 +428,13 @@ type BubbleProps = {
   showReadReceipt?: boolean;
 };
 
-function Bubble({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showReadReceipt }: BubbleProps) {
+function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showReadReceipt }: BubbleProps) {
   return (
     <motion.li
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.18, ease: "easeOut" }}
+      style={{ willChange: "transform, opacity", contain: "layout paint" }}
       className={`flex items-end gap-2 ${me ? "justify-end" : "justify-start"} ${
         isFirstOfGroup ? "mt-3" : "mt-0.5"
       }`}
@@ -441,7 +442,7 @@ function Bubble({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showRead
       {!me &&
         (isLastOfGroup ? (
           avatar ? (
-            <img src={avatar} alt={name} className="h-8 w-8 shrink-0 rounded-full object-cover" />
+            <img src={avatar} alt={name} width={32} height={32} loading="lazy" decoding="async" className="h-8 w-8 shrink-0 rounded-full object-cover" />
           ) : (
             <div className="h-8 w-8 shrink-0 rounded-full bg-gradient-flame" />
           )
@@ -467,6 +468,16 @@ function Bubble({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showRead
     </motion.li>
   );
 }
+
+const Bubble = memo(BubbleImpl, (a, b) =>
+  a.msg.id === b.msg.id &&
+  a.msg.content === b.msg.content &&
+  a.me === b.me &&
+  a.isFirstOfGroup === b.isFirstOfGroup &&
+  a.isLastOfGroup === b.isLastOfGroup &&
+  a.avatar === b.avatar &&
+  a.showReadReceipt === b.showReadReceipt,
+);
 
 function DateSeparator({ label }: { label: string }) {
   return (
