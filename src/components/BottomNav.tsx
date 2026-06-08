@@ -18,6 +18,7 @@ type Tab = "discover" | "likes" | "chat" | "profile";
 interface BottomNavProps {
   activeTab: Tab;
   onTabChange: (tab: Tab) => void;
+  onTabHover?: (tab: Tab) => void;
   likesCount?: number;
   unreadChats?: number;
   /** Docks the nav flush to the viewport bottom, removing the floating gap. */
@@ -31,6 +32,7 @@ interface BottomNavProps {
 export const BottomNavBase = ({
   activeTab,
   onTabChange,
+  onTabHover,
   likesCount = 0,
   unreadChats = 0,
   dockToBottom = false,
@@ -195,6 +197,7 @@ export const BottomNavBase = ({
                 pillX={pillX}
                 pointerStartRef={pointerStartRef}
                 onTap={() => handleTabChange(tab.id)}
+                onHover={onTabHover ? () => onTabHover(tab.id) : undefined}
               />
             );
           })}
@@ -219,6 +222,7 @@ interface TabButtonProps {
   pillX: MotionValue<number>;
   pointerStartRef: React.MutableRefObject<{ x: number; y: number; time: number } | null>;
   onTap: () => void;
+  onHover?: () => void;
 }
 
 const TabButton = ({
@@ -233,6 +237,7 @@ const TabButton = ({
   pillX,
   pointerStartRef,
   onTap,
+  onHover,
 }: TabButtonProps) => {
   return (
     <motion.button
@@ -241,7 +246,9 @@ const TabButton = ({
       type="button"
       onPointerDown={(e) => {
         pointerStartRef.current = { x: e.clientX, y: e.clientY, time: Date.now() };
+        onHover?.();
       }}
+      onPointerEnter={() => onHover?.()}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -330,10 +337,10 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
       unreadChats={unreadChats}
       {...props}
       activeTab={activeTab}
-      onTabChange={(t) => {
-        // Warm the target route synchronously on tap so beforeLoad/component
-        // chunks are ready before navigate() commits.
+      onTabHover={(t) => {
         router.preloadRoute({ to: TAB_TO_PATH[t] }).catch(() => {});
+      }}
+      onTabChange={(t) => {
         navigate({ to: TAB_TO_PATH[t] });
       }}
     />
