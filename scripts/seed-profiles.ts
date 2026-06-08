@@ -101,11 +101,18 @@ const INTERESTS = [
 ];
 
 const CITIES = [
-  { name: "Maputo",    count: 30, lat: -25.9692, lng: 32.5732 },
-  { name: "Beira",     count: 20, lat: -19.8437, lng: 34.8389 },
-  { name: "Nampula",   count: 15, lat: -15.1165, lng: 39.2666 },
-  { name: "Quelimane", count:  8, lat: -17.8786, lng: 36.8883 },
-  { name: "Tete",      count:  7, lat: -16.1564, lng: 33.5867 },
+  { name: "Maputo",       count: 60, lat: -25.9692, lng: 32.5732 },
+  { name: "Matola",       count: 30, lat: -25.9622, lng: 32.4589 },
+  { name: "Beira",        count: 40, lat: -19.8437, lng: 34.8389 },
+  { name: "Nampula",      count: 30, lat: -15.1165, lng: 39.2666 },
+  { name: "Quelimane",    count: 15, lat: -17.8786, lng: 36.8883 },
+  { name: "Tete",         count: 15, lat: -16.1564, lng: 33.5867 },
+  { name: "Xai-Xai",      count: 12, lat: -25.0519, lng: 33.6442 },
+  { name: "Inhambane",    count: 12, lat: -23.8650, lng: 35.3833 },
+  { name: "Chimoio",      count: 12, lat: -19.1164, lng: 33.4833 },
+  { name: "Lichinga",     count: 10, lat: -13.3128, lng: 35.2406 },
+  { name: "Pemba",        count: 10, lat: -12.9730, lng: 40.5178 },
+  { name: "Nacala",       count: 10, lat: -14.5626, lng: 40.6854 },
 ];
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
