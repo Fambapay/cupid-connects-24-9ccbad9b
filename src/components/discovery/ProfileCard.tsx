@@ -93,7 +93,8 @@ const StackCard = ({
         zIndex: stackIndex === 1 ? 9 : 8,
         pointerEvents: "none",
         background: "#000",
-        borderRadius: 0,
+        borderBottomLeftRadius: 28,
+        borderBottomRightRadius: 28,
         willChange: "transform",
         transform:
           stackIndex === 1
@@ -345,7 +346,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               inset: 0,
               overflow: "hidden",
               background: "#111",
-              borderRadius: 0,
+              borderBottomLeftRadius: 28,
+              borderBottomRightRadius: 28,
             }}
           >
             {photos.map((src, i) => (

@@ -131,29 +131,17 @@ function Discover() {
           pointerEvents: "auto",
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            bottom: "calc(78px + env(safe-area-inset-bottom, 0px))",
-            borderBottomLeftRadius: 28,
-            borderBottomRightRadius: 28,
-            overflow: "hidden",
-            background: "#000",
-          }}
-        >
-          {visible.length > 0 ? (
-            <DiscoveryPage
-              profiles={visible}
-              onSwipe={handleSwipe}
-              onOpenFilters={onOpenFilters}
-              onBoost={onBoost}
-              onEnd={reload}
-            />
-          ) : (
-            <EmptyDiscovery loading={loading} onRefresh={reload} />
-          )}
-        </div>
+        {visible.length > 0 ? (
+          <DiscoveryPage
+            profiles={visible}
+            onSwipe={handleSwipe}
+            onOpenFilters={onOpenFilters}
+            onBoost={onBoost}
+            onEnd={reload}
+          />
+        ) : (
+          <EmptyDiscovery loading={loading} onRefresh={reload} />
+        )}
       </main>
 
 
