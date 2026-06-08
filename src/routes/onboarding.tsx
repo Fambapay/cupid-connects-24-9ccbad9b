@@ -248,7 +248,13 @@ function OnboardingPage() {
 
   const goNext = () => {
     setDir(1);
-    setDraft((d) => ({ ...d, stepIdx: Math.min(d.stepIdx + 1, STEPS.length - 1) }));
+    setDraft((d) => {
+      if (d.stepIdx >= STEPS.length - 1) {
+        setDone(true);
+        return d;
+      }
+      return { ...d, stepIdx: d.stepIdx + 1 };
+    });
   };
   const goBack = () => {
     setDir(-1);
