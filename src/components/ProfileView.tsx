@@ -296,22 +296,24 @@ export function ProfileView({
             to={a.to}
             {...('search' in a && a.search ? { search: a.search } : {})}
             onClick={() => hapticTap()}
-            className="group relative overflow-hidden rounded-2xl p-3 flex flex-col items-center text-center min-h-[118px] active:scale-[0.97] transition-transform"
+            className="group relative isolate overflow-hidden rounded-2xl p-3 flex flex-col items-center text-center min-h-[118px] active:scale-[0.97] transition-transform"
             style={{
-              background: `linear-gradient(160deg, ${a.color}22 0%, ${a.color}08 55%, transparent 100%)`,
-              border: `1px solid ${a.color}33`,
+              background: `linear-gradient(160deg, ${a.color}1f 0%, ${a.color}0a 60%, rgba(255,255,255,0.02) 100%)`,
+              border: `1px solid ${a.color}3d`,
             }}
           >
             <div
               aria-hidden
-              className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-25 blur-2xl"
-              style={{ background: a.color }}
+              className="pointer-events-none absolute inset-0 rounded-2xl"
+              style={{
+                background: `radial-gradient(60% 45% at 50% 22%, ${a.color}26 0%, transparent 70%)`,
+              }}
             />
             <div
-              className="relative h-11 w-11 rounded-full grid place-items-center mb-2 ring-1"
+              className="relative h-11 w-11 rounded-full grid place-items-center mb-2"
               style={{
-                background: `${a.color}22`,
-                boxShadow: `0 6px 18px -6px ${a.color}99`,
+                background: `${a.color}1f`,
+                border: `1px solid ${a.color}33`,
               }}
             >
               <a.Icon size={20} color={a.color} fill={a.color} strokeWidth={0} />
