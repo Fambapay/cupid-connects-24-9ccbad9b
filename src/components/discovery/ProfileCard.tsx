@@ -374,6 +374,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               background: "#111",
               borderBottomLeftRadius: 28,
               borderBottomRightRadius: 28,
+              willChange: "transform",
             }}
           >
             {photos.map((src, i) => (
