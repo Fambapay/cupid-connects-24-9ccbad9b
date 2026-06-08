@@ -71,8 +71,8 @@ export function ProfileBundles() {
     <section className="relative px-5 pt-2 pb-5">
       <div className="mb-3 flex items-end justify-between">
         <div>
-          <h3 className="text-[15px] font-extrabold tracking-tight text-foreground flex items-center gap-1.5">
-            <Sparkles size={14} style={{ color: "#FF4FA3" }} />
+          <h3 className="text-[20px] tracking-tight text-foreground flex items-center gap-1.5" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}>
+            <Sparkles size={16} style={{ color: "#FF4FA3" }} />
             Pacotes & Bundles
           </h3>
           <p className="text-[11.5px] text-muted-foreground tracking-tight mt-0.5">
