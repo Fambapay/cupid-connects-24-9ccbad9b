@@ -198,6 +198,8 @@ function EmptyLikes({ onDiscover, onBoost }: { onDiscover: () => void; onBoost: 
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.25 }}
         style={{
+          fontFamily: "'Montserrat', sans-serif",
+          fontWeight: 900,
           backgroundImage: "linear-gradient(135deg, #FF4FA3 0%, #E935A0 50%, #B13CFF 100%)",
           WebkitBackgroundClip: "text",
           backgroundClip: "text",
