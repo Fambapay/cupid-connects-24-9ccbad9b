@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { getAdminKpis, getRevenueSeries } from "@/lib/admin.functions";
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { getAdminKpis, getRevenueSeries, getEngagementSeries } from "@/lib/admin.functions";
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, Legend } from "recharts";
 import { Card } from "@/components/ui/card";
-import { Users, Sparkles, Heart, MessageSquare, ShieldCheck, BadgeCheck, Wallet } from "lucide-react";
+import { Users, Sparkles, Heart, MessageSquare, ShieldCheck, BadgeCheck, Wallet, UserPlus, Activity } from "lucide-react";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
@@ -17,10 +17,13 @@ const fmtInt = (n: number) => new Intl.NumberFormat("pt-PT").format(n);
 function AdminDashboard() {
   const kpis = useServerFn(getAdminKpis);
   const series = useServerFn(getRevenueSeries);
+  const engagement = useServerFn(getEngagementSeries);
   const kq = useQuery({ queryKey: ["admin-kpis"], queryFn: () => kpis() });
   const sq = useQuery({ queryKey: ["admin-revenue", 30], queryFn: () => series({ data: { days: 30 } }) });
+  const eq = useQuery({ queryKey: ["admin-engagement", 30], queryFn: () => engagement({ data: { days: 30 } }) });
 
   const k = kq.data;
+  const e = eq.data;
   return (
     <div className="space-y-6">
       <div>
@@ -68,9 +71,38 @@ function AdminDashboard() {
           </Card>
 
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            <Stat icon={Activity} label="DAU hoje" value={fmtInt(e?.today.dau ?? 0)} sub={`${fmtInt(e?.dau.d7 ?? 0)} · 7d`} />
+            <Stat icon={UserPlus} label="Signups hoje" value={fmtInt(e?.today.signups ?? 0)} />
+            <Stat icon={Heart} label="Matches hoje" value={fmtInt(e?.today.matches ?? 0)} />
+            <Stat icon={Users} label="Ativos 30d" value={fmtInt(e?.dau.d30 ?? 0)} />
+          </div>
+
+          <Card className="p-4">
+            <div className="mb-3 flex items-baseline justify-between">
+              <h2 className="font-semibold">Atividade · últimos 30 dias</h2>
+              {eq.isLoading && <span className="text-xs text-muted-foreground">a carregar…</span>}
+            </div>
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={e?.series ?? []}>
+                  <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" />
+                  <XAxis dataKey="day" tickFormatter={(d) => String(d).slice(5)} fontSize={11} stroke="hsl(var(--muted-foreground))" />
+                  <YAxis fontSize={11} stroke="hsl(var(--muted-foreground))" allowDecimals={false} />
+                  <Tooltip
+                    contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <Line type="monotone" dataKey="signups" name="Signups" stroke="hsl(var(--flame))" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="matches" name="Matches" stroke="#8b5cf6" strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <Stat icon={Users} label="Utilizadores" value={fmtInt(k.users.total)} sub={`${fmtInt(k.users.onboarded)} onboarded`} />
             <Stat icon={Users} label="Ativos 7d" value={fmtInt(k.users.active7d)} />
-            <Stat icon={Heart} label="Matches" value={fmtInt(k.engagement.matches)} />
+            <Stat icon={Heart} label="Matches total" value={fmtInt(k.engagement.matches)} />
             <Stat icon={MessageSquare} label="Mensagens" value={fmtInt(k.engagement.messages)} />
           </div>
 
