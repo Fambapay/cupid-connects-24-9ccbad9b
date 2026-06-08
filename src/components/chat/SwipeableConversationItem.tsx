@@ -204,9 +204,10 @@ export function SwipeableConversationItem({
                 {name}
               </span>
               {unread > 0 && (
-                <span className="ml-2 inline-flex h-5 min-w-[20px] shrink-0 items-center justify-center rounded-full bg-gradient-flame px-1.5 text-[11px] font-bold text-flame-foreground shadow-sm">
-                  {unread > 99 ? "99+" : unread}
-                </span>
+                <span
+                  aria-label={`${unread} novas mensagens`}
+                  className="ml-2 h-2.5 w-2.5 shrink-0 rounded-full bg-gradient-flame shadow-[0_0_10px_rgba(233,53,160,0.55)]"
+                />
               )}
             </div>
             <p
