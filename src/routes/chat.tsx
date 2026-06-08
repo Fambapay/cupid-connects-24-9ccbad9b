@@ -34,7 +34,7 @@ function ChatList() {
 
   return (
     <AppShell>
-      <header className="sticky top-0 z-30 flex items-center justify-between bg-background/70 px-5 pb-3 pt-5 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 flex items-center justify-between bg-background/70 px-4 pb-3 pt-5 backdrop-blur-xl">
         <h1
           className="text-[34px] leading-none tracking-tight text-white"
           style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}
@@ -52,7 +52,7 @@ function ChatList() {
       </header>
 
       {newMatches.length > 0 && (
-        <section className="mt-2 px-5">
+        <section className="mt-2 px-4">
           <h2
             className="text-[15px] uppercase tracking-tight text-white"
             style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 800 }}
@@ -86,7 +86,7 @@ function ChatList() {
         </section>
       )}
 
-      <section className={`${newMatches.length > 0 ? "mt-5" : "mt-2"} px-5`}>
+      <section className={`${newMatches.length > 0 ? "mt-5" : "mt-2"} px-4`}>
         <h2
           className="text-[15px] uppercase tracking-tight text-white"
           style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 800 }}
