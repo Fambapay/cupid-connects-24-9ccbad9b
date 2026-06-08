@@ -325,7 +325,14 @@ function PlanCardView({
         </div>
       )}
 
-      <h3 className="mt-1 text-lg font-black" style={{ color: plan.accent }}>
+      <h3
+        className="mt-1 text-lg"
+        style={{
+          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          fontWeight: 900,
+          color: plan.accent,
+        }}
+      >
         {plan.label}
       </h3>
 
