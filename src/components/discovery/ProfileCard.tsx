@@ -394,7 +394,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             position: "absolute",
             inset: 0,
             zIndex: 10,
-            touchAction: "pan-y",
+            touchAction: "none",
             willChange: "transform",
             userSelect: "none",
             transformStyle: "preserve-3d",
