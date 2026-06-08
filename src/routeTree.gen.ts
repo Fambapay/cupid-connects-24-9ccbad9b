@@ -41,6 +41,7 @@ import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicVapidKeyRouteImport } from './routes/api/public/vapid-key'
+import { Route as ApiPublicReactivationCronRouteImport } from './routes/api/public/reactivation-cron'
 import { Route as ApiPublicNotifyRouteImport } from './routes/api/public/notify'
 import { Route as ApiPublicMembershipExpiryCronRouteImport } from './routes/api/public/membership-expiry-cron'
 import { Route as ApiPublicDebitoWebhookRouteImport } from './routes/api/public/debito-webhook'
@@ -211,6 +212,12 @@ const ApiPublicVapidKeyRoute = ApiPublicVapidKeyRouteImport.update({
   path: '/api/public/vapid-key',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicReactivationCronRoute =
+  ApiPublicReactivationCronRouteImport.update({
+    id: '/api/public/reactivation-cron',
+    path: '/api/public/reactivation-cron',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicNotifyRoute = ApiPublicNotifyRouteImport.update({
   id: '/api/public/notify',
   path: '/api/public/notify',
@@ -302,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
   '/api/public/membership-expiry-cron': typeof ApiPublicMembershipExpiryCronRoute
   '/api/public/notify': typeof ApiPublicNotifyRoute
+  '/api/public/reactivation-cron': typeof ApiPublicReactivationCronRoute
   '/api/public/vapid-key': typeof ApiPublicVapidKeyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -344,6 +352,7 @@ export interface FileRoutesByTo {
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
   '/api/public/membership-expiry-cron': typeof ApiPublicMembershipExpiryCronRoute
   '/api/public/notify': typeof ApiPublicNotifyRoute
+  '/api/public/reactivation-cron': typeof ApiPublicReactivationCronRoute
   '/api/public/vapid-key': typeof ApiPublicVapidKeyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -389,6 +398,7 @@ export interface FileRoutesById {
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
   '/api/public/membership-expiry-cron': typeof ApiPublicMembershipExpiryCronRoute
   '/api/public/notify': typeof ApiPublicNotifyRoute
+  '/api/public/reactivation-cron': typeof ApiPublicReactivationCronRoute
   '/api/public/vapid-key': typeof ApiPublicVapidKeyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -434,6 +444,7 @@ export interface FileRouteTypes {
     | '/api/public/debito-webhook'
     | '/api/public/membership-expiry-cron'
     | '/api/public/notify'
+    | '/api/public/reactivation-cron'
     | '/api/public/vapid-key'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
@@ -476,6 +487,7 @@ export interface FileRouteTypes {
     | '/api/public/debito-webhook'
     | '/api/public/membership-expiry-cron'
     | '/api/public/notify'
+    | '/api/public/reactivation-cron'
     | '/api/public/vapid-key'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
@@ -520,6 +532,7 @@ export interface FileRouteTypes {
     | '/api/public/debito-webhook'
     | '/api/public/membership-expiry-cron'
     | '/api/public/notify'
+    | '/api/public/reactivation-cron'
     | '/api/public/vapid-key'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
@@ -551,6 +564,7 @@ export interface RootRouteChildren {
   ApiPublicDebitoWebhookRoute: typeof ApiPublicDebitoWebhookRoute
   ApiPublicMembershipExpiryCronRoute: typeof ApiPublicMembershipExpiryCronRoute
   ApiPublicNotifyRoute: typeof ApiPublicNotifyRoute
+  ApiPublicReactivationCronRoute: typeof ApiPublicReactivationCronRoute
   ApiPublicVapidKeyRoute: typeof ApiPublicVapidKeyRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -786,6 +800,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicVapidKeyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/reactivation-cron': {
+      id: '/api/public/reactivation-cron'
+      path: '/api/public/reactivation-cron'
+      fullPath: '/api/public/reactivation-cron'
+      preLoaderRoute: typeof ApiPublicReactivationCronRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/notify': {
       id: '/api/public/notify'
       path: '/api/public/notify'
@@ -965,6 +986,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicDebitoWebhookRoute: ApiPublicDebitoWebhookRoute,
   ApiPublicMembershipExpiryCronRoute: ApiPublicMembershipExpiryCronRoute,
   ApiPublicNotifyRoute: ApiPublicNotifyRoute,
+  ApiPublicReactivationCronRoute: ApiPublicReactivationCronRoute,
   ApiPublicVapidKeyRoute: ApiPublicVapidKeyRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
