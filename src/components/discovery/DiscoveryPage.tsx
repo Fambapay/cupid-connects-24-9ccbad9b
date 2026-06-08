@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { useMotionValue } from "framer-motion";
 import { ProfileCard, type ProfileCardHandle } from "./ProfileCard";
 import { SwipeActions } from "./SwipeActions";
@@ -31,6 +31,21 @@ export const DiscoveryPage = ({
   const current = profiles[index];
   const next1 = profiles[index + 1];
   const next2 = profiles[index + 2];
+  const next3 = profiles[index + 3];
+
+  // Aggressively preload the next 3 cards' first photos so the stack behind
+  // the top card never flashes black during a swipe. Uses Image() + decode()
+  // to push the decode work off the main thread before the user sees the card.
+  useEffect(() => {
+    [next1, next2, next3].forEach((p) => {
+      const url = p?.photos?.[0];
+      if (!url) return;
+      const img = new Image();
+      img.decoding = "async";
+      img.src = url;
+      img.decode?.().catch(() => {});
+    });
+  }, [next1, next2, next3]);
 
   const handle = useCallback(
     (dir: SwipeDirection) => {
