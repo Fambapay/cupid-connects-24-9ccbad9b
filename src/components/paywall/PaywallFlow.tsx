@@ -325,17 +325,31 @@ function PlanCardView({
         </div>
       )}
 
-      <h3
-        className="mt-1 text-2xl uppercase"
-        style={{
-          fontFamily: "'Montserrat', sans-serif",
-          fontWeight: 900,
-          letterSpacing: "-0.02em",
-          color: plan.accent,
-        }}
-      >
-        {plan.label}
-      </h3>
+      <div className="mt-1 flex items-center gap-2">
+        <h3
+          className="text-2xl uppercase text-white"
+          style={{
+            fontFamily: "'Montserrat', sans-serif",
+            fontWeight: 900,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          HUNIE
+        </h3>
+        <span
+          className="rounded-full px-2 py-0.5 text-[10px] uppercase"
+          style={{
+            fontFamily: "'Montserrat', sans-serif",
+            fontWeight: 900,
+            letterSpacing: "0.06em",
+            backgroundColor: plan.accent,
+            color: "#0a0a0a",
+          }}
+        >
+          {plan.label}
+        </span>
+      </div>
+
 
       <div className="mt-3 flex items-baseline gap-1">
         <span className="text-3xl font-black">{price.toLocaleString("pt-PT")}</span>
