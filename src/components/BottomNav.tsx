@@ -310,9 +310,20 @@ function pathToTab(pathname: string): TabId | null {
 export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange"> = {}) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const router = useRouter();
   const activeTab = pathToTab(pathname) ?? "profile";
   const likesCount = useLikesCount();
   const unreadChats = useUnreadChats();
+
+  // Warm all main tab routes (code chunks + loader data) on mount so tab
+  // switches feel instantaneous instead of waiting on network/JS chunks.
+  useEffect(() => {
+    const paths = ["/discover", "/matches", "/chat", "/profile"] as const;
+    paths.forEach((to) => {
+      router.preloadRoute({ to }).catch(() => {});
+    });
+  }, [router]);
+
   return (
     <BottomNavBase
       likesCount={likesCount}
