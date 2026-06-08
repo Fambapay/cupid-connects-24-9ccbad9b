@@ -86,6 +86,7 @@ export interface PlanCardConfig {
   tier: PlanTier;
   label: string;
   priceMzn: number;
+  annualPriceMzn: number;
   tagline: string;
   badge?: string;
   accent: string;
@@ -94,51 +95,54 @@ export interface PlanCardConfig {
 
 export const PLAN_CARDS: PlanCardConfig[] = [
   {
-    tier: "select",
-    label: "Select",
-    priceMzn: PLAN_PRICES.select.priceMzn,
-    tagline: "Aparece. Sem ser ignorado.",
-    accent: "#5BB8FF",
+    tier: "elite",
+    label: "Elite",
+    priceMzn: PLAN_PRICES.elite.priceMzn,
+    annualPriceMzn: PLAN_PRICES.elite.annualPriceMzn,
+    tagline: "Sê a prioridade de todos.",
+    badge: "VIP",
+    accent: "#C9A84C",
     highlights: [
-      { label: "1 Boost grátis (30 min) na ativação", bold: true },
-      { label: "Selo Verificado no teu perfil", bold: true },
-      { label: "Likes ilimitados" },
-      { label: "1 Super Like por dia" },
-      { label: "Sem anúncios" },
+      { label: "Topo do feed", bold: true },
+      { label: "Badge Elite" },
+      { label: "Perfil verificado" },
+      { label: "10 Super Likes / dia" },
+      { label: "Boost diário" },
+      { label: "Modo invisível" },
+      { label: "Suporte VIP" },
     ],
   },
   {
     tier: "plus",
     label: "Plus",
     priceMzn: PLAN_PRICES.plus.priceMzn,
-    tagline: "Tudo do Select, mais controlo e visibilidade.",
+    annualPriceMzn: PLAN_PRICES.plus.annualPriceMzn,
+    tagline: "Multiplica as tuas hipóteses.",
     badge: "Mais popular",
     accent: "#F0468C",
     highlights: [
-      { label: "Vê quem te curtiu", bold: true },
-      { label: "Rewind ilimitado" },
-      { label: "Filtros avançados" },
-      { label: "Passport — muda de cidade" },
-      { label: "Read receipts" },
-      { label: "1 Boost / semana" },
+      { label: "Tudo do Select", bold: true },
+      { label: "Ver quem te curtiu" },
       { label: "5 Super Likes / dia" },
+      { label: "1 Boost por semana" },
+      { label: "Filtros avançados" },
+      { label: "Read receipts" },
+      { label: "Sem anúncios" },
     ],
   },
   {
-    tier: "elite",
-    label: "Elite",
-    priceMzn: PLAN_PRICES.elite.priceMzn,
-    tagline: "VIP. Prioridade absoluta no Hunie.",
-    badge: "VIP",
-    accent: "#C9A84C",
+    tier: "select",
+    label: "Select",
+    priceMzn: PLAN_PRICES.select.priceMzn,
+    annualPriceMzn: PLAN_PRICES.select.annualPriceMzn,
+    tagline: "Começa a conhecer pessoas hoje.",
+    accent: "#5BB8FF",
     highlights: [
-      { label: "Prioridade no discovery", bold: true },
-      { label: "Boost diário" },
-      { label: "Modo invisível" },
-      
-      { label: "Analytics de perfil" },
-      { label: "Badge Elite" },
-      { label: "10 Super Likes / dia" },
+      { label: "Likes ilimitados", bold: true },
+      { label: "Ver quem te curtiu" },
+      { label: "1 Super Like por dia" },
+      { label: "1 Boost na ativação" },
+      { label: "Filtros básicos" },
     ],
   },
 ];
@@ -146,3 +150,4 @@ export const PLAN_CARDS: PlanCardConfig[] = [
 export function formatPrice(mzn: number) {
   return `${mzn.toLocaleString("pt-PT")} MZN`;
 }
+
