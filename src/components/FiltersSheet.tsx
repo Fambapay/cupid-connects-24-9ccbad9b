@@ -263,7 +263,7 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
                 onClick={apply}
                 className="w-full rounded-2xl py-4 text-[17px] font-semibold text-white"
                 style={{
-                  background: 'linear-gradient(135deg,#ec4899 0%,#a855f7 100%)',
+                  background: 'linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%)',
                   boxShadow: '0 10px 30px -8px rgba(236,72,153,0.55)',
                 }}
               >
@@ -392,7 +392,7 @@ const SingleSlider = ({ min, max, value, onChange, disabled }: { min: number; ma
   return (
     <div className="px-1 pt-1.5">
       <div className="relative h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.12)' }}>
-        <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${pct}%`, background: 'linear-gradient(90deg,#ec4899,#a855f7)' }} />
+        <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${pct}%`, background: 'linear-gradient(90deg, var(--brand-pink), var(--brand-purple))' }} />
         <input
           type="range" min={min} max={max} value={value} disabled={disabled}
           onChange={(e) => onChange(Number(e.target.value))}
@@ -411,7 +411,7 @@ const RangeSlider = ({ min, max, valueMin, valueMax, onChange, disabled }: {
   return (
     <div className="px-1 pt-1.5">
       <div className="relative h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.12)' }}>
-        <div className="absolute inset-y-0 rounded-full" style={{ left: `${pctMin}%`, right: `${100 - pctMax}%`, background: 'linear-gradient(90deg,#ec4899,#a855f7)' }} />
+        <div className="absolute inset-y-0 rounded-full" style={{ left: `${pctMin}%`, right: `${100 - pctMax}%`, background: 'linear-gradient(90deg, var(--brand-pink), var(--brand-purple))' }} />
         <input
           type="range" min={min} max={max} value={valueMin} disabled={disabled}
           onChange={(e) => onChange(Math.min(Number(e.target.value), valueMax - 1), valueMax)}
@@ -440,7 +440,7 @@ const ChipGrid = ({ options, selected, onToggle, disabled }: { options: string[]
           disabled={disabled}
           className="rounded-full px-3.5 py-2 text-[13px] font-medium transition-all"
           style={{
-            background: on ? 'linear-gradient(135deg,#ec4899,#a855f7)' : 'rgba(255,255,255,0.08)',
+            background: on ? 'linear-gradient(135deg, var(--brand-pink), var(--brand-purple))' : 'rgba(255,255,255,0.08)',
             border: on ? '1px solid transparent' : '1px solid rgba(255,255,255,0.1)',
             color: '#fff',
           }}
