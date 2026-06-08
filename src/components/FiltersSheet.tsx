@@ -297,7 +297,7 @@ const PremiumSection = ({ title, trailing, locked, children }: { title: string; 
     <div className="mb-2 flex items-end justify-between px-1">
       <div className="flex items-center gap-1.5">
         <h3 className="text-[13px] font-semibold uppercase tracking-wider text-white/50">{title}</h3>
-        {locked && <Lock size={11} className="text-amber-400" />}
+        {locked && <Lock size={11} style={{ color: 'var(--brand-pink)' }} />}
       </div>
       {trailing && <span className="text-[13px] font-medium text-white/80">{trailing}</span>}
     </div>
