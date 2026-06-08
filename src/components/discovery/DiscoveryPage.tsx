@@ -82,6 +82,18 @@ export const DiscoveryPage = ({
     [current, index, profiles.length, onSwipe, onEnd, x, y],
   );
 
+  const handleRewind = useCallback(async () => {
+    if (rewinding || !onRewind) return;
+    setRewinding(true);
+    try {
+      await onRewind();
+    } finally {
+      setRewinding(false);
+    }
+  }, [onRewind, rewinding]);
+
+  const canRewind = !!onRewind && !rewinding;
+
   return (
     <div
       className="relative h-full w-full overflow-hidden"
