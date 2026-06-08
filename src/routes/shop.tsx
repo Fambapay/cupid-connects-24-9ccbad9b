@@ -212,7 +212,22 @@ function ShopPage() {
                     <Star size={24} fill="#38BDF8" stroke="none" />
                   )}
                 </div>
-                <h2 className="text-[22px] font-extrabold leading-tight">{copy.hook}</h2>
+                <h2 className="text-[24px] font-extrabold leading-tight">
+                  {(() => {
+                    const text = copy.hook.replace(/\.$/, "");
+                    const parts = text.split(" ");
+                    const last = parts.pop() ?? "";
+                    const head = parts.join(" ");
+                    return (
+                      <>
+                        {head ? `${head} ` : ""}
+                        <span style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontWeight: 400 }}>
+                          {last}.
+                        </span>
+                      </>
+                    );
+                  })()}
+                </h2>
                 <p className="mt-1 text-[13px] text-muted-foreground">{copy.sub}</p>
 
                 <div className="mt-4 grid grid-cols-3 gap-2">
