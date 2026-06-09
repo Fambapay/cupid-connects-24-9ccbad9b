@@ -316,6 +316,7 @@ function Discover() {
       <FirstImpressionSheet
         open={!!firstImpression}
         profile={firstImpression}
+        superLikeBalance={credits.super_like_balance}
         onClose={() => setFirstImpression(null)}
         onSend={handleSendFirstImpression}
       />
