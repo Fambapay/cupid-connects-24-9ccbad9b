@@ -108,7 +108,10 @@ function Discover() {
     }
   };
 
-  const handleSwipe = async (target: DiscoveryProfile, dir: SwipeDirection) => {
+  const handleSwipe = async (
+    target: DiscoveryProfile,
+    dir: SwipeDirection,
+  ): Promise<void | "blocked"> => {
     const direction = dir === "right" ? "like" : dir === "up" ? "super" : "pass";
 
     // Pass (dislike) is always free — never trigger paywall.
@@ -122,7 +125,7 @@ function Discover() {
     if (direction === "super" && !isPremium) {
       setPendingAction({ profileId: target.id, direction });
       openPaywall();
-      return;
+      return "blocked";
     }
 
     // Like: free users get 5/day. On the 6th attempt, open paywall.
@@ -130,14 +133,14 @@ function Discover() {
       if (dailyLimits.likesLimit >= 0 && dailyLimits.likesRemaining <= 0) {
         setPendingAction({ profileId: target.id, direction });
         openPaywall();
-        return;
+        return "blocked";
       }
     }
 
     // Premium daily-limit guard (likesLimit < 0 means unlimited).
     if (dailyLimits.likesLimit >= 0 && dailyLimits.likesRemaining <= 0 && isPremium) {
       toast.error("Atingiste o limite diário de likes.");
-      return;
+      return "blocked";
     }
     setIndex((i) => i + 1);
     await performSwipe({ id: target.id, name: target.name, photo: target.photos?.[0] }, direction);
