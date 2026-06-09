@@ -274,9 +274,48 @@ function OnboardingPage() {
   const stepId = STEPS[draft.stepIdx];
   const [dir, setDir] = useState<1 | -1>(1);
 
+  const validateStep = useCallback((step: StepId, d: DraftState): string | null => {
+    switch (step) {
+      case "name":
+        if (!d.name.trim() || d.name.trim().length < 2) return "Indica o teu nome";
+        break;
+      case "birthdate": {
+        if (!d.day || !d.month || !d.year) return "Seleciona a data de nascimento completa";
+        const iso = `${String(d.year).padStart(4, "0")}-${String(d.month).padStart(2, "0")}-${String(d.day).padStart(2, "0")}`;
+        const age = computeAge(iso);
+        if (age < 18) return "Tens de ter pelo menos 18 anos";
+        break;
+      }
+      case "gender":
+        if (!d.gender) return "Seleciona o teu género";
+        break;
+      case "interested":
+        if (!d.interested) return "Indica quem queres conhecer";
+        break;
+      case "photos":
+        if (photos.length < 1) return "Adiciona pelo menos 1 foto";
+        break;
+      case "location": {
+        const hasCoords = d.latitude != null && d.longitude != null;
+        const hasCity = d.city.trim().length >= 2;
+        if (!hasCoords && !hasCity) return "Indica a tua localização";
+        break;
+      }
+      default:
+        return null;
+    }
+    return null;
+  }, [photos.length]);
+
   const goNext = () => {
     setDir(1);
     setDraft((d) => {
+      const currentStep = STEPS[d.stepIdx];
+      const err = validateStep(currentStep, d);
+      if (err) {
+        toast({ title: "Ups", description: err, variant: "destructive" });
+        return d;
+      }
       if (d.stepIdx >= STEPS.length - 1) {
         setDone(true);
         return d;
@@ -292,11 +331,40 @@ function OnboardingPage() {
   const finish = useCallback(async () => {
     if (!user) return;
     const { day, month, year, name, bio, city, gender, interested, interests, latitude, longitude } = draft;
-    const birthdate =
-      day && month && year
-        ? `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-        : null;
-    const age = birthdate ? computeAge(birthdate) : null;
+
+    // Comprehensive validation before submit
+    if (!name.trim() || name.trim().length < 2) {
+      toast({ title: "Perfil incompleto", description: "Indica o teu nome", variant: "destructive" });
+      return;
+    }
+    if (!day || !month || !year) {
+      toast({ title: "Perfil incompleto", description: "Seleciona a data de nascimento", variant: "destructive" });
+      return;
+    }
+    const birthdate = `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    const age = computeAge(birthdate);
+    if (age < 18) {
+      toast({ title: "Perfil incompleto", description: "Tens de ter pelo menos 18 anos", variant: "destructive" });
+      return;
+    }
+    if (!gender) {
+      toast({ title: "Perfil incompleto", description: "Seleciona o teu género", variant: "destructive" });
+      return;
+    }
+    if (!interested) {
+      toast({ title: "Perfil incompleto", description: "Indica quem queres conhecer", variant: "destructive" });
+      return;
+    }
+    if (photos.length < 1) {
+      toast({ title: "Perfil incompleto", description: "Adiciona pelo menos 1 foto", variant: "destructive" });
+      return;
+    }
+    const hasCoords = latitude != null && longitude != null;
+    const hasCity = city.trim().length >= 2;
+    if (!hasCoords && !hasCity) {
+      toast({ title: "Perfil incompleto", description: "Indica a tua localização", variant: "destructive" });
+      return;
+    }
 
     const interestedMap: Record<InterestedIn, string[]> = {
       men: ["man"],
@@ -331,7 +399,7 @@ function OnboardingPage() {
     invalidateOnboardingCache();
     await reload();
     navigate({ to: "/discover" });
-  }, [draft, user, navigate, reload, toast]);
+  }, [draft, user, navigate, reload, toast, photos.length]);
 
   const showProgress = stepId !== "welcome" && !done;
   const showBackButton = stepId !== "welcome" && draft.stepIdx > 0;
