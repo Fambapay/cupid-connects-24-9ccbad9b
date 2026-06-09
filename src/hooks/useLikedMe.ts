@@ -105,6 +105,7 @@ export function useLikedMe() {
             city: "",
             photo: firstPath[id] ? urlByPath[firstPath[id]] : "",
             isSuper: s.direction === "super",
+            firstImpression: (s as { first_impression_message?: string | null }).first_impression_message ?? null,
           };
         }),
       );
