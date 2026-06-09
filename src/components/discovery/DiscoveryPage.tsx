@@ -38,6 +38,7 @@ export const DiscoveryPage = ({
   const [enterAnim, setEnterAnim] = useState<
     "rewind-left" | "rewind-right" | "rewind-up" | null
   >(null);
+  const [animNonce, setAnimNonce] = useState(0);
   const cardRef = useRef<ProfileCardHandle>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
