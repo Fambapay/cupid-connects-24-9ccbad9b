@@ -458,14 +458,11 @@ type BubbleProps = {
 
 function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showReadReceipt }: BubbleProps) {
   return (
-    <motion.li
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.18, ease: "easeOut" }}
-      style={{ willChange: "transform, opacity", contain: "layout paint" }}
+    <div
       className={`flex items-end gap-2 ${me ? "justify-end" : "justify-start"} ${
         isFirstOfGroup ? "mt-3" : "mt-0.5"
       }`}
+      style={{ contain: "layout paint" }}
     >
       {!me &&
         (isLastOfGroup ? (
@@ -493,7 +490,8 @@ function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, show
           <span className="mt-1 px-1 text-[11px] text-white/45">Sent</span>
         )}
       </div>
-    </motion.li>
+    </div>
+
   );
 }
 
