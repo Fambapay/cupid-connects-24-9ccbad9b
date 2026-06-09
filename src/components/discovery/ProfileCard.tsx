@@ -244,15 +244,16 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     useMotionValueEvent(entry, "change", schedule);
 
 
-    // Spring the card up from the stacked pose into place on mount
+    // Spring the card up from the stacked pose into place on mount.
+    // `entry` is already initialised to 1 so the first paint matches the start
+    // of the animation — no visible jump.
     useEffect(() => {
       if (enterAnim) return; // rewind handles its own entry
-      entry.set(1);
       const controls = animate(entry, 0, {
         type: "spring",
-        stiffness: 340,
-        damping: 30,
-        mass: 0.7,
+        stiffness: 260,
+        damping: 28,
+        mass: 0.9,
         restDelta: 0.001,
       });
       return () => controls.stop();
