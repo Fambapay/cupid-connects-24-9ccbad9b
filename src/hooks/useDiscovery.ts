@@ -289,7 +289,7 @@ async function fetchDiscovery(
 export function useDiscovery(options: DiscoveryOptions = {}) {
   const { user } = useAuth();
   const { filters, userCoords } = options;
-  const queryClient = useQueryClient();
+  
 
   const queryKey = useMemo(
     () => ["discovery", user?.id ?? null, filters, userCoords] as const,
