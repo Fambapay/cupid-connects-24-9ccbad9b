@@ -90,12 +90,23 @@ export const DiscoveryPage = ({
   const handle = useCallback(
     async (dir: SwipeDirection) => {
       if (!current) return;
-      const result = await onSwipe?.(current, dir);
+      // Optimistic advance: show the next card immediately so the UI
+      // never waits on network round-trips (swipe insert + credit RPC + match query).
+      const advancedFrom = current;
+      setHistory((h) => [...h, { id: advancedFrom.id, dir }]);
+      setRewindUsed(false);
+      setEnterAnim(null);
+      if (index + 1 >= profiles.length) onEnd?.();
+      x.set(0);
+      y.set(0);
+      setIndex((i) => i + 1);
+
+      const result = await onSwipe?.(advancedFrom, dir);
       if (result === "blocked") {
         // Parent rejected the swipe (e.g. out of likes → paywall).
-        // Bounce the card back from where it flew off. Reset shared
-        // motion values and bump nonce so the key changes even when the
-        // same direction is attempted twice in a row.
+        // Roll back the optimistic advance and bounce the card back.
+        setHistory((h) => h.slice(0, -1));
+        setIndex((i) => Math.max(0, i - 1));
         x.set(0);
         y.set(0);
         setEnterAnim(
@@ -106,15 +117,7 @@ export const DiscoveryPage = ({
               : "rewind-up",
         );
         setAnimNonce((n) => n + 1);
-        return;
       }
-      setHistory((h) => [...h, { id: current.id, dir }]);
-      setRewindUsed(false);
-      setEnterAnim(null);
-      if (index + 1 >= profiles.length) onEnd?.();
-      x.set(0);
-      y.set(0);
-      setIndex((i) => i + 1);
     },
     [current, index, profiles.length, onSwipe, onEnd, x, y],
   );
