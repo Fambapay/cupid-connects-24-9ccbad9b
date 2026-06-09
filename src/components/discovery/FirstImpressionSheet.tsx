@@ -6,6 +6,7 @@ import type { DiscoveryProfile } from "./types";
 interface FirstImpressionSheetProps {
   open: boolean;
   profile: DiscoveryProfile | null;
+  superLikeBalance?: number;
   onClose: () => void;
   onSend: (message: string) => Promise<void> | void;
 }
