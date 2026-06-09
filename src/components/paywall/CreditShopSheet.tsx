@@ -307,7 +307,10 @@ export function CreditShopSheet({ open, kind, onClose, onSuccess }: CreditShopSh
                     : undefined,
                 }}
               >
-                <span className="relative inline-flex items-center justify-center gap-1.5">
+                <span
+                  className="relative inline-flex items-center justify-center gap-1.5 uppercase tracking-[0.04em]"
+                  style={{ fontFamily: "Montserrat, var(--font-display)", fontWeight: 800 }}
+                >
                   <Sparkles size={14} className="opacity-90" />
                   Desbloquear · {selected?.priceMzn.toLocaleString("pt-PT")} MZN
                 </span>
