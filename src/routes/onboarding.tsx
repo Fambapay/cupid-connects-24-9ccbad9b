@@ -123,6 +123,12 @@ const EXTENDED_GENDERS: { value: ExtendedGender; label: string }[] = [
   { value: "other", label: "Outro" },
 ];
 
+const BIO_PROMPTS = [
+  "O que me faz rir…",
+  "O melhor de mim…",
+  "Procuro alguém que…",
+];
+
 // ─────────────────────────────────────────────────────────────
 // Page
 
@@ -236,7 +242,7 @@ function OnboardingPage() {
 
   const finish = useCallback(async () => {
     if (!user) return;
-    const { day, month, year, name, bio, city, gender, interested, interests, latitude, longitude, prompts } = draft;
+    const { day, month, year, name, bio, city, gender, interested, interests, latitude, longitude } = draft;
     const birthdate =
       day && month && year
         ? `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
@@ -269,20 +275,6 @@ function OnboardingPage() {
     if (error) {
       toast({ title: "Erro a guardar", description: error.message, variant: "destructive" });
       return;
-    }
-
-    // Save prompts (replace previous)
-    const validPrompts = prompts.filter((p) => p.question.trim() && p.answer.trim());
-    if (validPrompts.length > 0) {
-      await supabase.from("profile_prompts").delete().eq("profile_id", user.id);
-      await supabase.from("profile_prompts").insert(
-        validPrompts.map((p, i) => ({
-          profile_id: user.id,
-          question: p.question.trim(),
-          answer: p.answer.trim(),
-          position: i,
-        })),
-      );
     }
 
     try { localStorage.removeItem(storageKey(user.id)); } catch { /* noop */ }
