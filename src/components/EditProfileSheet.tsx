@@ -179,19 +179,27 @@ export function EditProfileSheet({
                     return (
                       <div
                         key={i}
-                        className="relative aspect-[3/4] overflow-hidden rounded-2xl"
+                        className="group relative aspect-[3/4] overflow-hidden rounded-2xl transition-all"
                         style={{
                           background: url
                             ? 'rgba(255,255,255,0.04)'
-                            : 'linear-gradient(160deg, rgba(255,79,163,0.06) 0%, rgba(177,60,255,0.06) 100%)',
+                            : 'linear-gradient(160deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.01) 100%)',
                           border: url
                             ? '1px solid rgba(255,255,255,0.10)'
-                            : '1px dashed color-mix(in oklab, var(--brand-pink) 35%, transparent)',
+                            : '1px dashed rgba(255,255,255,0.12)',
+                          boxShadow: url ? '0 6px 16px -10px rgba(0,0,0,0.6)' : 'none',
                         }}
                       >
                         {url ? (
                           <>
                             <img src={url} alt="" className="h-full w-full object-cover" />
+                            <div
+                              className="pointer-events-none absolute inset-x-0 top-0 h-12"
+                              style={{
+                                background:
+                                  'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 100%)',
+                              }}
+                            />
                             {isPrimary && (
                               <div
                                 className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
@@ -211,7 +219,7 @@ export function EditProfileSheet({
                               className="absolute right-1.5 top-1.5 grid h-7 w-7 place-items-center rounded-full backdrop-blur-md disabled:opacity-60"
                               style={{
                                 background: 'rgba(0,0,0,0.55)',
-                                border: '1px solid rgba(255,255,255,0.12)',
+                                border: '1px solid rgba(255,255,255,0.14)',
                               }}
                               aria-label="Remover"
                             >
@@ -221,19 +229,18 @@ export function EditProfileSheet({
                         ) : (
                           <button
                             onClick={() => fileRef.current?.click()}
-                            className="absolute inset-0 grid place-items-center"
+                            className="absolute inset-0 grid place-items-center transition-transform active:scale-95"
                             aria-label="Adicionar foto"
                           >
                             <div
-                              className="grid h-10 w-10 place-items-center rounded-full"
+                              className="grid h-9 w-9 place-items-center rounded-full transition-transform group-hover:scale-105"
                               style={{
-                                backgroundImage:
-                                  'linear-gradient(135deg, #FF4FA3 0%, #B13CFF 100%)',
-                                boxShadow:
-                                  '0 8px 18px -8px color-mix(in oklab, var(--brand-pink) 70%, transparent)',
+                                background: 'rgba(255,255,255,0.06)',
+                                border: '1px solid rgba(255,255,255,0.14)',
+                                backdropFilter: 'blur(8px)',
                               }}
                             >
-                              <Plus size={18} className="text-white" strokeWidth={2.6} />
+                              <Plus size={16} className="text-white/80" strokeWidth={2.4} />
                             </div>
                           </button>
                         )}
