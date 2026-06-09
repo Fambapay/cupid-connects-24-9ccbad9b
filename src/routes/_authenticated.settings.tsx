@@ -27,6 +27,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
   AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { PaywallSheet } from '@/components/paywall/PaywallSheet';
 
 export const Route = createFileRoute('/_authenticated/settings')({
   head: () => ({
