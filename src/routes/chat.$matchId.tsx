@@ -174,6 +174,43 @@ function ChatRoom() {
     ch.send({ type: "broadcast", event: "typing", payload: { userId: user.id } });
   }, [user]);
 
+  // Pre-compute per-row metadata once per messages/receipt change
+  const rows = useMemo(() => {
+    const peerReadMs = peerLastReadAt ? new Date(peerLastReadAt).getTime() : 0;
+    let lastReadOwnIdx = -1;
+    if (peerReadMs && entitlements.canReadReceipts) {
+      for (let i = messages.length - 1; i >= 0; i--) {
+        const m = messages[i];
+        if (m.sender_id !== user?.id) continue;
+        if (new Date(m.created_at).getTime() <= peerReadMs) { lastReadOwnIdx = i; break; }
+      }
+    }
+    return messages.map((m, i) => {
+      const prev = messages[i - 1];
+      const next = messages[i + 1];
+      const me = m.sender_id === user?.id;
+      const prevMe = prev ? prev.sender_id === user?.id : null;
+      const nextMe = next ? next.sender_id === user?.id : null;
+      return {
+        msg: m,
+        me,
+        isFirstOfGroup: prevMe === null || prevMe !== me,
+        isLastOfGroup: nextMe === null || nextMe !== me,
+        showReadReceipt: entitlements.canReadReceipts && me && i === lastReadOwnIdx,
+      };
+    });
+  }, [messages, user?.id, peerLastReadAt, entitlements.canReadReceipts]);
+
+  const rowVirtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 56,
+    overscan: 8,
+    measureElement: (el) => el.getBoundingClientRect().height,
+    getItemKey: (i) => rows[i].msg.id,
+  });
+
+
 
   if (notFound) {
     return (
