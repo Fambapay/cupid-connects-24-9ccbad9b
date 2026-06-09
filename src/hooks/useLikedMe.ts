@@ -11,6 +11,7 @@ export interface Liker {
   city: string;
   photo: string;
   isSuper: boolean;
+  firstImpression?: string | null;
 }
 
 function computeAge(birthdate: string | null): number {
@@ -42,7 +43,7 @@ export function useLikedMe() {
     ] = await Promise.all([
       supabase
         .from("swipes")
-        .select("swiper_id,direction,created_at")
+        .select("swiper_id,direction,created_at,first_impression_message")
         .eq("swiped_id", user.id)
         .in("direction", ["like", "super"])
         .order("created_at", { ascending: false }),
@@ -104,6 +105,7 @@ export function useLikedMe() {
             city: "",
             photo: firstPath[id] ? urlByPath[firstPath[id]] : "",
             isSuper: s.direction === "super",
+            firstImpression: (s as { first_impression_message?: string | null }).first_impression_message ?? null,
           };
         }),
       );
@@ -147,6 +149,7 @@ export function useLikedMe() {
             city: (p.city as string) ?? "",
             photo: firstPath[id] ? urlByPath[firstPath[id]] : "",
             isSuper: s.direction === "super",
+            firstImpression: (s as { first_impression_message?: string | null }).first_impression_message ?? null,
           } as Liker;
         })
         .filter((x): x is Liker => !!x),

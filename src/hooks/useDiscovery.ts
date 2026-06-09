@@ -319,6 +319,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     async (
       targetId: string,
       direction: "like" | "pass" | "super",
+      options?: { firstImpressionMessage?: string },
     ): Promise<{ matched: boolean; matchId?: string; reason?: string; remainingSuperLikes?: number }> => {
       if (!user) return { matched: false };
       let remainingSuperLikes: number | undefined;
@@ -337,9 +338,17 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
         }
       }
 
+      const fiMsg = options?.firstImpressionMessage?.trim().slice(0, 280) || null;
+      const insertRow: Record<string, unknown> = {
+        swiper_id: user.id,
+        swiped_id: targetId,
+        direction,
+      };
+      if (fiMsg) insertRow.first_impression_message = fiMsg;
+
       const { error: insertError } = await supabase
         .from("swipes")
-        .insert({ swiper_id: user.id, swiped_id: targetId, direction });
+        .insert(insertRow as never);
       if (insertError) {
         console.error("swipe insert failed", insertError);
         return { matched: false, reason: "insert_failed" };

@@ -744,6 +744,7 @@ export type Database = {
         Row: {
           created_at: string
           direction: Database["public"]["Enums"]["swipe_direction"]
+          first_impression_message: string | null
           id: string
           swiped_id: string
           swiper_id: string
@@ -751,6 +752,7 @@ export type Database = {
         Insert: {
           created_at?: string
           direction: Database["public"]["Enums"]["swipe_direction"]
+          first_impression_message?: string | null
           id?: string
           swiped_id: string
           swiper_id: string
@@ -758,6 +760,7 @@ export type Database = {
         Update: {
           created_at?: string
           direction?: Database["public"]["Enums"]["swipe_direction"]
+          first_impression_message?: string | null
           id?: string
           swiped_id?: string
           swiper_id?: string
