@@ -49,8 +49,9 @@ function Discover() {
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [bannerVisible, setBannerVisible] = useState(false);
   const [firstImpression, setFirstImpression] = useState<DiscoveryProfile | null>(null);
+  const [sendingFI, setSendingFI] = useState(false);
   const [pendingAction, setPendingAction] = useState<
-    | { profileId: string; direction: "like" | "super" }
+    | { profileId: string; direction: "like" | "super"; firstImpressionMessage?: string }
     | null
   >(null);
 
