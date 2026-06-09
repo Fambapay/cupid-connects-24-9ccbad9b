@@ -19,26 +19,9 @@ import { z } from "zod";
 import { useCredits } from "@/hooks/useCredits";
 import { requireMembership } from "@/lib/authGuard";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
+import { PACKS, type Pack, type PackKind } from "@/lib/pricing";
 
-type PackKind = "boost" | "super_like";
-
-interface Pack {
-  id: string;
-  kind: PackKind;
-  quantity: number;
-  priceMzn: number;
-  popular?: boolean;
-  best?: boolean;
-}
-
-const PACKS: Pack[] = [
-  { id: "boost_1", kind: "boost", quantity: 1, priceMzn: 199 },
-  { id: "boost_5", kind: "boost", quantity: 5, priceMzn: 799, popular: true },
-  { id: "boost_15", kind: "boost", quantity: 15, priceMzn: 1899, best: true },
-  { id: "super_like_5", kind: "super_like", quantity: 5, priceMzn: 299 },
-  { id: "super_like_25", kind: "super_like", quantity: 25, priceMzn: 1299, popular: true },
-  { id: "super_like_60", kind: "super_like", quantity: 60, priceMzn: 2499, best: true },
-];
+const PACKS_ARRAY = Object.values(PACKS);
 
 const POSITION_HOOKS = ["Para testar", "A escolha de 7 em cada 10", "Maior poupança"];
 
@@ -92,8 +75,8 @@ function unitPrice(p: Pack) {
 }
 
 function discountPct(kind: PackKind, pricePerUnit: number) {
-  const base = PACKS.find((p) => p.kind === kind && p.quantity === 1)?.priceMzn
-    ?? (kind === "super_like" ? PACKS.find((p) => p.kind === kind)!.priceMzn / PACKS.find((p) => p.kind === kind)!.quantity : 0);
+  const base = PACKS_ARRAY.find((p) => p.kind === kind && p.quantity === 1)?.priceMzn
+    ?? (kind === "super_like" ? PACKS_ARRAY.find((p) => p.kind === kind)!.priceMzn / PACKS_ARRAY.find((p) => p.kind === kind)!.quantity : 0);
   if (!base) return 0;
   return Math.round((1 - pricePerUnit / base) * 100);
 }
@@ -109,7 +92,7 @@ function ShopPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search.tab]);
 
-  const packs = useMemo(() => PACKS.filter((p) => p.kind === tab), [tab]);
+  const packs = useMemo(() => PACKS_ARRAY.filter((p) => p.kind === tab), [tab]);
   const copy = TAB_COPY[tab];
   const tabCount = tab === "boost" ? credits.boost_balance : credits.super_like_balance;
 
