@@ -8,6 +8,8 @@ import { EmptyDiscovery } from "@/components/discovery/EmptyDiscovery";
 import { MatchOverlay } from "@/components/discovery/MatchOverlay";
 import { FiltersSheet, DEFAULT_FILTERS, type DiscoveryFilters } from "@/components/FiltersSheet";
 import { PaywallSheet } from "@/components/paywall/PaywallSheet";
+import { CreditShopSheet } from "@/components/paywall/CreditShopSheet";
+import type { PackKind } from "@/lib/pricing";
 import { FirstImpressionSheet } from "@/components/discovery/FirstImpressionSheet";
 import { FirstImpressionToast } from "@/components/discovery/FirstImpressionToast";
 import { BrowseBanner } from "@/components/discovery/BrowseBanner";
@@ -42,11 +44,12 @@ function Discover() {
   const { items, loading, swipe, rewind, reload, dailyLimits } = useDiscovery({ filters });
   const { credits, reload: reloadCredits, syncCredits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
-  const boost = useBoost(goShop);
+  const boost = useBoost(() => setCreditShop("boost"));
   const [index, setIndex] = useState(0);
   const [matched, setMatched] = useState<{ id: string; name: string; photo?: string | null } | null>(null);
   const [openingChat, setOpeningChat] = useState(false);
   const [paywallOpen, setPaywallOpen] = useState(false);
+  const [creditShop, setCreditShop] = useState<PackKind | null>(null);
   const [bannerVisible, setBannerVisible] = useState(false);
   const [firstImpression, setFirstImpression] = useState<DiscoveryProfile | null>(null);
   const [sendingFI, setSendingFI] = useState(false);
@@ -109,8 +112,7 @@ function Discover() {
       reloadCredits();
     } else if (direction === "super") {
       if (result.reason === "insufficient_credits") {
-        toast.error("Sem Super Likes — vai à loja");
-        goShop();
+        setCreditShop("super_like");
         return result;
       }
       if (typeof result.remainingSuperLikes === "number") {
@@ -179,7 +181,7 @@ function Discover() {
     // Qualquer user (Free ou Premium) que tenha boost_balance > 0 pode ativar.
     // Sem créditos → manda para a loja (onInsufficient já tratado pelo useBoost,
     // mas validamos antes para evitar uma RPC desnecessária).
-    if (credits.boost_balance <= 0) { goShop(); return; }
+    if (credits.boost_balance <= 0) { setCreditShop("boost"); return; }
     boost.activate();
   };
 
@@ -289,6 +291,12 @@ function Discover() {
             }
           }
         }}
+      />
+
+      <CreditShopSheet
+        open={creditShop !== null}
+        kind={creditShop ?? "super_like"}
+        onClose={() => setCreditShop(null)}
       />
 
       <MatchOverlay
