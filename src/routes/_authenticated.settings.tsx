@@ -84,12 +84,10 @@ function SettingsPage() {
     : membershipTier === 'plus' ? 'Plus'
     : membershipTier === 'select' ? 'Select' : 'Membership';
 
+  const [paywallOpen, setPaywallOpen] = useState(false);
   const goShop = (tab?: 'boost' | 'super_like') =>
     navigate({ to: '/shop', search: tab ? { tab } : {} });
-  const goUpgrade = () => {
-    toast({ title: 'Funcionalidade Premium', description: 'Faz upgrade para desbloquear.' });
-    navigate({ to: '/membership' });
-  };
+  const goUpgrade = () => setPaywallOpen(true);
   const soon = () => toast({ title: 'Em breve' });
   const goBack = () => navigate({ to: '/profile' });
 
