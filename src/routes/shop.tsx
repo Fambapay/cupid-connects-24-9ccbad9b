@@ -19,7 +19,9 @@ import { z } from "zod";
 import { useCredits } from "@/hooks/useCredits";
 import { requireMembership } from "@/lib/authGuard";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
-import { PACKS, type PackKind } from "@/lib/pricing";
+import { PACKS, type Pack, type PackKind } from "@/lib/pricing";
+
+const PACKS_ARRAY = Object.values(PACKS);
 
 const POSITION_HOOKS = ["Para testar", "A escolha de 7 em cada 10", "Maior poupança"];
 
