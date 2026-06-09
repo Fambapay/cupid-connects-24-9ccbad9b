@@ -32,10 +32,16 @@ export function useCredits() {
     await supabase.rpc("refill_my_credits");
     const { data } = await supabase
       .from("user_credits")
-      .select("boost_balance, super_like_balance")
+      .select("boost_balance, super_like_balance, first_impression_balance")
       .eq("user_id", user.id)
       .maybeSingle();
-    const next = data ? (data as Credits) : EMPTY_CREDITS;
+    const next = data
+      ? {
+          boost_balance: (data as Credits).boost_balance ?? 0,
+          super_like_balance: (data as Credits).super_like_balance ?? 0,
+          first_impression_balance: (data as Credits).first_impression_balance ?? 0,
+        }
+      : EMPTY_CREDITS;
     creditsCache.set(user.id, next);
     setCredits(next);
     setLoading(false);
@@ -79,10 +85,11 @@ export function useCredits() {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          const row = (payload.new ?? payload.old) as Credits | null;
+          const row = (payload.new ?? payload.old) as Partial<Credits> | null;
           if (row) setCredits({
             boost_balance: row.boost_balance ?? 0,
             super_like_balance: row.super_like_balance ?? 0,
+            first_impression_balance: row.first_impression_balance ?? 0,
           });
         },
       )
@@ -96,6 +103,7 @@ export function useCredits() {
     setCredits((current) => ({
       boost_balance: next.boost_balance ?? current.boost_balance,
       super_like_balance: next.super_like_balance ?? current.super_like_balance,
+      first_impression_balance: next.first_impression_balance ?? current.first_impression_balance,
     }));
   }, []);
 
