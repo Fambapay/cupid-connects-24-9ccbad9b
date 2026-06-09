@@ -12,10 +12,13 @@ const EMPTY_CREDITS: Credits = {
   super_like_balance: 0,
 };
 
+const creditsCache = new Map<string, Credits>();
+
 export function useCredits() {
   const { user } = useAuth();
-  const [credits, setCredits] = useState<Credits>(EMPTY_CREDITS);
-  const [loading, setLoading] = useState(true);
+  const cached = user ? creditsCache.get(user.id) ?? EMPTY_CREDITS : EMPTY_CREDITS;
+  const [credits, setCredits] = useState<Credits>(cached);
+  const [loading, setLoading] = useState(!user ? false : !creditsCache.has(user.id));
 
   const load = useCallback(async () => {
     if (!user) {
@@ -30,13 +33,20 @@ export function useCredits() {
       .select("boost_balance, super_like_balance")
       .eq("user_id", user.id)
       .maybeSingle();
-    setCredits(data ? (data as Credits) : EMPTY_CREDITS);
+    const next = data ? (data as Credits) : EMPTY_CREDITS;
+    creditsCache.set(user.id, next);
+    setCredits(next);
     setLoading(false);
   }, [user]);
 
   useEffect(() => {
+    if (user) {
+      const c = creditsCache.get(user.id);
+      if (c) setCredits(c);
+    }
     load();
-  }, [load]);
+  }, [load, user]);
+
 
   useEffect(() => {
     if (typeof window === "undefined") return;
