@@ -200,7 +200,3 @@ export const DiscoverTopBar = ({
     </div>
   );
 };
-      `}</style>
-    </div>
-  );
-};
