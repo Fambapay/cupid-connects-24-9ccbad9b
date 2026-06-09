@@ -75,8 +75,8 @@ function unitPrice(p: Pack) {
 }
 
 function discountPct(kind: PackKind, pricePerUnit: number) {
-  const base = PACKS.find((p) => p.kind === kind && p.quantity === 1)?.priceMzn
-    ?? (kind === "super_like" ? PACKS.find((p) => p.kind === kind)!.priceMzn / PACKS.find((p) => p.kind === kind)!.quantity : 0);
+  const base = PACKS_ARRAY.find((p) => p.kind === kind && p.quantity === 1)?.priceMzn
+    ?? (kind === "super_like" ? PACKS_ARRAY.find((p) => p.kind === kind)!.priceMzn / PACKS_ARRAY.find((p) => p.kind === kind)!.quantity : 0);
   if (!base) return 0;
   return Math.round((1 - pricePerUnit / base) * 100);
 }
