@@ -14,6 +14,7 @@ interface DiscoveryPageProps {
   ) => void | "blocked" | Promise<void | "blocked">;
   onOpenFilters?: () => void;
   onBoost?: () => void;
+  onFirstImpression?: (profile: DiscoveryProfile) => void;
   onRewind?: () => boolean | Promise<boolean | unknown>;
   onEnd?: () => void;
   showTopBar?: boolean;
@@ -24,6 +25,7 @@ export const DiscoveryPage = ({
   onSwipe,
   onOpenFilters,
   onBoost,
+  onFirstImpression,
   onRewind,
   onEnd,
   showTopBar = true,
@@ -172,6 +174,7 @@ export const DiscoveryPage = ({
                   else cardRef.current?.flyUp();
                 }}
                 onBoost={onBoost}
+                onFirstImpression={() => onFirstImpression?.(current)}
                 onRewind={handleRewind}
                 canRewind={canRewind}
               />
@@ -184,6 +187,7 @@ export const DiscoveryPage = ({
                   else cardRef.current?.flyUp();
                 }}
                 onBoost={onBoost}
+                onFirstImpression={() => onFirstImpression?.(current)}
                 onRewind={handleRewind}
                 canRewind={canRewind}
               />
