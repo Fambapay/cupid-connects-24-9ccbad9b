@@ -188,12 +188,23 @@ function Discover() {
       openPaywall();
       return;
     }
+    if (credits.super_like_balance <= 0) {
+      setFirstImpression(null);
+      toast.error("Sem Super Likes — vai à loja");
+      goShop();
+      return;
+    }
     setFirstImpression(null);
-    await performSwipe(
+    setIndex((i) => i + 1);
+    const result = await performSwipe(
       { id: target.id, name: target.name, photo: target.photos?.[0] },
       "super",
       { firstImpressionMessage: message },
     );
+    if (result?.reason) {
+      // performSwipe already surfaced the right error toast / paywall.
+      return;
+    }
     toast.custom(
       () => (
         <FirstImpressionToast photo={target.photos?.[0]} name={target.name} />
