@@ -248,7 +248,7 @@ function OnboardingPage() {
         women: ["woman"],
         everyone: ["man", "woman", "nonbinary"],
       };
-      const patch: Record<string, unknown> = {
+      const patch = {
         onboarding_step: stepIdx + 1,
         name: name.trim() || null,
         bio: bio.trim() || null,
