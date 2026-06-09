@@ -174,16 +174,17 @@ function Discover() {
   };
 
   const onFirstImpression = (profile: DiscoveryProfile) => {
-    if (!entitlements.canSendFirstImpression) {
-      openPaywall();
-      return;
-    }
     setFirstImpression(profile);
   };
 
   const handleSendFirstImpression = async (message: string) => {
     if (!firstImpression) return;
     const target = firstImpression;
+    if (!entitlements.canSendFirstImpression) {
+      setFirstImpression(null);
+      openPaywall();
+      return;
+    }
     setFirstImpression(null);
     try {
       sessionStorage.setItem(`hunie:first-impression:${target.id}`, message);
