@@ -163,6 +163,43 @@ export const DiscoverTopBar = ({
         .boost-zap-icon {
           animation: boost-zap-bolt 1.2s ease-in-out infinite;
         }
+        @keyframes boost-mult-pop {
+          0%   { transform: translate(35%, -35%) scale(0.4); opacity: 0; }
+          25%  { transform: translate(35%, -35%) scale(1.25); opacity: 1; }
+          60%  { transform: translate(35%, -35%) scale(1); }
+          100% { transform: translate(35%, -35%) scale(1); opacity: 1; }
+        }
+        @keyframes boost-mult-glow {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(251,191,36,0.0), 0 0 10px rgba(236,72,153,0.55); }
+          50%      { box-shadow: 0 0 0 4px rgba(251,191,36,0.18), 0 0 16px rgba(236,72,153,0.85); }
+        }
+        .boost-multiplier-badge {
+          position: absolute;
+          top: 0;
+          right: 0;
+          z-index: 3;
+          min-width: 22px;
+          height: 16px;
+          padding: 0 4px;
+          border-radius: 999px;
+          background: linear-gradient(135deg, #FBBF24, #F59E0B);
+          color: #1a0a02;
+          font-size: 10px;
+          font-weight: 900;
+          line-height: 16px;
+          letter-spacing: -0.02em;
+          text-align: center;
+          border: 1.5px solid rgba(255,255,255,0.95);
+          transform-origin: top right;
+          animation:
+            boost-mult-pop 360ms cubic-bezier(0.34, 1.56, 0.64, 1) both,
+            boost-mult-glow 1.8s ease-in-out 360ms infinite;
+          pointer-events: none;
+        }
+      `}</style>
+    </div>
+  );
+};
       `}</style>
     </div>
   );
