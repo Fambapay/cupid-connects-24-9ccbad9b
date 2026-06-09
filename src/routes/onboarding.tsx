@@ -102,20 +102,7 @@ const AVAILABLE_INTERESTS = [
   "Jogos", "Tecnologia", "Animais", "Natureza", "Vinho", "Brunch",
 ];
 
-const PROMPT_QUESTIONS = [
-  "A minha cena é…",
-  "O que me faz rir…",
-  "O melhor de mim…",
-  "Procuro alguém que…",
-  "O meu prato preferido é…",
-  "Domingo perfeito é…",
-  "Nunca sairei sem…",
-  "Confessar: sou viciado em…",
-];
-
 const MAX_INTERESTS = 5;
-const MIN_PROMPTS = 3;
-const PROMPT_SLOTS = 3;
 
 const STORAGE_KEY_PREFIX = "hunie:onboarding:v2:";
 const storageKey = (uid?: string | null) => `${STORAGE_KEY_PREFIX}${uid ?? "anon"}`;
