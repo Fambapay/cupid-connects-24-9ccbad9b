@@ -161,7 +161,16 @@ function Discover() {
       return "blocked";
     }
     setIndex((i) => i + 1);
-    await performSwipe({ id: target.id, name: target.name, photo: target.photos?.[0] }, direction);
+    const res = await performSwipe(
+      { id: target.id, name: target.name, photo: target.photos?.[0] },
+      direction,
+    );
+    if (direction === "super" && res?.reason === "insufficient_credits") {
+      // Credit shop was opened by performSwipe; bounce the card back so the
+      // profile returns to the stack (same UX as the out-of-likes case).
+      setIndex((i) => Math.max(0, i - 1));
+      return "blocked";
+    }
   };
 
   const onRewind = async (): Promise<boolean> => {
