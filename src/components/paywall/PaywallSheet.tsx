@@ -197,16 +197,11 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
                         <div className="text-right">
                           <div className="flex items-baseline gap-0.5">
                             <span className="text-lg font-black tabular-nums">
-                              {monthlyEquivalent(plan).toLocaleString("pt-PT")}
+                              {plan.priceMzn.toLocaleString("pt-PT")}
                             </span>
                             <span className="text-[10px] font-bold text-muted-foreground">MZN</span>
                           </div>
                           <p className="text-[10px] text-muted-foreground">/ mês</p>
-                          {period === "annual" && (
-                            <p className="mt-0.5 text-[10px] font-semibold text-primary">
-                              Poupa {annualSavingsPct(plan)}%
-                            </p>
-                          )}
                         </div>
                       </div>
                     </button>
