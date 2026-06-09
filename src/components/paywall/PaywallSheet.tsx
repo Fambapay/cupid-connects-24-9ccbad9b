@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 import { PLAN_CARDS, formatPrice, type PlanCardConfig } from "@/lib/plans";
-import { PLAN_PRICES, type BillingPeriod, type PlanTier } from "@/lib/pricing";
+import { type PlanTier } from "@/lib/pricing";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 import { invalidateOnboardingCache } from "@/lib/authGuard";
 import { toast } from "sonner";
