@@ -109,6 +109,11 @@ export const DiscoverTopBar = ({
           }}
           className={boostActive ? "boost-zap-icon" : ""}
         />
+        {boostActive && (
+          <span className="boost-multiplier-badge" aria-hidden>
+            ×{boostMultiplier}
+          </span>
+        )}
       </button>
 
       <style>{`
