@@ -50,13 +50,10 @@ function ChatRoom() {
     });
   }, []);
 
+  // Single effect: scroll on mount, on match change, and on new messages/typing.
   useLayoutEffect(() => {
     scrollToLatest("auto");
-  }, [matchId, scrollToLatest]);
-
-  useEffect(() => {
-    scrollToLatest("auto");
-  }, [messages.length, typing, scrollToLatest]);
+  }, [matchId, messages.length, typing, scrollToLatest]);
 
   // Mark conversation as read on open and whenever new messages arrive (debounced)
   useEffect(() => {
