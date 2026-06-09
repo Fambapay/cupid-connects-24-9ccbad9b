@@ -7,11 +7,11 @@ import { useSubscription } from "@/hooks/useSubscription";
 import hunieMark from "@/assets/hunie-mark.png.asset.json";
 
 
-import { requireMembership } from "@/lib/authGuard";
+import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
 export const Route = createFileRoute("/matches")({
   ssr: false,
-  beforeLoad: requireMembership,
+  beforeLoad: requireAuthAndOnboarding,
   head: () => ({
     meta: [
       { title: "Likes — Hunie" },
