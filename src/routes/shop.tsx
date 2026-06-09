@@ -15,7 +15,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
-import { BottomNav } from "@/components/BottomNav";
+
 import { useCredits } from "@/hooks/useCredits";
 import { requireMembership } from "@/lib/authGuard";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
@@ -266,7 +266,7 @@ function ShopPage() {
         </motion.div>
       </AnimatePresence>
 
-      <BottomNav />
+      
     </div>
   );
 }
