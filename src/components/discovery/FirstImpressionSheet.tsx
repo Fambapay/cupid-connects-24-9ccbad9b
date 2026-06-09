@@ -6,7 +6,7 @@ import type { DiscoveryProfile } from "./types";
 interface FirstImpressionSheetProps {
   open: boolean;
   profile: DiscoveryProfile | null;
-  superLikeBalance?: number;
+  firstImpressionBalance?: number;
   onClose: () => void;
   onSend: (message: string) => Promise<void> | void;
 }
@@ -16,7 +16,7 @@ const MAX_LEN = 140;
 export const FirstImpressionSheet = ({
   open,
   profile,
-  superLikeBalance,
+  firstImpressionBalance,
   onClose,
   onSend,
 }: FirstImpressionSheetProps) => {
@@ -238,10 +238,10 @@ export const FirstImpressionSheet = ({
                   color: "rgba(255,255,255,0.55)",
                 }}
               >
-                <span>Usa 1 Super Like</span>
-                {typeof superLikeBalance === "number" && (
-                  <span style={{ color: superLikeBalance > 0 ? "#5AA9FF" : "#FF6B6B", fontWeight: 600 }}>
-                    Saldo: {superLikeBalance}
+                <span>Usa 1 First Impression</span>
+                {typeof firstImpressionBalance === "number" && (
+                  <span style={{ color: firstImpressionBalance > 0 ? "#5AA9FF" : "#FF6B6B", fontWeight: 600 }}>
+                    Saldo: {firstImpressionBalance}/mês
                   </span>
                 )}
               </div>

@@ -320,14 +320,31 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       targetId: string,
       direction: "like" | "pass" | "super",
       options?: { firstImpressionMessage?: string },
-    ): Promise<{ matched: boolean; matchId?: string; reason?: string; remainingSuperLikes?: number }> => {
+    ): Promise<{
+      matched: boolean;
+      matchId?: string;
+      reason?: string;
+      remainingSuperLikes?: number;
+      remainingFirstImpressions?: number;
+    }> => {
       if (!user) return { matched: false };
       let remainingSuperLikes: number | undefined;
+      let remainingFirstImpressions: number | undefined;
+      const fiMsg = options?.firstImpressionMessage?.trim().slice(0, 280) || null;
+      const isFirstImpression = !!fiMsg;
 
-      // For Super Like, verify the user has at least one credit BEFORE
-      // attempting the insert (cheap read; consume happens only after a
-      // successful insert so a failed swipe never burns a credit).
-      if (direction === "super") {
+      // First Impression: check own credit category (Elite-only, 10/month, fixed).
+      // Otherwise, a Super Like swipe checks the super_like_balance.
+      if (isFirstImpression) {
+        const { data: balance } = await supabase
+          .from("user_credits")
+          .select("first_impression_balance")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (!balance || (balance.first_impression_balance ?? 0) <= 0) {
+          return { matched: false, reason: "insufficient_credits" };
+        }
+      } else if (direction === "super") {
         const { data: balance } = await supabase
           .from("user_credits")
           .select("super_like_balance")
@@ -338,7 +355,6 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
         }
       }
 
-      const fiMsg = options?.firstImpressionMessage?.trim().slice(0, 280) || null;
       const insertRow: Record<string, unknown> = {
         swiper_id: user.id,
         swiped_id: targetId,
@@ -346,9 +362,6 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       };
       if (fiMsg) insertRow.first_impression_message = fiMsg;
 
-      // Upsert on (swiper_id, swiped_id) so re-swipes (e.g. after rewind) don't
-      // fail with a unique violation and the first-impression message is not
-      // silently lost.
       const { error: insertError } = await supabase
         .from("swipes")
         .upsert(insertRow as never, { onConflict: "swiper_id,swiped_id" });
@@ -357,10 +370,18 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
         return { matched: false, reason: "insert_failed" };
       }
 
-      // Insert succeeded — now atomically consume the credit. If this fails
-      // (race with concurrent consume, network blip), the user got one free
-      // Super Like; we surface a warning but do not roll back the swipe.
-      if (direction === "super") {
+      // Consume the appropriate credit AFTER a successful insert.
+      // First Impression credit is consumed regardless of match outcome.
+      if (isFirstImpression) {
+        const { data } = await supabase.rpc("consume_first_impression_credit");
+        const res = data as { success: boolean; remaining_balance?: number } | null;
+        if (res?.success) {
+          remainingFirstImpressions = res.remaining_balance;
+        } else {
+          console.warn("first_impression credit consume failed after insert", res);
+        }
+        window.dispatchEvent(new CustomEvent("hunie:credits-changed"));
+      } else if (direction === "super") {
         const { data } = await supabase.rpc("consume_super_like_credit");
         const res = data as { success: boolean; remaining_balance?: number } | null;
         if (res?.success) {
@@ -380,7 +401,12 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
         .eq("user_a", a)
         .eq("user_b", b)
         .maybeSingle();
-      return { matched: !!match, matchId: match?.id, remainingSuperLikes };
+      return {
+        matched: !!match,
+        matchId: match?.id,
+        remainingSuperLikes,
+        remainingFirstImpressions,
+      };
     },
     [user],
   );

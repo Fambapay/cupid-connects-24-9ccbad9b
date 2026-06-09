@@ -96,7 +96,17 @@ function Discover() {
     options?: { firstImpressionMessage?: string },
   ) => {
     const result = await swipe(target.id, direction, options);
-    if (direction === "super") {
+    const isFI = !!options?.firstImpressionMessage;
+    if (isFI) {
+      if (result.reason === "insufficient_credits") {
+        toast.error("Sem First Impressions disponíveis este mês");
+        return result;
+      }
+      if (typeof result.remainingFirstImpressions === "number") {
+        syncCredits({ first_impression_balance: result.remainingFirstImpressions });
+      }
+      reloadCredits();
+    } else if (direction === "super") {
       if (result.reason === "insufficient_credits") {
         toast.error("Sem Super Likes — vai à loja");
         goShop();
@@ -188,10 +198,9 @@ function Discover() {
       openPaywall();
       return;
     }
-    if (credits.super_like_balance <= 0) {
+    if (credits.first_impression_balance <= 0) {
       setFirstImpression(null);
-      toast.error("Sem Super Likes — vai à loja");
-      goShop();
+      toast.error("Sem First Impressions disponíveis este mês");
       return;
     }
     setFirstImpression(null);
@@ -316,7 +325,7 @@ function Discover() {
       <FirstImpressionSheet
         open={!!firstImpression}
         profile={firstImpression}
-        superLikeBalance={credits.super_like_balance}
+        firstImpressionBalance={credits.first_impression_balance}
         onClose={() => setFirstImpression(null)}
         onSend={handleSendFirstImpression}
       />

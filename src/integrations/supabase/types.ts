@@ -771,7 +771,9 @@ export type Database = {
         Row: {
           boost_balance: number
           created_at: string
+          first_impression_balance: number
           last_boost_refill_date: string | null
+          last_fi_refill_month: string | null
           last_super_refill_date: string | null
           super_like_balance: number
           updated_at: string
@@ -780,7 +782,9 @@ export type Database = {
         Insert: {
           boost_balance?: number
           created_at?: string
+          first_impression_balance?: number
           last_boost_refill_date?: string | null
+          last_fi_refill_month?: string | null
           last_super_refill_date?: string | null
           super_like_balance?: number
           updated_at?: string
@@ -789,7 +793,9 @@ export type Database = {
         Update: {
           boost_balance?: number
           created_at?: string
+          first_impression_balance?: number
           last_boost_refill_date?: string | null
+          last_fi_refill_month?: string | null
           last_super_refill_date?: string | null
           super_like_balance?: number
           updated_at?: string
@@ -894,6 +900,7 @@ export type Database = {
         }[]
       }
       consume_boost_credit: { Args: never; Returns: Json }
+      consume_first_impression_credit: { Args: never; Returns: Json }
       consume_super_like_credit: { Args: never; Returns: Json }
       credit_pack_debito: {
         Args: {
