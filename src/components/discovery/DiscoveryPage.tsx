@@ -8,7 +8,10 @@ import type { DiscoveryProfile, SwipeDirection } from "./types";
 
 interface DiscoveryPageProps {
   profiles: DiscoveryProfile[];
-  onSwipe?: (profile: DiscoveryProfile, dir: SwipeDirection) => void;
+  onSwipe?: (
+    profile: DiscoveryProfile,
+    dir: SwipeDirection,
+  ) => void | "blocked" | Promise<void | "blocked">;
   onOpenFilters?: () => void;
   onBoost?: () => void;
   onRewind?: () => boolean | Promise<boolean | unknown>;
