@@ -139,46 +139,70 @@ export function CreditShopSheet({ open, kind, onClose, onSuccess }: CreditShopSh
 
             <div className="relative flex-1 overflow-y-auto overscroll-contain px-6 pb-[max(env(safe-area-inset-bottom),132px)]">
               {/* Hero */}
-              <div className="pt-7 pb-6">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/40">
+              <div className="pt-8 pb-6">
+                <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-white/35">
                   {copy.eyebrow}
                 </p>
-                <div className="mt-3 flex items-center gap-3">
-                  <div
-                    className="grid h-12 w-12 place-items-center rounded-2xl"
-                    style={{ background: `${accentColor}22` }}
-                  >
-                    {kind === "boost" ? (
-                      <Zap size={24} fill={accentColor} stroke="none" />
-                    ) : (
-                      <Star size={24} fill={accentColor} stroke="none" />
-                    )}
+                <div className="mt-4 flex items-start gap-3.5">
+                  <div className="relative shrink-0">
+                    <div
+                      className="absolute inset-0 rounded-2xl blur-xl opacity-60"
+                      style={{ background: accentColor }}
+                    />
+                    <div
+                      className="relative grid h-12 w-12 place-items-center rounded-2xl"
+                      style={{
+                        background: `linear-gradient(135deg, ${accentColor}33, ${accentColor}14)`,
+                        boxShadow: `inset 0 1px 0 ${accentColor}55, 0 8px 20px -10px ${accentColor}99`,
+                      }}
+                    >
+                      {kind === "boost" ? (
+                        <Zap size={22} fill={accentColor} stroke="none" />
+                      ) : (
+                        <Star size={22} fill={accentColor} stroke="none" />
+                      )}
+                    </div>
                   </div>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <h2
-                      className="text-[26px] font-semibold leading-[1.05] tracking-[-0.02em] text-white"
-                      style={{ fontFamily: "var(--font-display)" }}
+                      className="text-[30px] uppercase leading-[0.95] tracking-[-0.02em] text-white"
+                      style={{ fontFamily: "Montserrat, var(--font-display)", fontWeight: 900 }}
                     >
                       {copy.title}
                     </h2>
-                    <p className="mt-0.5 text-[14px] text-white/70">{copy.titleAccent}</p>
+                    <p
+                      className="mt-1.5 text-[13px] uppercase tracking-[0.08em] text-white/55"
+                      style={{ fontFamily: "Montserrat, var(--font-display)", fontWeight: 800 }}
+                    >
+                      {copy.titleAccent}
+                    </p>
                   </div>
                 </div>
-                <p className="mt-3 max-w-[320px] text-[14px] leading-snug text-white/55">
+                <p className="mt-4 max-w-[320px] text-[13.5px] leading-snug text-white/55">
                   {copy.sub}
                 </p>
 
-                <div className="mt-4 grid grid-cols-3 gap-2">
+                <div className="mt-5 grid grid-cols-3 gap-1.5">
                   {copy.benefits.map(({ icon: Icon, label }) => (
-                    <div key={label} className="rounded-xl bg-white/[0.05] px-2 py-2">
-                      <Icon size={14} className="mb-1 text-white/80" />
-                      <div className="text-[11px] leading-tight text-white/80">{label}</div>
+                    <div
+                      key={label}
+                      className="rounded-xl border border-white/[0.06] bg-white/[0.035] px-2.5 py-2.5"
+                    >
+                      <Icon size={13} style={{ color: accentColor }} className="mb-1.5" />
+                      <div className="text-[10.5px] font-medium leading-[1.2] text-white/80">
+                        {label}
+                      </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-3 text-[11px] text-white/50">
-                  Tens <b className="text-white">{balance}</b> disponíve{balance === 1 ? "l" : "is"}
+                <div className="mt-4 flex items-baseline justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">
+                    Escolhe o teu pack
+                  </span>
+                  <span className="text-[10.5px] text-white/45">
+                    Tens <b className="text-white/85">{balance}</b> disponíve{balance === 1 ? "l" : "is"}
+                  </span>
                 </div>
               </div>
 
@@ -188,58 +212,80 @@ export function CreditShopSheet({ open, kind, onClose, onSuccess }: CreditShopSh
                   const active = pack.id === selected?.id;
                   const unit = unitPrice(pack);
                   return (
-                    <button
+                    <motion.button
                       key={pack.id}
                       onClick={() => setSelectedId(pack.id)}
-                      className={`relative block w-full rounded-2xl border px-4 py-3.5 text-left transition-all ${
-                        active
-                          ? "border-white/70 bg-white/[0.06]"
-                          : "border-white/[0.08] bg-white/[0.025] hover:bg-white/[0.04]"
-                      }`}
+                      whileTap={{ scale: 0.99 }}
+                      className="relative block w-full rounded-2xl border px-4 py-3.5 text-left transition-all"
+                      style={{
+                        borderColor: active ? `${accentColor}80` : "rgba(255,255,255,0.07)",
+                        background: active
+                          ? `linear-gradient(135deg, ${accentColor}1a, ${accentColor}08)`
+                          : "rgba(255,255,255,0.025)",
+                        boxShadow: active
+                          ? `inset 0 0 0 1px ${accentColor}40, 0 8px 24px -16px ${accentColor}aa`
+                          : undefined,
+                      }}
                     >
                       <div className="flex items-center gap-3">
                         <div
-                          className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border transition-colors ${
-                            active ? "border-white bg-white" : "border-white/25"
-                          }`}
+                          className="grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 transition-colors"
+                          style={{
+                            borderColor: active ? accentColor : "rgba(255,255,255,0.2)",
+                          }}
                         >
                           {active && (
-                            <div className="h-2 w-2 rounded-full bg-black" />
+                            <div
+                              className="h-2 w-2 rounded-full"
+                              style={{ background: accentColor }}
+                            />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-[15px] font-semibold tracking-tight text-white">
+                            <span
+                              className="text-[14px] uppercase tracking-tight text-white whitespace-nowrap"
+                              style={{ fontFamily: "Montserrat, var(--font-display)", fontWeight: 800 }}
+                            >
                               {pack.quantity} {kind === "boost" ? "Boosts" : "Super Likes"}
                             </span>
                             {pack.popular && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-orange-300">
-                                <Flame size={9} /> Popular
+                              <span className="inline-flex items-center gap-1 rounded-md bg-orange-500/15 px-1.5 py-0.5 text-[8.5px] font-extrabold uppercase tracking-[0.08em] text-orange-300">
+                                <Flame size={8} /> Popular
                               </span>
                             )}
                             {pack.best && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-300">
-                                <Crown size={9} /> Melhor
+                              <span
+                                className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[8.5px] font-extrabold uppercase tracking-[0.08em]"
+                                style={{
+                                  background: `${accentColor}22`,
+                                  color: accentColor,
+                                }}
+                              >
+                                <Crown size={8} /> Melhor
                               </span>
                             )}
                           </div>
-                          <div className="mt-0.5 text-[11px] text-white/45">
+                          <div className="mt-0.5 text-[10.5px] text-white/45">
                             {unit} MZN cada
                           </div>
                         </div>
                         <div className="text-right">
-                          <span className="text-[15px] font-semibold tabular-nums text-white">
+                          <span
+                            className="text-[15px] tabular-nums text-white"
+                            style={{ fontFamily: "Montserrat, var(--font-display)", fontWeight: 800 }}
+                          >
                             {pack.priceMzn.toLocaleString("pt-PT")}
                           </span>
-                          <span className="ml-1 text-[12px] text-white/45">MZN</span>
+                          <span className="ml-1 text-[11px] font-medium text-white/45">MZN</span>
                         </div>
                       </div>
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>
 
-              <p className="mt-6 text-center text-[11px] leading-relaxed text-white/35">
+              <p className="mt-6 text-center text-[10.5px] leading-relaxed tracking-wide text-white/35">
                 Crédito instantâneo · Nunca expira<br />
                 Pagamento via M-Pesa ou e-Mola
               </p>
@@ -261,7 +307,10 @@ export function CreditShopSheet({ open, kind, onClose, onSuccess }: CreditShopSh
                     : undefined,
                 }}
               >
-                <span className="relative inline-flex items-center justify-center gap-1.5">
+                <span
+                  className="relative inline-flex items-center justify-center gap-1.5 uppercase tracking-[0.04em]"
+                  style={{ fontFamily: "Montserrat, var(--font-display)", fontWeight: 800 }}
+                >
                   <Sparkles size={14} className="opacity-90" />
                   Desbloquear · {selected?.priceMzn.toLocaleString("pt-PT")} MZN
                 </span>
