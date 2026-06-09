@@ -147,41 +147,7 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
                 </p>
               </div>
 
-              {/* Billing toggle */}
-              <div className="mx-auto mb-5 flex w-full max-w-xs rounded-full border border-border/60 bg-card p-1">
-                {(["monthly", "annual"] as BillingPeriod[]).map((p) => {
-                  const active = period === p;
-                  return (
-                    <button
-                      key={p}
-                      onClick={() => setPeriod(p)}
-                      className={`relative flex-1 rounded-full py-2 text-xs font-bold transition-colors ${
-                        active ? "text-primary-foreground" : "text-muted-foreground"
-                      }`}
-                    >
-                      {active && (
-                        <motion.span
-                          layoutId="period-pill"
-                          transition={{ type: "spring", stiffness: 400, damping: 32 }}
-                          className="absolute inset-0 rounded-full bg-primary"
-                        />
-                      )}
-                      <span className="relative inline-flex items-center gap-1.5">
-                        {p === "monthly" ? "Mensal" : "Anual"}
-                        {p === "annual" && (
-                          <span
-                            className={`rounded-full px-1.5 py-0.5 text-[9px] font-extrabold uppercase ${
-                              active ? "bg-primary-foreground/15 text-primary-foreground" : "bg-primary/15 text-primary"
-                            }`}
-                          >
-                            -33%
-                          </span>
-                        )}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+              {/* Plans */}
 
               {/* Plan cards */}
               <div className="space-y-2.5">
