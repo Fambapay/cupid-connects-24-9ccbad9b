@@ -19,26 +19,7 @@ import { z } from "zod";
 import { useCredits } from "@/hooks/useCredits";
 import { requireMembership } from "@/lib/authGuard";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
-
-type PackKind = "boost" | "super_like";
-
-interface Pack {
-  id: string;
-  kind: PackKind;
-  quantity: number;
-  priceMzn: number;
-  popular?: boolean;
-  best?: boolean;
-}
-
-const PACKS: Pack[] = [
-  { id: "boost_1", kind: "boost", quantity: 1, priceMzn: 199 },
-  { id: "boost_5", kind: "boost", quantity: 5, priceMzn: 799, popular: true },
-  { id: "boost_15", kind: "boost", quantity: 15, priceMzn: 1899, best: true },
-  { id: "super_like_5", kind: "super_like", quantity: 5, priceMzn: 299 },
-  { id: "super_like_25", kind: "super_like", quantity: 25, priceMzn: 1299, popular: true },
-  { id: "super_like_60", kind: "super_like", quantity: 60, priceMzn: 2499, best: true },
-];
+import { PACKS, type PackKind } from "@/lib/pricing";
 
 const POSITION_HOOKS = ["Para testar", "A escolha de 7 em cada 10", "Maior poupança"];
 
