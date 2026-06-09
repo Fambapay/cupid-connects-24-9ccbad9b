@@ -165,7 +165,6 @@ function Discover() {
   };
 
   const onOpenFilters = () => {
-    if (!isPremium) { openPaywall(); return; }
     setFiltersOpen(true);
   };
 
