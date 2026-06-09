@@ -420,6 +420,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          is_first_impression: boolean
           match_id: string
           sender_id: string
         }
@@ -427,6 +428,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          is_first_impression?: boolean
           match_id: string
           sender_id: string
         }
@@ -434,6 +436,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          is_first_impression?: boolean
           match_id?: string
           sender_id?: string
         }
