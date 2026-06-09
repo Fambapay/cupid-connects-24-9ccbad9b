@@ -82,7 +82,6 @@ type StepId =
   | "bio"
   | "interests"
   | "location"
-  | "prompts"
   | "done";
 const STEPS: StepId[] = [
   "welcome",
