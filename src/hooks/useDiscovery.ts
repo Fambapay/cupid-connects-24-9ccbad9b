@@ -390,5 +390,5 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     return { success: false, error: res?.error };
   }, []);
 
-  return { items, loading, swipe, rewind, reload: load, dailyLimits };
+  return { items, loading, swipe, rewind, reload, dailyLimits };
 }
