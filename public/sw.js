@@ -33,8 +33,8 @@ self.addEventListener('push', (event) => {
     // avoiding the duplicate-notification problem.
     try {
       const clientsArr = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
-      const appOpen = clientsArr.some((c) => c.visibilityState === 'visible' && c.focused)
-      if (appOpen) return
+      const appInForeground = clientsArr.some((c) => c.visibilityState === 'visible')
+      if (appInForeground) return
     } catch (e) {}
     await self.registration.showNotification(payload.title || 'hunie', options)
   })())
