@@ -201,7 +201,12 @@ export const DiscoveryPage = ({
             }
           />
           {showTopBar && (
-            <DiscoverTopBar onOpenFilters={onOpenFilters} onBoost={onBoost} />
+            <DiscoverTopBar
+              onOpenFilters={onOpenFilters}
+              onBoost={onBoost}
+              boostActive={boostActive}
+              boostMultiplier={boostMultiplier}
+            />
           )}
         </>
       ) : (
