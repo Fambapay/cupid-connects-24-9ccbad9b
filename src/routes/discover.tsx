@@ -112,8 +112,7 @@ function Discover() {
       reloadCredits();
     } else if (direction === "super") {
       if (result.reason === "insufficient_credits") {
-        toast.error("Sem Super Likes — vai à loja");
-        goShop();
+        setCreditShop("super_like");
         return result;
       }
       if (typeof result.remainingSuperLikes === "number") {
