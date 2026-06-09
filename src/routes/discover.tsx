@@ -44,7 +44,7 @@ function Discover() {
   const { items, loading, swipe, rewind, reload, dailyLimits } = useDiscovery({ filters });
   const { credits, reload: reloadCredits, syncCredits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
-  const boost = useBoost(goShop);
+  const boost = useBoost(() => setCreditShop("boost"));
   const [index, setIndex] = useState(0);
   const [matched, setMatched] = useState<{ id: string; name: string; photo?: string | null } | null>(null);
   const [openingChat, setOpeningChat] = useState(false);
