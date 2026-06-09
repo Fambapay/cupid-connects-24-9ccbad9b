@@ -213,9 +213,11 @@ function Discover() {
             onSwipe={handleSwipe}
             onOpenFilters={onOpenFilters}
             onBoost={onBoost}
+            onFirstImpression={onFirstImpression}
             onRewind={onRewind}
             onEnd={reload}
           />
+
         ) : (
           <EmptyDiscovery loading={loading} onRefresh={reload} onOpenFilters={onOpenFilters} />
         )}
