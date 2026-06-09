@@ -417,13 +417,6 @@ function OnboardingPage() {
                     onNext={goNext}
                   />
                 )}
-                {stepId === "prompts" && (
-                  <PromptsStep
-                    value={draft.prompts}
-                    onChange={(v) => set("prompts", v)}
-                    onNext={() => setDone(true)}
-                  />
-                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -1350,7 +1343,7 @@ function BioStep({
               Inspirações
             </p>
             <div className="flex flex-wrap gap-2">
-              {PROMPTS.map((p) => (
+              {BIO_PROMPTS.map((p) => (
                 <motion.button
                   key={p}
                   type="button"
