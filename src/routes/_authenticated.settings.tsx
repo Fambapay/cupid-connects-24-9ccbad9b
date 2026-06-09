@@ -303,7 +303,7 @@ function SettingsPage() {
           </div>
           <motion.button
             onClick={goBack}
-            className="hunie-pill-primary rounded-full px-4 py-2 text-[13px] font-semibold"
+            className="rounded-full px-4 py-2 text-[13px] font-semibold bg-white/10 text-foreground border border-white/15 hover:bg-white/15"
             whileTap={{ scale: 0.95 }}
           >
             Concluído
