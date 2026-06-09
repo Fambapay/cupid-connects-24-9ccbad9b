@@ -92,7 +92,7 @@ function ShopPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search.tab]);
 
-  const packs = useMemo(() => PACKS.filter((p) => p.kind === tab), [tab]);
+  const packs = useMemo(() => PACKS_ARRAY.filter((p) => p.kind === tab), [tab]);
   const copy = TAB_COPY[tab];
   const tabCount = tab === "boost" ? credits.boost_balance : credits.super_like_balance;
 
