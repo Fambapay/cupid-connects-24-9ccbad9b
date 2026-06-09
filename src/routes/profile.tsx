@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { AppleToast } from '@/components/notifications/AppleToast';
 import { ProfileView, type ProfileViewData } from '@/components/ProfileView';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
 import { VerificationModal } from '@/components/VerificationModal';
@@ -82,7 +83,17 @@ function ProfilePage() {
         bio: next.bio.trim() || null,
         interests: next.interests,
       });
-      toast.success('Perfil atualizado');
+      toast.custom(
+        (t) => (
+          <AppleToast
+            toastId={t}
+            title="Perfil atualizado"
+            body="As tuas alterações foram guardadas."
+            onDismiss={() => toast.dismiss(t)}
+          />
+        ),
+        { duration: 2600 },
+      );
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Não foi possível guardar';
       toast.error(msg);
