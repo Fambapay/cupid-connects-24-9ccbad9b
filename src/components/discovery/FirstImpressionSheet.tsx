@@ -16,6 +16,7 @@ const MAX_LEN = 140;
 export const FirstImpressionSheet = ({
   open,
   profile,
+  superLikeBalance,
   onClose,
   onSend,
 }: FirstImpressionSheetProps) => {
