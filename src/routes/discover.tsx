@@ -198,10 +198,9 @@ function Discover() {
       openPaywall();
       return;
     }
-    if (credits.super_like_balance <= 0) {
+    if (credits.first_impression_balance <= 0) {
       setFirstImpression(null);
-      toast.error("Sem Super Likes — vai à loja");
-      goShop();
+      toast.error("Sem First Impressions disponíveis este mês");
       return;
     }
     setFirstImpression(null);
