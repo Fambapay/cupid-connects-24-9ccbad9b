@@ -11,6 +11,7 @@ export interface Liker {
   city: string;
   photo: string;
   isSuper: boolean;
+  firstImpression?: string | null;
 }
 
 function computeAge(birthdate: string | null): number {
