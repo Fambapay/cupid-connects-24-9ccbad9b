@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Heart, Sparkles, Compass, Lock } from "lucide-react";
+import { Heart, Sparkles, Compass, Lock, Send } from "lucide-react";
 import { motion } from "framer-motion";
 import { AppShell, TopBar } from "@/components/AppShell";
 import { useLikedMe } from "@/hooks/useLikedMe";
