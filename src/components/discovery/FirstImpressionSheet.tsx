@@ -231,6 +231,24 @@ export const FirstImpressionSheet = ({
                 style={{
                   display: "flex",
                   alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 8,
+                  padding: "0 4px 8px",
+                  fontSize: 12,
+                  color: "rgba(255,255,255,0.55)",
+                }}
+              >
+                <span>Usa 1 Super Like</span>
+                {typeof superLikeBalance === "number" && (
+                  <span style={{ color: superLikeBalance > 0 ? "#5AA9FF" : "#FF6B6B", fontWeight: 600 }}>
+                    Saldo: {superLikeBalance}
+                  </span>
+                )}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
                   gap: 10,
                   padding: "10px 14px",
                   borderRadius: 999,
