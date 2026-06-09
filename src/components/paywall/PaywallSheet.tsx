@@ -50,13 +50,11 @@ const PLUS_BENEFITS: Benefit[] = [
 
 export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }: PaywallSheetProps) {
   const { reload } = useProfile();
-  const [period, setPeriod] = useState<BillingPeriod>("annual");
   const [selectedTier, setSelectedTier] = useState<PlanTier>(defaultTier);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setPeriod("annual");
       setSelectedTier(defaultTier);
     }
   }, [open, defaultTier]);
@@ -77,15 +75,8 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
   );
   const selectedPlan = plans.find((p) => p.tier === selectedTier) ?? plans[1];
 
-  const monthlyEquivalent = (p: PlanCardConfig) =>
-    period === "annual" ? Math.round(p.annualPriceMzn / 12) : p.priceMzn;
-  const totalCharge = (p: PlanCardConfig) =>
-    period === "annual" ? p.annualPriceMzn : p.priceMzn;
-  const annualSavingsPct = (p: PlanCardConfig) =>
-    Math.round((1 - p.annualPriceMzn / (p.priceMzn * 12)) * 100);
-
-  const ctaPrice = formatPrice(totalCharge(selectedPlan));
-  const ctaPeriodLabel = period === "annual" ? "/ ano" : "/ mês";
+  const ctaPrice = formatPrice(selectedPlan.priceMzn);
+  const ctaPeriodLabel = "/ mês";
 
   return (
     <AnimatePresence>
