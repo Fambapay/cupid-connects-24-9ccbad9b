@@ -4,12 +4,12 @@ import { AppShell } from "@/components/AppShell";
 import { useMatches } from "@/hooks/useMatches";
 import { SwipeableConversationItem } from "@/components/chat/SwipeableConversationItem";
 
-import { requireMembership } from "@/lib/authGuard";
+import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
 
 export const Route = createFileRoute("/chat")({
   ssr: false,
-  beforeLoad: requireMembership,
+  beforeLoad: requireAuthAndOnboarding,
   head: () => ({
     meta: [
       { title: "Conversas — Hunie" },
