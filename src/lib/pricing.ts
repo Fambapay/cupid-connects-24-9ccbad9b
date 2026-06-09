@@ -34,15 +34,17 @@ export type Pack = {
   kind: PackKind;
   quantity: number;
   priceMzn: number;
+  popular?: boolean;
+  best?: boolean;
 };
 
 export const PACKS: Record<string, Pack> = {
   boost_1:        { id: "boost_1",        kind: "boost",      quantity: 1,  priceMzn: 99 },
-  boost_5:        { id: "boost_5",        kind: "boost",      quantity: 5,  priceMzn: 399 },
-  boost_15:       { id: "boost_15",       kind: "boost",      quantity: 15, priceMzn: 999 },
+  boost_5:        { id: "boost_5",        kind: "boost",      quantity: 5,  priceMzn: 399,  popular: true },
+  boost_15:       { id: "boost_15",       kind: "boost",      quantity: 15, priceMzn: 999,  best: true },
   super_like_1:   { id: "super_like_1",   kind: "super_like", quantity: 1,  priceMzn: 49 },
-  super_like_5:   { id: "super_like_5",   kind: "super_like", quantity: 5,  priceMzn: 199 },
-  super_like_25:  { id: "super_like_25",  kind: "super_like", quantity: 25, priceMzn: 899 },
+  super_like_5:   { id: "super_like_5",   kind: "super_like", quantity: 5,  priceMzn: 199,  popular: true },
+  super_like_25:  { id: "super_like_25",  kind: "super_like", quantity: 25, priceMzn: 899,  best: true },
 };
 
 export const PAYMENT_METHODS = [
