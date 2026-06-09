@@ -7,7 +7,7 @@ import { DiscoveryPage } from "@/components/discovery/DiscoveryPage";
 import { EmptyDiscovery } from "@/components/discovery/EmptyDiscovery";
 import { MatchOverlay } from "@/components/discovery/MatchOverlay";
 import { FiltersSheet, DEFAULT_FILTERS, type DiscoveryFilters } from "@/components/FiltersSheet";
-import { PaywallFlow } from "@/components/paywall/PaywallFlow";
+import { PaywallSheet } from "@/components/paywall/PaywallSheet";
 import { BrowseBanner } from "@/components/discovery/BrowseBanner";
 import { useDiscovery } from "@/hooks/useDiscovery";
 import { useCredits } from "@/hooks/useCredits";
@@ -46,6 +46,10 @@ function Discover() {
   const [openingChat, setOpeningChat] = useState(false);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [bannerVisible, setBannerVisible] = useState(false);
+  const [pendingAction, setPendingAction] = useState<
+    | { profileId: string; direction: "like" | "super" }
+    | null
+  >(null);
 
   useEffect(() => {
     setIndex(0);
@@ -83,17 +87,10 @@ function Discover() {
   const visible = isPremium ? mapped : mapped.slice(0, 6);
   void index;
 
-  const handleSwipe = async (target: DiscoveryProfile, dir: SwipeDirection) => {
-    if (!isPremium) {
-      openPaywall();
-      return;
-    }
-    const direction = dir === "right" ? "like" : dir === "up" ? "super" : "pass";
-    if ((direction === "like" || direction === "super") && dailyLimits.likesLimit >= 0 && dailyLimits.likesRemaining <= 0) {
-      toast.error("Atingiste o limite diário de likes.");
-      return;
-    }
-    setIndex((i) => i + 1);
+  const performSwipe = async (
+    target: { id: string; name: string; photo?: string | null },
+    direction: "like" | "super" | "pass",
+  ) => {
     const result = await swipe(target.id, direction);
     if (direction === "super") {
       if (result.reason === "insufficient_credits") {
@@ -106,7 +103,34 @@ function Discover() {
       }
       reloadCredits();
     }
-    if (result.matched) setMatched({ id: target.id, name: target.name, photo: target.photos?.[0] ?? null });
+    if (result.matched) {
+      setMatched({ id: target.id, name: target.name, photo: target.photo ?? null });
+    }
+  };
+
+  const handleSwipe = async (target: DiscoveryProfile, dir: SwipeDirection) => {
+    const direction = dir === "right" ? "like" : dir === "up" ? "super" : "pass";
+
+    // Pass (dislike) is always free — never trigger paywall.
+    if (direction === "pass") {
+      setIndex((i) => i + 1);
+      await performSwipe({ id: target.id, name: target.name, photo: target.photos?.[0] }, "pass");
+      return;
+    }
+
+    // Like / super require active membership.
+    if (!isPremium) {
+      setPendingAction({ profileId: target.id, direction });
+      openPaywall();
+      return;
+    }
+
+    if (dailyLimits.likesLimit >= 0 && dailyLimits.likesRemaining <= 0) {
+      toast.error("Atingiste o limite diário de likes.");
+      return;
+    }
+    setIndex((i) => i + 1);
+    await performSwipe({ id: target.id, name: target.name, photo: target.photos?.[0] }, direction);
   };
 
   const onRewind = async (): Promise<boolean> => {
@@ -166,12 +190,28 @@ function Discover() {
         </div>
       )}
 
-      <PaywallFlow
+      <PaywallSheet
         open={paywallOpen}
-        onClose={() => setPaywallOpen(false)}
-        onSuccess={() => {
+        onClose={() => {
           setPaywallOpen(false);
-          reload();
+          setPendingAction(null);
+        }}
+        onSuccess={async () => {
+          setPaywallOpen(false);
+          const action = pendingAction;
+          setPendingAction(null);
+          await reload();
+          if (action) {
+            // Auto-record the like that triggered the paywall.
+            const target = items.find((p) => p.id === action.profileId);
+            if (target) {
+              setIndex((i) => i + 1);
+              await performSwipe(
+                { id: target.id, name: target.name, photo: target.photos?.[0] },
+                action.direction,
+              );
+            }
+          }
         }}
       />
 
