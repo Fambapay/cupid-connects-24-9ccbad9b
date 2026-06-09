@@ -154,7 +154,6 @@ const initialDraft: DraftState = {
   interests: [],
   latitude: null,
   longitude: null,
-  prompts: [],
 };
 
 function OnboardingPage() {
