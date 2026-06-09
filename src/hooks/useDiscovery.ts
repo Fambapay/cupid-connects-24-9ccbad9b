@@ -305,7 +305,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     refetchOnWindowFocus: false,
   });
 
-  const items = data?.items ?? [];
+  const items: DiscoverProfile[] = data?.items ?? [];
   const dailyLimits = data?.dailyLimits ?? DEFAULT_LIMITS;
   const loading = !!user && isLoading;
 
