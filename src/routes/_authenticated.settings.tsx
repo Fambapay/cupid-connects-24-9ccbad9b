@@ -326,7 +326,7 @@ function SettingsPage() {
           ]).map(({ tier, name, tagline, accent, icon }) => {
             const isCurrent = isPremium && membershipTier === tier;
             return (
-              <motion.button key={tier} onClick={() => navigate({ to: '/membership' })}
+              <motion.button key={tier} onClick={() => goUpgrade()}
                 className="w-full hunie-card p-5 flex flex-col items-center gap-1.5 relative overflow-hidden"
                 whileTap={{ scale: 0.98 }}
                 style={isCurrent ? { borderColor: accent } : undefined}
@@ -517,7 +517,7 @@ function SettingsPage() {
           </div>
           {!isPremium && (
             <motion.button
-              onClick={() => navigate({ to: '/membership' })}
+              onClick={() => goUpgrade()}
               whileTap={{ scale: 0.98 }}
               className="hunie-pill-primary mt-3 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-[15px] font-semibold"
             >
@@ -663,7 +663,7 @@ function SettingsPage() {
         <motion.div className="mt-6" variants={itemVariants}>
           <SectionHeader icon={Crown} label="Conta" />
           <div className="hunie-card overflow-hidden">
-            <motion.button onClick={() => navigate({ to: '/membership' })}
+            <motion.button onClick={() => goUpgrade()}
               className="w-full p-4 flex items-center justify-between border-b border-white/[0.06] transition-colors hover:bg-white/[0.02]" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isPremium ? 'bg-amber-500' : 'bg-amber-500/10'}`}>
