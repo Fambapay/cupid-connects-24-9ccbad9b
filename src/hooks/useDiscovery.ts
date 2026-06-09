@@ -346,9 +346,12 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       };
       if (fiMsg) insertRow.first_impression_message = fiMsg;
 
+      // Upsert on (swiper_id, swiped_id) so re-swipes (e.g. after rewind) don't
+      // fail with a unique violation and the first-impression message is not
+      // silently lost.
       const { error: insertError } = await supabase
         .from("swipes")
-        .insert(insertRow as never);
+        .upsert(insertRow as never, { onConflict: "swiper_id,swiped_id" });
       if (insertError) {
         console.error("swipe insert failed", insertError);
         return { matched: false, reason: "insert_failed" };
