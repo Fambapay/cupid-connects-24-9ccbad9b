@@ -285,7 +285,7 @@ function OnboardingPage() {
   }, [draft, user, navigate, reload, toast]);
 
   const showProgress = stepId !== "welcome" && !done;
-  const showBackButton = stepId === "photos";
+  const showBackButton = stepId !== "welcome" && draft.stepIdx > 0;
 
   const progress = ((draft.stepIdx) / (STEP_COUNT - 1)) * 100;
 
@@ -374,19 +374,15 @@ function OnboardingPage() {
                 {stepId === "gender" && (
                   <GenderStep
                     value={draft.gender}
-                    onSelect={(g) => {
-                      set("gender", g);
-                      setTimeout(goNext, 300);
-                    }}
+                    onSelect={(g) => set("gender", g)}
+                    onNext={goNext}
                   />
                 )}
                 {stepId === "interested" && (
                   <InterestedStep
                     value={draft.interested}
-                    onSelect={(i) => {
-                      set("interested", i);
-                      setTimeout(goNext, 300);
-                    }}
+                    onSelect={(i) => set("interested", i)}
+                    onNext={goNext}
                   />
                 )}
                 {stepId === "photos" && (
@@ -966,9 +962,11 @@ function ScrollPickerSheet<T extends number>({
 function GenderStep({
   value,
   onSelect,
+  onNext,
 }: {
   value: ExtendedGender | null;
   onSelect: (v: ExtendedGender) => void;
+  onNext: () => void;
 }) {
   const [extOpen, setExtOpen] = useState(false);
   const primary: { value: Gender; label: string; Icon: typeof User }[] = [
@@ -1037,6 +1035,11 @@ function GenderStep({
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
+      <CtaBar>
+        <PrimaryButton disabled={!value} onClick={onNext}>
+          Continuar
+        </PrimaryButton>
+      </CtaBar>
     </div>
   );
 }
@@ -1089,9 +1092,11 @@ function GenderCard({
 function InterestedStep({
   value,
   onSelect,
+  onNext,
 }: {
   value: InterestedIn | null;
   onSelect: (v: InterestedIn) => void;
+  onNext: () => void;
 }) {
   const opts: { value: InterestedIn; label: string; Icon: typeof User }[] = [
     { value: "women", label: "Mulheres", Icon: User },
@@ -1119,6 +1124,11 @@ function InterestedStep({
           ))}
         </motion.div>
       </StepScroll>
+      <CtaBar>
+        <PrimaryButton disabled={!value} onClick={onNext}>
+          Continuar
+        </PrimaryButton>
+      </CtaBar>
     </div>
   );
 }
