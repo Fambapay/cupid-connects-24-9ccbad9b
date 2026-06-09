@@ -18,6 +18,8 @@ interface DiscoveryPageProps {
   onRewind?: () => boolean | Promise<boolean | unknown>;
   onEnd?: () => void;
   showTopBar?: boolean;
+  boostActive?: boolean;
+  boostMultiplier?: number;
 }
 
 export const DiscoveryPage = ({
@@ -29,6 +31,8 @@ export const DiscoveryPage = ({
   onRewind,
   onEnd,
   showTopBar = true,
+  boostActive = false,
+  boostMultiplier = 10,
 }: DiscoveryPageProps) => {
   const [index, setIndex] = useState(0);
   const [rewinding, setRewinding] = useState(false);
@@ -197,7 +201,12 @@ export const DiscoveryPage = ({
             }
           />
           {showTopBar && (
-            <DiscoverTopBar onOpenFilters={onOpenFilters} onBoost={onBoost} />
+            <DiscoverTopBar
+              onOpenFilters={onOpenFilters}
+              onBoost={onBoost}
+              boostActive={boostActive}
+              boostMultiplier={boostMultiplier}
+            />
           )}
         </>
       ) : (
