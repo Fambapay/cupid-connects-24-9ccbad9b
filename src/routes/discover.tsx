@@ -192,7 +192,7 @@ function Discover() {
   };
 
   const handleSendFirstImpression = async (message: string) => {
-    if (!firstImpression) return;
+    if (!firstImpression || sendingFI) return;
     const target = firstImpression;
     if (!entitlements.canSendFirstImpression) {
       setFirstImpression(null);
@@ -204,23 +204,30 @@ function Discover() {
       toast.error("Sem First Impressions disponíveis este mês");
       return;
     }
-    setFirstImpression(null);
-    setIndex((i) => i + 1);
-    const result = await performSwipe(
-      { id: target.id, name: target.name, photo: target.photos?.[0] },
-      "super",
-      { firstImpressionMessage: message },
-    );
-    if (result?.reason) {
-      // performSwipe already surfaced the right error toast / paywall.
-      return;
+    setSendingFI(true);
+    try {
+      const result = await performSwipe(
+        { id: target.id, name: target.name, photo: target.photos?.[0] },
+        "super",
+        { firstImpressionMessage: message },
+      );
+      if (result?.reason) {
+        // performSwipe already surfaced the right error toast / paywall.
+        // Keep card visible so the user can retry or pass.
+        return;
+      }
+      // Only advance & close sheet on confirmed success.
+      setFirstImpression(null);
+      setIndex((i) => i + 1);
+      toast.custom(
+        () => (
+          <FirstImpressionToast photo={target.photos?.[0]} name={target.name} />
+        ),
+        { duration: 2600 },
+      );
+    } finally {
+      setSendingFI(false);
     }
-    toast.custom(
-      () => (
-        <FirstImpressionToast photo={target.photos?.[0]} name={target.name} />
-      ),
-      { duration: 2600 },
-    );
   };
 
   return (
