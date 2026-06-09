@@ -11,11 +11,16 @@ import {
   CheckCheck,
   Undo2,
   Globe2,
-  Sparkles,
   Crown,
+  Sparkles,
+  ShieldCheck,
+  EyeOff,
+  TrendingUp,
+  BarChart3,
+  Headphones,
 } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
-import { PLAN_CARDS, formatPrice, type PlanCardConfig } from "@/lib/plans";
+import { PLAN_CARDS, formatPrice } from "@/lib/plans";
 import { type PlanTier } from "@/lib/pricing";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 import { invalidateOnboardingCache } from "@/lib/authGuard";
@@ -24,29 +29,45 @@ import { toast } from "sonner";
 export interface PaywallSheetProps {
   open: boolean;
   onClose: () => void;
-  /** Called after successful payment so caller can record pending action. */
   onSuccess?: () => void;
-  /** Default plan to highlight. */
   defaultTier?: PlanTier;
 }
 
 type Benefit = {
   icon: React.ComponentType<{ size?: number; className?: string }>;
   label: string;
-  hint?: string;
 };
 
-// Synced with PLUS entitlements in src/lib/plans.ts (single source of truth).
-const PLUS_BENEFITS: Benefit[] = [
-  { icon: InfinityIcon, label: "Likes ilimitados", hint: "Sem o limite diário do Grátis" },
-  { icon: Eye, label: "Vê quem já gostou de ti", hint: "Salta etapas — vai direto ao match" },
-  { icon: Star, label: "5 Super Likes por dia", hint: "Destaca-te de imediato" },
-  { icon: Rocket, label: "1 Boost por semana", hint: "30 min no topo do feed" },
-  { icon: SlidersHorizontal, label: "Filtros avançados", hint: "Idade, distância, interesses" },
-  { icon: CheckCheck, label: "Confirmação de leitura" },
-  { icon: Undo2, label: "Volta atrás no último swipe" },
-  { icon: Globe2, label: "Passport — desbloqueia outras cidades" },
-];
+// Per-tier benefits — strictly synced with getEntitlements() in src/lib/plans.ts.
+const BENEFITS_BY_TIER: Record<PlanTier, Benefit[]> = {
+  select: [
+    { icon: InfinityIcon, label: "Likes ilimitados" },
+    { icon: Eye, label: "Vê quem já gostou de ti" },
+    { icon: Star, label: "1 Super Like por dia" },
+    { icon: Rocket, label: "1 Boost na ativação" },
+  ],
+  plus: [
+    { icon: InfinityIcon, label: "Likes ilimitados" },
+    { icon: Eye, label: "Vê quem já gostou de ti" },
+    { icon: Star, label: "5 Super Likes por dia" },
+    { icon: Rocket, label: "1 Boost por semana" },
+    { icon: SlidersHorizontal, label: "Filtros avançados" },
+    { icon: CheckCheck, label: "Confirmação de leitura" },
+    { icon: Undo2, label: "Voltar atrás no último swipe" },
+    { icon: Globe2, label: "Passport — outras cidades" },
+  ],
+  elite: [
+    { icon: TrendingUp, label: "Prioridade no topo do feed" },
+    { icon: Crown, label: "Badge Elite no teu perfil" },
+    { icon: Star, label: "10 Super Likes por dia" },
+    { icon: Rocket, label: "1 Boost por dia" },
+    { icon: EyeOff, label: "Modo invisível" },
+    { icon: BarChart3, label: "Estatísticas do perfil" },
+    { icon: Sparkles, label: "Acesso antecipado a novidades" },
+    { icon: Headphones, label: "Suporte VIP prioritário" },
+    { icon: ShieldCheck, label: "Tudo do Plus incluído" },
+  ],
+};
 
 export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }: PaywallSheetProps) {
   const { reload } = useProfile();
@@ -54,12 +75,9 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
   const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      setSelectedTier(defaultTier);
-    }
+    if (open) setSelectedTier(defaultTier);
   }, [open, defaultTier]);
 
-  // Body scroll lock
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -69,14 +87,13 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
     };
   }, [open]);
 
+  // Order: Select → Plus → Elite (ascending price).
   const plans = useMemo(
     () => PLAN_CARDS.slice().sort((a, b) => a.priceMzn - b.priceMzn),
     [],
   );
   const selectedPlan = plans.find((p) => p.tier === selectedTier) ?? plans[1];
-
-  const ctaPrice = formatPrice(selectedPlan.priceMzn);
-  const ctaPeriodLabel = "/ mês";
+  const benefits = BENEFITS_BY_TIER[selectedPlan.tier];
 
   return (
     <AnimatePresence>
@@ -87,7 +104,8 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md"
+            className="fixed inset-0 bg-black/70 backdrop-blur-md"
+            style={{ zIndex: 10000 }}
             onClick={onClose}
           />
           <motion.div
@@ -95,113 +113,88 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+            transition={{ duration: 0.42, ease: [0.32, 0.72, 0, 1] }}
             drag="y"
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0, bottom: 0.4 }}
             onDragEnd={(_, info) => {
               if (info.offset.y > 140 || info.velocity.y > 600) onClose();
             }}
-            className="fixed inset-x-0 bottom-0 top-[3%] z-[61] flex flex-col overflow-hidden rounded-t-[28px] border-t border-border/40 bg-background text-foreground shadow-2xl"
+            className="fixed inset-x-0 bottom-0 top-[4%] flex flex-col overflow-hidden rounded-t-[32px] border-t border-white/[0.06] bg-[#0b0b0d] text-foreground"
+            style={{ zIndex: 10001, boxShadow: "0 -20px 60px rgba(0,0,0,0.6)" }}
           >
-            {/* Aurora glow background */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-[55%]"
-              style={{
-                background:
-                  "radial-gradient(60% 60% at 50% 0%, color-mix(in oklab, var(--brand-pink) 35%, transparent), transparent 70%), radial-gradient(50% 50% at 90% 20%, color-mix(in oklab, var(--brand-purple) 30%, transparent), transparent 70%)",
-              }}
-            />
-
             {/* Drag handle */}
-            <div className="relative flex justify-center pt-3 pb-1 shrink-0">
-              <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+            <div className="relative flex justify-center pt-2.5 pb-1 shrink-0">
+              <div className="h-[5px] w-9 rounded-full bg-white/15" />
             </div>
 
             {/* Close */}
             <button
               onClick={onClose}
               aria-label="Fechar"
-              className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full bg-background/60 backdrop-blur hover:bg-background/80 transition-colors"
+              className="absolute right-4 top-4 z-10 grid h-8 w-8 place-items-center rounded-full bg-white/[0.08] backdrop-blur hover:bg-white/[0.14] transition-colors"
             >
-              <X size={16} />
+              <X size={15} className="text-white/80" />
             </button>
 
             {/* Scrollable body */}
-            <div className="relative flex-1 overflow-y-auto overscroll-contain px-5 pb-[max(env(safe-area-inset-bottom),120px)]">
+            <div className="relative flex-1 overflow-y-auto overscroll-contain px-6 pb-[max(env(safe-area-inset-bottom),132px)]">
               {/* Hero */}
-              <div className="pt-6 pb-5 text-center">
-                <div className="mx-auto mb-3 inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/60 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground backdrop-blur">
-                  <Sparkles size={11} className="text-primary" />
+              <div className="pt-7 pb-7">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/40">
                   Hunie Premium
-                </div>
+                </p>
                 <h2
-                  className="text-3xl font-black leading-[1.05] tracking-tight text-gradient-sunset"
+                  className="mt-3 text-[34px] font-semibold leading-[1.05] tracking-[-0.02em] text-white"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
-                  Encontra alguém,<br />não percas tempo.
+                  Conhece quem<br />realmente quer.
                 </h2>
-                <p className="mx-auto mt-3 max-w-[280px] text-sm text-muted-foreground">
+                <p className="mt-3 max-w-[300px] text-[15px] leading-snug text-white/55">
                   Desbloqueia tudo o que precisas para fazer matches a sério.
                 </p>
               </div>
 
-              {/* Plans */}
-
               {/* Plan cards */}
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 {plans.map((plan) => {
                   const active = plan.tier === selectedTier;
                   const popular = plan.tier === "plus";
-                  const isElite = plan.tier === "elite";
                   return (
                     <button
                       key={plan.tier}
                       onClick={() => setSelectedTier(plan.tier)}
-                      className={`relative block w-full overflow-hidden rounded-2xl border p-4 text-left transition-all ${
+                      className={`relative block w-full rounded-2xl border px-4 py-3.5 text-left transition-all ${
                         active
-                          ? "border-primary bg-primary/10 shadow-[0_0_0_1px_var(--primary)]"
-                          : "border-border/60 bg-card hover:border-border"
+                          ? "border-white/70 bg-white/[0.06]"
+                          : "border-white/[0.08] bg-white/[0.025] hover:bg-white/[0.04]"
                       }`}
                     >
-                      {popular && (
-                        <span className="absolute right-3 top-3 rounded-full bg-primary px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-primary-foreground">
-                          Mais popular
-                        </span>
-                      )}
                       <div className="flex items-center gap-3">
                         <div
-                          className={`grid h-9 w-9 shrink-0 place-items-center rounded-full border ${
-                            active ? "border-primary bg-primary" : "border-border/70 bg-background/60"
+                          className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border transition-colors ${
+                            active ? "border-white bg-white" : "border-white/25"
                           }`}
                         >
-                          {active ? (
-                            <Check size={16} className="text-primary-foreground" />
-                          ) : isElite ? (
-                            <Crown size={15} className="text-muted-foreground" />
-                          ) : (
-                            <Sparkles size={15} className="text-muted-foreground" />
-                          )}
+                          {active && <Check size={12} strokeWidth={3} className="text-black" />}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-baseline gap-1.5">
-                            <span className="text-sm font-extrabold uppercase tracking-wider">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[15px] font-semibold tracking-tight text-white">
                               {plan.label}
                             </span>
+                            {popular && (
+                              <span className="rounded-full bg-white/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-white/70">
+                                Popular
+                              </span>
+                            )}
                           </div>
-                          <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                            {plan.tagline}
-                          </p>
                         </div>
                         <div className="text-right">
-                          <div className="flex items-baseline gap-0.5">
-                            <span className="text-lg font-black tabular-nums">
-                              {plan.priceMzn.toLocaleString("pt-PT")}
-                            </span>
-                            <span className="text-[10px] font-bold text-muted-foreground">MZN</span>
-                          </div>
-                          <p className="text-[10px] text-muted-foreground">/ mês</p>
+                          <span className="text-[15px] font-semibold tabular-nums text-white">
+                            {plan.priceMzn.toLocaleString("pt-PT")}
+                          </span>
+                          <span className="ml-1 text-[12px] text-white/45">MZN / mês</span>
                         </div>
                       </div>
                     </button>
@@ -210,57 +203,43 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
               </div>
 
               {/* Benefits */}
-              <div className="mt-7">
-                <h3 className="mb-3 text-xs font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
-                  O que recebes com {selectedPlan.label}
-                </h3>
-                <ul className="space-y-2.5">
-                  {PLUS_BENEFITS.map((b) => {
+              <div className="mt-8">
+                <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/40">
+                  Incluído no {selectedPlan.label}
+                </p>
+                <ul className="space-y-3.5">
+                  {benefits.map((b) => {
                     const Icon = b.icon;
                     return (
-                      <li key={b.label} className="flex items-start gap-3">
-                        <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
-                          <Icon size={15} />
+                      <li key={b.label} className="flex items-center gap-3.5">
+                        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/[0.06] text-white/85">
+                          <Icon size={14} />
                         </span>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-semibold leading-tight">{b.label}</p>
-                          {b.hint && (
-                            <p className="mt-0.5 text-xs leading-snug text-muted-foreground">
-                              {b.hint}
-                            </p>
-                          )}
-                        </div>
+                        <span className="text-[15px] leading-tight text-white/90">{b.label}</span>
                       </li>
                     );
                   })}
                 </ul>
               </div>
 
-              <p className="mt-6 text-center text-[11px] leading-relaxed text-muted-foreground/70">
-                Renovação automática. Cancela a qualquer momento nas Definições.<br />
-                Pagamento seguro via M-Pesa ou e-Mola.
+              <p className="mt-8 text-center text-[11px] leading-relaxed text-white/35">
+                Renovação automática · Cancela quando quiseres<br />
+                Pagamento via M-Pesa ou e-Mola
               </p>
             </div>
 
             {/* Sticky CTA */}
             <div
-              className="absolute inset-x-0 bottom-0 z-10 border-t border-border/40 bg-background/95 px-5 pt-3 backdrop-blur-xl"
-              style={{ paddingBottom: "max(env(safe-area-inset-bottom), 16px)" }}
+              className="absolute inset-x-0 bottom-0 border-t border-white/[0.06] bg-[#0b0b0d]/95 px-6 pt-3 backdrop-blur-xl"
+              style={{ paddingBottom: "max(env(safe-area-inset-bottom), 18px)", zIndex: 5 }}
             >
               <motion.button
                 whileTap={{ scale: 0.985 }}
                 onClick={() => setCheckoutOpen(true)}
-                className="relative h-13 w-full overflow-hidden rounded-full py-3.5 text-base font-bold text-primary-foreground shadow-[0_10px_30px_-10px_color-mix(in_oklab,var(--brand-pink)_55%,transparent)]"
-                style={{ background: "var(--gradient-brand)" }}
+                className="h-12 w-full rounded-full bg-white text-[15px] font-semibold text-black hover:bg-white/95 transition-colors"
               >
-                <span className="relative">
-                  Subscrever {selectedPlan.label} · {ctaPrice}{" "}
-                  <span className="opacity-80">{ctaPeriodLabel}</span>
-                </span>
+                Continuar · {formatPrice(selectedPlan.priceMzn)} / mês
               </motion.button>
-              <p className="mt-2 text-center text-[10px] text-muted-foreground/70">
-                Total {ctaPrice} cobrado mensalmente
-              </p>
             </div>
           </motion.div>
 
