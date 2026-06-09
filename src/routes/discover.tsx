@@ -8,6 +8,8 @@ import { EmptyDiscovery } from "@/components/discovery/EmptyDiscovery";
 import { MatchOverlay } from "@/components/discovery/MatchOverlay";
 import { FiltersSheet, DEFAULT_FILTERS, type DiscoveryFilters } from "@/components/FiltersSheet";
 import { PaywallSheet } from "@/components/paywall/PaywallSheet";
+import { CreditShopSheet } from "@/components/paywall/CreditShopSheet";
+import type { PackKind } from "@/lib/pricing";
 import { FirstImpressionSheet } from "@/components/discovery/FirstImpressionSheet";
 import { FirstImpressionToast } from "@/components/discovery/FirstImpressionToast";
 import { BrowseBanner } from "@/components/discovery/BrowseBanner";
