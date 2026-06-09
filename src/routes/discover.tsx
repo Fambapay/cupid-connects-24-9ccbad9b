@@ -293,6 +293,12 @@ function Discover() {
         }}
       />
 
+      <CreditShopSheet
+        open={creditShop !== null}
+        kind={creditShop ?? "super_like"}
+        onClose={() => setCreditShop(null)}
+      />
+
       <MatchOverlay
         open={!!matched}
         targetName={matched?.name ?? ""}
