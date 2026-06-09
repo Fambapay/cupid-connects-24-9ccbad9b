@@ -323,40 +323,60 @@ function ChatRoom() {
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3" style={{ WebkitOverflowScrolling: "touch", contain: "layout paint" }}>
         <DateSeparator label={formatDateLabel(messages[0]?.created_at)} />
 
-        <ul className="space-y-1.5">
-          {(() => {
-            const peerReadMs = peerLastReadAt ? new Date(peerLastReadAt).getTime() : 0;
-            let lastReadOwnIdx = -1;
-            if (peerReadMs && entitlements.canReadReceipts) {
-              for (let i = messages.length - 1; i >= 0; i--) {
-                const m = messages[i];
-                if (m.sender_id !== user?.id) continue;
-                if (new Date(m.created_at).getTime() <= peerReadMs) { lastReadOwnIdx = i; break; }
-              }
-            }
-            return messages.map((m, i) => {
-              const prev = messages[i - 1];
-              const next = messages[i + 1];
-              const me = m.sender_id === user?.id;
-              const prevMe = prev ? prev.sender_id === user?.id : null;
-              const nextMe = next ? next.sender_id === user?.id : null;
-              const isFirstOfGroup = prevMe === null || prevMe !== me;
-              const isLastOfGroup = nextMe === null || nextMe !== me;
-              return (
+        <div style={{ position: "relative", height: rowVirtualizer.getTotalSize(), width: "100%" }}>
+          {rowVirtualizer.getVirtualItems().map((vi) => {
+            const r = rows[vi.index];
+            return (
+              <div
+                key={r.msg.id}
+                data-index={vi.index}
+                ref={rowVirtualizer.measureElement}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  transform: `translateY(${vi.start}px)`,
+                  contentVisibility: "auto",
+                  containIntrinsicSize: "0 56px",
+                }}
+              >
                 <Bubble
-                  key={m.id}
-                  msg={m}
-                  me={me}
-                  isFirstOfGroup={isFirstOfGroup}
-                  isLastOfGroup={isLastOfGroup}
+                  msg={r.msg}
+                  me={r.me}
+                  isFirstOfGroup={r.isFirstOfGroup}
+                  isLastOfGroup={r.isLastOfGroup}
                   avatar={peer.photo}
                   name={peer.name}
-                  showReadReceipt={entitlements.canReadReceipts && me && i === lastReadOwnIdx}
+                  showReadReceipt={r.showReadReceipt}
                 />
-              );
-            });
-          })()}
-        </ul>
+              </div>
+            );
+          })}
+        </div>
+
+
+        <AnimatePresence>
+          {typing && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="mt-2 flex items-end gap-2"
+            >
+              {peer.photo ? (
+                <img src={peer.photo} alt="" className="h-7 w-7 shrink-0 rounded-full object-cover" />
+              ) : (
+                <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-flame" />
+              )}
+              <div className="rounded-3xl rounded-bl-md bg-[#101010] px-4 py-3">
+                <TypingDots />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
 
 
         <AnimatePresence>
