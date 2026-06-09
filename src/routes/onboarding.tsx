@@ -82,7 +82,6 @@ type StepId =
   | "bio"
   | "interests"
   | "location"
-  | "prompts"
   | "done";
 const STEPS: StepId[] = [
   "welcome",
@@ -103,20 +102,7 @@ const AVAILABLE_INTERESTS = [
   "Jogos", "Tecnologia", "Animais", "Natureza", "Vinho", "Brunch",
 ];
 
-const PROMPT_QUESTIONS = [
-  "A minha cena é…",
-  "O que me faz rir…",
-  "O melhor de mim…",
-  "Procuro alguém que…",
-  "O meu prato preferido é…",
-  "Domingo perfeito é…",
-  "Nunca sairei sem…",
-  "Confessar: sou viciado em…",
-];
-
 const MAX_INTERESTS = 5;
-const MIN_PROMPTS = 3;
-const PROMPT_SLOTS = 3;
 
 const STORAGE_KEY_PREFIX = "hunie:onboarding:v2:";
 const storageKey = (uid?: string | null) => `${STORAGE_KEY_PREFIX}${uid ?? "anon"}`;
@@ -137,7 +123,7 @@ const EXTENDED_GENDERS: { value: ExtendedGender; label: string }[] = [
   { value: "other", label: "Outro" },
 ];
 
-const PROMPTS = [
+const BIO_PROMPTS = [
   "O que me faz rir…",
   "O melhor de mim…",
   "Procuro alguém que…",
@@ -145,11 +131,6 @@ const PROMPTS = [
 
 // ─────────────────────────────────────────────────────────────
 // Page
-
-interface PromptDraft {
-  question: string;
-  answer: string;
-}
 
 interface DraftState {
   stepIdx: number;
@@ -164,7 +145,6 @@ interface DraftState {
   interests: string[];
   latitude: number | null;
   longitude: number | null;
-  prompts: PromptDraft[];
 }
 
 const initialDraft: DraftState = {
@@ -180,7 +160,6 @@ const initialDraft: DraftState = {
   interests: [],
   latitude: null,
   longitude: null,
-  prompts: [],
 };
 
 function OnboardingPage() {
@@ -263,7 +242,7 @@ function OnboardingPage() {
 
   const finish = useCallback(async () => {
     if (!user) return;
-    const { day, month, year, name, bio, city, gender, interested, interests, latitude, longitude, prompts } = draft;
+    const { day, month, year, name, bio, city, gender, interested, interests, latitude, longitude } = draft;
     const birthdate =
       day && month && year
         ? `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
@@ -296,20 +275,6 @@ function OnboardingPage() {
     if (error) {
       toast({ title: "Erro a guardar", description: error.message, variant: "destructive" });
       return;
-    }
-
-    // Save prompts (replace previous)
-    const validPrompts = prompts.filter((p) => p.question.trim() && p.answer.trim());
-    if (validPrompts.length > 0) {
-      await supabase.from("profile_prompts").delete().eq("profile_id", user.id);
-      await supabase.from("profile_prompts").insert(
-        validPrompts.map((p, i) => ({
-          profile_id: user.id,
-          question: p.question.trim(),
-          answer: p.answer.trim(),
-          position: i,
-        })),
-      );
     }
 
     try { localStorage.removeItem(storageKey(user.id)); } catch { /* noop */ }
@@ -450,13 +415,6 @@ function OnboardingPage() {
                       set("longitude", lng);
                     }}
                     onNext={goNext}
-                  />
-                )}
-                {stepId === "prompts" && (
-                  <PromptsStep
-                    value={draft.prompts}
-                    onChange={(v) => set("prompts", v)}
-                    onNext={() => setDone(true)}
                   />
                 )}
               </motion.div>
@@ -1385,7 +1343,7 @@ function BioStep({
               Inspirações
             </p>
             <div className="flex flex-wrap gap-2">
-              {PROMPTS.map((p) => (
+              {BIO_PROMPTS.map((p) => (
                 <motion.button
                   key={p}
                   type="button"
@@ -1641,140 +1599,6 @@ function InterestsStep({
   );
 }
 
-// Prompts ─────
-function PromptsStep({
-  value,
-  onChange,
-  onNext,
-}: {
-  value: PromptDraft[];
-  onChange: (v: PromptDraft[]) => void;
-  onNext: () => void;
-}) {
-  const slots: PromptDraft[] = Array.from(
-    { length: PROMPT_SLOTS },
-    (_, i) => value[i] ?? { question: "", answer: "" },
-  );
-  const [pickerFor, setPickerFor] = useState<number | null>(null);
-
-  const updateSlot = (i: number, patch: Partial<PromptDraft>) => {
-    const next = slots.map((s, idx) => (idx === i ? { ...s, ...patch } : s));
-    onChange(next);
-  };
-
-  const validCount = slots.filter(
-    (s) => s.question.trim() && s.answer.trim(),
-  ).length;
-  const canNext = validCount >= MIN_PROMPTS;
-
-  return (
-    <div className="flex flex-1 min-h-0 flex-col">
-
-      <StepScroll>
-        <Heading
-          title="Mostra a tua personalidade"
-          subtitle={`Escolhe ${MIN_PROMPTS} perguntas e responde`}
-        />
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, delay: 0.12 }}
-          className="mt-6 space-y-3"
-        >
-          {slots.map((slot, i) => {
-            const filled = !!slot.question;
-            return (
-              <div
-                key={i}
-                className={cn(
-                  "rounded-2xl border bg-white/[0.04] p-4 transition-colors",
-                  filled ? "border-white/15" : "border-dashed border-white/15",
-                )}
-              >
-                <button
-                  type="button"
-                  onClick={() => setPickerFor(i)}
-                  className="flex w-full items-center justify-between text-left"
-                  style={{ touchAction: "manipulation" }}
-                >
-                  <span
-                    className={cn(
-                      "text-sm font-semibold",
-                      filled ? "text-foreground" : "text-muted-foreground",
-                    )}
-                  >
-                    {slot.question || `Escolher pergunta ${i + 1}`}
-                  </span>
-                  <span className="ml-3 text-xs text-muted-foreground">Mudar</span>
-                </button>
-                {filled && (
-                  <textarea
-                    value={slot.answer}
-                    onChange={(e) =>
-                      updateSlot(i, { answer: e.target.value.slice(0, 150) })
-                    }
-                    placeholder="A tua resposta…"
-                    rows={2}
-                    maxLength={150}
-                    className={cn(
-                      "mt-3 w-full resize-none bg-transparent text-base outline-none",
-                      "border-b border-white/10 pb-2 focus:border-[color:var(--brand-pink)]",
-                      "placeholder:text-muted-foreground transition-colors",
-                    )}
-                  />
-                )}
-              </div>
-            );
-          })}
-        </motion.div>
-        <p className="mt-4 text-xs text-muted-foreground">
-          {validCount}/{MIN_PROMPTS} prompts completos
-        </p>
-      </StepScroll>
-      <CtaBar>
-        <PrimaryButton disabled={!canNext} onClick={onNext}>
-          Continuar
-        </PrimaryButton>
-      </CtaBar>
-
-      <Drawer open={pickerFor !== null} onOpenChange={(o) => !o && setPickerFor(null)}>
-        <DrawerContent className="bg-card">
-          <DrawerHeader>
-            <DrawerTitle className="text-center text-base">Escolhe uma pergunta</DrawerTitle>
-          </DrawerHeader>
-          <div className="max-h-[60vh] overflow-y-auto px-4 pb-2">
-            {PROMPT_QUESTIONS.filter(
-              (q) => !slots.some((s, i) => i !== pickerFor && s.question === q),
-            ).map((q) => {
-              const active = pickerFor !== null && slots[pickerFor]?.question === q;
-              return (
-                <button
-                  key={q}
-                  onClick={() => {
-                    if (pickerFor !== null) updateSlot(pickerFor, { question: q });
-                    setPickerFor(null);
-                  }}
-                  className={cn(
-                    "flex w-full items-center justify-between rounded-xl px-4 py-3 text-left",
-                    active ? "bg-white/10" : "active:bg-white/5",
-                  )}
-                >
-                  <span className={cn("text-base", active && "font-semibold")}>{q}</span>
-                  {active && <Check className="h-4 w-4 text-[color:var(--brand-pink)]" />}
-                </button>
-              );
-            })}
-          </div>
-          <DrawerFooter>
-            <DrawerClose asChild>
-              <Button variant="ghost" className="w-full">Cancelar</Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-    </div>
-  );
-}
 
 // Completion ─────
 function CompletionScreen({ onContinue }: { onContinue: () => void }) {
