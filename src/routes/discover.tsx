@@ -96,7 +96,17 @@ function Discover() {
     options?: { firstImpressionMessage?: string },
   ) => {
     const result = await swipe(target.id, direction, options);
-    if (direction === "super") {
+    const isFI = !!options?.firstImpressionMessage;
+    if (isFI) {
+      if (result.reason === "insufficient_credits") {
+        toast.error("Sem First Impressions disponíveis este mês");
+        return result;
+      }
+      if (typeof result.remainingFirstImpressions === "number") {
+        syncCredits({ first_impression_balance: result.remainingFirstImpressions });
+      }
+      reloadCredits();
+    } else if (direction === "super") {
       if (result.reason === "insufficient_credits") {
         toast.error("Sem Super Likes — vai à loja");
         goShop();
