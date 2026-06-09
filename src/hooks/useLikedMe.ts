@@ -149,6 +149,7 @@ export function useLikedMe() {
             city: (p.city as string) ?? "",
             photo: firstPath[id] ? urlByPath[firstPath[id]] : "",
             isSuper: s.direction === "super",
+            firstImpression: (s as { first_impression_message?: string | null }).first_impression_message ?? null,
           } as Liker;
         })
         .filter((x): x is Liker => !!x),
