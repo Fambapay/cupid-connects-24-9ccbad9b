@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 import { PLAN_CARDS, formatPrice, type PlanCardConfig } from "@/lib/plans";
-import { PLAN_PRICES, type BillingPeriod, type PlanTier } from "@/lib/pricing";
+import { type PlanTier } from "@/lib/pricing";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 import { invalidateOnboardingCache } from "@/lib/authGuard";
 import { toast } from "sonner";
@@ -50,13 +50,11 @@ const PLUS_BENEFITS: Benefit[] = [
 
 export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }: PaywallSheetProps) {
   const { reload } = useProfile();
-  const [period, setPeriod] = useState<BillingPeriod>("annual");
   const [selectedTier, setSelectedTier] = useState<PlanTier>(defaultTier);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setPeriod("annual");
       setSelectedTier(defaultTier);
     }
   }, [open, defaultTier]);
@@ -77,15 +75,8 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
   );
   const selectedPlan = plans.find((p) => p.tier === selectedTier) ?? plans[1];
 
-  const monthlyEquivalent = (p: PlanCardConfig) =>
-    period === "annual" ? Math.round(p.annualPriceMzn / 12) : p.priceMzn;
-  const totalCharge = (p: PlanCardConfig) =>
-    period === "annual" ? p.annualPriceMzn : p.priceMzn;
-  const annualSavingsPct = (p: PlanCardConfig) =>
-    Math.round((1 - p.annualPriceMzn / (p.priceMzn * 12)) * 100);
-
-  const ctaPrice = formatPrice(totalCharge(selectedPlan));
-  const ctaPeriodLabel = period === "annual" ? "/ ano" : "/ mês";
+  const ctaPrice = formatPrice(selectedPlan.priceMzn);
+  const ctaPeriodLabel = "/ mês";
 
   return (
     <AnimatePresence>
@@ -156,41 +147,7 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
                 </p>
               </div>
 
-              {/* Billing toggle */}
-              <div className="mx-auto mb-5 flex w-full max-w-xs rounded-full border border-border/60 bg-card p-1">
-                {(["monthly", "annual"] as BillingPeriod[]).map((p) => {
-                  const active = period === p;
-                  return (
-                    <button
-                      key={p}
-                      onClick={() => setPeriod(p)}
-                      className={`relative flex-1 rounded-full py-2 text-xs font-bold transition-colors ${
-                        active ? "text-primary-foreground" : "text-muted-foreground"
-                      }`}
-                    >
-                      {active && (
-                        <motion.span
-                          layoutId="period-pill"
-                          transition={{ type: "spring", stiffness: 400, damping: 32 }}
-                          className="absolute inset-0 rounded-full bg-primary"
-                        />
-                      )}
-                      <span className="relative inline-flex items-center gap-1.5">
-                        {p === "monthly" ? "Mensal" : "Anual"}
-                        {p === "annual" && (
-                          <span
-                            className={`rounded-full px-1.5 py-0.5 text-[9px] font-extrabold uppercase ${
-                              active ? "bg-primary-foreground/15 text-primary-foreground" : "bg-primary/15 text-primary"
-                            }`}
-                          >
-                            -33%
-                          </span>
-                        )}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+              {/* Plans */}
 
               {/* Plan cards */}
               <div className="space-y-2.5">
@@ -240,16 +197,11 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
                         <div className="text-right">
                           <div className="flex items-baseline gap-0.5">
                             <span className="text-lg font-black tabular-nums">
-                              {monthlyEquivalent(plan).toLocaleString("pt-PT")}
+                              {plan.priceMzn.toLocaleString("pt-PT")}
                             </span>
                             <span className="text-[10px] font-bold text-muted-foreground">MZN</span>
                           </div>
                           <p className="text-[10px] text-muted-foreground">/ mês</p>
-                          {period === "annual" && (
-                            <p className="mt-0.5 text-[10px] font-semibold text-primary">
-                              Poupa {annualSavingsPct(plan)}%
-                            </p>
-                          )}
                         </div>
                       </div>
                     </button>
@@ -307,9 +259,7 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
                 </span>
               </motion.button>
               <p className="mt-2 text-center text-[10px] text-muted-foreground/70">
-                {period === "annual"
-                  ? `Equivale a ${monthlyEquivalent(selectedPlan).toLocaleString("pt-PT")} MZN/mês`
-                  : `Total ${formatPrice(PLAN_PRICES[selectedPlan.tier].priceMzn)} cobrado mensalmente`}
+                Total {ctaPrice} cobrado mensalmente
               </p>
             </div>
           </motion.div>
@@ -319,14 +269,10 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
               open={checkoutOpen}
               onClose={() => setCheckoutOpen(false)}
               title={`Hunie ${selectedPlan.label}`}
-              subtitle={
-                period === "annual"
-                  ? `Subscrição anual — ${formatPrice(selectedPlan.annualPriceMzn)}`
-                  : `Subscrição mensal — ${formatPrice(selectedPlan.priceMzn)}`
-              }
-              amountMzn={totalCharge(selectedPlan)}
+              subtitle={`Subscrição mensal — ${formatPrice(selectedPlan.priceMzn)}`}
+              amountMzn={selectedPlan.priceMzn}
               planTier={selectedPlan.tier}
-              billingPeriod={period}
+              billingPeriod="monthly"
               onSuccess={async () => {
                 invalidateOnboardingCache();
                 await reload();
