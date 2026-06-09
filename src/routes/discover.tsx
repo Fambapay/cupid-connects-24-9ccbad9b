@@ -297,7 +297,14 @@ function Discover() {
         onUpgrade={goShop}
       />
 
-      {!filtersOpen && <BottomNav />}
+      <FirstImpressionSheet
+        open={!!firstImpression}
+        profile={firstImpression}
+        onClose={() => setFirstImpression(null)}
+        onSend={handleSendFirstImpression}
+      />
+
+      {!filtersOpen && !firstImpression && <BottomNav />}
     </div>
   );
 }
