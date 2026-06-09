@@ -41,7 +41,43 @@ export function useBoost(onInsufficient?: () => void) {
     fetchStatus();
   }, [fetchStatus]);
 
-  // Countdown
+  // Refresh quando o tab volta a ficar visível ou ganha focus —
+  // garante sincronização se o boost foi ativado/expirado noutro tab.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onVisible = () => {
+      if (document.visibilityState === "visible") fetchStatus();
+    };
+    window.addEventListener("focus", fetchStatus);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.removeEventListener("focus", fetchStatus);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [fetchStatus]);
+
+  // Realtime: subscrever inserts/updates na tabela boosts para este profile.
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel(`boosts:${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "boosts",
+          filter: `profile_id=eq.${user.id}`,
+        },
+        () => fetchStatus(),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, fetchStatus]);
+
+  // Countdown (só corre enquanto há boost ativo).
   useEffect(() => {
     if (!status.active || !status.expiresAt) return;
     const tick = () => {
