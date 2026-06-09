@@ -38,6 +38,7 @@ export const DiscoveryPage = ({
   const [enterAnim, setEnterAnim] = useState<
     "rewind-left" | "rewind-right" | "rewind-up" | null
   >(null);
+  const [animNonce, setAnimNonce] = useState(0);
   const cardRef = useRef<ProfileCardHandle>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -90,7 +91,11 @@ export const DiscoveryPage = ({
       const result = await onSwipe?.(current, dir);
       if (result === "blocked") {
         // Parent rejected the swipe (e.g. out of likes → paywall).
-        // Bounce the card back from where it flew off.
+        // Bounce the card back from where it flew off. Reset shared
+        // motion values and bump nonce so the key changes even when the
+        // same direction is attempted twice in a row.
+        x.set(0);
+        y.set(0);
         setEnterAnim(
           dir === "left"
             ? "rewind-left"
@@ -98,6 +103,7 @@ export const DiscoveryPage = ({
               ? "rewind-right"
               : "rewind-up",
         );
+        setAnimNonce((n) => n + 1);
         return;
       }
       setHistory((h) => [...h, { id: current.id, dir }]);
@@ -151,7 +157,7 @@ export const DiscoveryPage = ({
         <>
           <ProfileCard
             ref={cardRef}
-            key={`${current.id}:${enterAnim ?? "n"}`}
+            key={`${current.id}:${enterAnim ?? "n"}:${animNonce}`}
             profile={current}
             nextProfiles={[next1, next2].filter(Boolean) as DiscoveryProfile[]}
             onSwipe={handle}
