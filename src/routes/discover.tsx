@@ -8,6 +8,7 @@ import { EmptyDiscovery } from "@/components/discovery/EmptyDiscovery";
 import { MatchOverlay } from "@/components/discovery/MatchOverlay";
 import { FiltersSheet, DEFAULT_FILTERS, type DiscoveryFilters } from "@/components/FiltersSheet";
 import { PaywallSheet } from "@/components/paywall/PaywallSheet";
+import { FirstImpressionSheet } from "@/components/discovery/FirstImpressionSheet";
 import { BrowseBanner } from "@/components/discovery/BrowseBanner";
 import { useDiscovery } from "@/hooks/useDiscovery";
 import { useCredits } from "@/hooks/useCredits";
@@ -46,6 +47,7 @@ function Discover() {
   const [openingChat, setOpeningChat] = useState(false);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [bannerVisible, setBannerVisible] = useState(false);
+  const [firstImpression, setFirstImpression] = useState<DiscoveryProfile | null>(null);
   const [pendingAction, setPendingAction] = useState<
     | { profileId: string; direction: "like" | "super" }
     | null
@@ -171,6 +173,30 @@ function Discover() {
     setFiltersOpen(true);
   };
 
+  const onFirstImpression = (profile: DiscoveryProfile) => {
+    if (!entitlements.canSendFirstImpression) {
+      openPaywall();
+      return;
+    }
+    setFirstImpression(profile);
+  };
+
+  const handleSendFirstImpression = async (message: string) => {
+    if (!firstImpression) return;
+    const target = firstImpression;
+    setFirstImpression(null);
+    try {
+      sessionStorage.setItem(`hunie:first-impression:${target.id}`, message);
+    } catch {
+      // ignore
+    }
+    await performSwipe(
+      { id: target.id, name: target.name, photo: target.photos?.[0] },
+      "super",
+    );
+    toast.success("First Impression enviada");
+  };
+
   return (
     <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
       <main
@@ -187,9 +213,11 @@ function Discover() {
             onSwipe={handleSwipe}
             onOpenFilters={onOpenFilters}
             onBoost={onBoost}
+            onFirstImpression={onFirstImpression}
             onRewind={onRewind}
             onEnd={reload}
           />
+
         ) : (
           <EmptyDiscovery loading={loading} onRefresh={reload} onOpenFilters={onOpenFilters} />
         )}
@@ -269,7 +297,14 @@ function Discover() {
         onUpgrade={goShop}
       />
 
-      {!filtersOpen && <BottomNav />}
+      <FirstImpressionSheet
+        open={!!firstImpression}
+        profile={firstImpression}
+        onClose={() => setFirstImpression(null)}
+        onSend={handleSendFirstImpression}
+      />
+
+      {!filtersOpen && !firstImpression && <BottomNav />}
     </div>
   );
 }

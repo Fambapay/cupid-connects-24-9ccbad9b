@@ -5,6 +5,7 @@ interface SwipeActionsProps {
   onSwipe: (d: SwipeDirection) => void;
   onRewind?: () => void;
   onBoost?: () => void;
+  onFirstImpression?: () => void;
   dailyLimits?: DailyLimits;
   canRewind?: boolean;
   canBoost?: boolean;
@@ -32,9 +33,12 @@ export const SwipeActions = ({
   onSwipe,
   onRewind,
   onBoost,
+  onFirstImpression,
   canRewind = true,
   canBoost = true,
 }: SwipeActionsProps) => {
+  void onBoost;
+  void canBoost;
   const press =
     (cb?: () => void) => (e: React.MouseEvent<HTMLButtonElement>) => {
       const el = e.currentTarget;
@@ -92,14 +96,12 @@ export const SwipeActions = ({
       </button>
 
       <button
-        onClick={press(onBoost)}
-        disabled={!canBoost}
-        aria-label="Boost"
+        onClick={press(onFirstImpression)}
+        aria-label="First Impression"
         style={{
           ...baseBtn,
           width: 48,
           height: 48,
-          opacity: canBoost ? 1 : 0.45,
         }}
       >
         <Send size={20} color="#4FA8FF" strokeWidth={2.4} style={{ transform: "translateX(-1px)" }} />

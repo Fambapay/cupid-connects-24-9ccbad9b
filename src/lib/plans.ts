@@ -18,6 +18,7 @@ export interface PlanEntitlements {
   
   profileAnalytics: boolean;
   earlyAccess: boolean;
+  canSendFirstImpression: boolean;
 }
 
 export const NO_TIER_ENTITLEMENTS: PlanEntitlements = {
@@ -36,6 +37,7 @@ export const NO_TIER_ENTITLEMENTS: PlanEntitlements = {
   
   profileAnalytics: false,
   earlyAccess: false,
+  canSendFirstImpression: false,
 };
 
 const SELECT: PlanEntitlements = {
@@ -66,6 +68,7 @@ const ELITE: PlanEntitlements = {
   
   profileAnalytics: true,
   earlyAccess: true,
+  canSendFirstImpression: true,
 };
 
 export function getEntitlements(tier: MembershipTier | null | undefined): PlanEntitlements {
