@@ -93,8 +93,9 @@ function Discover() {
   const performSwipe = async (
     target: { id: string; name: string; photo?: string | null },
     direction: "like" | "super" | "pass",
+    options?: { firstImpressionMessage?: string },
   ) => {
-    const result = await swipe(target.id, direction);
+    const result = await swipe(target.id, direction, options);
     if (direction === "super") {
       if (result.reason === "insufficient_credits") {
         toast.error("Sem Super Likes — vai à loja");
