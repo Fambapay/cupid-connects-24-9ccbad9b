@@ -43,7 +43,7 @@ export function useLikedMe() {
     ] = await Promise.all([
       supabase
         .from("swipes")
-        .select("swiper_id,direction,created_at")
+        .select("swiper_id,direction,created_at,first_impression_message")
         .eq("swiped_id", user.id)
         .in("direction", ["like", "super"])
         .order("created_at", { ascending: false }),
