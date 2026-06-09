@@ -5,11 +5,13 @@ import { useAuth } from "./useAuth";
 export interface Credits {
   boost_balance: number;
   super_like_balance: number;
+  first_impression_balance: number;
 }
 
 const EMPTY_CREDITS: Credits = {
   boost_balance: 0,
   super_like_balance: 0,
+  first_impression_balance: 0,
 };
 
 const creditsCache = new Map<string, Credits>();
