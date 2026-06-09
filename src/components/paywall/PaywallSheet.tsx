@@ -259,9 +259,7 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
                 </span>
               </motion.button>
               <p className="mt-2 text-center text-[10px] text-muted-foreground/70">
-                {period === "annual"
-                  ? `Equivale a ${monthlyEquivalent(selectedPlan).toLocaleString("pt-PT")} MZN/mês`
-                  : `Total ${formatPrice(PLAN_PRICES[selectedPlan.tier].priceMzn)} cobrado mensalmente`}
+                Total {ctaPrice} cobrado mensalmente
               </p>
             </div>
           </motion.div>
