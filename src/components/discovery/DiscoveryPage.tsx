@@ -18,6 +18,8 @@ interface DiscoveryPageProps {
   onRewind?: () => boolean | Promise<boolean | unknown>;
   onEnd?: () => void;
   showTopBar?: boolean;
+  boostActive?: boolean;
+  boostMultiplier?: number;
 }
 
 export const DiscoveryPage = ({
