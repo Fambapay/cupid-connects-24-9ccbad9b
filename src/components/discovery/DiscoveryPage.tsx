@@ -31,6 +31,8 @@ export const DiscoveryPage = ({
   onRewind,
   onEnd,
   showTopBar = true,
+  boostActive = false,
+  boostMultiplier = 10,
 }: DiscoveryPageProps) => {
   const [index, setIndex] = useState(0);
   const [rewinding, setRewinding] = useState(false);
