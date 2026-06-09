@@ -169,7 +169,9 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     const localY = useMotionValue(0);
     const x = sharedX ?? localX;
     const y = sharedY ?? localY;
-    const entry = useMotionValue(enterAnim ? 1 : 0); // 0 = settled, 1 = stacked pose
+    // Start in the stacked pose on first paint so the spring-in is smooth
+    // (avoids a 1-frame jump from settled -> stacked before the animation starts).
+    const entry = useMotionValue(enterAnim ? 0 : 1); // 0 = settled, 1 = stacked pose
     const cardRef = useRef<HTMLDivElement>(null);
     const photoWrapRef = useRef<HTMLDivElement>(null);
     const infoWrapRef = useRef<HTMLDivElement>(null);
@@ -242,15 +244,16 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     useMotionValueEvent(entry, "change", schedule);
 
 
-    // Spring the card up from the stacked pose into place on mount
+    // Spring the card up from the stacked pose into place on mount.
+    // `entry` is already initialised to 1 so the first paint matches the start
+    // of the animation — no visible jump.
     useEffect(() => {
       if (enterAnim) return; // rewind handles its own entry
-      entry.set(1);
       const controls = animate(entry, 0, {
         type: "spring",
-        stiffness: 340,
-        damping: 30,
-        mass: 0.7,
+        stiffness: 260,
+        damping: 28,
+        mass: 0.9,
         restDelta: 0.001,
       });
       return () => controls.stop();
