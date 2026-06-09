@@ -191,13 +191,39 @@ function OnboardingPage() {
 
   useEffect(() => {
     if (!profile || !hydrated) return;
-    setDraft((d) => ({
-      ...d,
-      stepIdx: d.stepIdx || Math.max(0, (profile.onboarding_step ?? 1) - 1),
-      name: d.name || profile.name || "",
-      bio: d.bio || profile.bio || "",
-      city: d.city || profile.city || "",
-    }));
+    setDraft((d) => {
+      // Parse birthdate from DB (YYYY-MM-DD)
+      let day = d.day, month = d.month, year = d.year;
+      const bd = (profile as { birthdate?: string | null }).birthdate ?? null;
+      if (bd && !d.day && !d.month && !d.year) {
+        const [y, m, da] = bd.split("-").map((n) => parseInt(n, 10));
+        if (!Number.isNaN(y) && !Number.isNaN(m) && !Number.isNaN(da)) {
+          year = y; month = m; day = da;
+        }
+      }
+      // Map interested_in array back to enum
+      let interested = d.interested;
+      if (!interested) {
+        const arr = (profile as { interested_in?: string[] | null }).interested_in ?? [];
+        if (arr.length === 0) interested = null;
+        else if (arr.includes("man") && arr.includes("woman")) interested = "everyone";
+        else if (arr.includes("woman")) interested = "women";
+        else if (arr.includes("man")) interested = "men";
+      }
+      return {
+        ...d,
+        stepIdx: Math.max(d.stepIdx, (profile.onboarding_step ?? 1) - 1),
+        name: d.name || profile.name || "",
+        bio: d.bio || profile.bio || "",
+        city: d.city || profile.city || "",
+        gender: d.gender || ((profile as { gender?: ExtendedGender | null }).gender ?? null),
+        interested,
+        interests: d.interests.length ? d.interests : ((profile as { interests?: string[] | null }).interests ?? []),
+        latitude: d.latitude ?? ((profile as { latitude?: number | null }).latitude ?? null),
+        longitude: d.longitude ?? ((profile as { longitude?: number | null }).longitude ?? null),
+        day, month, year,
+      };
+    });
   }, [profile, hydrated]);
 
   // Persist draft locally
@@ -206,17 +232,40 @@ function OnboardingPage() {
     try { localStorage.setItem(storageKey(user.id), JSON.stringify(draft)); } catch { /* noop */ }
   }, [draft, hydrated, user]);
 
-
-
-  // Persist current step to DB so reopen resumes
+  // Incremental persistence to DB (debounced) — so user can resume on another device.
+  // Avoids setting onboarding_completed (handled only by finish()).
   useEffect(() => {
     if (!hydrated || !user) return;
-    supabase
-      .from("profiles")
-      .update({ onboarding_step: draft.stepIdx + 1 })
-      .eq("id", user.id)
-      .then(() => {});
-  }, [draft.stepIdx, hydrated, user]);
+    const t = window.setTimeout(() => {
+      const { name, bio, city, gender, interested, interests, latitude, longitude, day, month, year, stepIdx } = draft;
+      const birthdate =
+        day && month && year
+          ? `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+          : null;
+      const age = birthdate ? computeAge(birthdate) : null;
+      const interestedMap: Record<InterestedIn, string[]> = {
+        men: ["man"],
+        women: ["woman"],
+        everyone: ["man", "woman", "nonbinary"],
+      };
+      const patch: Record<string, unknown> = {
+        onboarding_step: stepIdx + 1,
+        name: name.trim() || null,
+        bio: bio.trim() || null,
+        city: city.trim() || null,
+        gender,
+        interested_in: interested ? interestedMap[interested] : [],
+        interests,
+        latitude,
+        longitude,
+        birthdate,
+        age,
+      };
+      supabase.from("profiles").update(patch).eq("id", user.id).then(() => {});
+    }, 600);
+    return () => window.clearTimeout(t);
+  }, [draft, hydrated, user]);
+
 
   const set = useCallback(<K extends keyof DraftState>(key: K, value: DraftState[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
