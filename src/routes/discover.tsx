@@ -100,7 +100,7 @@ function Discover() {
       if (result.reason === "insufficient_credits") {
         toast.error("Sem Super Likes — vai à loja");
         goShop();
-        return;
+        return result;
       }
       if (typeof result.remainingSuperLikes === "number") {
         syncCredits({ super_like_balance: result.remainingSuperLikes });
@@ -110,6 +110,7 @@ function Discover() {
     if (result.matched) {
       setMatched({ id: target.id, name: target.name, photo: target.photo ?? null });
     }
+    return result;
   };
 
   const handleSwipe = async (
