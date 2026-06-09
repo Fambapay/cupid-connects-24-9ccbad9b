@@ -167,7 +167,7 @@ function OnboardingPage() {
   const { profile, reload } = useProfile();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { photos } = usePhotoUpload();
+  const { photos, upload, remove, loading } = usePhotoUpload();
 
   const [draft, setDraft] = useState<DraftState>(initialDraft);
   const [hydrated, setHydrated] = useState(false);
