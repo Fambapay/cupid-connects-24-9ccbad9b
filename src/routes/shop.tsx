@@ -124,7 +124,7 @@ function ShopPage() {
           <motion.button
             whileTap={{ scale: 0.9 }}
             onClick={() => {
-              navigate({ to: "/discover" });
+              navigate({ to: "/profile" });
             }}
             className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.06]"
             aria-label="Voltar"
