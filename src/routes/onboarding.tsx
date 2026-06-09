@@ -123,19 +123,8 @@ const EXTENDED_GENDERS: { value: ExtendedGender; label: string }[] = [
   { value: "other", label: "Outro" },
 ];
 
-const PROMPTS = [
-  "O que me faz rir…",
-  "O melhor de mim…",
-  "Procuro alguém que…",
-];
-
 // ─────────────────────────────────────────────────────────────
 // Page
-
-interface PromptDraft {
-  question: string;
-  answer: string;
-}
 
 interface DraftState {
   stepIdx: number;
@@ -150,7 +139,6 @@ interface DraftState {
   interests: string[];
   latitude: number | null;
   longitude: number | null;
-  prompts: PromptDraft[];
 }
 
 const initialDraft: DraftState = {
