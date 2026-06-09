@@ -173,6 +173,30 @@ function Discover() {
     setFiltersOpen(true);
   };
 
+  const onFirstImpression = (profile: DiscoveryProfile) => {
+    if (!entitlements.canSendFirstImpression) {
+      openPaywall();
+      return;
+    }
+    setFirstImpression(profile);
+  };
+
+  const handleSendFirstImpression = async (message: string) => {
+    if (!firstImpression) return;
+    const target = firstImpression;
+    setFirstImpression(null);
+    try {
+      sessionStorage.setItem(`hunie:first-impression:${target.id}`, message);
+    } catch {
+      // ignore
+    }
+    await performSwipe(
+      { id: target.id, name: target.name, photo: target.photos?.[0] },
+      "super",
+    );
+    toast.success("First Impression enviada");
+  };
+
   return (
     <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
       <main
