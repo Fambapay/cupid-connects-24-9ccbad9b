@@ -8,6 +8,7 @@ import { EmptyDiscovery } from "@/components/discovery/EmptyDiscovery";
 import { MatchOverlay } from "@/components/discovery/MatchOverlay";
 import { FiltersSheet, DEFAULT_FILTERS, type DiscoveryFilters } from "@/components/FiltersSheet";
 import { PaywallSheet } from "@/components/paywall/PaywallSheet";
+import { FirstImpressionSheet } from "@/components/discovery/FirstImpressionSheet";
 import { BrowseBanner } from "@/components/discovery/BrowseBanner";
 import { useDiscovery } from "@/hooks/useDiscovery";
 import { useCredits } from "@/hooks/useCredits";
@@ -46,6 +47,7 @@ function Discover() {
   const [openingChat, setOpeningChat] = useState(false);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [bannerVisible, setBannerVisible] = useState(false);
+  const [firstImpression, setFirstImpression] = useState<DiscoveryProfile | null>(null);
   const [pendingAction, setPendingAction] = useState<
     | { profileId: string; direction: "like" | "super" }
     | null
