@@ -111,6 +111,18 @@ export function useNewMessageNotifier() {
 
 
 
+    // Fetch own tier for like-reveal gating (mirrors push payload logic)
+    let isPremium = false;
+    supabase
+      .from("profiles")
+      .select("membership_tier")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        const tier = (data?.membership_tier as string | undefined) ?? "free";
+        isPremium = tier !== "free";
+      });
+
     const ch = supabase
       .channel(`global-msgs-${user.id}`)
       .on(
@@ -156,9 +168,115 @@ export function useNewMessageNotifier() {
       )
       .subscribe();
 
+    // New match toast
+    const matchesCh = supabase
+      .channel(`global-matches-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "matches" },
+        async (payload) => {
+          if (!notificationsEnabled) return;
+          const row = payload.new as { id: string; user_a: string; user_b: string };
+          if (row.user_a !== user.id && row.user_b !== user.id) return;
+          if (currentPathRef.current === "/matches") return;
+
+          const peer = await resolvePeer(row.id);
+          if (!peer) return;
+          toast.custom(
+            (t) => (
+              <AppleToast
+                toastId={t}
+                title="Novo match 💘"
+                body={`Tu e ${peer.name} deram like. Manda já uma mensagem!`}
+                avatar={peer.photo}
+                appName="Hunie"
+                timeLabel="agora"
+                onClick={() => {
+                  toast.dismiss(t);
+                  navigate({ to: "/matches" });
+                }}
+                onDismiss={() => toast.dismiss(t)}
+              />
+            ),
+            { duration: 5000 },
+          );
+        },
+      )
+      .subscribe();
+
+    // New like toast (only received likes/super likes, not passes)
+    const likesCh = supabase
+      .channel(`global-likes-${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "swipes",
+          filter: `swiped_id=eq.${user.id}`,
+        },
+        async (payload) => {
+          if (!notificationsEnabled) return;
+          const s = payload.new as {
+            id: string;
+            swiper_id: string;
+            direction: "like" | "pass" | "super";
+          };
+          if (s.direction === "pass") return;
+          if (currentPathRef.current === "/discover") return;
+
+          let revealName = "Alguém";
+          let avatar = "";
+          if (isPremium) {
+            const [{ data: prof }, { data: photo }] = await Promise.all([
+              supabase.from("profiles").select("name").eq("id", s.swiper_id).maybeSingle(),
+              supabase
+                .from("profile_photos")
+                .select("storage_path")
+                .eq("profile_id", s.swiper_id)
+                .order("position", { ascending: true })
+                .limit(1)
+                .maybeSingle(),
+            ]);
+            revealName = (prof?.name as string) || "Alguém";
+            if (photo?.storage_path) {
+              avatar = await signPhoto(photo.storage_path as string, 3600, {
+                width: 96,
+                height: 96,
+                resize: "cover",
+                quality: 70,
+              });
+            }
+          }
+
+          const isSuper = s.direction === "super";
+          toast.custom(
+            (t) => (
+              <AppleToast
+                toastId={t}
+                title={isSuper ? "Super Like ⭐" : "Novo like 👀"}
+                body={`${revealName} mostrou interesse no teu perfil.`}
+                avatar={avatar}
+                appName="Hunie"
+                timeLabel="agora"
+                onClick={() => {
+                  toast.dismiss(t);
+                  navigate({ to: "/discover" });
+                }}
+                onDismiss={() => toast.dismiss(t)}
+              />
+            ),
+            { duration: 5000 },
+          );
+        },
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(ch);
       supabase.removeChannel(settingsCh);
+      supabase.removeChannel(matchesCh);
+      supabase.removeChannel(likesCh);
     };
   }, [user, navigate]);
 }
