@@ -8,14 +8,27 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
+    let initialized = false;
+    const finalize = (s: Session | null) => {
       setSession(s);
-      setLoading(false);
+      if (!initialized) {
+        initialized = true;
+        setLoading(false);
+      }
+    };
+
+    // Source of truth: onAuthStateChange fires INITIAL_SESSION immediately
+    // on subscribe, then for every subsequent SIGNED_IN/SIGNED_OUT/etc.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
+      finalize(s);
     });
+
+    // Fallback in case INITIAL_SESSION is delayed: resolve once with whatever
+    // getSession returns. If onAuthStateChange already fired, this is a no-op.
     supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
+      if (!initialized) finalize(data.session);
     });
+
     return () => subscription.unsubscribe();
   }, []);
 
