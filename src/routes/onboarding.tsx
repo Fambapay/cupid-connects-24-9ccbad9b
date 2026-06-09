@@ -662,12 +662,6 @@ function WelcomeStep({ onStart }: { onStart: () => void }) {
         className="space-y-4 pb-2"
       >
         <PrimaryButton onClick={onStart}>Começar</PrimaryButton>
-        <p className="text-center text-sm text-muted-foreground">
-          Já tens conta?{" "}
-          <Link to="/auth/login" className="font-semibold text-foreground">
-            Entrar
-          </Link>
-        </p>
       </motion.div>
     </div>
   );
