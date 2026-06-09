@@ -21,7 +21,7 @@ export interface PlanEntitlements {
 }
 
 export const NO_TIER_ENTITLEMENTS: PlanEntitlements = {
-  dailyLikes: 25,
+  dailyLikes: 5,
   dailySuperLikes: 0,
   weeklyBoosts: 0,
   dailyBoosts: 0,

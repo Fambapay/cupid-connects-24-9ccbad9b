@@ -83,8 +83,8 @@ function Discover() {
     isVerified: p.is_verified,
   }));
 
-  // Limit non-members to first 6 profiles
-  const visible = isPremium ? mapped : mapped.slice(0, 6);
+  // Free users browse the full feed; the daily-likes counter (5/day) gates the like action itself.
+  const visible = mapped;
   void index;
 
   const performSwipe = async (
@@ -118,14 +118,24 @@ function Discover() {
       return;
     }
 
-    // Like / super require active membership.
-    if (!isPremium) {
+    // Super Like requires active membership for non-premium users.
+    if (direction === "super" && !isPremium) {
       setPendingAction({ profileId: target.id, direction });
       openPaywall();
       return;
     }
 
-    if (dailyLimits.likesLimit >= 0 && dailyLimits.likesRemaining <= 0) {
+    // Like: free users get 5/day. On the 6th attempt, open paywall.
+    if (direction === "like" && !isPremium) {
+      if (dailyLimits.likesLimit >= 0 && dailyLimits.likesRemaining <= 0) {
+        setPendingAction({ profileId: target.id, direction });
+        openPaywall();
+        return;
+      }
+    }
+
+    // Premium daily-limit guard (likesLimit < 0 means unlimited).
+    if (dailyLimits.likesLimit >= 0 && dailyLimits.likesRemaining <= 0 && isPremium) {
       toast.error("Atingiste o limite diário de likes.");
       return;
     }
