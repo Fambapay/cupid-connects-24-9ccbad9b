@@ -8,7 +8,10 @@ import type { DiscoveryProfile, SwipeDirection } from "./types";
 
 interface DiscoveryPageProps {
   profiles: DiscoveryProfile[];
-  onSwipe?: (profile: DiscoveryProfile, dir: SwipeDirection) => void;
+  onSwipe?: (
+    profile: DiscoveryProfile,
+    dir: SwipeDirection,
+  ) => void | "blocked" | Promise<void | "blocked">;
   onOpenFilters?: () => void;
   onBoost?: () => void;
   onRewind?: () => boolean | Promise<boolean | unknown>;
@@ -82,9 +85,21 @@ export const DiscoveryPage = ({
 
 
   const handle = useCallback(
-    (dir: SwipeDirection) => {
+    async (dir: SwipeDirection) => {
       if (!current) return;
-      onSwipe?.(current, dir);
+      const result = await onSwipe?.(current, dir);
+      if (result === "blocked") {
+        // Parent rejected the swipe (e.g. out of likes → paywall).
+        // Bounce the card back from where it flew off.
+        setEnterAnim(
+          dir === "left"
+            ? "rewind-left"
+            : dir === "right"
+              ? "rewind-right"
+              : "rewind-up",
+        );
+        return;
+      }
       setHistory((h) => [...h, { id: current.id, dir }]);
       setRewindUsed(false);
       setEnterAnim(null);
