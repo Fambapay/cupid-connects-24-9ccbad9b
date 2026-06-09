@@ -190,12 +190,28 @@ function Discover() {
         </div>
       )}
 
-      <PaywallFlow
+      <PaywallSheet
         open={paywallOpen}
-        onClose={() => setPaywallOpen(false)}
-        onSuccess={() => {
+        onClose={() => {
           setPaywallOpen(false);
-          reload();
+          setPendingAction(null);
+        }}
+        onSuccess={async () => {
+          setPaywallOpen(false);
+          const action = pendingAction;
+          setPendingAction(null);
+          await reload();
+          if (action) {
+            // Auto-record the like that triggered the paywall.
+            const target = items.find((p) => p.id === action.profileId);
+            if (target) {
+              setIndex((i) => i + 1);
+              await performSwipe(
+                { id: target.id, name: target.name, photo: target.photos?.[0] },
+                action.direction,
+              );
+            }
+          }
         }}
       />
 
