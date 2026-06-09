@@ -181,7 +181,7 @@ function Discover() {
     // Qualquer user (Free ou Premium) que tenha boost_balance > 0 pode ativar.
     // Sem créditos → manda para a loja (onInsufficient já tratado pelo useBoost,
     // mas validamos antes para evitar uma RPC desnecessária).
-    if (credits.boost_balance <= 0) { goShop(); return; }
+    if (credits.boost_balance <= 0) { setCreditShop("boost"); return; }
     boost.activate();
   };
 
