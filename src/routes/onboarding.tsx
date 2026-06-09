@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/drawer";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { usePhotoUpload } from "@/hooks/usePhotoUpload";
+import { usePhotoUpload, type PhotoRow } from "@/hooks/usePhotoUpload";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
