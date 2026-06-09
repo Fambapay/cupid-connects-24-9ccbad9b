@@ -18,10 +18,16 @@ function generateToken(): string {
 }
 
 function authorized(request: Request): boolean {
-  const anon = process.env.SUPABASE_PUBLISHABLE_KEY || ''
-  const header = request.headers.get('apikey') || request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') || ''
-  return !!anon && header === anon
+  const secret = process.env.CRON_SECRET || ''
+  if (!secret) return false
+  const header =
+    request.headers.get('x-cron-secret') ||
+    request.headers.get('apikey') ||
+    request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') ||
+    ''
+  return header === secret
 }
+
 
 async function ensureUnsubToken(email: string): Promise<string | null> {
   const norm = email.toLowerCase()
