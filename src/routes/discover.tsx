@@ -195,7 +195,12 @@ function Discover() {
       { id: target.id, name: target.name, photo: target.photos?.[0] },
       "super",
     );
-    toast.success("First Impression enviada");
+    toast.custom(
+      () => (
+        <FirstImpressionToast photo={target.photos?.[0]} name={target.name} />
+      ),
+      { duration: 2600 },
+    );
   };
 
   return (
