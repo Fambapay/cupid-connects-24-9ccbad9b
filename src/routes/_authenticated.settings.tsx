@@ -434,7 +434,7 @@ function SettingsPage() {
               ) : locationPermission === 'denied' ? (
                 <span className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide">Bloqueada</span>
               ) : (
-                <span className="px-3 py-1.5 rounded-full bg-brand-purple text-primary-foreground text-[12px] font-bold">Ativar</span>
+                <span className="px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-foreground text-[12px] font-bold">Ativar</span>
               )}
             </button>
 
@@ -442,7 +442,7 @@ function SettingsPage() {
             <div className="p-4 border-b border-white/[0.06]">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-[15px] text-foreground font-medium">Distância máxima</span>
-                <span className="text-[13px] font-semibold text-brand-purple tabular-nums tracking-tight">{distanceValue} km</span>
+                <span className="text-[13px] font-semibold text-foreground tabular-nums tracking-tight">{distanceValue} km</span>
               </div>
               <Slider value={[distanceValue]} onValueChange={(v) => setLiveDistance(v[0])}
                 onValueCommit={handleDistanceChange} max={500} min={5} step={5} />
@@ -455,7 +455,7 @@ function SettingsPage() {
             <div className="p-4 border-b border-white/[0.06]">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-[15px] text-foreground font-medium">Faixa etária</span>
-                <span className="text-[13px] font-semibold text-brand-purple tabular-nums tracking-tight">{ageMin}–{ageMax}</span>
+                <span className="text-[13px] font-semibold text-foreground tabular-nums tracking-tight">{ageMin}–{ageMax}</span>
               </div>
               <Slider value={[ageMin, ageMax]} onValueChange={(v) => setLiveAge([v[0], v[1]])}
                 onValueCommit={handleAgeChange} max={100} min={18} step={1} minStepsBetweenThumbs={3} />
@@ -493,7 +493,7 @@ function SettingsPage() {
             <div className="p-4 border-b border-white/[0.06]">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-[15px] text-foreground font-medium">Nº mínimo de fotos</span>
-                <span className="text-[13px] font-semibold text-brand-purple tabular-nums tracking-tight">{minPhotosValue}</span>
+                <span className="text-[13px] font-semibold text-foreground tabular-nums tracking-tight">{minPhotosValue}</span>
               </div>
               <Slider value={[minPhotosValue]}
                 onValueChange={(v) => isPremium && setLiveMinPhotos(v[0])}
