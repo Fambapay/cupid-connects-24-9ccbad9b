@@ -282,6 +282,9 @@ function Discover() {
               await performSwipe(
                 { id: target.id, name: target.name, photo: target.photos?.[0] },
                 action.direction,
+                action.firstImpressionMessage
+                  ? { firstImpressionMessage: action.firstImpressionMessage }
+                  : undefined,
               );
             }
           }
