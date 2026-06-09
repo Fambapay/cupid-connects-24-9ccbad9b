@@ -188,14 +188,10 @@ function Discover() {
       return;
     }
     setFirstImpression(null);
-    try {
-      sessionStorage.setItem(`hunie:first-impression:${target.id}`, message);
-    } catch {
-      // ignore
-    }
     await performSwipe(
       { id: target.id, name: target.name, photo: target.photos?.[0] },
       "super",
+      { firstImpressionMessage: message },
     );
     toast.custom(
       () => (
