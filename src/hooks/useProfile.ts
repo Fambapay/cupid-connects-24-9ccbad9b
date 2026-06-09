@@ -26,10 +26,13 @@ export interface Profile {
   longitude: number | null;
 }
 
+const profileCache = new Map<string, Profile>();
+
 export function useProfile() {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const cached = user ? profileCache.get(user.id) ?? null : null;
+  const [profile, setProfile] = useState<Profile | null>(cached);
+  const [loading, setLoading] = useState(!cached);
 
   const load = useCallback(async () => {
     if (!user) {
@@ -37,7 +40,7 @@ export function useProfile() {
       setLoading(false);
       return;
     }
-    setLoading(true);
+    if (!profileCache.has(user.id)) setLoading(true);
     const [{ data }, { data: phoneData }] = await Promise.all([
       supabase
         .from("profiles")
@@ -46,15 +49,23 @@ export function useProfile() {
         .maybeSingle(),
       supabase.rpc("get_my_phone"),
     ]);
-    setProfile(
-      data
-        ? ({ ...(data as any), phone: (phoneData as unknown as string | null) ?? null } as Profile)
-        : null
-    );
+    const next = data
+      ? ({ ...(data as any), phone: (phoneData as unknown as string | null) ?? null } as Profile)
+      : null;
+    if (next) profileCache.set(user.id, next);
+    setProfile(next);
     setLoading(false);
   }, [user]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    // Hydrate from cache immediately on mount, then refresh in background.
+    if (user) {
+      const c = profileCache.get(user.id);
+      if (c) setProfile(c);
+    }
+    load();
+  }, [load, user]);
+
 
   const updateProfile = async (patch: Partial<Profile>) => {
     if (!user) throw new Error("Not authenticated");

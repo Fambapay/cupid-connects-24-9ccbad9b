@@ -48,9 +48,12 @@ async function compressImage(file: File): Promise<Blob> {
   }
 }
 
+const photosCache = new Map<string, PhotoRow[]>();
+
 export function usePhotoUpload() {
   const { user } = useAuth();
-  const [photos, setPhotos] = useState<PhotoRow[]>([]);
+  const cached = user ? photosCache.get(user.id) ?? [] : [];
+  const [photos, setPhotos] = useState<PhotoRow[]>(cached);
   const [loading, setLoading] = useState(false);
 
   const load = useCallback(async () => {
@@ -64,12 +67,18 @@ export function usePhotoUpload() {
     const withUrls = await Promise.all(
       rows.map(async (r) => ({ ...r, url: await signUrl(r.storage_path) })),
     );
+    photosCache.set(user.id, withUrls);
     setPhotos(withUrls);
   }, [user]);
 
   useEffect(() => {
+    if (user) {
+      const c = photosCache.get(user.id);
+      if (c) setPhotos(c);
+    }
     load();
-  }, [load]);
+  }, [load, user]);
+
 
   useEffect(() => {
     if (!user || typeof window === "undefined") return;
