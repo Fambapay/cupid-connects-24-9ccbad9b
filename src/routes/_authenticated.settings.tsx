@@ -754,6 +754,7 @@ function SettingsPage() {
           </div>
         </SheetContent>
       </Sheet>
+      <PaywallSheet open={paywallOpen} onClose={() => setPaywallOpen(false)} />
     </div>
   );
 }
