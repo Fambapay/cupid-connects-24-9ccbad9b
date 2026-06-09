@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/drawer";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { usePhotoUpload } from "@/hooks/usePhotoUpload";
+import { usePhotoUpload, type PhotoRow } from "@/hooks/usePhotoUpload";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -167,7 +167,7 @@ function OnboardingPage() {
   const { profile, reload } = useProfile();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { photos } = usePhotoUpload();
+  const { photos, upload, remove, loading } = usePhotoUpload();
 
   const [draft, setDraft] = useState<DraftState>(initialDraft);
   const [hydrated, setHydrated] = useState(false);
@@ -435,7 +435,13 @@ function OnboardingPage() {
                   />
                 )}
                 {stepId === "photos" && (
-                  <PhotosStep onNext={goNext} count={photos.length} />
+                  <PhotosStep
+                    onNext={goNext}
+                    photos={photos}
+                    upload={upload}
+                    remove={remove}
+                    loading={loading}
+                  />
                 )}
                 {stepId === "bio" && (
                   <BioStep
@@ -1183,8 +1189,19 @@ function InterestedStep({
 }
 
 // Photos ─────
-function PhotosStep({ onNext }: { onNext: () => void; count?: number }) {
-  const { photos, upload, remove, loading } = usePhotoUpload();
+function PhotosStep({
+  onNext,
+  photos,
+  upload,
+  remove,
+  loading,
+}: {
+  onNext: () => void;
+  photos: PhotoRow[];
+  upload: (file: File) => Promise<void>;
+  remove: (id: string) => Promise<void>;
+  loading: boolean;
+}) {
   const { toast } = useToast();
   const [actionFor, setActionFor] = useState<string | null>(null);
 
