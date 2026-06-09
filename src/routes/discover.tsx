@@ -9,6 +9,7 @@ import { MatchOverlay } from "@/components/discovery/MatchOverlay";
 import { FiltersSheet, DEFAULT_FILTERS, type DiscoveryFilters } from "@/components/FiltersSheet";
 import { PaywallSheet } from "@/components/paywall/PaywallSheet";
 import { FirstImpressionSheet } from "@/components/discovery/FirstImpressionSheet";
+import { FirstImpressionToast } from "@/components/discovery/FirstImpressionToast";
 import { BrowseBanner } from "@/components/discovery/BrowseBanner";
 import { useDiscovery } from "@/hooks/useDiscovery";
 import { useCredits } from "@/hooks/useCredits";
@@ -195,7 +196,12 @@ function Discover() {
       { id: target.id, name: target.name, photo: target.photos?.[0] },
       "super",
     );
-    toast.success("First Impression enviada");
+    toast.custom(
+      () => (
+        <FirstImpressionToast photo={target.photos?.[0]} name={target.name} />
+      ),
+      { duration: 2600 },
+    );
   };
 
   return (
