@@ -251,7 +251,7 @@ function Discover() {
             onFirstImpression={onFirstImpression}
             onRewind={onRewind}
             onEnd={reload}
-            boostActive={boost.status.active}
+            boostActive={boost.active}
             boostMultiplier={10}
           />
 
