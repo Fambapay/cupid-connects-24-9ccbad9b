@@ -269,14 +269,10 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
               open={checkoutOpen}
               onClose={() => setCheckoutOpen(false)}
               title={`Hunie ${selectedPlan.label}`}
-              subtitle={
-                period === "annual"
-                  ? `Subscrição anual — ${formatPrice(selectedPlan.annualPriceMzn)}`
-                  : `Subscrição mensal — ${formatPrice(selectedPlan.priceMzn)}`
-              }
-              amountMzn={totalCharge(selectedPlan)}
+              subtitle={`Subscrição mensal — ${formatPrice(selectedPlan.priceMzn)}`}
+              amountMzn={selectedPlan.priceMzn}
               planTier={selectedPlan.tier}
-              billingPeriod={period}
+              billingPeriod="monthly"
               onSuccess={async () => {
                 invalidateOnboardingCache();
                 await reload();
