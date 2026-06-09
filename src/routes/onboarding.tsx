@@ -1189,8 +1189,19 @@ function InterestedStep({
 }
 
 // Photos ─────
-function PhotosStep({ onNext }: { onNext: () => void; count?: number }) {
-  const { photos, upload, remove, loading } = usePhotoUpload();
+function PhotosStep({
+  onNext,
+  photos,
+  upload,
+  remove,
+  loading,
+}: {
+  onNext: () => void;
+  photos: PhotoRow[];
+  upload: (file: File) => Promise<void>;
+  remove: (id: string) => Promise<void>;
+  loading: boolean;
+}) {
   const { toast } = useToast();
   const [actionFor, setActionFor] = useState<string | null>(null);
 
