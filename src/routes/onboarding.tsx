@@ -435,7 +435,13 @@ function OnboardingPage() {
                   />
                 )}
                 {stepId === "photos" && (
-                  <PhotosStep onNext={goNext} count={photos.length} />
+                  <PhotosStep
+                    onNext={goNext}
+                    photos={photos}
+                    upload={upload}
+                    remove={remove}
+                    loading={loading}
+                  />
                 )}
                 {stepId === "bio" && (
                   <BioStep
