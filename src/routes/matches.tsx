@@ -84,8 +84,11 @@ function LikesPage() {
                   </div>
                 )}
                 {p.firstImpression && !isPremium && (
-                  <div className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-[#4FA8FF]/90 shadow-lg ring-1 ring-white/30">
-                    <Send className="h-3.5 w-3.5 text-white" strokeWidth={2.6} />
+                  <div className="absolute left-2 right-2 top-2 flex items-center gap-1.5 rounded-full border border-white/20 bg-[#4FA8FF]/85 px-2.5 py-1 shadow-lg backdrop-blur-md">
+                    <Send className="h-3 w-3 shrink-0 text-white" strokeWidth={2.8} />
+                    <span className="truncate text-[10.5px] font-semibold uppercase tracking-wide text-white">
+                      Mensagem · desbloquear
+                    </span>
                   </div>
                 )}
                 <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between gap-2">

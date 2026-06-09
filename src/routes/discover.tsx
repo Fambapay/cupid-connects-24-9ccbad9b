@@ -100,7 +100,7 @@ function Discover() {
       if (result.reason === "insufficient_credits") {
         toast.error("Sem Super Likes — vai à loja");
         goShop();
-        return;
+        return result;
       }
       if (typeof result.remainingSuperLikes === "number") {
         syncCredits({ super_like_balance: result.remainingSuperLikes });
@@ -110,6 +110,7 @@ function Discover() {
     if (result.matched) {
       setMatched({ id: target.id, name: target.name, photo: target.photo ?? null });
     }
+    return result;
   };
 
   const handleSwipe = async (
@@ -187,12 +188,23 @@ function Discover() {
       openPaywall();
       return;
     }
+    if (credits.super_like_balance <= 0) {
+      setFirstImpression(null);
+      toast.error("Sem Super Likes — vai à loja");
+      goShop();
+      return;
+    }
     setFirstImpression(null);
-    await performSwipe(
+    setIndex((i) => i + 1);
+    const result = await performSwipe(
       { id: target.id, name: target.name, photo: target.photos?.[0] },
       "super",
       { firstImpressionMessage: message },
     );
+    if (result?.reason) {
+      // performSwipe already surfaced the right error toast / paywall.
+      return;
+    }
     toast.custom(
       () => (
         <FirstImpressionToast photo={target.photos?.[0]} name={target.name} />
@@ -304,6 +316,7 @@ function Discover() {
       <FirstImpressionSheet
         open={!!firstImpression}
         profile={firstImpression}
+        superLikeBalance={credits.super_like_balance}
         onClose={() => setFirstImpression(null)}
         onSend={handleSendFirstImpression}
       />
