@@ -6,7 +6,7 @@ import type { DiscoveryProfile } from "./types";
 interface FirstImpressionSheetProps {
   open: boolean;
   profile: DiscoveryProfile | null;
-  superLikeBalance?: number;
+  firstImpressionBalance?: number;
   onClose: () => void;
   onSend: (message: string) => Promise<void> | void;
 }
@@ -16,7 +16,7 @@ const MAX_LEN = 140;
 export const FirstImpressionSheet = ({
   open,
   profile,
-  superLikeBalance,
+  firstImpressionBalance,
   onClose,
   onSend,
 }: FirstImpressionSheetProps) => {
