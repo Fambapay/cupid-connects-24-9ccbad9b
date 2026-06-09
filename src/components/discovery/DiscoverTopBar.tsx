@@ -5,6 +5,7 @@ interface DiscoverTopBarProps {
   onBoost?: () => void;
   logoSrc?: string;
   boostActive?: boolean;
+  boostMultiplier?: number;
 }
 
 export const DiscoverTopBar = ({
@@ -12,6 +13,7 @@ export const DiscoverTopBar = ({
   onBoost,
   logoSrc,
   boostActive = false,
+  boostMultiplier = 10,
 }: DiscoverTopBarProps) => {
   return (
     <div
