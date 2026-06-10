@@ -63,6 +63,7 @@ export const Route = createFileRoute("/shop")({
       { property: "og:url", content: "https://hunie.app/shop" },
     ],
     links: [
+      { rel: "canonical", href: "https://hunie.app/shop" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" },
     ],
   }),
