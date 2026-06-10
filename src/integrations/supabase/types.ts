@@ -958,6 +958,13 @@ export type Database = {
           user_id: string
         }[]
       }
+      compute_distances_km: {
+        Args: { _ids: string[]; _viewer_lat: number; _viewer_lng: number }
+        Returns: {
+          distance_km: number
+          id: string
+        }[]
+      }
       consume_boost_credit: { Args: never; Returns: Json }
       consume_first_impression_credit: { Args: never; Returns: Json }
       consume_super_like_credit: { Args: never; Returns: Json }
@@ -985,9 +992,24 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_my_location: {
+        Args: never
+        Returns: {
+          latitude: number
+          longitude: number
+        }[]
+      }
       get_my_phone: { Args: never; Returns: string }
       grant_credits: {
         Args: { _pack_kind: string; _quantity: number; _user_id: string }
+        Returns: Json
+      }
+      insert_swipe: {
+        Args: {
+          _direction: string
+          _first_impression_message?: string
+          _target_id: string
+        }
         Returns: Json
       }
       is_admin: { Args: { _uid: string }; Returns: boolean }

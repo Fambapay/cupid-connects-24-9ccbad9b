@@ -48,21 +48,6 @@ function computeAge(birthdate: string | null): number {
   return Math.max(0, Math.floor(diff / (365.25 * 24 * 3600 * 1000)));
 }
 
-function haversine(
-  a: { lat: number; lng: number },
-  b: { lat: number; lng: number },
-): number {
-  const R = 6371;
-  const toRad = (x: number) => (x * Math.PI) / 180;
-  const dLat = toRad(b.lat - a.lat);
-  const dLng = toRad(b.lng - a.lng);
-  const lat1 = toRad(a.lat);
-  const lat2 = toRad(b.lat);
-  const s =
-    Math.sin(dLat / 2) ** 2 +
-    Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
-  return Math.round(2 * R * Math.asin(Math.sqrt(s)));
-}
 
 function mapGenderFilter(g: DiscoveryFilters["gender"]): string[] | null {
   switch (g) {
@@ -109,7 +94,7 @@ async function fetchDiscovery(
     supabase.from("swipes").select("swiped_id").eq("swiper_id", userId),
     supabase
       .from("profiles")
-      .select("interested_in, latitude, longitude, membership_tier, membership_status, membership_expires_at")
+      .select("interested_in, membership_tier, membership_status, membership_expires_at")
       .eq("id", userId)
       .maybeSingle(),
     supabase
@@ -161,7 +146,7 @@ async function fetchDiscovery(
   let q = supabase
     .from("profiles")
     .select(
-      "id,name,age,birthdate,city,country,bio,interests,is_verified,gender,latitude,longitude,last_active_at,is_seed,is_incognito,membership_tier,membership_status,membership_expires_at",
+      "id,name,age,birthdate,city,country,bio,interests,is_verified,gender,last_active_at,is_seed,is_incognito,membership_tier,membership_status,membership_expires_at",
     )
     .eq("onboarding_completed", true)
     .eq("is_paused", false)
@@ -191,22 +176,34 @@ async function fetchDiscovery(
     .filter((r) => !excluded.has(r.id))
     .filter((r) => !r.is_incognito || likedMe.has(r.id));
 
-  const myCoords =
-    userCoords ??
-    (me?.latitude != null && me?.longitude != null
-      ? { lat: me.latitude as number, lng: me.longitude as number }
-      : null);
-  const withDistance = candidates.map((r) => {
-    const dist =
-      myCoords && r.latitude != null && r.longitude != null
-        ? haversine(myCoords, { lat: r.latitude as number, lng: r.longitude as number })
-        : 0;
-    return { ...r, _distance: dist };
-  });
+  // Resolve viewer coordinates. We never read other users' lat/lng on the
+  // client; distances are computed server-side via the compute_distances_km RPC.
+  let myCoords = userCoords ?? null;
+  if (!myCoords) {
+    const { data: locData } = await (supabase.rpc as any)("get_my_location");
+    const loc = Array.isArray(locData) ? locData[0] : locData;
+    if (loc?.latitude != null && loc?.longitude != null) {
+      myCoords = { lat: loc.latitude as number, lng: loc.longitude as number };
+    }
+  }
+
+  let distanceById = new Map<string, number>();
+  if (myCoords && candidates.length) {
+    const { data: dists } = await (supabase.rpc as any)("compute_distances_km", {
+      _viewer_lat: myCoords.lat,
+      _viewer_lng: myCoords.lng,
+      _ids: candidates.map((r) => r.id),
+    });
+    (dists as Array<{ id: string; distance_km: number }> | null)?.forEach((d) =>
+      distanceById.set(d.id, d.distance_km ?? 0),
+    );
+  }
+  const withDistance = candidates.map((r) => ({ ...r, _distance: distanceById.get(r.id) ?? 0 }));
   candidates =
     myCoords && distanceMax < 200
       ? withDistance.filter((r) => r._distance <= distanceMax)
       : withDistance;
+
 
   if (filters?.onlineNow) {
     const now = Date.now();
@@ -328,88 +325,48 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       remainingFirstImpressions?: number;
     }> => {
       if (!user) return { matched: false };
-      let remainingSuperLikes: number | undefined;
-      let remainingFirstImpressions: number | undefined;
       const fiMsg = options?.firstImpressionMessage?.trim().slice(0, 280) || null;
-      const isFirstImpression = !!fiMsg;
 
-      // First Impression: check own credit category (Elite-only, 10/month, fixed).
-      // Otherwise, a Super Like swipe checks the super_like_balance.
-      if (isFirstImpression) {
-        const { data: balance } = await supabase
-          .from("user_credits")
-          .select("first_impression_balance")
-          .eq("user_id", user.id)
-          .maybeSingle();
-        if (!balance || (balance.first_impression_balance ?? 0) <= 0) {
-          return { matched: false, reason: "insufficient_credits" };
-        }
-      } else if (direction === "super") {
-        const { data: balance } = await supabase
-          .from("user_credits")
-          .select("super_like_balance")
-          .eq("user_id", user.id)
-          .maybeSingle();
-        if (!balance || (balance.super_like_balance ?? 0) <= 0) {
-          return { matched: false, reason: "insufficient_credits" };
-        }
-      }
-
-      const insertRow: Record<string, unknown> = {
-        swiper_id: user.id,
-        swiped_id: targetId,
-        direction,
-      };
-      if (fiMsg) insertRow.first_impression_message = fiMsg;
-
-      const { error: insertError } = await supabase
-        .from("swipes")
-        .upsert(insertRow as never, { onConflict: "swiper_id,swiped_id" });
-      if (insertError) {
-        console.error("swipe insert failed", insertError);
+      // All credit checks, daily-limit enforcement, swipe insertion, and
+      // credit consumption happen atomically server-side via insert_swipe.
+      const { data, error } = await (supabase.rpc as any)("insert_swipe", {
+        _target_id: targetId,
+        _direction: direction,
+        _first_impression_message: fiMsg,
+      });
+      if (error) {
+        console.error("insert_swipe failed", error);
         return { matched: false, reason: "insert_failed" };
       }
-
-      // Consume the appropriate credit AFTER a successful insert.
-      // First Impression credit is consumed regardless of match outcome.
-      if (isFirstImpression) {
-        const { data } = await supabase.rpc("consume_first_impression_credit");
-        const res = data as { success: boolean; remaining_balance?: number } | null;
-        if (res?.success) {
-          remainingFirstImpressions = res.remaining_balance;
-        } else {
-          console.warn("first_impression credit consume failed after insert", res);
-        }
-        window.dispatchEvent(new CustomEvent("hunie:credits-changed"));
-      } else if (direction === "super") {
-        const { data } = await supabase.rpc("consume_super_like_credit");
-        const res = data as { success: boolean; remaining_balance?: number } | null;
-        if (res?.success) {
-          remainingSuperLikes = res.remaining_balance;
-        } else {
-          console.warn("super_like credit consume failed after insert", res);
-        }
+      const res = data as {
+        success: boolean;
+        reason?: string;
+        matched?: boolean;
+        match_id?: string;
+        remaining_super_likes?: number | null;
+        remaining_first_impressions?: number | null;
+      } | null;
+      if (!res?.success) {
+        const reasonMap: Record<string, string> = {
+          insufficient_super_like: "insufficient_credits",
+          insufficient_first_impression: "insufficient_credits",
+          daily_limit_reached: "daily_limit_reached",
+        };
+        return { matched: false, reason: reasonMap[res?.reason ?? ""] ?? res?.reason };
+      }
+      if (fiMsg || direction === "super") {
         window.dispatchEvent(new CustomEvent("hunie:credits-changed"));
       }
-
-      if (direction === "pass") return { matched: false };
-      const a = user.id < targetId ? user.id : targetId;
-      const b = user.id < targetId ? targetId : user.id;
-      const { data: match } = await supabase
-        .from("matches")
-        .select("id")
-        .eq("user_a", a)
-        .eq("user_b", b)
-        .maybeSingle();
       return {
-        matched: !!match,
-        matchId: match?.id,
-        remainingSuperLikes,
-        remainingFirstImpressions,
+        matched: !!res.matched,
+        matchId: res.match_id ?? undefined,
+        remainingSuperLikes: res.remaining_super_likes ?? undefined,
+        remainingFirstImpressions: res.remaining_first_impressions ?? undefined,
       };
     },
     [user],
   );
+
 
   const rewind = useCallback(async (): Promise<{
     success: boolean;
