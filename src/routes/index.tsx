@@ -128,67 +128,9 @@ function Splash() {
 }
 
 /* ============================================================
-   New Landing — Apple liquid glass, dark, brand pink↔purple
+   New Landing — Apple liquid glass, dark, brand pink↔purple.
+   Fully country-driven via useCountry / getCountryCopy.
    ============================================================ */
-
-const TYPE_PHRASES = [
-  "em Maputo.",
-  "na Beira.",
-  "em Matola.",
-  "que vibra contigo.",
-  "à tua altura.",
-];
-
-const STEPS = [
-  { n: "01", title: "Cria o teu perfil", body: "Foto verificada, bio e o que procuras. Em menos de dois minutos estás dentro." },
-  { n: "02", title: "Descobre quem combina", body: "Algoritmo afinado para Moçambique. Sem swipes infinitos — só perfis que fazem sentido." },
-  { n: "03", title: "Conversa quando há match", body: "Mensagens diretas, áudios e fotos. Reais. Privados. Sem ruído de redes sociais." },
-];
-
-const CITIES = [
-  { name: "Maputo", count: "12.4k" },
-  { name: "Matola", count: "4.2k" },
-  { name: "Beira", count: "3.1k" },
-  { name: "Nampula", count: "1.8k" },
-  { name: "Chimoio", count: "980" },
-];
-
-const TIERS = [
-  {
-    name: "Select", price: "149", per: "MZN/mês",
-    icon: <BadgeCheck size={18} />,
-    perks: ["Comunidade verificada", "Likes diários", "Mensagens com matches", "Sem anúncios"],
-    cta: "Começar grátis",
-    featured: false,
-  },
-  {
-    name: "Plus", price: "499", per: "MZN/mês",
-    icon: <Sparkles size={18} />,
-    perks: ["Tudo do Select", "Likes ilimitados", "Vê quem te curtiu", "Modo Anónimo"],
-    cta: "Escolher Plus",
-    featured: true,
-  },
-  {
-    name: "Elite", price: "1.499", per: "MZN/mês",
-    icon: <Crown size={18} />,
-    perks: ["Tudo do Plus", "Prioridade na descoberta", "Boost semanal", "Acesso a eventos privados"],
-    cta: "Escolher Elite",
-    featured: false,
-  },
-];
-
-const QUOTES = [
-  { text: "Conheci o Mário aqui. Três meses depois ainda estamos juntos. Coisa rara, hoje em dia.", name: "Carla", meta: "Maputo · 28" },
-  { text: "Finalmente uma app feita para nós. Sem pessoas a fingir, sem perfis estranhos.", name: "Tiago", meta: "Matola · 31" },
-  { text: "Adoro que pago em MZN com M-Pesa. Tudo simples, tudo cá.", name: "Joana", meta: "Beira · 25" },
-];
-
-const FAQ = [
-  { q: "É só para Moçambique?", a: "Sim. Hunie foi pensada para Moçambique — preços em MZN, M-Pesa, perfis verificados nas principais cidades." },
-  { q: "Como funciona a verificação?", a: "Tiras uma selfie que comparamos com a tua foto de perfil. Demora menos de um minuto e recebes o ✓ verificado." },
-  { q: "Posso cancelar quando quiser?", a: "Sim. Cancelas no settings em dois toques. Mantens o acesso até ao fim do ciclo pago." },
-  { q: "Os meus dados estão seguros?", a: "Encriptação ponta-a-ponta nas conversas. Nunca vendemos dados. Nunca." },
-];
 
 function Landing() {
   const [installOpen, setInstallOpen] = useState(false);
@@ -196,9 +138,50 @@ function Landing() {
   const { deferredPrompt, isStandalone } = usePWAInstall();
   const navigate = useNavigate();
   const rootRef = useRef<HTMLDivElement>(null);
-  const typed = useTypewriter(TYPE_PHRASES, { typeMs: 70, deleteMs: 38, holdMs: 1900 });
 
-  // Body scroll unlock (landing page has its own scroll context)
+  // Re-resolve country on mount in case the route's head() default was
+  // wrong (e.g. SSR shell rendered a different host than this fetch).
+  const { country, config, setCountry } = useCountry();
+  useEffect(() => {
+    const resolved = resolveCountryClient();
+    if (resolved !== country) setCountry(resolved);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const copy = useMemo(() => getCountryCopy(country), [country]);
+  const planCards = useMemo(() => getPlanCards(country), [country]);
+
+  // City phrases for typewriter, country-driven
+  const typePhrases = useMemo(
+    () => config.heroCities.map((c) => `em ${c.replace(/\.$/, "")}.`),
+    [config.heroCities],
+  );
+  const typed = useTypewriter(typePhrases, { typeMs: 70, deleteMs: 38, holdMs: 1900 });
+
+  const stepsCopy = useMemo(
+    () => [
+      { n: "01", title: "Cria o teu perfil", body: "Foto verificada, bio e o que procuras. Em menos de dois minutos estás dentro." },
+      { n: "02", title: "Descobre quem combina", body: `Algoritmo afinado para ${config.name}. Sem swipes infinitos — só perfis que fazem sentido.` },
+      { n: "03", title: "Conversa quando há match", body: "Mensagens diretas, áudios e fotos. Reais. Privados. Sem ruído de redes sociais." },
+    ],
+    [config.name],
+  );
+
+  // Top 5 cities for the grid
+  const heroCityCounts = useMemo(() => {
+    const sample = config.cities.slice(0, 5);
+    const counts = ["12.4k", "4.2k", "3.1k", "1.8k", "980"];
+    return sample.map((name, i) => ({ name, count: counts[i] ?? "—" }));
+  }, [config.cities]);
+
+  const paymentMethodLine = useMemo(
+    () => config.payments.map((p) => paymentLabel(p as PaymentMethodCode)).join(", "),
+    [config.payments],
+  );
+
+  const planosSubtitle = `Sem letra pequena. Cancelas quando quiseres. Pagas em ${config.currency} com ${config.payments.slice(0, 2).map((p) => paymentLabel(p as PaymentMethodCode)).join(" ou ")} ou cartão.`;
+
+  // Body scroll unlock
   useEffect(() => {
     const root = document.documentElement;
     root.classList.add("landing-scroll-unlocked");
@@ -212,7 +195,7 @@ function Landing() {
     };
   }, []);
 
-  // Premium smooth inertia scroll (Lenis)
+  // Smooth inertia scroll
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -259,9 +242,22 @@ function Landing() {
     setInstallOpen(true);
   };
 
+  // Map plan cards to landing-tier display
+  const tiers = planCards
+    .slice()
+    .sort((a, b) => a.priceMzn - b.priceMzn)
+    .map((p, i) => ({
+      name: p.label,
+      price: formatCountryPrice(p.priceMzn, country),
+      per: "/mês",
+      icon: i === 0 ? <BadgeCheck size={18} /> : i === 1 ? <Sparkles size={18} /> : <Crown size={18} />,
+      perks: p.highlights.map((h) => h.label),
+      cta: i === 0 ? "Começar grátis" : `Escolher ${p.label}`,
+      featured: p.badge === "Mais popular",
+    }));
+
   return (
     <div className="ll-root" ref={rootRef}>
-      {/* Ambient */}
       <div className="ll-ambient" aria-hidden>
         <div className="ll-orb ll-orb-1" />
         <div className="ll-orb ll-orb-2" />
@@ -270,12 +266,10 @@ function Landing() {
       </div>
 
       <div className="ll-shell">
-        {/* Nav */}
         <nav className="ll-nav" aria-label="Navegação principal">
           <div className="ll-nav-inner">
             <Link to="/" className="ll-logo" aria-label="Hunie">
               <img src={hunieMark.url} alt="Hunie" className="ll-logo-img" />
-
             </Link>
             <div className="ll-nav-links">
               <a className="ll-nav-link" href="#como-funciona">Como funciona</a>
@@ -290,38 +284,36 @@ function Landing() {
           </div>
         </nav>
 
-        {/* Hero */}
         <header className="ll-hero">
           <div className="ll-container">
             <div className="ll-hero-inner">
-              <span className="ll-eyebrow ll-reveal">🇲🇿 Feito em Moçambique</span>
+              <span className="ll-eyebrow ll-reveal">{copy.hero.eyebrow}</span>
               <h1 className="ll-h1 ll-reveal">
-                Encontra alguém
+                {copy.hero.line1}
                 <br />
                 <span className="ll-tw-line">
                   {typed}
                   <span className="ll-caret" aria-hidden />
                 </span>
               </h1>
-              <p className="ll-lead ll-reveal">
-                Hunie é a comunidade de encontros <span className="ll-italic">membership-only</span> de Moçambique. Perfis verificados, conversas em português, preços em MZN.
-              </p>
+              <p
+                className="ll-lead ll-reveal"
+                dangerouslySetInnerHTML={{ __html: copy.hero.leadHtml }}
+              />
               <div className="ll-hero-cta ll-reveal">
-                <button onClick={handleInstallClick} className="ll-btn ll-btn-primary">Instalar app</button>
-                <Link to="/auth/register" className="ll-btn ll-btn-ghost">Criar conta grátis</Link>
+                <button onClick={handleInstallClick} className="ll-btn ll-btn-primary">{copy.hero.ctaPrimary}</button>
+                <Link to="/auth/register" className="ll-btn ll-btn-ghost">{copy.hero.ctaSecondary}</Link>
               </div>
-
             </div>
           </div>
         </header>
 
-        {/* Como funciona */}
         <section id="como-funciona" className="ll-section">
           <div className="ll-container ll-section-center">
             <span className="ll-eyebrow ll-reveal">Como funciona</span>
             <h2 className="ll-h2 ll-reveal">Três passos. Zero <span className="ll-italic ll-grad-text">complicação.</span></h2>
             <div className="ll-grid-3">
-              {STEPS.map((s) => (
+              {stepsCopy.map((s) => (
                 <div key={s.n} className="ll-card ll-reveal" style={{ textAlign: "left" }}>
                   <div className="ll-step-num">{s.n}</div>
                   <div className="ll-step-title">{s.title}</div>
@@ -332,14 +324,13 @@ function Landing() {
           </div>
         </section>
 
-        {/* Tiers / Planos */}
         <section id="planos" className="ll-section">
           <div className="ll-container ll-section-center">
             <span className="ll-eyebrow ll-reveal">Planos</span>
             <h2 className="ll-h2 ll-reveal">Escolhe o teu <span className="ll-italic ll-grad-text">ritmo.</span></h2>
-            <p className="ll-lead ll-reveal">Sem letra pequena. Cancelas quando quiseres. Pagas em MZN com M-Pesa ou cartão.</p>
+            <p className="ll-lead ll-reveal">{planosSubtitle}</p>
             <div className="ll-tiers">
-              {TIERS.map((t) => (
+              {tiers.map((t) => (
                 <div key={t.name} className={`ll-card ll-tier ll-reveal ${t.featured ? "ll-tier-featured" : ""}`} style={{ textAlign: "left" }}>
                   {t.featured && <span className="ll-tier-badge">POPULAR</span>}
                   <div className="ll-tier-name" style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -358,13 +349,14 @@ function Landing() {
           </div>
         </section>
 
-        {/* Cities */}
         <section id="cidades" className="ll-section">
           <div className="ll-container ll-section-center">
             <span className="ll-eyebrow ll-reveal">Onde estamos</span>
-            <h2 className="ll-h2 ll-reveal">Comunidade ativa em <span className="ll-italic ll-grad-text">cinco cidades.</span></h2>
+            <h2 className="ll-h2 ll-reveal">
+              Comunidade ativa {config.nameLocative}, da capital às <span className="ll-italic ll-grad-text">grandes cidades.</span>
+            </h2>
             <div className="ll-cities">
-              {CITIES.map((c) => (
+              {heroCityCounts.map((c) => (
                 <div key={c.name} className="ll-city ll-reveal">
                   <div className="ll-city-name">{c.name}</div>
                   <div className="ll-city-count">{c.count} pessoas</div>
@@ -374,13 +366,12 @@ function Landing() {
           </div>
         </section>
 
-        {/* Testimonials */}
         <section className="ll-section">
           <div className="ll-container ll-section-center">
             <span className="ll-eyebrow ll-reveal">Histórias reais</span>
             <h2 className="ll-h2 ll-reveal">Quem já <span className="ll-italic ll-grad-text">encontrou.</span></h2>
             <div className="ll-quotes">
-              {QUOTES.map((q) => (
+              {copy.testimonials.map((q) => (
                 <div key={q.name} className="ll-card ll-quote ll-reveal" style={{ textAlign: "left" }}>
                   <p>"{q.text}"</p>
                   <div className="ll-quote-who">
@@ -396,13 +387,12 @@ function Landing() {
           </div>
         </section>
 
-        {/* FAQ */}
         <section id="faq" className="ll-section">
           <div className="ll-container ll-section-center">
             <span className="ll-eyebrow ll-reveal">FAQ</span>
             <h2 className="ll-h2 ll-reveal">Perguntas <span className="ll-italic ll-grad-text">honestas.</span></h2>
             <div className="ll-faq">
-              {FAQ.map((f, i) => (
+              {copy.faq.map((f, i) => (
                 <div key={f.q} className="ll-faq-item ll-reveal" data-open={openFaq === i}>
                   <button className="ll-faq-q" onClick={() => setOpenFaq(openFaq === i ? null : i)} aria-expanded={openFaq === i}>
                     <span>{f.q}</span>
@@ -415,7 +405,6 @@ function Landing() {
           </div>
         </section>
 
-        {/* Final CTA */}
         <section className="ll-section" style={{ paddingTop: 0 }}>
           <div className="ll-container">
             <div className="ll-card ll-final ll-reveal">
@@ -425,16 +414,17 @@ function Landing() {
                 <br />
                 <span className="ll-italic ll-grad-text">esta semana.</span>
               </h2>
-              <p className="ll-lead">Junta-te aos solteiros de Moçambique. Acesso desde 149 MZN/mês.</p>
+              <p className="ll-lead">
+                {copy.final.sub} Acesso desde {formatCountryPrice(planCards[0]?.priceMzn ?? 0, country)}/mês.
+              </p>
               <div className="ll-hero-cta" style={{ marginTop: 28 }}>
-                <button onClick={handleInstallClick} className="ll-btn ll-btn-primary">Instalar app</button>
+                <button onClick={handleInstallClick} className="ll-btn ll-btn-primary">{copy.hero.ctaPrimary}</button>
                 <Link to="/auth/register" className="ll-btn ll-btn-ghost">Criar conta</Link>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Footer */}
         <footer className="ll-footer">
           <div className="ll-container">
             <div className="ll-footer-inner">
@@ -451,7 +441,15 @@ function Landing() {
                 <Link to="/legal/termos">Termos</Link>
                 <a href="mailto:ola@hunie.app">Contacto</a>
               </div>
-              <span>© 2026 Hunie · Made in MZ</span>
+
+              <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>
+                  Pagamentos: {paymentMethodLine}
+                </span>
+                <CountrySwitcher compact />
+              </div>
+
+              <span>© 2026 Hunie · {config.flag} {config.name}</span>
             </div>
           </div>
         </footer>
@@ -461,4 +459,5 @@ function Landing() {
     </div>
   );
 }
+
 
