@@ -163,9 +163,9 @@ export function ProfileView({
           </button>
 
           <div className="min-w-0 flex-1">
-            <span className="block text-[22px] font-semibold tracking-tight text-foreground truncate leading-tight">
+            <h1 className="block text-[22px] font-semibold tracking-tight text-foreground truncate leading-tight m-0">
               {name}
-            </span>
+            </h1>
             <div className="flex items-center gap-1.5 mt-0.5 mb-2">
               {age > 0 && (
                 <span className="text-[14px] font-medium text-muted-foreground">

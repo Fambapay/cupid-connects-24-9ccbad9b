@@ -11,8 +11,12 @@ export const Route = createFileRoute("/membership")({
   head: () => ({
     meta: [
       { title: "Hunie Membership — Desbloqueia tudo" },
-      { name: "description", content: "Escolhe o teu plano Hunie: Select, Plus ou Elite." },
+      { name: "description", content: "Escolhe o teu plano Hunie: Select, Plus ou Elite. Likes ilimitados, vê quem te deu like, Super Likes diários e prioridade no feed." },
+      { property: "og:title", content: "Hunie Membership — Desbloqueia tudo" },
+      { property: "og:description", content: "Escolhe o teu plano Hunie: Select, Plus ou Elite. Likes ilimitados, vê quem te deu like, Super Likes diários e prioridade no feed." },
+      { property: "og:url", content: "https://hunie.app/membership" },
     ],
+    links: [{ rel: "canonical", href: "https://hunie.app/membership" }],
   }),
   component: MembershipPage,
 });

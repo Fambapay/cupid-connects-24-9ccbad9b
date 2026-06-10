@@ -1,0 +1,17 @@
+# Hunie
+
+> Hunie é a comunidade de encontros membership-only feita em Moçambique e Angola. Perfis verificados, conversas em português, pagamentos em moeda local (M-Pesa, e-Mola, Multicaixa, cartão).
+
+Hunie é uma PWA dating instalável em iPhone e Android. Foco em qualidade sobre quantidade: cada perfil é verificado por selfie, a moderação é humana e local, e o feed prioriza pessoas reais perto de ti. Disponível em Maputo, Matola, Beira, Nampula, Chimoio, Tete, Pemba (Moçambique) e Luanda, Benguela, Huambo, Lobito, Lubango (Angola).
+
+## Pages
+
+- [Página inicial](/): O que é a Hunie, planos, cidades e FAQ.
+- [Planos & Membership](/membership): Select, Plus e Elite — preços em MZN/AOA, comparação de funcionalidades.
+- [Hunie Store](/shop): Boosts e Super Likes avulsos para mais visibilidade e matches.
+- [Boas-vindas](/welcome): Introdução ao funcionamento da app para novos visitantes.
+
+## Optional
+
+- [Termos de uso](/legal/termos): Termos legais e condições da Hunie.
+- [Política de privacidade](/legal/privacidade): Como tratamos dados pessoais, fotos e conversas.

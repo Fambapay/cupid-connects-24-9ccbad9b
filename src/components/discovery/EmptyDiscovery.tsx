@@ -127,7 +127,7 @@ export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters }: Em
         />
         <motion.img
           src={"/icon-192.png"}
-          alt="Hunie"
+          alt="Logótipo Hunie"
           width={132}
           height={132}
           className="relative h-[132px] w-[132px] select-none"
