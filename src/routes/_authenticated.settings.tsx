@@ -22,6 +22,7 @@ import { BlockedUsersModal } from '@/components/BlockedUsersModal';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { PhoneVerificationModal } from '@/components/PhoneVerificationModal';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
+import { InstallModal } from '@/components/landing/InstallModal';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
