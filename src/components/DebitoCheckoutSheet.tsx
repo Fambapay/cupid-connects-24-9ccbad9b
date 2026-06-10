@@ -70,6 +70,13 @@ export function DebitoCheckoutSheet({
   const [method, setMethod] = useState<PaymentMethod>(() => availableMethods[0] ?? "mpesa");
   const [phone, setPhone] = useState("");
   const [reference, setReference] = useState<string | null>(null);
+  const [mcReference, setMcReference] = useState<{
+    entity: string;
+    number: string;
+    instructions?: string;
+    expiresAt?: string;
+    expiresIn?: string;
+  } | null>(null);
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [errMsg, setErrMsg] = useState<string | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(TIMEOUT_MS / 1000);
