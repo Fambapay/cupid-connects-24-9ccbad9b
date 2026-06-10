@@ -16,6 +16,7 @@ import { COUNTRY_CONFIG, DEFAULT_COUNTRY, formatCountryPrice, paymentLabel, type
 import { countryFromHost, resolveCountryClient } from "@/lib/country/detect";
 import { getPlanCards } from "@/lib/plans";
 import { CountrySwitcher } from "@/components/CountrySwitcher";
+import { faqData } from "@/components/landing/faqData";
 
 // Build country-aware <head> at SSR time using the request host.
 // The route is ssr: false so this runs client-side on hydration; we read
@@ -53,21 +54,35 @@ function buildHead(country: keyof typeof COUNTRY_CONFIG): any {
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" },
     ],
-    scripts: [{
-      type: "application/ld+json",
-      children: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "MobileApplication",
-        name: "Hunie",
-        description: `Dating membership-only ${cfg.nameLocative}`,
-        applicationCategory: "SocialNetworkingApplication",
-        operatingSystem: "PWA",
-        url: s.ogUrl,
-        offers: { "@type": "Offer", price: s.priceFrom, priceCurrency: cfg.currency },
-        areaServed: { "@type": "Country", name: s.areaServed },
-        aggregateRating: { "@type": "AggregateRating", ratingValue: "4.8", ratingCount: "1240" },
-      }),
-    }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "MobileApplication",
+          name: "Hunie",
+          description: `Dating membership-only ${cfg.nameLocative}`,
+          applicationCategory: "SocialNetworkingApplication",
+          operatingSystem: "PWA",
+          url: s.ogUrl,
+          offers: { "@type": "Offer", price: s.priceFrom, priceCurrency: cfg.currency },
+          areaServed: { "@type": "Country", name: s.areaServed },
+          aggregateRating: { "@type": "AggregateRating", ratingValue: "4.8", ratingCount: "1240" },
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqData.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        }),
+      },
+    ],
   };
 }
 
