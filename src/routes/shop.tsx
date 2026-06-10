@@ -101,7 +101,7 @@ function ShopPage() {
     <div className="min-h-screen bg-background pb-28 text-foreground">
       {/* Header */}
       <header
-        className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl"
+        className="sticky top-0 z-30 bg-background"
         style={{ paddingTop: "max(var(--sat, 12px), 12px)" }}
       >
         <div className="flex items-center gap-3 px-4 pb-3">
