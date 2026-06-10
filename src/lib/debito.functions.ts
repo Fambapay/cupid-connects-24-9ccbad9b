@@ -157,21 +157,65 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
       .single();
     if (insErr || !row) throw new Error("Falha ao criar pagamento");
 
-    // ── 2a) Methods NOT live yet (e.g. Multicaixa, Unitel Money, cards) ──
-    // Don't call the MZ orchestrator with credentials that won't work.
-    // Insert pending and return a friendly message — webhook integration lands later.
+    // ── 2a) Angola: KambaPay (Multicaixa Express + Referência MC) ──
+    if (country === "AO" && (method === "multicaixa_express" || method === "referencia_mc")) {
+      const { createKambapayPayment } = await import("./kambapay.server");
+      const kpMethod = method === "multicaixa_express" ? "express" : "reference";
+      const res = await createKambapayPayment({
+        orderId: row.source_id!,
+        amount: Math.round(amount),
+        method: kpMethod,
+        customerName: data.customer_name ?? "Hunie user",
+        customerEmail: data.customer_email ?? null,
+        customerPhone: kpMethod === "express" ? normalizedPhone : null,
+      });
+
+      await supabaseAdmin
+        .from("debito_payments")
+        .update({
+          status: res.ok ? "pending" : "failed",
+          debito_payment_id: res.payment?.id ?? null,
+          debito_reference: res.payment?.reference?.number ?? null,
+          raw_response: sanitizePayload(res.raw) as never,
+        })
+        .eq("id", row.id);
+
+      if (!res.ok) {
+        return {
+          success: false,
+          error: "gateway_error",
+          message: "Não foi possível iniciar o pagamento. Tenta novamente.",
+          payment_id: row.id,
+        } as const;
+      }
+
+      return {
+        success: true,
+        payment_id: row.id,
+        status: "pending" as const,
+        reference: res.payment?.reference?.number ?? null,
+        mc_reference: res.payment?.reference ?? null,
+        checkout_url: null,
+        awaiting_confirmation: kpMethod === "express",
+        awaiting_provider: false,
+      } as const;
+    }
+
+    // ── 2b) Methods NOT live yet (e.g. Unitel Money, cards) ──
     if (!liveMethod) {
       return {
         success: true,
         payment_id: row.id,
         status: "pending" as const,
         reference: null,
+        mc_reference: null,
         checkout_url: null,
         awaiting_confirmation: false,
         awaiting_provider: true,
         message: `${method} estará disponível em breve em ${countryCfg.name}. Estamos a finalizar a integração com o operador.`,
       } as const;
     }
+
 
     // ── 2b) Live MZ orchestrator path ──
     const apiKey = process.env.DEBITO_API_KEY;

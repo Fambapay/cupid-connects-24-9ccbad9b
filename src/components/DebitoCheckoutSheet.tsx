@@ -70,6 +70,13 @@ export function DebitoCheckoutSheet({
   const [method, setMethod] = useState<PaymentMethod>(() => availableMethods[0] ?? "mpesa");
   const [phone, setPhone] = useState("");
   const [reference, setReference] = useState<string | null>(null);
+  const [mcReference, setMcReference] = useState<{
+    entity: string;
+    number: string;
+    instructions?: string;
+    expiresAt?: string;
+    expiresIn?: string;
+  } | null>(null);
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [errMsg, setErrMsg] = useState<string | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(TIMEOUT_MS / 1000);
@@ -155,6 +162,7 @@ export function DebitoCheckoutSheet({
   const reset = () => {
     setStage("form");
     setReference(null);
+    setMcReference(null);
     setPaymentId(null);
     setErrMsg(null);
   };
@@ -189,6 +197,11 @@ export function DebitoCheckoutSheet({
         return;
       }
       setReference(res.reference ?? null);
+      setMcReference(
+        "mc_reference" in res && res.mc_reference
+          ? (res.mc_reference as typeof mcReference)
+          : null,
+      );
       setPaymentId(res.payment_id ?? null);
       if (res.status === "success") {
         setStage("success");
@@ -325,7 +338,40 @@ export function DebitoCheckoutSheet({
               </>
             )}
 
-            {stage === "pending" && (
+            {stage === "pending" && mcReference && (
+              <div className="mt-5 rounded-2xl border border-blue-500/30 bg-blue-500/[0.06] p-5">
+                <div className="text-center">
+                  <p className="text-base font-bold">Pague em qualquer ATM ou Internet Banking</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Use os dados abaixo para finalizar o pagamento.
+                  </p>
+                </div>
+                <div className="mt-4 space-y-2">
+                  <div className="flex items-center justify-between rounded-xl bg-white/[0.06] px-3 py-3">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Entidade</span>
+                    <span className="font-mono text-base font-bold text-white">{mcReference.entity}</span>
+                  </div>
+                  <div className="flex items-center justify-between rounded-xl bg-white/[0.06] px-3 py-3">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Referência</span>
+                    <span className="font-mono text-base font-bold text-white">{mcReference.number}</span>
+                  </div>
+                  <div className="flex items-center justify-between rounded-xl bg-white/[0.06] px-3 py-3">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Montante</span>
+                    <span className="font-mono text-base font-bold text-white">{amountFormatted}</span>
+                  </div>
+                </div>
+                {mcReference.instructions && (
+                  <p className="mt-3 whitespace-pre-line text-[11px] text-muted-foreground">
+                    {mcReference.instructions}
+                  </p>
+                )}
+                <p className="mt-3 text-center text-xs font-mono tabular-nums text-white/70">
+                  A aguardar confirmação · {countdown}
+                </p>
+              </div>
+            )}
+
+            {stage === "pending" && !mcReference && (
               <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center">
                 <div className="relative mx-auto h-16 w-16">
                   <Loader2 size={64} className="animate-spin text-fuchsia-400" />
@@ -344,6 +390,7 @@ export function DebitoCheckoutSheet({
                 </p>
               </div>
             )}
+
 
             {stage === "success" && (
               <div className="mt-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5 text-center">
