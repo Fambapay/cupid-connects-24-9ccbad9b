@@ -86,6 +86,7 @@ function SettingsPage() {
     : membershipTier === 'select' ? 'Select' : 'Membership';
 
   const [paywallOpen, setPaywallOpen] = useState(false);
+  const [installOpen, setInstallOpen] = useState(false);
   const goShop = (tab?: 'boost' | 'super_like') =>
     navigate({ to: '/shop', search: tab ? { tab } : {} });
   const goUpgrade = () => setPaywallOpen(true);
@@ -93,27 +94,12 @@ function SettingsPage() {
   const goBack = () => navigate({ to: '/profile' });
 
   const pwa = usePWAInstall();
-  const handleInstallApp = async () => {
+  const handleInstallApp = () => {
     if (pwa.installed) {
       toast({ title: 'Já instalada', description: 'Estás a usar a app instalada.' });
       return;
     }
-    if (pwa.canInstall) {
-      const outcome = await pwa.promptInstall();
-      if (outcome === 'accepted') toast({ title: 'App instalada' });
-      return;
-    }
-    if (pwa.isIOS) {
-      toast({
-        title: 'Adicionar ao ecrã inicial',
-        description: 'Toca em Partilhar e escolhe "Adicionar ao Ecrã Principal".',
-      });
-      return;
-    }
-    toast({
-      title: 'Instalação indisponível',
-      description: 'Abre no Chrome/Edge para instalar a app.',
-    });
+    setInstallOpen(true);
   };
 
   const handleEnableLocation = async () => {
