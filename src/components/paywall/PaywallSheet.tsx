@@ -20,8 +20,10 @@ import {
   Headphones,
 } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
-import { PLAN_CARDS, formatPrice } from "@/lib/plans";
+import { getPlanCards, formatPrice } from "@/lib/plans";
 import { type PlanTier } from "@/lib/pricing";
+import { useCountry } from "@/lib/country/context";
+import { paymentLabel, type PaymentMethodCode } from "@/lib/country/config";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 import { invalidateOnboardingCache } from "@/lib/authGuard";
 import { toast } from "sonner";
@@ -38,7 +40,6 @@ type Benefit = {
   label: string;
 };
 
-// Per-tier benefits — strictly synced with getEntitlements() in src/lib/plans.ts.
 const BENEFITS_BY_TIER: Record<PlanTier, Benefit[]> = {
   select: [
     { icon: InfinityIcon, label: "Likes ilimitados" },
@@ -71,6 +72,7 @@ const BENEFITS_BY_TIER: Record<PlanTier, Benefit[]> = {
 
 export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }: PaywallSheetProps) {
   const { reload } = useProfile();
+  const { country, config } = useCountry();
   const [selectedTier, setSelectedTier] = useState<PlanTier>(defaultTier);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
 
@@ -87,13 +89,17 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
     };
   }, [open]);
 
-  // Order: Select → Plus → Elite (ascending price).
   const plans = useMemo(
-    () => PLAN_CARDS.slice().sort((a, b) => a.priceMzn - b.priceMzn),
-    [],
+    () => getPlanCards(country).slice().sort((a, b) => a.priceMzn - b.priceMzn),
+    [country],
   );
   const selectedPlan = plans.find((p) => p.tier === selectedTier) ?? plans[1];
   const benefits = BENEFITS_BY_TIER[selectedPlan.tier];
+
+  const paymentSummary = useMemo(() => {
+    const items = config.payments.slice(0, 3).map((p) => paymentLabel(p as PaymentMethodCode));
+    return items.join(", ");
+  }, [config.payments]);
 
   return (
     <AnimatePresence>
@@ -123,12 +129,10 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
             className="fixed inset-x-0 bottom-0 top-[4%] flex flex-col overflow-hidden rounded-t-[32px] border-t border-white/[0.06] bg-[#0b0b0d] text-foreground"
             style={{ zIndex: 10001, boxShadow: "0 -20px 60px rgba(0,0,0,0.6)" }}
           >
-            {/* Drag handle */}
             <div className="relative flex justify-center pt-2.5 pb-1 shrink-0">
               <div className="h-[5px] w-9 rounded-full bg-white/15" />
             </div>
 
-            {/* Close */}
             <button
               onClick={onClose}
               aria-label="Fechar"
@@ -137,12 +141,10 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
               <X size={15} className="text-white/80" />
             </button>
 
-            {/* Scrollable body */}
             <div className="relative flex-1 overflow-y-auto overscroll-contain px-6 pb-[max(env(safe-area-inset-bottom),132px)]">
-              {/* Hero */}
               <div className="pt-7 pb-7">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/40">
-                  Hunie Premium
+                  Hunie Premium · {config.flag} {config.name}
                 </p>
                 <h2
                   className="mt-3 text-[34px] font-semibold leading-[1.05] tracking-[-0.02em] text-white"
@@ -155,7 +157,6 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
                 </p>
               </div>
 
-              {/* Plan cards */}
               <div className="space-y-2">
                 {plans.map((plan) => {
                   const active = plan.tier === selectedTier;
@@ -192,9 +193,9 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
                         </div>
                         <div className="text-right">
                           <span className="text-[15px] font-semibold tabular-nums text-white">
-                            {plan.priceMzn.toLocaleString("pt-PT")}
+                            {formatPrice(plan.priceMzn, country)}
                           </span>
-                          <span className="ml-1 text-[12px] text-white/45">MZN / mês</span>
+                          <span className="ml-1 text-[12px] text-white/45">/ mês</span>
                         </div>
                       </div>
                     </button>
@@ -202,7 +203,6 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
                 })}
               </div>
 
-              {/* Benefits */}
               <div className="mt-8">
                 <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/40">
                   Incluído no {selectedPlan.label}
@@ -224,11 +224,10 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
 
               <p className="mt-8 text-center text-[11px] leading-relaxed text-white/35">
                 Renovação automática · Cancela quando quiseres<br />
-                Pagamento via M-Pesa ou e-Mola
+                Pagamento via {paymentSummary}
               </p>
             </div>
 
-            {/* Sticky CTA */}
             <div
               className="absolute inset-x-0 bottom-0 border-t border-white/[0.06] bg-[#0b0b0d]/95 px-6 pt-3 backdrop-blur-xl"
               style={{ paddingBottom: "max(env(safe-area-inset-bottom), 18px)", zIndex: 5 }}
@@ -238,7 +237,7 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
                 onClick={() => setCheckoutOpen(true)}
                 className="h-12 w-full rounded-full bg-white text-[15px] font-semibold text-black hover:bg-white/95 transition-colors"
               >
-                Continuar · {formatPrice(selectedPlan.priceMzn)} / mês
+                Continuar · {formatPrice(selectedPlan.priceMzn, country)} / mês
               </motion.button>
             </div>
           </motion.div>
@@ -248,7 +247,7 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
               open={checkoutOpen}
               onClose={() => setCheckoutOpen(false)}
               title={`Hunie ${selectedPlan.label}`}
-              subtitle={`Subscrição mensal — ${formatPrice(selectedPlan.priceMzn)}`}
+              subtitle={`Subscrição mensal — ${formatPrice(selectedPlan.priceMzn, country)}`}
               amountMzn={selectedPlan.priceMzn}
               planTier={selectedPlan.tier}
               billingPeriod="monthly"

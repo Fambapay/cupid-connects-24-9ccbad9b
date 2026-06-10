@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Check, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { PLAN_CARDS, formatPrice, type PlanCardConfig } from "@/lib/plans";
+import { getPlanCards, formatPrice, type PlanCardConfig } from "@/lib/plans";
 import type { BillingPeriod } from "@/lib/pricing";
+import { useCountry } from "@/lib/country/context";
+import { paymentLabel, type PaymentMethodCode } from "@/lib/country/config";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 import { invalidateOnboardingCache } from "@/lib/authGuard";
 import { toast } from "sonner";
@@ -26,6 +28,12 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
   const [selected, setSelected] = useState<PlanCardConfig | null>(null);
   const { user } = useAuth();
   const { profile, reload } = useProfile();
+  const { country, config } = useCountry();
+  const planCards = useMemo(() => getPlanCards(country), [country]);
+  const paymentSummary = useMemo(
+    () => config.payments.slice(0, 3).map((p) => paymentLabel(p as PaymentMethodCode)).join(" e "),
+    [config.payments],
+  );
   const [fomoData, setFomoData] = useState<{ count: number; city: string; avatars: string[] }>({
     count: 4,
     city: "perto de ti",
@@ -242,17 +250,18 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
           {/* Plans scroll */}
           <div className="flex-1 overflow-y-auto px-3 pb-[max(env(safe-area-inset-bottom),120px)] pt-5">
             <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
-              {PLAN_CARDS.map((plan) => (
+              {planCards.map((plan) => (
                 <PlanCardView
                   key={plan.tier}
                   plan={plan}
                   period={period}
+                  country={country}
                   onSelect={() => setSelected(plan)}
                 />
               ))}
             </div>
             <p className="mt-6 px-2 text-center text-xs text-muted-foreground">
-              🔒 Pagamento seguro via M-Pesa e e-Mola
+              🔒 Pagamento seguro via {paymentSummary}
             </p>
             <p className="mt-1 text-center text-[11px] text-muted-foreground/80">
               Cancela a qualquer momento · Renovação automática
@@ -268,8 +277,8 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
           title={`Hunie ${selected.label}`}
           subtitle={
             period === "annual"
-              ? `Subscrição anual — ${formatPrice(selected.annualPriceMzn)}`
-              : `Subscrição mensal — ${formatPrice(selected.priceMzn)}`
+              ? `Subscrição anual — ${formatPrice(selected.annualPriceMzn, country)}`
+              : `Subscrição mensal — ${formatPrice(selected.priceMzn, country)}`
           }
           amountMzn={period === "annual" ? selected.annualPriceMzn : selected.priceMzn}
           planTier={selected.tier}
@@ -291,10 +300,12 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
 function PlanCardView({
   plan,
   period,
+  country,
   onSelect,
 }: {
   plan: PlanCardConfig;
   period: BillingPeriod;
+  country: import("@/lib/country/config").CountryCode;
   onSelect: () => void;
 }) {
   const isPopular = plan.badge === "Mais popular";
@@ -352,14 +363,13 @@ function PlanCardView({
 
 
       <div className="mt-3 flex items-baseline gap-1">
-        <span className="text-3xl font-black">{price.toLocaleString("pt-PT")}</span>
-        <span className="text-sm font-bold text-white/70">MZN</span>
+        <span className="text-3xl font-black">{formatPrice(price, country)}</span>
         <span className="text-xs text-white/50">/{period === "annual" ? "ano" : "mês"}</span>
       </div>
       {period === "annual" && (
         <div className="mt-1 flex items-center gap-2 text-xs">
-          <span className="text-white/40 line-through">{fullPrice.toLocaleString("pt-PT")}</span>
-          <span className="font-semibold text-emerald-400">Poupa {savings.toLocaleString("pt-PT")} MZN</span>
+          <span className="text-white/40 line-through">{formatPrice(fullPrice, country)}</span>
+          <span className="font-semibold text-emerald-400">Poupa {formatPrice(savings, country)}</span>
         </div>
       )}
 

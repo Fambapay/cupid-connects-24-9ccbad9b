@@ -2,22 +2,33 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
-  PACKS,
-  PLAN_PRICES,
   PAYMENT_METHODS,
   MOBILE_MONEY_METHODS,
+  LIVE_DEBITO_METHODS,
   isAllowedReturnUrl,
-  normalizePhone,
   sanitizePayload,
   getPlanAmount,
   getPlanDays,
+  getPlanPrices,
+  getPacks,
+  getCurrency,
   type PaymentMethod,
   type BillingPeriod,
 } from "./pricing";
+import {
+  DEFAULT_COUNTRY,
+  COUNTRY_CONFIG,
+  normalizePhoneForCountry,
+  type CountryCode,
+} from "./country/config";
 
 const ORCHESTRATOR_URL =
   "https://gyqoaningqhurhvdugne.supabase.co/functions/v1/payment-orchestrator";
-const DEFAULT_RETURN_URL = "https://hunie.lovable.app/app?subscription=success";
+
+function defaultReturnUrl(country: CountryCode) {
+  const host = COUNTRY_CONFIG[country]?.defaultReturnHost ?? "hunie.app";
+  return `https://${host}/app?subscription=success`;
+}
 
 const InputSchema = z.object({
   plan_tier: z.enum(["select", "plus", "elite"]).optional(),
@@ -28,6 +39,7 @@ const InputSchema = z.object({
   return_url: z.string().url().optional(),
   customer_name: z.string().max(120).optional(),
   customer_email: z.string().email().optional(),
+  country: z.enum(["MZ", "AO", "ZA", "PT"]).optional(),
 });
 
 async function sha256Hex(input: string): Promise<string> {
@@ -48,17 +60,22 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const { userId } = context;
+    const country: CountryCode = (data.country ?? DEFAULT_COUNTRY) as CountryCode;
+    const countryCfg = COUNTRY_CONFIG[country] ?? COUNTRY_CONFIG[DEFAULT_COUNTRY];
+    const currency = getCurrency(country);
 
-    const apiKey = process.env.DEBITO_API_KEY;
-    const merchantId = process.env.DEBITO_MERCHANT_ID;
-    const walletCode = process.env.DEBITO_WALLET_CODE;
-    if (!apiKey || !merchantId || !walletCode) {
-      throw new Error("Missing Debito Pay credentials");
+    // ── Validate method against country's enabled list ──
+    if (!countryCfg.payments.includes(data.payment_method as never)) {
+      return {
+        success: false,
+        error: "method_not_available",
+        message: `${data.payment_method} não está disponível em ${countryCfg.name}.`,
+      } as const;
     }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Rate limit: >=3 pending in last 60s -> 429
+    // ── Rate limit: ≥3 pending in last 60s → 429 ──
     const sinceIso = new Date(Date.now() - 60_000).toISOString();
     const { count } = await supabaseAdmin
       .from("debito_payments")
@@ -67,51 +84,58 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
       .eq("status", "pending")
       .gte("created_at", sinceIso);
     if ((count ?? 0) >= 3) {
-      return { success: false, error: "rate_limited", message: "Aguarda um momento e tenta de novo." } as const;
+      return {
+        success: false,
+        error: "rate_limited",
+        message: "Aguarda um momento e tenta de novo.",
+      } as const;
     }
 
-    // Resolve kind, amount, validation
+    // ── Resolve kind + amount (server-recomputed, never trust client) ──
     const kind: "plan" | "pack" = data.pack_id ? "pack" : "plan";
     let amount = 0;
     let plan_tier: string | null = null;
     let pack_id: string | null = null;
     let pack_kind: "boost" | "super_like" | null = null;
     let pack_quantity: number | null = null;
-
     let plan_days = 30;
     const period: BillingPeriod = (data.billing_period ?? "monthly") as BillingPeriod;
+
     if (kind === "plan") {
-      const p = PLAN_PRICES[data.plan_tier!];
+      const p = getPlanPrices(country)[data.plan_tier!];
       if (!p) throw new Error("Invalid plan_tier");
       plan_tier = data.plan_tier!;
-      amount = getPlanAmount(data.plan_tier!, period);
-      plan_days = getPlanDays(data.plan_tier!, period);
+      amount = getPlanAmount(data.plan_tier!, period, country);
+      plan_days = getPlanDays(data.plan_tier!, period, country);
     } else {
-      const pack = PACKS[data.pack_id!];
+      const pack = getPacks(country)[data.pack_id!];
       if (!pack) throw new Error("Invalid pack_id");
       pack_id = pack.id;
       pack_kind = pack.kind;
       pack_quantity = pack.quantity;
-      amount = pack.priceMzn;
+      amount = pack.price;
     }
 
     const method = data.payment_method as PaymentMethod;
     const isMobile = MOBILE_MONEY_METHODS.includes(method);
+    const liveMethod = LIVE_DEBITO_METHODS.includes(method);
 
     let normalizedPhone: string | null = null;
     let phone_hash: string | null = null;
     let phone_last4: string | null = null;
     if (isMobile) {
       if (!data.phone) throw new Error("Phone required for mobile money");
-      normalizedPhone = normalizePhone(data.phone);
+      normalizedPhone = normalizePhoneForCountry(data.phone, country);
       if (!normalizedPhone) throw new Error("Número de telemóvel inválido");
       phone_hash = await sha256Hex(normalizedPhone);
       phone_last4 = normalizedPhone.slice(-4);
     }
 
-    const returnUrl = isAllowedReturnUrl(data.return_url) ? data.return_url! : DEFAULT_RETURN_URL;
+    const returnUrl = isAllowedReturnUrl(data.return_url)
+      ? data.return_url!
+      : defaultReturnUrl(country);
 
-    // 1) insert local pending row
+    // ── 1) Insert local pending row ──
     const { data: row, error: insErr } = await supabaseAdmin
       .from("debito_payments")
       .insert({
@@ -123,7 +147,7 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
         pack_quantity,
         payment_method: method,
         amount,
-        currency: "MZN",
+        currency,
         phone_hash,
         phone_last4,
         customer_email: data.customer_email ?? null,
@@ -133,7 +157,30 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
       .single();
     if (insErr || !row) throw new Error("Falha ao criar pagamento");
 
-    // 2) call orchestrator
+    // ── 2a) Methods NOT live yet (e.g. Multicaixa, Unitel Money, cards) ──
+    // Don't call the MZ orchestrator with credentials that won't work.
+    // Insert pending and return a friendly message — webhook integration lands later.
+    if (!liveMethod) {
+      return {
+        success: true,
+        payment_id: row.id,
+        status: "pending" as const,
+        reference: null,
+        checkout_url: null,
+        awaiting_confirmation: false,
+        awaiting_provider: true,
+        message: `${method} estará disponível em breve em ${countryCfg.name}. Estamos a finalizar a integração com o operador.`,
+      } as const;
+    }
+
+    // ── 2b) Live MZ orchestrator path ──
+    const apiKey = process.env.DEBITO_API_KEY;
+    const merchantId = process.env.DEBITO_MERCHANT_ID;
+    const walletCode = process.env.DEBITO_WALLET_CODE;
+    if (!apiKey || !merchantId || !walletCode) {
+      throw new Error("Missing Debito Pay credentials");
+    }
+
     const minuteBucket = Math.floor(Date.now() / 60_000);
     const idemKey = `${userId}:${plan_tier ?? pack_id}:${method}:${minuteBucket}`;
 
@@ -143,7 +190,7 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
       merchant_id: merchantId,
       wallet_code: walletCode,
       amount,
-      currency: "MZN",
+      currency,
       source: "gateway",
       source_id: row.source_id,
       customer_name: data.customer_name ?? "Hunie user",
@@ -175,14 +222,13 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
       rawStatus === "success" || rawStatus === "completed"
         ? "success"
         : rawStatus === "failed" || rawStatus === "cancelled"
-        ? "failed"
-        : "pending";
+          ? "failed"
+          : "pending";
 
     const debitoPaymentId = (respJson.payment_id ?? respJson.id ?? null) as string | null;
     const debitoReference = (respJson.reference ?? null) as string | null;
-    const debitoTransactionId = (respJson.transactionId ?? respJson.transaction_id ?? null) as
-      | string
-      | null;
+    const debitoTransactionId =
+      (respJson.transactionId ?? respJson.transaction_id ?? null) as string | null;
     const checkoutUrl = (respJson.checkout_url ?? null) as string | null;
 
     await supabaseAdmin
@@ -197,7 +243,7 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
       })
       .eq("id", row.id);
 
-    // 3) sync success: credit immediately
+    // ── 3) Sync success: credit immediately ──
     if (orchestratorOk && mappedStatus === "success") {
       if (kind === "pack" && pack_kind && pack_quantity) {
         await supabaseAdmin.rpc("credit_pack_debito", {
@@ -205,7 +251,7 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
           _pack_kind: pack_kind,
           _quantity: pack_quantity,
           _amount_minor: Math.round(amount * 100),
-          _currency: "MZN",
+          _currency: currency,
           _source_id: row.source_id,
           _debito_payment_id: debitoPaymentId ?? "",
         });
@@ -238,5 +284,6 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
       reference: debitoReference,
       checkout_url: checkoutUrl,
       awaiting_confirmation: mappedStatus === "pending",
+      awaiting_provider: false,
     } as const;
   });

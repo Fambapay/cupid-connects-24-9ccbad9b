@@ -11,11 +11,11 @@ import {
   Flame,
   Crown,
 } from "lucide-react";
-import { PACKS, type Pack, type PackKind } from "@/lib/pricing";
+import { getPacks, type Pack, type PackKind } from "@/lib/pricing";
+import { formatCountryPrice } from "@/lib/country/config";
+import { useCountry } from "@/lib/country/context";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 import { useCredits } from "@/hooks/useCredits";
-
-const PACKS_ARRAY = Object.values(PACKS);
 
 const COPY: Record<
   PackKind,
@@ -59,17 +59,21 @@ export interface CreditShopSheetProps {
 }
 
 function unitPrice(p: Pack) {
-  return Math.round((p.priceMzn / p.quantity) * 10) / 10;
+  return Math.round((p.price / p.quantity) * 10) / 10;
 }
 
 export function CreditShopSheet({ open, kind, onClose, onSuccess }: CreditShopSheetProps) {
   const { credits, reload } = useCredits();
+  const { country, config } = useCountry();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   const packs = useMemo(
-    () => PACKS_ARRAY.filter((p) => p.kind === kind).sort((a, b) => a.priceMzn - b.priceMzn),
-    [kind],
+    () =>
+      Object.values(getPacks(country))
+        .filter((p) => p.kind === kind)
+        .sort((a, b) => a.price - b.price),
+    [kind, country],
   );
   const copy = COPY[kind];
   const accent = kind === "boost" ? "from-fuchsia-500 to-indigo-500" : "from-sky-400 to-blue-500";
@@ -267,7 +271,7 @@ export function CreditShopSheet({ open, kind, onClose, onSuccess }: CreditShopSh
                             )}
                           </div>
                           <div className="mt-0.5 text-[10.5px] text-white/45">
-                            {unit} MZN cada
+                            {formatCountryPrice(unit, country)} cada
                           </div>
                         </div>
                         <div className="text-right">
@@ -275,9 +279,8 @@ export function CreditShopSheet({ open, kind, onClose, onSuccess }: CreditShopSh
                             className="text-[15px] tabular-nums text-white"
                             style={{ fontFamily: "Montserrat, var(--font-display)", fontWeight: 800 }}
                           >
-                            {pack.priceMzn.toLocaleString("pt-PT")}
+                            {formatCountryPrice(pack.price, country)}
                           </span>
-                          <span className="ml-1 text-[11px] font-medium text-white/45">MZN</span>
                         </div>
                       </div>
                     </motion.button>
@@ -287,7 +290,7 @@ export function CreditShopSheet({ open, kind, onClose, onSuccess }: CreditShopSh
 
               <p className="mt-6 text-center text-[10.5px] leading-relaxed tracking-wide text-white/35">
                 Crédito instantâneo · Nunca expira<br />
-                Pagamento via M-Pesa ou e-Mola
+                Pagamento {config.flag} {config.name}
               </p>
             </div>
 
@@ -312,7 +315,7 @@ export function CreditShopSheet({ open, kind, onClose, onSuccess }: CreditShopSh
                   style={{ fontFamily: "Montserrat, var(--font-display)", fontWeight: 800 }}
                 >
                   <Sparkles size={14} className="opacity-90" />
-                  Desbloquear · {selected?.priceMzn.toLocaleString("pt-PT")} MZN
+                  Desbloquear · {selected ? formatCountryPrice(selected.price, country) : ""}
                 </span>
               </motion.button>
             </div>
@@ -324,7 +327,7 @@ export function CreditShopSheet({ open, kind, onClose, onSuccess }: CreditShopSh
               onClose={() => setCheckoutOpen(false)}
               title={`${selected.quantity} ${kind === "boost" ? "Boosts" : "Super Likes"}`}
               subtitle="Crédito instantâneo após confirmação"
-              amountMzn={selected.priceMzn}
+              amountMzn={selected.price}
               packId={selected.id}
               onSuccess={async () => {
                 await reload();

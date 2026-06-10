@@ -19,9 +19,9 @@ import { z } from "zod";
 import { useCredits } from "@/hooks/useCredits";
 import { requireMembership } from "@/lib/authGuard";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
-import { PACKS, type Pack, type PackKind } from "@/lib/pricing";
-
-const PACKS_ARRAY = Object.values(PACKS);
+import { getPacks, type Pack, type PackKind } from "@/lib/pricing";
+import { formatCountryPrice, type CountryCode } from "@/lib/country/config";
+import { useCountry } from "@/lib/country/context";
 
 const POSITION_HOOKS = ["Para testar", "A escolha de 7 em cada 10", "Maior poupança"];
 
@@ -66,17 +66,14 @@ export const Route = createFileRoute("/shop")({
   component: ShopPage,
 });
 
-function formatMZN(n: number) {
-  return `${n.toLocaleString("pt-PT")} MZN`;
-}
-
 function unitPrice(p: Pack) {
-  return Math.round((p.priceMzn / p.quantity) * 10) / 10;
+  return Math.round((p.price / p.quantity) * 10) / 10;
 }
 
-function discountPct(kind: PackKind, pricePerUnit: number) {
-  const base = PACKS_ARRAY.find((p) => p.kind === kind && p.quantity === 1)?.priceMzn
-    ?? (kind === "super_like" ? PACKS_ARRAY.find((p) => p.kind === kind)!.priceMzn / PACKS_ARRAY.find((p) => p.kind === kind)!.quantity : 0);
+function discountPct(country: CountryCode, kind: PackKind, pricePerUnit: number) {
+  const all = Object.values(getPacks(country));
+  const single = all.find((p) => p.kind === kind && p.quantity === 1);
+  const base = single?.price ?? 0;
   if (!base) return 0;
   return Math.round((1 - pricePerUnit / base) * 100);
 }
@@ -85,6 +82,7 @@ function ShopPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const { credits } = useCredits();
+  const { country } = useCountry();
   const [tab, setTab] = useState<PackKind>(search.tab ?? "boost");
 
   useEffect(() => {
@@ -92,7 +90,10 @@ function ShopPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search.tab]);
 
-  const packs = useMemo(() => PACKS_ARRAY.filter((p) => p.kind === tab), [tab]);
+  const packs = useMemo(
+    () => Object.values(getPacks(country)).filter((p) => p.kind === tab),
+    [tab, country],
+  );
   const copy = TAB_COPY[tab];
   const tabCount = tab === "boost" ? credits.boost_balance : credits.super_like_balance;
 
@@ -233,7 +234,7 @@ function ShopPage() {
           {/* Pack list */}
           <div className="mt-5 space-y-3 px-4">
             {packs.map((pack, i) => (
-              <PackCard key={pack.id} pack={pack} index={i} />
+              <PackCard key={pack.id} pack={pack} index={i} country={country} />
             ))}
           </div>
 
@@ -307,7 +308,7 @@ function TrustTile({ icon, label }: { icon: React.ReactNode; label: string }) {
   );
 }
 
-function PackCard({ pack, index }: { pack: Pack; index: number }) {
+function PackCard({ pack, index, country }: { pack: Pack; index: number; country: CountryCode }) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const accent =
     pack.kind === "boost"
@@ -316,7 +317,7 @@ function PackCard({ pack, index }: { pack: Pack; index: number }) {
   const accentColor = pack.kind === "boost" ? "#A855F7" : "#38BDF8";
   const featured = pack.popular || pack.best;
   const unit = unitPrice(pack);
-  const disc = discountPct(pack.kind, unit);
+  const disc = discountPct(country, pack.kind, unit);
 
   const handleBuy = () => setSheetOpen(true);
 
@@ -388,11 +389,11 @@ function PackCard({ pack, index }: { pack: Pack; index: number }) {
                 </span>
               </div>
               <div className="mt-1 text-[11px] text-muted-foreground">
-                {unit} MZN cada
+                {formatCountryPrice(unit, country)} cada
               </div>
             </div>
             <div className="text-right">
-              <div className="text-base font-bold">{formatMZN(pack.priceMzn)}</div>
+              <div className="text-base font-bold">{formatCountryPrice(pack.price, country)}</div>
             </div>
           </div>
 
@@ -432,7 +433,7 @@ function PackCard({ pack, index }: { pack: Pack; index: number }) {
         onClose={() => setSheetOpen(false)}
         title={`${pack.quantity} ${pack.kind === "boost" ? "Boosts" : "Super Likes"}`}
         subtitle="Crédito instantâneo após confirmação"
-        amountMzn={pack.priceMzn}
+        amountMzn={pack.price}
         packId={pack.id}
       />
     </motion.div>

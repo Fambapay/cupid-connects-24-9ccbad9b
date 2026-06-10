@@ -18,6 +18,7 @@ import { useNewMessageNotifier } from "@/hooks/useNewMessageNotifier";
 import { useHeartbeat } from "@/hooks/useHeartbeat";
 import { PushPermissionPrompt } from "@/components/PushPermissionPrompt";
 import { supabase } from "@/integrations/supabase/client";
+import { CountryProvider } from "@/lib/country/context";
 
 function GlobalNotifiers() {
   useNewMessageNotifier();
@@ -174,10 +175,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
-      <GlobalNotifiers />
-      <PushPromptGate />
-      <Toaster position="top-center" richColors />
+      <CountryProvider>
+        <Outlet />
+        <GlobalNotifiers />
+        <PushPromptGate />
+        <Toaster position="top-center" richColors />
+      </CountryProvider>
     </QueryClientProvider>
   );
 }
