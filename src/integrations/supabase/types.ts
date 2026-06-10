@@ -158,6 +158,62 @@ export type Database = {
         }
         Relationships: []
       }
+      checkout_currency_events: {
+        Row: {
+          amount: number
+          cf_ipcountry: string | null
+          checkout_country: string
+          created_at: string
+          currency: string
+          host: string | null
+          id: string
+          meta: Json
+          mismatch: boolean
+          payment_id: string | null
+          payment_method: string
+          profile_country: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          cf_ipcountry?: string | null
+          checkout_country: string
+          created_at?: string
+          currency: string
+          host?: string | null
+          id?: string
+          meta?: Json
+          mismatch?: boolean
+          payment_id?: string | null
+          payment_method: string
+          profile_country?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          cf_ipcountry?: string | null
+          checkout_country?: string
+          created_at?: string
+          currency?: string
+          host?: string | null
+          id?: string
+          meta?: Json
+          mismatch?: boolean
+          payment_id?: string | null
+          payment_method?: string
+          profile_country?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checkout_currency_events_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "debito_payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       credit_purchases: {
         Row: {
           amount_minor: number

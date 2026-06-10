@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
@@ -156,6 +157,34 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
       .select("id, source_id")
       .single();
     if (insErr || !row) throw new Error("Falha ao criar pagamento");
+
+    // ── Log checkout currency event (audit: domain vs profile country) ──
+    try {
+      const host =
+        getRequestHeader("host") ?? getRequestHeader("x-forwarded-host") ?? null;
+      const cfIp = getRequestHeader("cf-ipcountry") ?? null;
+      const { data: profileRow } = await supabaseAdmin
+        .from("profiles")
+        .select("country")
+        .eq("id", userId)
+        .maybeSingle();
+      const profileCountry = (profileRow?.country as string | null) ?? null;
+      await supabaseAdmin.from("checkout_currency_events").insert({
+        user_id: userId,
+        payment_id: row.id,
+        checkout_country: country,
+        profile_country: profileCountry,
+        host,
+        cf_ipcountry: cfIp,
+        currency,
+        payment_method: method,
+        amount,
+        mismatch: profileCountry != null && profileCountry !== country,
+        meta: { kind, plan_tier, pack_id, period },
+      });
+    } catch (e) {
+      console.warn("checkout_currency_events insert failed", e);
+    }
 
     // ── 2a) Angola: KambaPay (Multicaixa Express + Referência MC) ──
     if (country === "AO" && (method === "multicaixa_express" || method === "referencia_mc")) {
