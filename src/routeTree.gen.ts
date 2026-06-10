@@ -45,6 +45,7 @@ import { Route as ApiPublicVapidKeyRouteImport } from './routes/api/public/vapid
 import { Route as ApiPublicReactivationCronRouteImport } from './routes/api/public/reactivation-cron'
 import { Route as ApiPublicNotifyRouteImport } from './routes/api/public/notify'
 import { Route as ApiPublicMembershipExpiryCronRouteImport } from './routes/api/public/membership-expiry-cron'
+import { Route as ApiPublicKambapayWebhookRouteImport } from './routes/api/public/kambapay-webhook'
 import { Route as ApiPublicDebitoWebhookRouteImport } from './routes/api/public/debito-webhook'
 import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated.settings.notifications'
@@ -235,6 +236,12 @@ const ApiPublicMembershipExpiryCronRoute =
     path: '/api/public/membership-expiry-cron',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicKambapayWebhookRoute =
+  ApiPublicKambapayWebhookRouteImport.update({
+    id: '/api/public/kambapay-webhook',
+    path: '/api/public/kambapay-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicDebitoWebhookRoute = ApiPublicDebitoWebhookRouteImport.update({
   id: '/api/public/debito-webhook',
   path: '/api/public/debito-webhook',
@@ -314,6 +321,7 @@ export interface FileRoutesByFullPath {
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
+  '/api/public/kambapay-webhook': typeof ApiPublicKambapayWebhookRoute
   '/api/public/membership-expiry-cron': typeof ApiPublicMembershipExpiryCronRoute
   '/api/public/notify': typeof ApiPublicNotifyRoute
   '/api/public/reactivation-cron': typeof ApiPublicReactivationCronRoute
@@ -358,6 +366,7 @@ export interface FileRoutesByTo {
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
+  '/api/public/kambapay-webhook': typeof ApiPublicKambapayWebhookRoute
   '/api/public/membership-expiry-cron': typeof ApiPublicMembershipExpiryCronRoute
   '/api/public/notify': typeof ApiPublicNotifyRoute
   '/api/public/reactivation-cron': typeof ApiPublicReactivationCronRoute
@@ -405,6 +414,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
+  '/api/public/kambapay-webhook': typeof ApiPublicKambapayWebhookRoute
   '/api/public/membership-expiry-cron': typeof ApiPublicMembershipExpiryCronRoute
   '/api/public/notify': typeof ApiPublicNotifyRoute
   '/api/public/reactivation-cron': typeof ApiPublicReactivationCronRoute
@@ -452,6 +462,7 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
+    | '/api/public/kambapay-webhook'
     | '/api/public/membership-expiry-cron'
     | '/api/public/notify'
     | '/api/public/reactivation-cron'
@@ -496,6 +507,7 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
+    | '/api/public/kambapay-webhook'
     | '/api/public/membership-expiry-cron'
     | '/api/public/notify'
     | '/api/public/reactivation-cron'
@@ -542,6 +554,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/notifications'
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
+    | '/api/public/kambapay-webhook'
     | '/api/public/membership-expiry-cron'
     | '/api/public/notify'
     | '/api/public/reactivation-cron'
@@ -574,6 +587,7 @@ export interface RootRouteChildren {
   LegalPrivacidadeRoute: typeof LegalPrivacidadeRoute
   LegalTermosRoute: typeof LegalTermosRoute
   ApiPublicDebitoWebhookRoute: typeof ApiPublicDebitoWebhookRoute
+  ApiPublicKambapayWebhookRoute: typeof ApiPublicKambapayWebhookRoute
   ApiPublicMembershipExpiryCronRoute: typeof ApiPublicMembershipExpiryCronRoute
   ApiPublicNotifyRoute: typeof ApiPublicNotifyRoute
   ApiPublicReactivationCronRoute: typeof ApiPublicReactivationCronRoute
@@ -840,6 +854,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicMembershipExpiryCronRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/kambapay-webhook': {
+      id: '/api/public/kambapay-webhook'
+      path: '/api/public/kambapay-webhook'
+      fullPath: '/api/public/kambapay-webhook'
+      preLoaderRoute: typeof ApiPublicKambapayWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/debito-webhook': {
       id: '/api/public/debito-webhook'
       path: '/api/public/debito-webhook'
@@ -1005,6 +1026,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalPrivacidadeRoute: LegalPrivacidadeRoute,
   LegalTermosRoute: LegalTermosRoute,
   ApiPublicDebitoWebhookRoute: ApiPublicDebitoWebhookRoute,
+  ApiPublicKambapayWebhookRoute: ApiPublicKambapayWebhookRoute,
   ApiPublicMembershipExpiryCronRoute: ApiPublicMembershipExpiryCronRoute,
   ApiPublicNotifyRoute: ApiPublicNotifyRoute,
   ApiPublicReactivationCronRoute: ApiPublicReactivationCronRoute,
