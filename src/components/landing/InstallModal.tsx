@@ -63,6 +63,24 @@ export function InstallModal({ open, onClose, deferredPrompt }: Props) {
       aria-modal="true"
       aria-label="Instalar app"
     >
+      <style>{`
+        .hl-modal-backdrop{position:fixed;inset:0;background:rgba(7,6,10,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:2000;display:grid;place-items:end center;padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom));animation:hlmFade .2s ease-out}
+        @media(min-width:768px){.hl-modal-backdrop{place-items:center}}
+        .hl-modal{width:100%;max-width:460px;border-radius:28px;background:linear-gradient(180deg,#15101e,#0b0710);border:1px solid rgba(255,255,255,.10);padding:28px 24px 24px;position:relative;color:#fff;box-shadow:0 30px 80px -20px rgba(0,0,0,.6);animation:hlmRise .28s cubic-bezier(.2,.8,.2,1)}
+        .hl-modal-close{position:absolute;top:14px;right:14px;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:#fff;cursor:pointer}
+        .hl-modal h3{font-family:"SF Pro Display",system-ui,sans-serif;font-weight:700;font-size:22px;letter-spacing:-0.02em;margin:0}
+        .hl-modal-tabs{display:flex;gap:6px;margin:20px 0 22px;padding:4px;border-radius:999px;background:rgba(255,255,255,.05)}
+        .hl-modal-tab{flex:1;padding:9px 14px;border-radius:999px;background:transparent;color:rgba(255,255,255,.7);border:none;cursor:pointer;font-weight:600;font-size:13px}
+        .hl-modal-tab.active{background:linear-gradient(135deg,#FF4FA3,#FF7AB8);color:#fff}
+        .hl-modal-step{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+        .hl-modal-step:last-of-type{border-bottom:none}
+        .hl-modal-step-icon{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border-radius:12px;background:rgba(255,79,163,.10);color:#FF7AB8}
+        .hl-modal-step strong{font-size:14px}
+        .hl-modal-step p{margin:4px 0 0;font-size:13px;color:rgba(255,255,255,.62);line-height:1.5}
+        .hl-modal .hl-btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 20px;border-radius:999px;background:linear-gradient(135deg,#FF4FA3,#FF7AB8);color:#fff;font-weight:600;border:none;cursor:pointer;font-size:15px}
+        @keyframes hlmFade{from{opacity:0}to{opacity:1}}
+        @keyframes hlmRise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+      `}</style>
       <div className="hl-modal" ref={dialogRef}>
         <button className="hl-modal-close" onClick={onClose} aria-label="Fechar">
           <X size={16} />
