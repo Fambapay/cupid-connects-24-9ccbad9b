@@ -152,6 +152,7 @@ function Splash() {
 
 function Landing() {
   const [installOpen, setInstallOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const { deferredPrompt, isStandalone } = usePWAInstall();
   const navigate = useNavigate();
