@@ -113,13 +113,12 @@ export const Route = createFileRoute("/api/public/kambapay-webhook")({
                 row.debito_payment_id ?? paymentId ?? "",
             });
           } else if (row.kind === "plan" && row.plan_tier) {
-            const { PLAN_PRICES_AO } = await import("@/lib/pricing");
-            const p =
-              PLAN_PRICES_AO[
-                row.plan_tier as "select" | "plus" | "elite"
-              ];
+            const { getPlanPrices } = await import("@/lib/pricing");
+            const p = getPlanPrices(
+              (row.currency === "AOA" ? "AO" : "MZ"),
+            )[row.plan_tier as "select" | "plus" | "elite"];
             const days =
-              p && Number(row.amount) >= p.annualPriceMzn
+              p && Number(row.amount) >= p.annualPrice
                 ? p.annualDays
                 : p.monthlyDays;
             await supabaseAdmin.rpc("activate_membership_debito", {
