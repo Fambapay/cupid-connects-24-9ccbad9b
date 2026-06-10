@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Plus, Sparkles, Crown, BadgeCheck, ArrowRight } from "lucide-react";
+import { Check, Plus, Sparkles, Crown, BadgeCheck, ArrowRight, Menu, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import "@fontsource/montserrat/400.css";
 import "@fontsource/montserrat/600.css";
@@ -152,6 +152,7 @@ function Splash() {
 
 function Landing() {
   const [installOpen, setInstallOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const { deferredPrompt, isStandalone } = usePWAInstall();
   const navigate = useNavigate();
@@ -297,10 +298,30 @@ function Landing() {
               <a className="ll-nav-link" href="#faq">FAQ</a>
               <Link to="/auth/login" className="ll-nav-link">Entrar</Link>
             </div>
-            <Link to="/auth/register" className="ll-btn ll-btn-primary" style={{ height: 38, padding: "0 18px", fontSize: 13.5 }}>
-              Criar conta
-            </Link>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <Link to="/auth/register" className="ll-btn ll-btn-primary" style={{ height: 38, padding: "0 18px", fontSize: 13.5 }}>
+                Criar conta
+              </Link>
+              <button
+                className="ll-nav-menu-btn"
+                onClick={() => setMenuOpen((v) => !v)}
+                aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+                aria-expanded={menuOpen}
+              >
+                {menuOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
+            </div>
           </div>
+          {menuOpen && (
+            <div className="ll-nav-menu">
+              <a className="ll-nav-menu-link" href="#como-funciona" onClick={() => setMenuOpen(false)}>Como funciona</a>
+              <a className="ll-nav-menu-link" href="#planos" onClick={() => setMenuOpen(false)}>Planos</a>
+              <a className="ll-nav-menu-link" href="#cidades" onClick={() => setMenuOpen(false)}>Cidades</a>
+              <a className="ll-nav-menu-link" href="#faq" onClick={() => setMenuOpen(false)}>FAQ</a>
+              <Link to="/auth/login" className="ll-nav-menu-link" onClick={() => setMenuOpen(false)}>Entrar</Link>
+              <Link to="/auth/register" className="ll-nav-menu-link ll-nav-menu-cta" onClick={() => setMenuOpen(false)}>Criar conta</Link>
+            </div>
+          )}
         </nav>
 
         {/* ========== HERO / MAGAZINE COVER ========== */}
