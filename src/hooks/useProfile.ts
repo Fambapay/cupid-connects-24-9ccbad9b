@@ -41,16 +41,23 @@ export function useProfile() {
       return;
     }
     if (!profileCache.has(user.id)) setLoading(true);
-    const [{ data }, { data: phoneData }] = await Promise.all([
+    const [{ data }, { data: phoneData }, { data: locData }] = await Promise.all([
       supabase
         .from("profiles")
-        .select("id,name,age,city,country,bio,is_paused,is_incognito,is_verified,membership_tier,membership_status,membership_expires_at,onboarding_completed,onboarding_step,birthdate,gender,interested_in,interests,latitude,longitude")
+        .select("id,name,age,city,country,bio,is_paused,is_incognito,is_verified,membership_tier,membership_status,membership_expires_at,onboarding_completed,onboarding_step,birthdate,gender,interested_in,interests")
         .eq("id", user.id)
         .maybeSingle(),
       supabase.rpc("get_my_phone"),
+      (supabase.rpc as any)("get_my_location"),
     ]);
+    const loc = Array.isArray(locData) ? locData[0] : locData;
     const next = data
-      ? ({ ...(data as any), phone: (phoneData as unknown as string | null) ?? null } as Profile)
+      ? ({
+          ...(data as any),
+          phone: (phoneData as unknown as string | null) ?? null,
+          latitude: (loc as any)?.latitude ?? null,
+          longitude: (loc as any)?.longitude ?? null,
+        } as Profile)
       : null;
     if (next) profileCache.set(user.id, next);
     setProfile(next);
