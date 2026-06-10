@@ -32,6 +32,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { usePhotoUpload, type PhotoRow } from "@/hooks/usePhotoUpload";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useCountry } from "@/lib/country/context";
 import { cn } from "@/lib/utils";
 import tutorialWoman1 from "@/assets/tutorial-woman-1.jpg";
 import tutorialWoman2 from "@/assets/tutorial-woman-2.jpg";
@@ -168,6 +169,7 @@ function OnboardingPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { photos, upload, remove, loading } = usePhotoUpload();
+  const { country, config: countryConfig } = useCountry();
 
   const [draft, setDraft] = useState<DraftState>(initialDraft);
   const [hydrated, setHydrated] = useState(false);
@@ -253,6 +255,7 @@ function OnboardingPage() {
         name: name.trim() || null,
         bio: bio.trim() || null,
         city: city.trim() || null,
+        country,
         gender,
         interested_in: interested ? interestedMap[interested] : [],
         interests,
@@ -378,6 +381,7 @@ function OnboardingPage() {
         name: name.trim(),
         bio: bio.trim() || null,
         city: city.trim() || null,
+        country,
         gender,
         interested_in: interested ? interestedMap[interested] : [],
         interests,
@@ -399,7 +403,7 @@ function OnboardingPage() {
     invalidateOnboardingCache();
     await reload();
     navigate({ to: "/discover" });
-  }, [draft, user, navigate, reload, toast, photos.length]);
+  }, [draft, user, navigate, reload, toast, photos.length, country]);
 
   const showProgress = stepId !== "welcome" && !done;
   const showBackButton = stepId !== "welcome" && draft.stepIdx > 0;
