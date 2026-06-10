@@ -161,7 +161,7 @@ async function fetchDiscovery(
   let q = supabase
     .from("profiles")
     .select(
-      "id,name,age,birthdate,city,country,bio,interests,is_verified,gender,latitude,longitude,last_active_at,is_seed,is_incognito,membership_tier,membership_status,membership_expires_at",
+      "id,name,age,birthdate,city,country,bio,interests,is_verified,gender,last_active_at,is_seed,is_incognito,membership_tier,membership_status,membership_expires_at",
     )
     .eq("onboarding_completed", true)
     .eq("is_paused", false)
@@ -191,22 +191,34 @@ async function fetchDiscovery(
     .filter((r) => !excluded.has(r.id))
     .filter((r) => !r.is_incognito || likedMe.has(r.id));
 
-  const myCoords =
-    userCoords ??
-    (me?.latitude != null && me?.longitude != null
-      ? { lat: me.latitude as number, lng: me.longitude as number }
-      : null);
-  const withDistance = candidates.map((r) => {
-    const dist =
-      myCoords && r.latitude != null && r.longitude != null
-        ? haversine(myCoords, { lat: r.latitude as number, lng: r.longitude as number })
-        : 0;
-    return { ...r, _distance: dist };
-  });
+  // Resolve viewer coordinates. We never read other users' lat/lng on the
+  // client; distances are computed server-side via the compute_distances_km RPC.
+  let myCoords = userCoords ?? null;
+  if (!myCoords) {
+    const { data: locData } = await (supabase.rpc as any)("get_my_location");
+    const loc = Array.isArray(locData) ? locData[0] : locData;
+    if (loc?.latitude != null && loc?.longitude != null) {
+      myCoords = { lat: loc.latitude as number, lng: loc.longitude as number };
+    }
+  }
+
+  let distanceById = new Map<string, number>();
+  if (myCoords && candidates.length) {
+    const { data: dists } = await (supabase.rpc as any)("compute_distances_km", {
+      _viewer_lat: myCoords.lat,
+      _viewer_lng: myCoords.lng,
+      _ids: candidates.map((r) => r.id),
+    });
+    (dists as Array<{ id: string; distance_km: number }> | null)?.forEach((d) =>
+      distanceById.set(d.id, d.distance_km ?? 0),
+    );
+  }
+  const withDistance = candidates.map((r) => ({ ...r, _distance: distanceById.get(r.id) ?? 0 }));
   candidates =
     myCoords && distanceMax < 200
       ? withDistance.filter((r) => r._distance <= distanceMax)
       : withDistance;
+
 
   if (filters?.onlineNow) {
     const now = Date.now();
