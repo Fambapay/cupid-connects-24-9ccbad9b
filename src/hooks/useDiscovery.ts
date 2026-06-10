@@ -48,21 +48,6 @@ function computeAge(birthdate: string | null): number {
   return Math.max(0, Math.floor(diff / (365.25 * 24 * 3600 * 1000)));
 }
 
-function haversine(
-  a: { lat: number; lng: number },
-  b: { lat: number; lng: number },
-): number {
-  const R = 6371;
-  const toRad = (x: number) => (x * Math.PI) / 180;
-  const dLat = toRad(b.lat - a.lat);
-  const dLng = toRad(b.lng - a.lng);
-  const lat1 = toRad(a.lat);
-  const lat2 = toRad(b.lat);
-  const s =
-    Math.sin(dLat / 2) ** 2 +
-    Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
-  return Math.round(2 * R * Math.asin(Math.sqrt(s)));
-}
 
 function mapGenderFilter(g: DiscoveryFilters["gender"]): string[] | null {
   switch (g) {
