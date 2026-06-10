@@ -52,7 +52,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/shop")({
   ssr: false,
-  beforeLoad: requireMembership,
+  beforeLoad: requireAuthAndOnboarding,
   validateSearch: searchSchema,
   head: () => ({
     meta: [
