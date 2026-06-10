@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useProfile } from "@/hooks/useProfile";
 import { useToast } from "@/hooks/use-toast";
+import { useCountry } from "@/lib/country/context";
 
 export function PhoneVerificationModal({
   open,
@@ -13,6 +14,7 @@ export function PhoneVerificationModal({
   onOpenChange: (open: boolean) => void;
 }) {
   const { profile, updateProfile } = useProfile();
+  const { config } = useCountry();
   const { toast } = useToast();
   const [phone, setPhone] = useState(profile?.phone ?? "");
   const [saving, setSaving] = useState(false);
@@ -41,7 +43,7 @@ export function PhoneVerificationModal({
         </DialogHeader>
         <Input
           type="tel"
-          placeholder="+351 912 345 678"
+          placeholder={`${config.phonePrefix} ${config.phoneExample}`}
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
         />

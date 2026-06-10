@@ -1,17 +1,20 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Zap, Star, Flame, Crown, Sparkles, Check, ChevronRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 import { hapticTap } from "@/hooks/useNativePlatform";
+import { getPack } from "@/lib/pricing";
+import { formatCountryPrice } from "@/lib/country/config";
+import { useCountry } from "@/lib/country/context";
 
 type Bundle = {
   id: string;
   packId: string;
   title: string;
   subtitle: string;
-  priceMzn: number;
-  originalMzn?: number;
+  /** Discount multiplier applied to per-unit price for the "original" strikethrough */
+  originalMultiplier?: number;
   perks: string[];
   badge?: { label: string; icon: typeof Flame; tone: string };
   gradient: string;
@@ -25,7 +28,6 @@ const BUNDLES: Bundle[] = [
     packId: "super_like_5",
     title: "Starter Bundle",
     subtitle: "5 Super Likes",
-    priceMzn: 299,
     perks: ["3× mais matches", "Notificação especial", "Apareces primeiro"],
     badge: { label: "Para começar", icon: Sparkles, tone: "#5BB8FF" },
     gradient: "linear-gradient(160deg, rgba(56,189,248,0.22), rgba(20,20,30,0.55))",
@@ -37,8 +39,7 @@ const BUNDLES: Bundle[] = [
     packId: "boost_5",
     title: "Power Pack",
     subtitle: "5 Boosts",
-    priceMzn: 799,
-    originalMzn: 995,
+    originalMultiplier: 1.25,
     perks: ["Até 10× visualizações", "30 min no topo", "Mais matches"],
     badge: { label: "Mais popular", icon: Flame, tone: "#FB923C" },
     gradient: "linear-gradient(160deg, rgba(168,85,247,0.28), rgba(20,20,30,0.6))",
@@ -50,8 +51,7 @@ const BUNDLES: Bundle[] = [
     packId: "boost_15",
     title: "Mega Bundle",
     subtitle: "15 Boosts",
-    priceMzn: 1899,
-    originalMzn: 2985,
+    originalMultiplier: 1.57,
     perks: ["Poupa 36%", "Suficiente para 2 semanas", "Vê quem te viu"],
     badge: { label: "Melhor valor", icon: Crown, tone: "#FFD66B" },
     gradient: "linear-gradient(160deg, rgba(255,79,163,0.28), rgba(177,60,255,0.22), rgba(20,20,30,0.6))",
@@ -60,12 +60,21 @@ const BUNDLES: Bundle[] = [
   },
 ];
 
-function fmt(n: number) {
-  return `${n.toLocaleString("pt-PT")} MZN`;
-}
-
 export function ProfileBundles() {
-  const [active, setActive] = useState<Bundle | null>(null);
+  const [active, setActive] = useState<{ bundle: Bundle; price: number } | null>(null);
+  const { country } = useCountry();
+
+  // Resolve each bundle's price from the country catalog at render time.
+  const items = useMemo(
+    () =>
+      BUNDLES.map((b) => {
+        const pack = getPack(b.packId, country);
+        const price = pack?.price ?? 0;
+        const original = b.originalMultiplier ? Math.round(price * b.originalMultiplier) : null;
+        return { bundle: b, price, original };
+      }),
+    [country],
+  );
 
   return (
     <section className="relative px-5 pt-2 pb-5">
@@ -90,10 +99,8 @@ export function ProfileBundles() {
 
       <div className="-mx-5 overflow-x-auto scroll-smooth snap-x snap-mandatory no-scrollbar">
         <div className="flex gap-3 px-5 pb-1">
-          {BUNDLES.map((b, i) => {
-            const discount = b.originalMzn
-              ? Math.round((1 - b.priceMzn / b.originalMzn) * 100)
-              : 0;
+          {items.map(({ bundle: b, price, original }, i) => {
+            const discount = original ? Math.round((1 - price / original) * 100) : 0;
             const BadgeIcon = b.badge?.icon;
             return (
               <motion.button
@@ -103,7 +110,7 @@ export function ProfileBundles() {
                 transition={{ delay: i * 0.05, duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
                 onClick={() => {
                   hapticTap();
-                  setActive(b);
+                  setActive({ bundle: b, price });
                 }}
                 className="relative shrink-0 snap-start w-[260px] text-left rounded-[20px] overflow-hidden border border-white/10 active:scale-[0.98] transition-transform"
                 style={{ background: b.gradient }}
@@ -115,7 +122,6 @@ export function ProfileBundles() {
                 />
 
                 <div className="relative p-4">
-                  {/* Top row: badge + discount */}
                   <div className="flex items-center justify-between mb-3 min-h-[20px]">
                     {b.badge && BadgeIcon ? (
                       <span
@@ -132,7 +138,6 @@ export function ProfileBundles() {
                     )}
                   </div>
 
-                  {/* Icon + title */}
                   <div className="flex items-center gap-3 mb-3">
                     <div
                       className="h-12 w-12 rounded-2xl grid place-items-center shrink-0"
@@ -151,7 +156,6 @@ export function ProfileBundles() {
                     </div>
                   </div>
 
-                  {/* Perks */}
                   <div className="flex flex-col gap-1.5 mb-3.5">
                     {b.perks.map((p) => (
                       <div key={p} className="flex items-center gap-2">
@@ -166,16 +170,15 @@ export function ProfileBundles() {
                     ))}
                   </div>
 
-                  {/* Price + CTA */}
                   <div className="flex items-end justify-between gap-2">
                     <div className="min-w-0">
-                      {b.originalMzn && (
+                      {original && (
                         <p className="text-[11px] text-white/40 line-through leading-none">
-                          {fmt(b.originalMzn)}
+                          {formatCountryPrice(original, country)}
                         </p>
                       )}
                       <p className="text-[20px] font-black tracking-tight text-white leading-tight">
-                        {fmt(b.priceMzn)}
+                        {formatCountryPrice(price, country)}
                       </p>
                     </div>
                     <div
@@ -199,10 +202,10 @@ export function ProfileBundles() {
         <DebitoCheckoutSheet
           open={!!active}
           onClose={() => setActive(null)}
-          title={`${active.title} · ${active.subtitle}`}
+          title={`${active.bundle.title} · ${active.bundle.subtitle}`}
           subtitle="Crédito instantâneo após confirmação"
-          amountMzn={active.priceMzn}
-          packId={active.packId}
+          amountMzn={active.price}
+          packId={active.bundle.packId}
         />
       )}
 
