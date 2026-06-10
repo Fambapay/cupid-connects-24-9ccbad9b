@@ -164,12 +164,13 @@ function Landing() {
 
   const stepsCopy = useMemo(
     () => [
-      { n: "01", title: "Cria o teu perfil", body: "Foto verificada, bio e o que procuras. Em menos de dois minutos estás dentro." },
-      { n: "02", title: "Descobre quem combina", body: `Algoritmo afinado para ${config.name}. Sem swipes infinitos — só perfis que fazem sentido.` },
-      { n: "03", title: "Conversa quando há match", body: "Mensagens diretas, áudios e fotos. Reais. Privados. Sem ruído de redes sociais." },
+      { n: "01", title: "Faz o teu perfil", body: "Foto verificada com selfie, bio curta e o que procuras. Em dois minutos estás dentro — com o badge azul." },
+      { n: "02", title: "Vê quem combina contigo", body: `Mostramos-te perfis ${config.nameLocative} escolhidos a dedo. Sem swipes infinitos, sem bots, sem perfis falsos.` },
+      { n: "03", title: "Conversa em privado", body: "Quando há match, conversam por mensagens, áudios e fotos privadas. Tudo encriptado. Sem ruído de redes sociais." },
     ],
-    [config.name],
+    [config.nameLocative],
   );
+
 
   // Top 5 cities for the grid
   const heroCityCounts = useMemo(() => {
@@ -291,18 +292,8 @@ function Landing() {
         {/* ========== HERO / MAGAZINE COVER ========== */}
         <header className="ll-hero">
           <div className="ll-container">
-            {/* Masthead strip */}
-            <div className="ll-masthead ll-reveal">
-              <span>Hunie · Vol. 01</span>
-              <span className="sep" />
-              <span className="dim">{config.flag} {config.name}</span>
-              <span className="sep" />
-              <span className="dim">Edição {new Date().getFullYear()}</span>
-              <span className="sep" />
-              <span className="dim">Membership-Only</span>
-            </div>
+            <div className="ll-hero-grid">
 
-            <div className="ll-hero-grid" style={{ marginTop: 40 }}>
               {/* Cover */}
               <div className="ll-hero-cover">
                 <span className="ll-kicker ll-reveal">
