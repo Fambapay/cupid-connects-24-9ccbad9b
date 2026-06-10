@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Plus, Sparkles, Crown, BadgeCheck, ArrowRight } from "lucide-react";
+import { Check, Plus, Sparkles, Crown, BadgeCheck, ArrowRight, Menu, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import "@fontsource/montserrat/400.css";
 import "@fontsource/montserrat/600.css";
