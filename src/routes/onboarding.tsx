@@ -32,6 +32,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { usePhotoUpload, type PhotoRow } from "@/hooks/usePhotoUpload";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useCountry } from "@/lib/country/context";
 import { cn } from "@/lib/utils";
 import tutorialWoman1 from "@/assets/tutorial-woman-1.jpg";
 import tutorialWoman2 from "@/assets/tutorial-woman-2.jpg";
@@ -168,6 +169,7 @@ function OnboardingPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { photos, upload, remove, loading } = usePhotoUpload();
+  const { country, config: countryConfig } = useCountry();
 
   const [draft, setDraft] = useState<DraftState>(initialDraft);
   const [hydrated, setHydrated] = useState(false);
@@ -253,6 +255,7 @@ function OnboardingPage() {
         name: name.trim() || null,
         bio: bio.trim() || null,
         city: city.trim() || null,
+        country,
         gender,
         interested_in: interested ? interestedMap[interested] : [],
         interests,
@@ -378,6 +381,7 @@ function OnboardingPage() {
         name: name.trim(),
         bio: bio.trim() || null,
         city: city.trim() || null,
+        country,
         gender,
         interested_in: interested ? interestedMap[interested] : [],
         interests,
@@ -399,7 +403,7 @@ function OnboardingPage() {
     invalidateOnboardingCache();
     await reload();
     navigate({ to: "/discover" });
-  }, [draft, user, navigate, reload, toast, photos.length]);
+  }, [draft, user, navigate, reload, toast, photos.length, country]);
 
   const showProgress = stepId !== "welcome" && !done;
   const showBackButton = stepId !== "welcome" && draft.stepIdx > 0;
@@ -534,6 +538,7 @@ function OnboardingPage() {
                       set("longitude", lng);
                     }}
                     onNext={goNext}
+                    citySuggestions={countryConfig.cities}
                   />
                 )}
               </motion.div>
@@ -1518,11 +1523,13 @@ function LocationStep({
   onChange,
   onCoords,
   onNext,
+  citySuggestions,
 }: {
   value: string;
   onChange: (v: string) => void;
   onCoords: (lat: number | null, lng: number | null) => void;
   onNext: () => void;
+  citySuggestions: readonly string[];
 }) {
   const [state, setState] = useState<"idle" | "loading" | "granted" | "denied">(
     value ? "granted" : "idle",
@@ -1643,6 +1650,8 @@ function LocationStep({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder="A tua cidade"
+                list="onboarding-city-suggestions"
+                autoComplete="off"
                 className={cn(
                   "w-full bg-transparent text-lg outline-none",
                   "border-b-2 border-white/15 pb-2",
@@ -1650,6 +1659,11 @@ function LocationStep({
                   "placeholder:text-muted-foreground transition-colors",
                 )}
               />
+              <datalist id="onboarding-city-suggestions">
+                {citySuggestions.map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
             </motion.div>
           )}
         </motion.div>
