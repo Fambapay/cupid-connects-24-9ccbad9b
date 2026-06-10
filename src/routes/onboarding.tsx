@@ -538,6 +538,7 @@ function OnboardingPage() {
                       set("longitude", lng);
                     }}
                     onNext={goNext}
+                    citySuggestions={countryConfig.cities}
                   />
                 )}
               </motion.div>
@@ -1522,11 +1523,13 @@ function LocationStep({
   onChange,
   onCoords,
   onNext,
+  citySuggestions,
 }: {
   value: string;
   onChange: (v: string) => void;
   onCoords: (lat: number | null, lng: number | null) => void;
   onNext: () => void;
+  citySuggestions: readonly string[];
 }) {
   const [state, setState] = useState<"idle" | "loading" | "granted" | "denied">(
     value ? "granted" : "idle",
@@ -1647,6 +1650,8 @@ function LocationStep({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder="A tua cidade"
+                list="onboarding-city-suggestions"
+                autoComplete="off"
                 className={cn(
                   "w-full bg-transparent text-lg outline-none",
                   "border-b-2 border-white/15 pb-2",
@@ -1654,6 +1659,11 @@ function LocationStep({
                   "placeholder:text-muted-foreground transition-colors",
                 )}
               />
+              <datalist id="onboarding-city-suggestions">
+                {citySuggestions.map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
             </motion.div>
           )}
         </motion.div>
