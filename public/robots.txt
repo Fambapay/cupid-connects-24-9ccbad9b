@@ -12,3 +12,4 @@ Disallow: /unsubscribe
 Disallow: /lovable
 
 Sitemap: https://hunie.app/sitemap.xml
+Sitemap: https://ao.hunie.app/sitemap.xml
