@@ -197,6 +197,11 @@ export function DebitoCheckoutSheet({
         return;
       }
       setReference(res.reference ?? null);
+      setMcReference(
+        "mc_reference" in res && res.mc_reference
+          ? (res.mc_reference as typeof mcReference)
+          : null,
+      );
       setPaymentId(res.payment_id ?? null);
       if (res.status === "success") {
         setStage("success");
