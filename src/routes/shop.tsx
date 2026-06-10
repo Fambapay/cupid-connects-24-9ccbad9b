@@ -17,7 +17,7 @@ import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 
 import { useCredits } from "@/hooks/useCredits";
-import { requireMembership } from "@/lib/authGuard";
+import { requireAuthAndOnboarding } from "@/lib/authGuard";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 import { getPacks, type Pack, type PackKind } from "@/lib/pricing";
 import { formatCountryPrice, type CountryCode } from "@/lib/country/config";
