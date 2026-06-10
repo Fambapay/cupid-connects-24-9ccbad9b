@@ -291,18 +291,8 @@ function Landing() {
         {/* ========== HERO / MAGAZINE COVER ========== */}
         <header className="ll-hero">
           <div className="ll-container">
-            {/* Masthead strip */}
-            <div className="ll-masthead ll-reveal">
-              <span>Hunie · Vol. 01</span>
-              <span className="sep" />
-              <span className="dim">{config.flag} {config.name}</span>
-              <span className="sep" />
-              <span className="dim">Edição {new Date().getFullYear()}</span>
-              <span className="sep" />
-              <span className="dim">Membership-Only</span>
-            </div>
+            <div className="ll-hero-grid">
 
-            <div className="ll-hero-grid" style={{ marginTop: 40 }}>
               {/* Cover */}
               <div className="ll-hero-cover">
                 <span className="ll-kicker ll-reveal">
