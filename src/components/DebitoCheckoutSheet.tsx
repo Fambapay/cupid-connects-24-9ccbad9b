@@ -162,6 +162,7 @@ export function DebitoCheckoutSheet({
   const reset = () => {
     setStage("form");
     setReference(null);
+    setMcReference(null);
     setPaymentId(null);
     setErrMsg(null);
   };
