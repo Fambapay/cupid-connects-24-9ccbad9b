@@ -55,7 +55,7 @@ function NotificationsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-border/40 bg-background/80 px-4 py-3 backdrop-blur">
+      <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-border/40 bg-background px-4 py-3">
         <button
           onClick={() => navigate({ to: '/settings' })}
           className="rounded-full p-2 hover:bg-muted"

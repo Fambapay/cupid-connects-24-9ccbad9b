@@ -109,7 +109,7 @@ export function SwipeCard({ profile, onSwipe, isTop, offset }: Props) {
                 {profile.interests.slice(0, 3).map((i) => (
                   <span
                     key={i}
-                    className="rounded-full bg-white/15 px-3 py-1 text-[11.5px] font-semibold text-white ring-1 ring-white/25 backdrop-blur-md"
+                    className="rounded-full bg-white/25 px-3 py-1 text-[11.5px] font-semibold text-white ring-1 ring-white/25"
                   >
                     {i}
                   </span>
@@ -120,7 +120,7 @@ export function SwipeCard({ profile, onSwipe, isTop, offset }: Props) {
               <button
                 type="button"
                 aria-label="Mais info"
-                className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/15 text-white ring-1 ring-white/30 backdrop-blur-md transition active:scale-90"
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/25 text-white ring-1 ring-white/30 transition active:scale-90"
               >
                 <Info className="h-5 w-5" strokeWidth={2.5} />
               </button>

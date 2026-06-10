@@ -229,7 +229,7 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
             </div>
 
             <div
-              className="absolute inset-x-0 bottom-0 border-t border-white/[0.06] bg-[#0b0b0d]/95 px-6 pt-3 backdrop-blur-xl"
+              className="absolute inset-x-0 bottom-0 border-t border-white/[0.06] bg-[#0b0b0d] px-6 pt-3"
               style={{ paddingBottom: "max(env(safe-area-inset-bottom), 18px)", zIndex: 5 }}
             >
               <motion.button

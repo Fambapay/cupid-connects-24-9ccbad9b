@@ -69,13 +69,13 @@ function LikesPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                 {!isPremium && (
                   <div className="absolute inset-0 grid place-items-center">
-                    <div className="grid h-11 w-11 place-items-center rounded-full bg-black/40 backdrop-blur-md ring-1 ring-white/20">
+                    <div className="grid h-11 w-11 place-items-center rounded-full bg-black/40 ring-1 ring-white/20">
                       <Lock className="h-4 w-4 text-white" />
                     </div>
                   </div>
                 )}
                 {p.firstImpression && isPremium && (
-                  <div className="absolute left-2 right-2 top-2 flex items-start gap-1.5 rounded-xl border border-white/15 bg-black/55 px-2.5 py-1.5 backdrop-blur-md">
+                  <div className="absolute left-2 right-2 top-2 flex items-start gap-1.5 rounded-xl border border-white/15 bg-black/55 px-2.5 py-1.5">
                     <Send className="mt-0.5 h-3 w-3 shrink-0 text-[#4FA8FF]" strokeWidth={2.6} />
                     <p className="line-clamp-2 text-[11px] leading-snug text-white/95">
                       “{p.firstImpression}”
@@ -83,7 +83,7 @@ function LikesPage() {
                   </div>
                 )}
                 {p.firstImpression && !isPremium && (
-                  <div className="absolute left-2 right-2 top-2 flex items-center gap-1.5 rounded-full border border-white/20 bg-[#4FA8FF]/85 px-2.5 py-1 shadow-lg backdrop-blur-md">
+                  <div className="absolute left-2 right-2 top-2 flex items-center gap-1.5 rounded-full border border-white/20 bg-[#4FA8FF]/85 px-2.5 py-1 shadow-lg">
                     <Send className="h-3 w-3 shrink-0 text-white" strokeWidth={2.8} />
                     <span className="truncate text-[10.5px] font-semibold uppercase tracking-wide text-white">
                       Mensagem · desbloquear
