@@ -10,7 +10,6 @@ import "@/styles/liquid-landing.css";
 import { InstallModal } from "@/components/landing/InstallModal";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useTypewriter } from "@/hooks/useTypewriter";
-import hunieMark from "@/assets/hunie-mark-transparent.png.asset.json";
 import { useCountry } from "@/lib/country/context";
 import { getCountryCopy } from "@/lib/country/copy";
 import { COUNTRY_CONFIG, DEFAULT_COUNTRY, formatCountryPrice, paymentLabel, type PaymentMethodCode } from "@/lib/country/config";
@@ -124,7 +123,7 @@ function Splash() {
   return (
     <div style={{ display: "grid", placeItems: "center", minHeight: "100dvh", background: "#07060a" }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-        <img src={hunieMark.url} alt="Hunie" style={{ width: 56, height: 56, borderRadius: 14, display: "block" }} />
+        <img src={"/icon-192.png"} alt="Hunie" style={{ width: 56, height: 56, borderRadius: 14, display: "block" }} />
         <span style={{ color: "#fff", fontWeight: 700, fontSize: 22, letterSpacing: "-0.02em" }}>Hunie</span>
       </div>
     </div>
@@ -274,7 +273,7 @@ function Landing() {
         <nav className="ll-nav" aria-label="Navegação principal">
           <div className="ll-nav-inner">
             <Link to="/" className="ll-logo" aria-label="Hunie">
-              <img src={hunieMark.url} alt="Hunie" className="ll-logo-img" />
+              <img src={"/icon-192.png"} alt="Hunie" className="ll-logo-img" />
             </Link>
             <div className="ll-nav-links">
               <a className="ll-nav-link" href="#como-funciona">Como funciona</a>
@@ -501,7 +500,7 @@ function Landing() {
           <div className="ll-container">
             <div className="ll-footer-inner">
               <Link to="/" className="ll-logo" aria-label="Hunie">
-                <img src={hunieMark.url} alt="Hunie" className="ll-logo-img" />
+                <img src={"/icon-192.png"} alt="Hunie" className="ll-logo-img" />
               </Link>
 
               <div className="ll-footer-links">
