@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import hunieMark from "@/assets/hunie-mark-transparent.png.asset.json";
 
 export const Route = createFileRoute("/legal/privacidade")({
   head: () => ({
@@ -28,7 +27,7 @@ function PrivacyPage() {
       <header className="border-b border-border/40">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-5">
           <Link to="/" className="flex items-center gap-2">
-            <img src={hunieMark.url} alt="Hunie" className="h-8 w-8" />
+            <img src={"/icon-192.png"} alt="Hunie" className="h-8 w-8" />
             <span className="font-serif text-lg">Hunie</span>
           </Link>
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
