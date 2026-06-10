@@ -24,7 +24,7 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const urls = Object.values(HOSTS).flatMap(({ host, lang }) =>
+        const urls = Object.values(HOSTS).flatMap(({ host }) =>
           ENTRIES.map((e) => {
             const alternates = Object.values(HOSTS).map(
               ({ host: h, lang: l }) =>
@@ -51,9 +51,6 @@ export const Route = createFileRoute("/sitemap.xml")({
           `</urlset>`,
         ].join("\n");
 
-        // Mark the host param as intentionally referenced
-        void lang;
-
         return new Response(xml, {
           headers: {
             "Content-Type": "application/xml",
@@ -64,7 +61,3 @@ export const Route = createFileRoute("/sitemap.xml")({
     },
   },
 });
-
-// `lang` is consumed inside the map; this re-declares it for the linter
-// in case the outer reference is shadowed in some bundlers.
-let lang: string;
