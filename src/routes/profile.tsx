@@ -20,8 +20,12 @@ export const Route = createFileRoute('/profile')({
   head: () => ({
     meta: [
       { title: 'Meu perfil — Hunie' },
-      { name: 'description', content: 'Gere o teu perfil.' },
+      { name: 'description', content: 'Gere o teu perfil Hunie: fotos, bio, interesses e verificação azul. Quanto mais completo, mais matches recebes.' },
+      { property: 'og:title', content: 'Meu perfil — Hunie' },
+      { property: 'og:description', content: 'Gere o teu perfil Hunie: fotos, bio, interesses e verificação azul. Quanto mais completo, mais matches recebes.' },
+      { property: 'og:url', content: 'https://hunie.app/profile' },
     ],
+    links: [{ rel: 'canonical', href: 'https://hunie.app/profile' }],
   }),
   component: ProfilePage,
 });

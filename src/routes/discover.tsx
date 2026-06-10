@@ -28,9 +28,13 @@ export const Route = createFileRoute("/discover")({
   beforeLoad: requireAuthAndOnboarding,
   head: () => ({
     meta: [
-      { title: "Hunie — Descobrir" },
-      { name: "description", content: "Desliza pra curtir, encontra o teu match." },
+      { title: "Descobrir matches — Hunie" },
+      { name: "description", content: "Descobre perfis verificados perto de ti. Desliza, dá like e encontra o teu próximo match na comunidade Hunie." },
+      { property: "og:title", content: "Descobrir matches — Hunie" },
+      { property: "og:description", content: "Descobre perfis verificados perto de ti. Desliza, dá like e encontra o teu próximo match na comunidade Hunie." },
+      { property: "og:url", content: "https://hunie.app/discover" },
     ],
+    links: [{ rel: "canonical", href: "https://hunie.app/discover" }],
   }),
   component: Discover,
 });
@@ -243,6 +247,7 @@ function Discover() {
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
+      <h1 className="sr-only">Descobrir matches verificados na Hunie</h1>
       <main
         className="relative w-full overflow-hidden"
         style={{

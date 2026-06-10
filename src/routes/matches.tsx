@@ -14,8 +14,12 @@ export const Route = createFileRoute("/matches")({
   head: () => ({
     meta: [
       { title: "Likes — Hunie" },
-      { name: "description", content: "Vê quem deu like em ti." },
+      { name: "description", content: "Vê quem já te deu like na Hunie. Desbloqueia com membership e começa conversas com quem realmente está interessado em ti." },
+      { property: "og:title", content: "Likes — Hunie" },
+      { property: "og:description", content: "Vê quem já te deu like na Hunie. Desbloqueia com membership e começa conversas com quem realmente está interessado em ti." },
+      { property: "og:url", content: "https://hunie.app/matches" },
     ],
+    links: [{ rel: "canonical", href: "https://hunie.app/matches" }],
   }),
   component: LikesPage,
 });

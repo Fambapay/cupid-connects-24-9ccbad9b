@@ -57,7 +57,10 @@ export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
       { title: "Hunie Store — Boosts & Super Likes" },
-      { name: "description", content: "Compra Boosts e Super Likes para apareceres mais e ter mais matches." },
+      { name: "description", content: "Compra Boosts e Super Likes na Hunie. Sê visto primeiro na tua zona e destaca-te à primeira para ter 3× mais matches." },
+      { property: "og:title", content: "Hunie Store — Boosts & Super Likes" },
+      { property: "og:description", content: "Compra Boosts e Super Likes na Hunie. Sê visto primeiro na tua zona e destaca-te à primeira para ter 3× mais matches." },
+      { property: "og:url", content: "https://hunie.app/shop" },
     ],
     links: [
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" },

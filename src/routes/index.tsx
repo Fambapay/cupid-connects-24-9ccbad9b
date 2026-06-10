@@ -123,7 +123,7 @@ function Splash() {
   return (
     <div style={{ display: "grid", placeItems: "center", minHeight: "100dvh", background: "#07060a" }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-        <img src={"/icon-192.png"} alt="Hunie" style={{ width: 56, height: 56, borderRadius: 14, display: "block" }} />
+        <img src={"/icon-192.png"} alt="Logótipo Hunie" style={{ width: 56, height: 56, borderRadius: 14, display: "block" }} />
         <span style={{ color: "#fff", fontWeight: 700, fontSize: 22, letterSpacing: "-0.02em" }}>Hunie</span>
       </div>
     </div>
@@ -273,7 +273,7 @@ function Landing() {
         <nav className="ll-nav" aria-label="Navegação principal">
           <div className="ll-nav-inner">
             <Link to="/" className="ll-logo" aria-label="Hunie">
-              <img src={"/icon-192.png"} alt="Hunie" className="ll-logo-img" />
+              <img src={"/icon-192.png"} alt="Logótipo Hunie" className="ll-logo-img" />
             </Link>
             <div className="ll-nav-links">
               <a className="ll-nav-link" href="#como-funciona">Como funciona</a>
@@ -500,7 +500,7 @@ function Landing() {
           <div className="ll-container">
             <div className="ll-footer-inner">
               <Link to="/" className="ll-logo" aria-label="Hunie">
-                <img src={"/icon-192.png"} alt="Hunie" className="ll-logo-img" />
+                <img src={"/icon-192.png"} alt="Logótipo Hunie" className="ll-logo-img" />
               </Link>
 
               <div className="ll-footer-links">

@@ -64,7 +64,7 @@ export function AuthShell({
             />
             <img
               src={logoAsset.url}
-              alt="Hunie"
+              alt="Logótipo Hunie"
               width={72}
               height={72}
               className="h-[72px] w-[72px] drop-shadow-[0_8px_24px_rgba(255,79,163,0.45)]"
