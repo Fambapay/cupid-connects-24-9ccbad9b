@@ -17,7 +17,7 @@ import { CountrySwitcher } from "@/components/CountrySwitcher";
 // Build country-aware <head> at SSR time using the request host.
 // The route is ssr: false so this runs client-side on hydration; we read
 // host on the server fetch path in future iterations.
-function buildHead(country: keyof typeof COUNTRY_CONFIG) {
+function buildHead(country: keyof typeof COUNTRY_CONFIG): any {
   const cfg = COUNTRY_CONFIG[country];
   const copy = getCountryCopy(country);
   const s = copy.seo;
