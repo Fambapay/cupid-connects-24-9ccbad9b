@@ -109,7 +109,7 @@ async function fetchDiscovery(
     supabase.from("swipes").select("swiped_id").eq("swiper_id", userId),
     supabase
       .from("profiles")
-      .select("interested_in, latitude, longitude, membership_tier, membership_status, membership_expires_at")
+      .select("interested_in, membership_tier, membership_status, membership_expires_at")
       .eq("id", userId)
       .maybeSingle(),
     supabase
