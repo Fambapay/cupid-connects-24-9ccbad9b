@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -88,65 +88,72 @@ function LoginPage() {
   };
 
   return (
-    <AuthShell title="Entrar">
+    <AuthShell title="Entrar" subtitle="Bem-vindo de volta. Continua a tua jornada.">
       <button
         type="button"
         onClick={handleGoogle}
         disabled={googleBusy}
         style={{ color: "#1f1f1f" }}
-        className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-white font-semibold shadow-md transition-transform active:scale-[0.98] disabled:opacity-60"
+        className="group relative flex h-12 w-full items-center justify-center gap-2.5 overflow-hidden rounded-full bg-white text-sm font-semibold shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)] transition-all hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.5)] active:scale-[0.98] disabled:opacity-60"
       >
         {googleBusy ? (
           <Loader2 className="h-5 w-5 animate-spin" />
         ) : (
           <>
             <GoogleIcon />
-            Continuar com Google
+            <span>Continuar com Google</span>
           </>
         )}
       </button>
 
-      <div className="flex items-center gap-3 py-2">
-        <div className="h-px flex-1 bg-white/10" />
-        <span className="text-xs text-muted-foreground">ou</span>
-        <div className="h-px flex-1 bg-white/10" />
+      <div className="flex items-center gap-3 py-4">
+        <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white/15" />
+        <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">ou com email</span>
+        <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/15" />
       </div>
 
       <form onSubmit={submit} className="space-y-4">
         <Field label="Email">
-          <Input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="h-12 rounded-xl bg-white/5"
-          />
+          <div className="relative">
+            <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="tu@exemplo.com"
+              className="h-12 rounded-full border-white/10 bg-white/5 pl-11 pr-4 text-sm transition-colors focus-visible:border-white/30 focus-visible:bg-white/[0.07]"
+            />
+          </div>
         </Field>
         <Field label="Palavra-passe">
           <div className="relative">
+            <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
             <Input
               type={show ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="h-12 rounded-xl bg-white/5 pr-12"
+              placeholder="••••••••"
+              className="h-12 rounded-full border-white/10 bg-white/5 pl-11 pr-12 text-sm transition-colors focus-visible:border-white/30 focus-visible:bg-white/[0.07]"
             />
             <button
               type="button"
               onClick={() => setShow((s) => !s)}
-              className="absolute inset-y-0 right-3 my-auto text-muted-foreground"
+              aria-label={show ? "Esconder palavra-passe" : "Mostrar palavra-passe"}
+              className="absolute inset-y-0 right-4 my-auto text-muted-foreground transition-colors hover:text-foreground"
             >
               {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
         </Field>
         {error && (
-          <p className="text-sm text-destructive">
+          <p className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-2.5 text-xs text-destructive">
             {error}
             {needsVerify && (
               <>
                 {" "}
-                <button type="button" onClick={resend} className="underline">
+                <button type="button" onClick={resend} className="font-semibold underline">
                   Reenviar email
                 </button>
               </>
@@ -156,20 +163,27 @@ function LoginPage() {
         <Button
           type="submit"
           disabled={busy}
-          className="h-14 w-full rounded-2xl bg-gradient-sunset text-base font-semibold text-white shadow-glow active:scale-[0.98]"
+          className="group h-12 w-full rounded-full bg-gradient-sunset text-sm font-semibold text-white shadow-glow transition-transform hover:shadow-[0_16px_40px_-8px_rgba(255,79,163,0.55)] active:scale-[0.98]"
         >
-          {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : "Entrar"}
+          {busy ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <span className="inline-flex items-center gap-2">
+              Entrar
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          )}
         </Button>
       </form>
-      <div className="mt-5 space-y-2 text-center text-sm">
+      <div className="mt-6 space-y-3 text-center text-sm">
         <div>
-          <Link to="/auth/forgot-password" className="text-muted-foreground hover:text-foreground">
+          <Link to="/auth/forgot-password" className="text-xs text-muted-foreground transition-colors hover:text-foreground">
             Esqueceste a palavra-passe?
           </Link>
         </div>
-        <div className="text-muted-foreground">
+        <div className="border-t border-white/5 pt-3 text-xs text-muted-foreground">
           Não tens conta?{" "}
-          <Link to="/auth/register" className="font-semibold text-foreground">
+          <Link to="/auth/register" className="font-semibold text-gradient-sunset">
             Criar conta
           </Link>
         </div>
@@ -181,7 +195,7 @@ function LoginPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs">{label}</Label>
+      <Label className="px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{label}</Label>
       {children}
     </div>
   );
