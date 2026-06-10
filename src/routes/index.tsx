@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Plus, Sparkles, Crown, BadgeCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import "@/styles/liquid-landing.css";
@@ -7,31 +7,45 @@ import { InstallModal } from "@/components/landing/InstallModal";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useTypewriter } from "@/hooks/useTypewriter";
 import hunieMark from "@/assets/hunie-mark-transparent.png.asset.json";
+import { useCountry } from "@/lib/country/context";
+import { getCountryCopy } from "@/lib/country/copy";
+import { COUNTRY_CONFIG, DEFAULT_COUNTRY, formatCountryPrice, paymentLabel, type PaymentMethodCode } from "@/lib/country/config";
+import { countryFromHost, resolveCountryClient } from "@/lib/country/detect";
+import { getPlanCards } from "@/lib/plans";
+import { CountrySwitcher } from "@/components/CountrySwitcher";
 
-export const Route = createFileRoute("/")({
-  ssr: false,
-  head: () => ({
+// Build country-aware <head> at SSR time using the request host.
+// The route is ssr: false so this runs client-side on hydration; we read
+// host on the server fetch path in future iterations.
+function buildHead(country: keyof typeof COUNTRY_CONFIG) {
+  const cfg = COUNTRY_CONFIG[country];
+  const copy = getCountryCopy(country);
+  const s = copy.seo;
+  return {
     meta: [
-      { title: "Hunie — Namoro em Moçambique. Comunidade verificada." },
-      { name: "description", content: "Hunie é a comunidade de encontros feita em Moçambique. Perfis verificados em Maputo, Matola, Beira, Nampula e Chimoio. Preços em MZN, pagamento M-Pesa." },
-      { name: "keywords", content: "namoro moçambique, dating maputo, encontros beira, solteiros matola, app namoro mz, hunie" },
+      { title: s.title },
+      { name: "description", content: s.description },
+      { name: "keywords", content: s.keywords },
       { name: "robots", content: "index, follow" },
       { name: "theme-color", content: "#07060a" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-title", content: "Hunie" },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://hunie.app" },
-      { property: "og:title", content: "Hunie — Namoro em Moçambique" },
-      { property: "og:description", content: "Comunidade de encontros membership-only feita em MZ. Maputo, Matola, Beira, Nampula, Chimoio." },
+      { property: "og:url", content: s.ogUrl },
+      { property: "og:title", content: s.ogTitle },
+      { property: "og:description", content: s.ogDescription },
       { property: "og:image", content: "https://hunie.app/og-image.jpg" },
-      { property: "og:locale", content: "pt_MZ" },
+      { property: "og:locale", content: cfg.ogLocale },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Hunie — Namoro em Moçambique" },
-      { name: "twitter:description", content: "Comunidade verificada. Conversas em PT. Preços em MZN." },
+      { name: "twitter:title", content: s.ogTitle },
+      { name: "twitter:description", content: s.twitterDescription },
       { name: "twitter:image", content: "https://hunie.app/og-image.jpg" },
     ],
     links: [
-      { rel: "canonical", href: "https://hunie.app" },
+      { rel: "canonical", href: s.canonical },
+      { rel: "alternate", hrefLang: "pt-MZ", href: "https://hunie.app/" },
+      { rel: "alternate", hrefLang: "pt-AO", href: "https://ao.hunie.app/" },
+      { rel: "alternate", hrefLang: "x-default", href: "https://hunie.app/" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" },
@@ -42,15 +56,28 @@ export const Route = createFileRoute("/")({
         "@context": "https://schema.org",
         "@type": "MobileApplication",
         name: "Hunie",
-        description: "Dating membership-only feito em Moçambique",
+        description: `Dating membership-only ${cfg.nameLocative}`,
         applicationCategory: "SocialNetworkingApplication",
         operatingSystem: "PWA",
-        url: "https://hunie.app",
-        offers: { "@type": "Offer", price: "149", priceCurrency: "MZN" },
+        url: s.ogUrl,
+        offers: { "@type": "Offer", price: s.priceFrom, priceCurrency: cfg.currency },
+        areaServed: { "@type": "Country", name: s.areaServed },
         aggregateRating: { "@type": "AggregateRating", ratingValue: "4.8", ratingCount: "1240" },
       }),
     }],
-  }),
+  };
+}
+
+export const Route = createFileRoute("/")({
+  ssr: false,
+  head: () => {
+    // Client-only resolution; the SSR shell uses defaults from __root.tsx.
+    const country =
+      typeof window !== "undefined"
+        ? (countryFromHost(window.location.host) ?? DEFAULT_COUNTRY)
+        : DEFAULT_COUNTRY;
+    return buildHead(country);
+  },
   component: LandingGate,
 });
 
