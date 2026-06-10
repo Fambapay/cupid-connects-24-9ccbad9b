@@ -340,88 +340,48 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       remainingFirstImpressions?: number;
     }> => {
       if (!user) return { matched: false };
-      let remainingSuperLikes: number | undefined;
-      let remainingFirstImpressions: number | undefined;
       const fiMsg = options?.firstImpressionMessage?.trim().slice(0, 280) || null;
-      const isFirstImpression = !!fiMsg;
 
-      // First Impression: check own credit category (Elite-only, 10/month, fixed).
-      // Otherwise, a Super Like swipe checks the super_like_balance.
-      if (isFirstImpression) {
-        const { data: balance } = await supabase
-          .from("user_credits")
-          .select("first_impression_balance")
-          .eq("user_id", user.id)
-          .maybeSingle();
-        if (!balance || (balance.first_impression_balance ?? 0) <= 0) {
-          return { matched: false, reason: "insufficient_credits" };
-        }
-      } else if (direction === "super") {
-        const { data: balance } = await supabase
-          .from("user_credits")
-          .select("super_like_balance")
-          .eq("user_id", user.id)
-          .maybeSingle();
-        if (!balance || (balance.super_like_balance ?? 0) <= 0) {
-          return { matched: false, reason: "insufficient_credits" };
-        }
-      }
-
-      const insertRow: Record<string, unknown> = {
-        swiper_id: user.id,
-        swiped_id: targetId,
-        direction,
-      };
-      if (fiMsg) insertRow.first_impression_message = fiMsg;
-
-      const { error: insertError } = await supabase
-        .from("swipes")
-        .upsert(insertRow as never, { onConflict: "swiper_id,swiped_id" });
-      if (insertError) {
-        console.error("swipe insert failed", insertError);
+      // All credit checks, daily-limit enforcement, swipe insertion, and
+      // credit consumption happen atomically server-side via insert_swipe.
+      const { data, error } = await (supabase.rpc as any)("insert_swipe", {
+        _target_id: targetId,
+        _direction: direction,
+        _first_impression_message: fiMsg,
+      });
+      if (error) {
+        console.error("insert_swipe failed", error);
         return { matched: false, reason: "insert_failed" };
       }
-
-      // Consume the appropriate credit AFTER a successful insert.
-      // First Impression credit is consumed regardless of match outcome.
-      if (isFirstImpression) {
-        const { data } = await supabase.rpc("consume_first_impression_credit");
-        const res = data as { success: boolean; remaining_balance?: number } | null;
-        if (res?.success) {
-          remainingFirstImpressions = res.remaining_balance;
-        } else {
-          console.warn("first_impression credit consume failed after insert", res);
-        }
-        window.dispatchEvent(new CustomEvent("hunie:credits-changed"));
-      } else if (direction === "super") {
-        const { data } = await supabase.rpc("consume_super_like_credit");
-        const res = data as { success: boolean; remaining_balance?: number } | null;
-        if (res?.success) {
-          remainingSuperLikes = res.remaining_balance;
-        } else {
-          console.warn("super_like credit consume failed after insert", res);
-        }
+      const res = data as {
+        success: boolean;
+        reason?: string;
+        matched?: boolean;
+        match_id?: string;
+        remaining_super_likes?: number | null;
+        remaining_first_impressions?: number | null;
+      } | null;
+      if (!res?.success) {
+        const reasonMap: Record<string, string> = {
+          insufficient_super_like: "insufficient_credits",
+          insufficient_first_impression: "insufficient_credits",
+          daily_limit_reached: "daily_limit_reached",
+        };
+        return { matched: false, reason: reasonMap[res?.reason ?? ""] ?? res?.reason };
+      }
+      if (fiMsg || direction === "super") {
         window.dispatchEvent(new CustomEvent("hunie:credits-changed"));
       }
-
-      if (direction === "pass") return { matched: false };
-      const a = user.id < targetId ? user.id : targetId;
-      const b = user.id < targetId ? targetId : user.id;
-      const { data: match } = await supabase
-        .from("matches")
-        .select("id")
-        .eq("user_a", a)
-        .eq("user_b", b)
-        .maybeSingle();
       return {
-        matched: !!match,
-        matchId: match?.id,
-        remainingSuperLikes,
-        remainingFirstImpressions,
+        matched: !!res.matched,
+        matchId: res.match_id ?? undefined,
+        remainingSuperLikes: res.remaining_super_likes ?? undefined,
+        remainingFirstImpressions: res.remaining_first_impressions ?? undefined,
       };
     },
     [user],
   );
+
 
   const rewind = useCallback(async (): Promise<{
     success: boolean;
