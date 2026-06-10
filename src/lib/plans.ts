@@ -1,4 +1,9 @@
-import { PLAN_PRICES, type PlanTier } from "./pricing";
+import { PLAN_PRICES, getPlanPrices, type PlanTier } from "./pricing";
+import {
+  DEFAULT_COUNTRY,
+  formatCountryPrice,
+  type CountryCode,
+} from "./country/config";
 
 export type MembershipTier = "free" | PlanTier;
 
@@ -15,7 +20,7 @@ export interface PlanEntitlements {
   priorityDiscovery: boolean;
   eliteBadge: boolean;
   invisibleMode: boolean;
-  
+
   profileAnalytics: boolean;
   earlyAccess: boolean;
   canSendFirstImpression: boolean;
@@ -34,7 +39,7 @@ export const NO_TIER_ENTITLEMENTS: PlanEntitlements = {
   priorityDiscovery: false,
   eliteBadge: false,
   invisibleMode: false,
-  
+
   profileAnalytics: false,
   earlyAccess: false,
   canSendFirstImpression: false,
@@ -65,7 +70,7 @@ const ELITE: PlanEntitlements = {
   priorityDiscovery: true,
   eliteBadge: true,
   invisibleMode: true,
-  
+
   profileAnalytics: true,
   earlyAccess: true,
   canSendFirstImpression: true,
@@ -88,7 +93,9 @@ export interface PlanHighlight {
 export interface PlanCardConfig {
   tier: PlanTier;
   label: string;
+  /** Monthly price in the country's currency */
   priceMzn: number;
+  /** Annual price in the country's currency */
   annualPriceMzn: number;
   tagline: string;
   badge?: string;
@@ -96,12 +103,10 @@ export interface PlanCardConfig {
   highlights: PlanHighlight[];
 }
 
-export const PLAN_CARDS: PlanCardConfig[] = [
+const PLAN_META: Omit<PlanCardConfig, "priceMzn" | "annualPriceMzn">[] = [
   {
     tier: "elite",
     label: "Elite",
-    priceMzn: PLAN_PRICES.elite.priceMzn,
-    annualPriceMzn: PLAN_PRICES.elite.annualPriceMzn,
     tagline: "Sê a prioridade de todos.",
     badge: "VIP",
     accent: "#C9A84C",
@@ -118,8 +123,6 @@ export const PLAN_CARDS: PlanCardConfig[] = [
   {
     tier: "plus",
     label: "Plus",
-    priceMzn: PLAN_PRICES.plus.priceMzn,
-    annualPriceMzn: PLAN_PRICES.plus.annualPriceMzn,
     tagline: "Multiplica as tuas hipóteses.",
     badge: "Mais popular",
     accent: "#F0468C",
@@ -136,8 +139,6 @@ export const PLAN_CARDS: PlanCardConfig[] = [
   {
     tier: "select",
     label: "Select",
-    priceMzn: PLAN_PRICES.select.priceMzn,
-    annualPriceMzn: PLAN_PRICES.select.annualPriceMzn,
     tagline: "Começa a conhecer pessoas hoje.",
     accent: "#5BB8FF",
     highlights: [
@@ -150,7 +151,26 @@ export const PLAN_CARDS: PlanCardConfig[] = [
   },
 ];
 
-export function formatPrice(mzn: number) {
-  return `${mzn.toLocaleString("pt-PT")} MZN`;
+/** Country-aware plan cards. Default MZ for legacy callers. */
+export function getPlanCards(country: CountryCode = DEFAULT_COUNTRY): PlanCardConfig[] {
+  const prices = getPlanPrices(country);
+  return PLAN_META.map((meta) => {
+    const p = prices[meta.tier];
+    return {
+      ...meta,
+      priceMzn: p.price,
+      annualPriceMzn: p.annualPrice,
+    };
+  });
 }
 
+/** Legacy MZ-only export, still used by code paths not yet country-aware. */
+export const PLAN_CARDS: PlanCardConfig[] = PLAN_META.map((meta) => {
+  const p = PLAN_PRICES[meta.tier];
+  return { ...meta, priceMzn: p.price, annualPriceMzn: p.annualPrice };
+});
+
+/** Format a price in the active country's currency. */
+export function formatPrice(amount: number, country: CountryCode = DEFAULT_COUNTRY): string {
+  return formatCountryPrice(amount, country);
+}
