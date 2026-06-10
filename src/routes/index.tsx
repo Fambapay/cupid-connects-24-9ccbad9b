@@ -288,58 +288,111 @@ function Landing() {
           </div>
         </nav>
 
+        {/* ========== HERO / MAGAZINE COVER ========== */}
         <header className="ll-hero">
           <div className="ll-container">
-            <div className="ll-hero-inner">
-              <span className="ll-eyebrow ll-reveal">{copy.hero.eyebrow}</span>
-              <h1 className="ll-h1 ll-reveal">
-                {copy.hero.line1}
-                <br />
-                <span className="ll-tw-line">
-                  {typed}
-                  <span className="ll-caret" aria-hidden />
+            {/* Masthead strip */}
+            <div className="ll-masthead ll-reveal">
+              <span>Hunie · Vol. 01</span>
+              <span className="sep" />
+              <span className="dim">{config.flag} {config.name}</span>
+              <span className="sep" />
+              <span className="dim">Edição {new Date().getFullYear()}</span>
+              <span className="sep" />
+              <span className="dim">Membership-Only</span>
+            </div>
+
+            <div className="ll-hero-grid" style={{ marginTop: 40 }}>
+              {/* Cover */}
+              <div className="ll-hero-cover">
+                <span className="ll-kicker ll-reveal">
+                  <span className="ll-kicker-dot" /> {copy.hero.eyebrow}
                 </span>
-              </h1>
-              <p
-                className="ll-lead ll-reveal"
-                dangerouslySetInnerHTML={{ __html: copy.hero.leadHtml }}
-              />
-              <div className="ll-hero-cta ll-reveal">
-                <button onClick={handleInstallClick} className="ll-btn ll-btn-primary">{copy.hero.ctaPrimary}</button>
-                <Link to="/auth/register" className="ll-btn ll-btn-ghost">{copy.hero.ctaSecondary}</Link>
+                <h1 className="ll-display ll-reveal">
+                  {copy.hero.line1}
+                  <br />
+                  <span className="ll-italic ll-grad-text">{typed}</span>
+                  <span className="ll-caret" aria-hidden />
+                </h1>
+              </div>
+
+              {/* Side column — lead + CTAs */}
+              <aside className="ll-hero-side ll-reveal">
+                <p
+                  className="ll-lead is-large"
+                  dangerouslySetInnerHTML={{ __html: copy.hero.leadHtml }}
+                />
+                <div className="ll-hero-cta">
+                  <button onClick={handleInstallClick} className="ll-btn ll-btn-primary">
+                    {copy.hero.ctaPrimary} <ArrowRight size={16} strokeWidth={2.8} />
+                  </button>
+                  <Link to="/auth/register" className="ll-btn ll-btn-ghost">{copy.hero.ctaSecondary}</Link>
+                </div>
+              </aside>
+            </div>
+
+            {/* Stat strip */}
+            <div className="ll-stat-strip ll-reveal">
+              <div className="ll-stat">
+                <div className="n">{config.cities.length}+</div>
+                <div className="l">Cidades {config.nameLocative}</div>
+              </div>
+              <div className="ll-stat">
+                <div className="n">100%</div>
+                <div className="l">Perfis verificados</div>
+              </div>
+              <div className="ll-stat">
+                <div className="n">{config.currency}</div>
+                <div className="l">Pagas em moeda local</div>
               </div>
             </div>
           </div>
         </header>
 
+        {/* ========== COMO FUNCIONA ========== */}
         <section id="como-funciona" className="ll-section">
-          <div className="ll-container ll-section-center">
-            <span className="ll-eyebrow ll-reveal">Como funciona</span>
-            <h2 className="ll-h2 ll-reveal">Três passos. Zero <span className="ll-italic ll-grad-text">complicação.</span></h2>
-            <div className="ll-grid-3">
+          <div className="ll-container">
+            <div className="ll-section-label ll-reveal">
+              <span className="num">№ 01</span>
+              <span className="dot">/</span>
+              <span>Como funciona</span>
+              <span className="meta">Três passos</span>
+            </div>
+            <h2 className="ll-h2 ll-reveal" style={{ maxWidth: 900 }}>
+              Três passos.<br />Zero <span className="ll-italic ll-grad-text">complicação.</span>
+            </h2>
+            <div className="ll-grid-3" style={{ marginTop: 56 }}>
               {stepsCopy.map((s) => (
-                <div key={s.n} className="ll-card ll-reveal" style={{ textAlign: "left" }}>
-                  <div className="ll-step-num">{s.n}</div>
-                  <div className="ll-step-title">{s.title}</div>
-                  <div className="ll-step-body">{s.body}</div>
-                </div>
+                <article key={s.n} className="ll-step ll-reveal">
+                  <span className="ll-step-num">{s.n}</span>
+                  <h3 className="ll-step-title">{s.title}</h3>
+                  <p className="ll-step-body">{s.body}</p>
+                </article>
               ))}
             </div>
           </div>
         </section>
 
+        {/* ========== PLANOS ========== */}
         <section id="planos" className="ll-section">
-          <div className="ll-container ll-section-center">
-            <span className="ll-eyebrow ll-reveal">Planos</span>
-            <h2 className="ll-h2 ll-reveal">Escolhe o teu <span className="ll-italic ll-grad-text">ritmo.</span></h2>
-            <p className="ll-lead ll-reveal">{planosSubtitle}</p>
+          <div className="ll-container">
+            <div className="ll-section-label ll-reveal">
+              <span className="num">№ 02</span>
+              <span className="dot">/</span>
+              <span>Planos</span>
+              <span className="meta">{config.currency} · Cancelas quando quiseres</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 28, alignItems: "end", marginBottom: 56 }}>
+              <h2 className="ll-h2 ll-reveal">
+                Escolhe o teu<br /><span className="ll-italic ll-grad-text">ritmo.</span>
+              </h2>
+              <p className="ll-lead ll-reveal" style={{ maxWidth: 620 }}>{planosSubtitle}</p>
+            </div>
             <div className="ll-tiers">
               {tiers.map((t) => (
-                <div key={t.name} className={`ll-card ll-tier ll-reveal ${t.featured ? "ll-tier-featured" : ""}`} style={{ textAlign: "left" }}>
-                  {t.featured && <span className="ll-tier-badge">POPULAR</span>}
-                  <div className="ll-tier-name" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    {t.icon} {t.name}
-                  </div>
+                <article key={t.name} className={`ll-tier ll-reveal ${t.featured ? "ll-tier-featured" : ""}`}>
+                  {t.featured && <span className="ll-tier-badge">Popular</span>}
+                  <div className="ll-tier-name">{t.icon} {t.name}</div>
                   <div className="ll-tier-price">{t.price}<small>{t.per}</small></div>
                   <ul className="ll-tier-list">
                     {t.perks.map((p) => (
@@ -347,60 +400,82 @@ function Landing() {
                     ))}
                   </ul>
                   <Link to="/auth/register" className={`ll-btn ${t.featured ? "ll-btn-primary" : "ll-btn-ghost"} ll-tier-cta`}>{t.cta}</Link>
-                </div>
+                </article>
               ))}
             </div>
           </div>
         </section>
 
+        {/* ========== CIDADES ========== */}
         <section id="cidades" className="ll-section">
-          <div className="ll-container ll-section-center">
-            <span className="ll-eyebrow ll-reveal">Onde estamos</span>
-            <h2 className="ll-h2 ll-reveal">
-              Comunidade ativa {config.nameLocative}, da capital às <span className="ll-italic ll-grad-text">grandes cidades.</span>
+          <div className="ll-container">
+            <div className="ll-section-label ll-reveal">
+              <span className="num">№ 03</span>
+              <span className="dot">/</span>
+              <span>Onde estamos</span>
+              <span className="meta">{config.flag} {config.name}</span>
+            </div>
+            <h2 className="ll-h2 ll-reveal" style={{ maxWidth: 1000, marginBottom: 56 }}>
+              Da capital às <span className="ll-italic ll-grad-text">grandes cidades.</span>
             </h2>
             <div className="ll-cities">
               {heroCityCounts.map((c) => (
                 <div key={c.name} className="ll-city ll-reveal">
+                  <div className="ll-city-count">{c.count}</div>
                   <div className="ll-city-name">{c.name}</div>
-                  <div className="ll-city-count">{c.count} pessoas</div>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
+        {/* ========== TESTIMONIALS ========== */}
         <section className="ll-section">
-          <div className="ll-container ll-section-center">
-            <span className="ll-eyebrow ll-reveal">Histórias reais</span>
-            <h2 className="ll-h2 ll-reveal">Quem já <span className="ll-italic ll-grad-text">encontrou.</span></h2>
+          <div className="ll-container">
+            <div className="ll-section-label ll-reveal">
+              <span className="num">№ 04</span>
+              <span className="dot">/</span>
+              <span>Histórias reais</span>
+              <span className="meta">Verificadas</span>
+            </div>
+            <h2 className="ll-h2 ll-reveal" style={{ maxWidth: 1000, marginBottom: 56 }}>
+              Quem já <span className="ll-italic ll-grad-text">encontrou.</span>
+            </h2>
             <div className="ll-quotes">
               {copy.testimonials.map((q) => (
-                <div key={q.name} className="ll-card ll-quote ll-reveal" style={{ textAlign: "left" }}>
-                  <p>"{q.text}"</p>
-                  <div className="ll-quote-who">
+                <figure key={q.name} className="ll-quote ll-reveal">
+                  <blockquote><p>{q.text}</p></blockquote>
+                  <figcaption className="ll-quote-who">
                     <div className="ll-quote-avatar" />
                     <div>
                       <div className="ll-quote-name">{q.name}</div>
                       <div className="ll-quote-meta">{q.meta}</div>
                     </div>
-                  </div>
-                </div>
+                  </figcaption>
+                </figure>
               ))}
             </div>
           </div>
         </section>
 
+        {/* ========== FAQ ========== */}
         <section id="faq" className="ll-section">
-          <div className="ll-container ll-section-center">
-            <span className="ll-eyebrow ll-reveal">FAQ</span>
-            <h2 className="ll-h2 ll-reveal">Perguntas <span className="ll-italic ll-grad-text">honestas.</span></h2>
+          <div className="ll-container">
+            <div className="ll-section-label ll-reveal">
+              <span className="num">№ 05</span>
+              <span className="dot">/</span>
+              <span>FAQ</span>
+              <span className="meta">Perguntas honestas</span>
+            </div>
+            <h2 className="ll-h2 ll-reveal" style={{ maxWidth: 900, marginBottom: 48 }}>
+              Perguntas <span className="ll-italic ll-grad-text">honestas.</span>
+            </h2>
             <div className="ll-faq">
               {copy.faq.map((f, i) => (
                 <div key={f.q} className="ll-faq-item ll-reveal" data-open={openFaq === i}>
                   <button className="ll-faq-q" onClick={() => setOpenFaq(openFaq === i ? null : i)} aria-expanded={openFaq === i}>
                     <span>{f.q}</span>
-                    <Plus size={20} />
+                    <Plus size={20} strokeWidth={2.5} />
                   </button>
                   <div className="ll-faq-a">{f.a}</div>
                 </div>
@@ -409,20 +484,22 @@ function Landing() {
           </div>
         </section>
 
+        {/* ========== FINAL CTA — INVERTED PAPER ========== */}
         <section className="ll-section" style={{ paddingTop: 0 }}>
           <div className="ll-container">
-            <div className="ll-card ll-final ll-reveal">
-              <span className="ll-eyebrow">Pronto?</span>
-              <h2 className="ll-h2" style={{ marginTop: 18 }}>
-                Conhece alguém novo
-                <br />
-                <span className="ll-italic ll-grad-text">esta semana.</span>
+            <div className="ll-final ll-reveal">
+              <span className="ll-kicker"><span className="ll-kicker-dot" /> Pronto?</span>
+              <h2 className="ll-display" style={{ fontSize: "clamp(48px, 10vw, 128px)" }}>
+                Conhece alguém<br />
+                <span className="ll-italic">esta semana.</span>
               </h2>
               <p className="ll-lead">
                 {copy.final.sub} Acesso desde {formatCountryPrice(planCards[0]?.priceMzn ?? 0, country)}/mês.
               </p>
-              <div className="ll-hero-cta" style={{ marginTop: 28 }}>
-                <button onClick={handleInstallClick} className="ll-btn ll-btn-primary">{copy.hero.ctaPrimary}</button>
+              <div className="ll-hero-cta" style={{ marginTop: 36 }}>
+                <button onClick={handleInstallClick} className="ll-btn ll-btn-primary">
+                  {copy.hero.ctaPrimary} <ArrowRight size={16} strokeWidth={2.8} />
+                </button>
                 <Link to="/auth/register" className="ll-btn ll-btn-ghost">Criar conta</Link>
               </div>
             </div>
