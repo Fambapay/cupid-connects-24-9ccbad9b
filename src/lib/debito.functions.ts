@@ -255,7 +255,7 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
     }
 
     const minuteBucket = Math.floor(Date.now() / 60_000);
-    const idemKey = `${userId}:${plan_tier ?? pack_id}:${method}:${minuteBucket}`;
+    const idemKey = `${userId}:${plan_tier ?? pack_id}:${period}:${method}:${minuteBucket}`;
 
     const orchestratorBody: Record<string, unknown> = {
       action: "process",

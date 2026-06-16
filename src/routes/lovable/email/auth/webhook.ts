@@ -116,11 +116,8 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
         // The email action type is in payload.data.action_type (e.g., "signup", "recovery")
         // payload.type is the hook event type ("auth")
         const emailType = payload.data.action_type
-        console.log('Received auth event', {
-          emailType,
-          email_redacted: redactEmail(payload.data.email),
-          run_id,
-        })
+        // Verbose per-event success logs removed to keep auth email volume manageable.
+        // Errors below still log with full context.
 
         const EmailTemplate = EMAIL_TEMPLATES[emailType]
         if (!EmailTemplate) {
@@ -202,12 +199,6 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
             { status: 500 }
           )
         }
-
-        console.log('Auth email enqueued', {
-          emailType,
-          email_redacted: redactEmail(payload.data.email),
-          run_id,
-        })
 
         return Response.json({ success: true, queued: true })
       },

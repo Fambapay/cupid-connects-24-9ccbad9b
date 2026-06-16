@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { AppShell, TopBar } from "@/components/AppShell";
 import { useLikedMe } from "@/hooks/useLikedMe";
 import { useSubscription } from "@/hooks/useSubscription";
+import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
 
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
@@ -214,7 +215,7 @@ function EmptyLikes({ onDiscover, onBoost }: { onDiscover: () => void; onBoost: 
       </div>
 
       <motion.img
-        src={"/icon-192.png"}
+        src={hunieMarkTransparent.url}
         alt=""
         aria-hidden
         className="relative mt-2 h-8 w-8 opacity-80"
