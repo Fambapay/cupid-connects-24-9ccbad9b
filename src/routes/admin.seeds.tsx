@@ -9,6 +9,7 @@ import {
   toggleAllSeeds,
   getSeedStats,
   setSeedThreshold,
+  generateSeeds,
 } from "@/lib/seeds.functions";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,7 @@ function SeedsAdmin() {
   const toggleAll = useServerFn(toggleAllSeeds);
   const stats = useServerFn(getSeedStats);
   const setThr = useServerFn(setSeedThreshold);
+  const generate = useServerFn(generateSeeds);
 
   const [city, setCity] = useState<string>("");
   const [gender, setGender] = useState<string>("");
@@ -95,6 +97,19 @@ function SeedsAdmin() {
     },
   });
 
+  const genMut = useMutation({
+    mutationFn: (v: { city: string; count: number; gender: "feminino" | "masculino" | "nao_binario" }) =>
+      generate({ data: v }),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["seeds"] });
+      qc.invalidateQueries({ queryKey: ["seed-stats"] });
+      const msg = `Criados ${res.inserted} seeds${res.skipped ? ` (${res.skipped} falhas)` : ""}`;
+      if (res.errors?.length) toast.warning(msg, { description: res.errors.join("; ") });
+      else toast.success(msg);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const s = statsQ.data;
   const total = listQ.data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / 20));
@@ -118,6 +133,9 @@ function SeedsAdmin() {
           value={s ? (s.autoDisabledAt ? "Disparado" : `aos ${s.threshold} users`) : "—"}
         />
       </div>
+
+      {/* Generator */}
+      <SeedGenerator onGenerate={(v) => genMut.mutate(v)} pending={genMut.isPending} />
 
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-3">
@@ -241,6 +259,43 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className="mt-1 text-xl font-bold">{value}</p>
       {sub && <p className="text-[10px] text-muted-foreground">{sub}</p>}
+    </div>
+  );
+}
+
+type GenInput = { city: string; count: number; gender: "feminino" | "masculino" | "nao_binario" };
+
+function SeedGenerator({ onGenerate, pending }: { onGenerate: (v: GenInput) => void; pending: boolean }) {
+  const [city, setCity] = useState<string>("Maputo");
+  const [gender, setGender] = useState<GenInput["gender"]>("feminino");
+  const [count, setCount] = useState<number>(20);
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-3">
+      <p className="text-sm font-medium">Gerar seeds</p>
+      <Select value={city} onValueChange={(v) => setCity(v)}>
+        <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+        <SelectContent>
+          {CITIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+        </SelectContent>
+      </Select>
+      <Select value={gender} onValueChange={(v) => setGender(v as GenInput["gender"])}>
+        <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+        <SelectContent>
+          {GENDERS.map((g) => <SelectItem key={g.v} value={g.v}>{g.l}</SelectItem>)}
+        </SelectContent>
+      </Select>
+      <Input
+        type="number"
+        min={1}
+        max={50}
+        value={count}
+        onChange={(e) => setCount(Math.max(1, Math.min(50, Number(e.target.value) || 1)))}
+        className="w-24"
+      />
+      <Button onClick={() => onGenerate({ city, gender, count })} disabled={pending}>
+        {pending ? "A gerar…" : "Gerar"}
+      </Button>
+      <p className="text-xs text-muted-foreground">Máx 50 por vez. Cria auth users + perfil + fotos.</p>
     </div>
   );
 }
