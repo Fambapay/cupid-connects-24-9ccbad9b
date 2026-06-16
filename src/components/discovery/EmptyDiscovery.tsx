@@ -127,7 +127,7 @@ export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters }: Em
           }}
         />
         <motion.img
-          src={"/icon-192.png"}
+          src={hunieMarkTransparent.url}
           alt="Logótipo Hunie"
           width={132}
           height={132}
