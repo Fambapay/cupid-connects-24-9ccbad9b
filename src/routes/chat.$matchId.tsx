@@ -451,13 +451,9 @@ function ChatRoom() {
 function formatDateLabel(iso?: string) {
   if (!iso) return "Hoje";
   const d = new Date(iso);
-  return d.toLocaleString("en-GB", {
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  }).replace(",", " at");
+  const datePart = d.toLocaleDateString("pt-PT", { day: "numeric", month: "short" });
+  const timePart = d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+  return `${datePart} às ${timePart}`;
 }
 
 
