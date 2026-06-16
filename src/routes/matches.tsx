@@ -25,11 +25,11 @@ export const Route = createFileRoute("/matches")({
 });
 
 function LikesPage() {
-  const { likers, loading } = useLikedMe();
+  const { likers, loading, error, reload } = useLikedMe();
   const { entitlements } = useSubscription();
   const isPremium = entitlements.canSeeWhoLiked;
   const navigate = useNavigate();
-  const isEmpty = !loading && likers.length === 0;
+  const isEmpty = !loading && !error && likers.length === 0;
 
   return (
     <AppShell>
@@ -43,7 +43,18 @@ function LikesPage() {
           </span>
         </div>
 
-        {loading && likers.length === 0 ? (
+        {error ? (
+          <div role="alert" className="mt-10 flex flex-col items-center gap-3 text-center text-sm">
+            <p className="text-muted-foreground">Não foi possível carregar os teus likes.</p>
+            <button
+              type="button"
+              onClick={() => reload()}
+              className="rounded-full bg-white/10 px-4 py-2 text-foreground active:scale-95"
+            >
+              Tentar de novo
+            </button>
+          </div>
+        ) : loading && likers.length === 0 ? (
           <div className="mt-10 text-center text-sm text-muted-foreground">A carregar...</div>
         ) : isEmpty ? (
           <EmptyLikes
