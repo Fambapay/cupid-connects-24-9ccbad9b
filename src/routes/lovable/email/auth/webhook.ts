@@ -200,12 +200,6 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           )
         }
 
-        console.log('Auth email enqueued', {
-          emailType,
-          email_redacted: redactEmail(payload.data.email),
-          run_id,
-        })
-
         return Response.json({ success: true, queued: true })
       },
     },
