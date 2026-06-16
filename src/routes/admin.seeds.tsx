@@ -134,6 +134,9 @@ function SeedsAdmin() {
         />
       </div>
 
+      {/* Generator */}
+      <SeedGenerator onGenerate={(v) => genMut.mutate(v)} pending={genMut.isPending} />
+
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-3">
         <Button variant="secondary" onClick={() => toggleAllMut.mutate(true)} disabled={toggleAllMut.isPending}>
