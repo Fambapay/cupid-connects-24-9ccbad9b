@@ -159,11 +159,16 @@ export function useLikedMe() {
         .filter((x): x is Liker => !!x),
     );
     setLoading(false);
+    } catch (e) {
+      console.error("useLikedMe load failed", e);
+      setError(e instanceof Error ? e.message : "Falha ao carregar likes");
+      setLoading(false);
+    }
   }, [user, canSeeWhoLiked]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  return { likers, loading, reload: load };
+  return { likers, loading, error, reload: load };
 }
