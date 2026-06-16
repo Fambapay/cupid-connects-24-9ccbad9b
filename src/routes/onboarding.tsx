@@ -554,7 +554,7 @@ function OnboardingPage() {
 
 function StepScroll({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-1 min-h-0 flex-col overflow-y-auto px-6 pb-6">
+    <div className="flex flex-1 min-h-0 flex-col overflow-y-auto px-6 pb-4">
       {children}
     </div>
   );
@@ -597,8 +597,8 @@ function CtaBar({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: staggerDelay }}
-      className="shrink-0 px-6 pt-3 pb-5"
-      style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
+      className="shrink-0 px-6 pt-2"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       {children}
     </motion.div>
@@ -640,7 +640,7 @@ function PrimaryButton({
 // Welcome ─────
 function WelcomeStep({ onStart }: { onStart: () => void }) {
   return (
-    <div className="flex flex-1 flex-col px-6 pb-6">
+    <div className="flex flex-1 flex-col px-6">
       <div className="flex flex-1 flex-col items-center justify-center text-center">
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
@@ -659,14 +659,9 @@ function WelcomeStep({ onStart }: { onStart: () => void }) {
           Vamos criar o teu perfil em menos de 2 minutos
         </motion.p>
       </div>
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25, delay: 0.2 }}
-        className="space-y-4 pb-2"
-      >
+      <CtaBar staggerDelay={0.2}>
         <PrimaryButton onClick={onStart}>Começar</PrimaryButton>
-      </motion.div>
+      </CtaBar>
     </div>
   );
 }
@@ -1857,14 +1852,9 @@ function CompletionScreen({ onContinue }: { onContinue: () => void }) {
       >
         Já podes começar a descobrir pessoas perto de ti
       </motion.p>
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25, delay: 0.6 }}
-        className="mt-10 w-full max-w-xs"
-      >
+      <div className="mt-10 w-full max-w-xs" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
         <PrimaryButton onClick={onContinue}>Como funciona a app</PrimaryButton>
-      </motion.div>
+      </div>
     </motion.div>
   );
 }
@@ -2005,8 +1995,8 @@ function TutorialCarousel({ onFinish }: { onFinish: () => void }) {
 
       {/* CTA */}
       <div
-        className="px-5 pb-6 pt-2"
-        style={{ paddingBottom: "max(env(safe-area-inset-bottom), 24px)" }}
+        className="px-5 pt-2"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <PrimaryButton onClick={next}>
           <span className="inline-flex items-center gap-2">
