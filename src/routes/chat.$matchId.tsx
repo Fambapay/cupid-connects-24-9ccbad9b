@@ -498,7 +498,7 @@ function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, show
           {msg.content}
         </div>
         {me && showReadReceipt && isLastOfGroup && (
-          <span className="mt-1 px-1 text-[11px] text-white/45">Sent</span>
+          <span className="mt-1 px-1 text-[11px] text-white/45">Lido</span>
         )}
       </div>
     </div>
