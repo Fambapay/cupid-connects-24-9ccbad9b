@@ -102,7 +102,7 @@ function ShopPage() {
   const tabCount = tab === "boost" ? credits.boost_balance : credits.super_like_balance;
 
   return (
-    <div className="min-h-screen bg-background pb-28 text-foreground">
+    <div className="min-h-[100dvh] bg-background pb-28 text-foreground">
       {/* Header */}
       <header
         className="sticky top-0 z-30 bg-background"
