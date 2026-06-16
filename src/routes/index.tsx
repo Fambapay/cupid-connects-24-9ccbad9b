@@ -1,4 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createIsomorphicFn } from "@tanstack/react-start";
+import { getRequestHeader } from "@tanstack/react-start/server";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Plus, Sparkles, Crown, BadgeCheck, ArrowRight, Menu, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,15 +15,16 @@ import { useTypewriter } from "@/hooks/useTypewriter";
 import { useCountry } from "@/lib/country/context";
 import { getCountryCopy } from "@/lib/country/copy";
 import { COUNTRY_CONFIG, DEFAULT_COUNTRY, formatCountryPrice, paymentLabel, type PaymentMethodCode } from "@/lib/country/config";
-import { countryFromHost, resolveCountryClient } from "@/lib/country/detect";
+import { countryFromHost, resolveCountryClient, resolveCountryServer } from "@/lib/country/detect";
 import { getPlanCards } from "@/lib/plans";
 import { CountrySwitcher } from "@/components/CountrySwitcher";
 import { faqData } from "@/components/landing/faqData";
 import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
 
-// Build country-aware <head> at SSR time using the request host.
-// The route is ssr: false so this runs client-side on hydration; we read
-// host on the server fetch path in future iterations.
+// SEO-01: Country-aware <head> resolved at SSR so crawlers (WhatsApp,
+// Twitter, Facebook, LinkedIn) get a real title/description/og:image when
+// links are shared. Was `ssr: false` before — crawlers only ever saw the
+// root shell defaults and no per-country/og:image, killing share previews.
 function buildHead(country: keyof typeof COUNTRY_CONFIG): any {
   const cfg = COUNTRY_CONFIG[country];
   const copy = getCountryCopy(country);
@@ -87,16 +90,20 @@ function buildHead(country: keyof typeof COUNTRY_CONFIG): any {
   };
 }
 
+// Detect country isomorphically: read request headers on the server
+// (so crawlers get the right country), fall back to window.location on
+// the client (for SPA navigations).
+const detectCountry = createIsomorphicFn()
+  .server(() => {
+    const host = getRequestHeader("host") ?? getRequestHeader("x-forwarded-host") ?? null;
+    const cf = getRequestHeader("cf-ipcountry") ?? null;
+    return resolveCountryServer(host, cf);
+  })
+  .client(() => resolveCountryClient());
+
 export const Route = createFileRoute("/")({
-  ssr: false,
-  head: () => {
-    // Client-only resolution; the SSR shell uses defaults from __root.tsx.
-    const country =
-      typeof window !== "undefined"
-        ? (countryFromHost(window.location.host) ?? DEFAULT_COUNTRY)
-        : DEFAULT_COUNTRY;
-    return buildHead(country);
-  },
+  loader: () => ({ country: detectCountry() }),
+  head: ({ loaderData }) => buildHead(loaderData?.country ?? DEFAULT_COUNTRY),
   component: LandingGate,
 });
 

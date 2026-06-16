@@ -219,26 +219,18 @@ export const listUsers = createServerFn({ method: "GET" })
     const { data: rows, error, count } = await q;
     if (error) throw new Error(error.message);
 
-    // Fetch emails from auth.users. Paginate until we've matched every wanted id
-    // or exhausted the directory — works beyond the 200/1000 perPage cap.
+    // ADM-01: O(k) by-id lookup instead of paginating the full auth.users
+    // directory. Was scanning up to 50k rows per page load.
     const ids = (rows ?? []).map((r) => r.id);
-    let emailMap = new Map<string, string>();
+    const emailMap = new Map<string, string>();
     if (ids.length) {
-      const wanted = new Set(ids);
-      const perPage = 1000;
-      const maxPages = 50; // hard ceiling, ~50k users
-      for (let page = 1; page <= maxPages && wanted.size > 0; page++) {
-        const { data: usersResp, error: listErr } = await sb.auth.admin.listUsers({ page, perPage });
-        if (listErr) break;
-        const users = usersResp?.users ?? [];
-        users.forEach((u) => {
-          if (wanted.has(u.id) && u.email) {
-            emailMap.set(u.id, u.email);
-            wanted.delete(u.id);
-          }
-        });
-        if (users.length < perPage) break;
-      }
+      const lookups = await Promise.all(
+        ids.map((id) => sb.auth.admin.getUserById(id).catch(() => null)),
+      );
+      lookups.forEach((res, i) => {
+        const email = res?.data?.user?.email;
+        if (email) emailMap.set(ids[i]!, email);
+      });
     }
     return {
       rows: (rows ?? []).map((r) => ({ ...r, email: emailMap.get(r.id) ?? null })),
