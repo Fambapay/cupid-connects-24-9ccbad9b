@@ -97,6 +97,19 @@ function SeedsAdmin() {
     },
   });
 
+  const genMut = useMutation({
+    mutationFn: (v: { city: string; count: number; gender: "feminino" | "masculino" | "nao_binario" }) =>
+      generate({ data: v }),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["seeds"] });
+      qc.invalidateQueries({ queryKey: ["seed-stats"] });
+      const msg = `Criados ${res.inserted} seeds${res.skipped ? ` (${res.skipped} falhas)` : ""}`;
+      if (res.errors?.length) toast.warning(msg, { description: res.errors.join("; ") });
+      else toast.success(msg);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const s = statsQ.data;
   const total = listQ.data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / 20));
