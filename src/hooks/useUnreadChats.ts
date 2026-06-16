@@ -11,52 +11,15 @@ export function useUnreadChats() {
       setCount(0);
       return;
     }
-    const { data: matches } = await supabase
-      .from("matches")
-      .select("id")
-      .or(`user_a.eq.${user.id},user_b.eq.${user.id}`);
-    const matchIds = (matches ?? []).map((m) => m.id as string);
-    if (!matchIds.length) {
+    const { data, error } = await (supabase.rpc as unknown as (
+      fn: string,
+    ) => Promise<{ data: unknown; error: unknown }>)("get_unread_chats_count");
+    if (error) {
+      console.error("get_unread_chats_count failed", error);
       setCount(0);
       return;
     }
-    const [{ data: reads }, { data: msgs }] = await Promise.all([
-      supabase
-        .from("match_reads")
-        .select("match_id,last_read_at")
-        .eq("user_id", user.id)
-        .in("match_id", matchIds),
-      supabase
-        .from("messages")
-        .select("match_id,created_at,sender_id")
-        .in("match_id", matchIds)
-        .neq("sender_id", user.id),
-    ]);
-    const readBy: Record<string, string> = {};
-    (reads ?? []).forEach((r) => (readBy[r.match_id as string] = r.last_read_at as string));
-
-    // Backfill missing reads so legacy conversations don't show as unread.
-    const missing = matchIds.filter((id) => !readBy[id]);
-    if (missing.length) {
-      const nowIso = new Date().toISOString();
-      await supabase
-        .from("match_reads")
-        .upsert(
-          missing.map((mid) => ({ match_id: mid, user_id: user.id, last_read_at: nowIso })),
-          { onConflict: "match_id,user_id" },
-        );
-      missing.forEach((mid) => (readBy[mid] = nowIso));
-    }
-
-    const unreadMatches = new Set<string>();
-    (msgs ?? []).forEach((m) => {
-      const mid = m.match_id as string;
-      const r = readBy[mid];
-      if (r && new Date(m.created_at as string) > new Date(r)) {
-        unreadMatches.add(mid);
-      }
-    });
-    setCount(unreadMatches.size);
+    setCount(typeof data === "number" ? data : 0);
   }, [user]);
 
   useEffect(() => {
@@ -68,8 +31,21 @@ export function useUnreadChats() {
     const ch = supabase
       .channel(`unread-chats-${user.id}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () => load())
-      .on("postgres_changes", { event: "*", schema: "public", table: "match_reads", filter: `user_id=eq.${user.id}` }, () => load())
-      .on("postgres_changes", { event: "*", schema: "public", table: "matches" }, () => load())
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "match_reads", filter: `user_id=eq.${user.id}` },
+        () => load(),
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "matches", filter: `user_a=eq.${user.id}` },
+        () => load(),
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "matches", filter: `user_b=eq.${user.id}` },
+        () => load(),
+      )
       .subscribe();
     return () => {
       supabase.removeChannel(ch);
