@@ -117,5 +117,5 @@ export function useCredits() {
     }));
   }, []);
 
-  return { credits, loading, reload: load, syncCredits };
+  return { credits, loading, error, reload: load, syncCredits };
 }
