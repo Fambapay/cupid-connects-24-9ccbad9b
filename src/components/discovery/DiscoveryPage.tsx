@@ -181,7 +181,6 @@ export const DiscoveryPage = ({
                   else if (d === "right") cardRef.current?.flyRight();
                   else cardRef.current?.flyUp();
                 }}
-                onBoost={onBoost}
                 onFirstImpression={() => onFirstImpression?.(current)}
                 onRewind={handleRewind}
                 canRewind={canRewind}
@@ -194,7 +193,6 @@ export const DiscoveryPage = ({
                   else if (d === "right") cardRef.current?.flyRight();
                   else cardRef.current?.flyUp();
                 }}
-                onBoost={onBoost}
                 onFirstImpression={() => onFirstImpression?.(current)}
                 onRewind={handleRewind}
                 canRewind={canRewind}
