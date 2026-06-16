@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { RefreshCw, SlidersHorizontal } from "lucide-react";
+import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
 
 interface EmptyDiscoveryProps {
   loading?: boolean;
