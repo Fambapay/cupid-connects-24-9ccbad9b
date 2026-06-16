@@ -55,14 +55,15 @@ export const DiscoveryPage = ({
   const next2 = profiles[index + 2];
   const next3 = profiles[index + 3];
 
-  // Reset stack when the parent feed is replaced (e.g. filters / reload).
-  const firstId = profiles[0]?.id;
+  // Reset stack when the parent feed is replaced. Use a hash of all IDs so
+  // the effect fires even when the first profile reappears after a reload.
+  const feedHash = profiles.map((p) => p.id).join(",");
   useEffect(() => {
     setIndex(0);
     setHistory([]);
     setRewindUsed(false);
     setEnterAnim(null);
-  }, [firstId]);
+  }, [feedHash]);
 
   // Preload next cards' first photos so the stack behind the top card never
   // flashes black. Defer to idle time so it never competes with swipe rendering.
