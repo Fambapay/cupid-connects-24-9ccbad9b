@@ -32,9 +32,12 @@ export function useLikedMe() {
     if (!user) {
       setLikers([]);
       setLoading(false);
+      setError(null);
       return;
     }
     setLoading(true);
+    setError(null);
+    try {
 
     const [
       { data: incoming },
