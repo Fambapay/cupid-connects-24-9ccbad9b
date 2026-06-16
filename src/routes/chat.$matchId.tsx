@@ -415,10 +415,11 @@ function ChatRoom() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
                 }}
-                placeholder="Type a message"
+                placeholder="Escreve uma mensagem"
                 autoCapitalize="sentences"
                 spellCheck={false}
                 enterKeyHint="send"
+                maxLength={2000}
                 className="block h-10 min-w-0 flex-1 appearance-none bg-transparent px-1 py-0 text-[16px] text-white outline-none placeholder:text-white/40 [-webkit-appearance:none]"
                 style={{ lineHeight: "40px", WebkitTextFillColor: "currentColor" }}
               />
@@ -450,13 +451,9 @@ function ChatRoom() {
 function formatDateLabel(iso?: string) {
   if (!iso) return "Hoje";
   const d = new Date(iso);
-  return d.toLocaleString("en-GB", {
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  }).replace(",", " at");
+  const datePart = d.toLocaleDateString("pt-PT", { day: "numeric", month: "short" });
+  const timePart = d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+  return `${datePart} às ${timePart}`;
 }
 
 
@@ -501,7 +498,7 @@ function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, show
           {msg.content}
         </div>
         {me && showReadReceipt && isLastOfGroup && (
-          <span className="mt-1 px-1 text-[11px] text-white/45">Sent</span>
+          <span className="mt-1 px-1 text-[11px] text-white/45">Lido</span>
         )}
       </div>
     </div>

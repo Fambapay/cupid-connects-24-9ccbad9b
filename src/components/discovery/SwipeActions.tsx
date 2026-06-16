@@ -4,11 +4,9 @@ import type { SwipeDirection, DailyLimits } from "./types";
 interface SwipeActionsProps {
   onSwipe: (d: SwipeDirection) => void;
   onRewind?: () => void;
-  onBoost?: () => void;
   onFirstImpression?: () => void;
   dailyLimits?: DailyLimits;
   canRewind?: boolean;
-  canBoost?: boolean;
   boostActive?: boolean;
   boostRemainingMinutes?: number;
 }
@@ -32,13 +30,9 @@ const baseBtn: React.CSSProperties = {
 export const SwipeActions = ({
   onSwipe,
   onRewind,
-  onBoost,
   onFirstImpression,
   canRewind = true,
-  canBoost = true,
 }: SwipeActionsProps) => {
-  void onBoost;
-  void canBoost;
   const press =
     (cb?: () => void) => (e: React.MouseEvent<HTMLButtonElement>) => {
       const el = e.currentTarget;

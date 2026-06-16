@@ -96,7 +96,6 @@ function Discover() {
 
   // Free users browse the full feed; the daily-likes counter (5/day) gates the like action itself.
   const visible = mapped;
-  void index;
 
   const performSwipe = async (
     target: { id: string; name: string; photo?: string | null },
@@ -275,9 +274,9 @@ function Discover() {
       </main>
 
 
-      {!isPremium && bannerVisible && (
+      {!isPremium && bannerVisible && items.length > 0 && (
         <div onClick={(e) => e.stopPropagation()}>
-          <BrowseBanner count={Math.max(3, Math.min(items.length, 12))} onActivate={openPaywall} />
+          <BrowseBanner count={items.length} onActivate={openPaywall} />
         </div>
       )}
 
@@ -324,18 +323,61 @@ function Discover() {
         onSendMessage={async () => {
           if (!matched || !user) return;
           setOpeningChat(true);
-          let matchId: string | null = null;
-          for (let i = 0; i < 5 && !matchId; i++) {
+
+          // Try direct query first — the match trigger usually runs in <100ms.
+          const findMatch = async (): Promise<string | null> => {
             const { data } = await supabase
               .from("matches")
               .select("id")
               .or(
-                `and(user_a.eq.${user.id},user_b.eq.${matched.id}),and(user_a.eq.${matched.id},user_b.eq.${user.id})`
+                `and(user_a.eq.${user.id},user_b.eq.${matched.id}),and(user_a.eq.${matched.id},user_b.eq.${user.id})`,
               )
               .maybeSingle();
-            matchId = (data as { id?: string } | null)?.id ?? null;
-            if (!matchId) await new Promise((r) => setTimeout(r, 250));
+            return (data as { id?: string } | null)?.id ?? null;
+          };
+
+          let matchId = await findMatch();
+
+          // If not yet present, listen for the INSERT via realtime with a
+          // 4s ceiling — much more responsive than polling and handles slow triggers.
+          if (!matchId) {
+            matchId = await new Promise<string | null>((resolve) => {
+              const channel = supabase
+                .channel(`match-wait-${user.id}-${matched.id}`)
+                .on(
+                  "postgres_changes",
+                  { event: "INSERT", schema: "public", table: "matches", filter: `user_a=eq.${user.id}` },
+                  (payload) => {
+                    const m = payload.new as { id: string; user_b: string };
+                    if (m.user_b === matched.id) {
+                      cleanup();
+                      resolve(m.id);
+                    }
+                  },
+                )
+                .on(
+                  "postgres_changes",
+                  { event: "INSERT", schema: "public", table: "matches", filter: `user_b=eq.${user.id}` },
+                  (payload) => {
+                    const m = payload.new as { id: string; user_a: string };
+                    if (m.user_a === matched.id) {
+                      cleanup();
+                      resolve(m.id);
+                    }
+                  },
+                )
+                .subscribe();
+              const timeout = window.setTimeout(async () => {
+                cleanup();
+                resolve(await findMatch());
+              }, 4000);
+              function cleanup() {
+                window.clearTimeout(timeout);
+                supabase.removeChannel(channel);
+              }
+            });
           }
+
           setOpeningChat(false);
           if (matchId) {
             setMatched(null);

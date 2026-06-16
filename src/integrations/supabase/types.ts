@@ -992,6 +992,16 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_discovery_feed: {
+        Args: {
+          _filters?: Json
+          _limit?: number
+          _viewer_lat?: number
+          _viewer_lng?: number
+        }
+        Returns: Json
+      }
+      get_match_summaries: { Args: never; Returns: Json }
       get_my_location: {
         Args: never
         Returns: {
@@ -1000,6 +1010,7 @@ export type Database = {
         }[]
       }
       get_my_phone: { Args: never; Returns: string }
+      get_unread_chats_count: { Args: never; Returns: number }
       grant_credits: {
         Args: { _pack_kind: string; _quantity: number; _user_id: string }
         Returns: Json

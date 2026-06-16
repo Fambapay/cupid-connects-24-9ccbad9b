@@ -3,9 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { signPhotos } from "@/lib/photos";
-import { getEntitlements, type MembershipTier } from "@/lib/plans";
 import type { DiscoveryFilters } from "@/components/FiltersSheet";
-
 
 export interface DailyLimits {
   likesUsed: number;
@@ -37,27 +35,7 @@ export interface DiscoveryOptions {
   userCoords?: { lat: number; lng: number } | null;
 }
 
-// Mirror of activityStatus LIVE_WINDOW_MS — consider a user "online now"
-// if their last heartbeat is within this window.
 const ONLINE_WINDOW_MS = 90_000;
-
-function computeAge(birthdate: string | null): number {
-  if (!birthdate) return 0;
-  const d = new Date(birthdate);
-  const diff = Date.now() - d.getTime();
-  return Math.max(0, Math.floor(diff / (365.25 * 24 * 3600 * 1000)));
-}
-
-
-function mapGenderFilter(g: DiscoveryFilters["gender"]): string[] | null {
-  switch (g) {
-    case "feminino": return ["woman", "transwoman"];
-    case "masculino": return ["man", "transman"];
-    case "nao_binario": return ["nonbinary", "genderfluid", "agender", "other"];
-    case "todos":
-    default: return null;
-  }
-}
 
 interface DiscoveryResult {
   items: DiscoverProfile[];
@@ -73,212 +51,118 @@ const DEFAULT_LIMITS: DailyLimits = {
   superLikesRemaining: 0,
 };
 
+interface RawCandidate {
+  id: string;
+  name: string | null;
+  age: number | null;
+  city: string | null;
+  country: string | null;
+  bio: string | null;
+  interests: string[] | null;
+  is_verified: boolean | null;
+  gender: string | null;
+  last_active_at: string | null;
+  distance_km: number | null;
+  photos: string[] | null;
+}
+
+interface FeedResponse {
+  candidates: RawCandidate[];
+  daily_limits: {
+    likes_used: number;
+    likes_limit: number;
+    super_used: number;
+    super_limit: number;
+  };
+}
+
 async function fetchDiscovery(
-  userId: string,
   filters: DiscoveryFilters | undefined,
   userCoords: { lat: number; lng: number } | null | undefined,
 ): Promise<DiscoveryResult> {
-  const todayStart = new Date();
-  todayStart.setUTCHours(0, 0, 0, 0);
-
-  // All independent reads in a single parallel batch (was 6 + 1 sequential).
-  const [
-    { data: mySwipes },
-    { data: me },
-    { data: mySettings },
-    { data: blocksA },
-    { data: blocksB },
-    { data: todaySwipes },
-    { data: likedMeRows },
-  ] = await Promise.all([
-    supabase.from("swipes").select("swiped_id").eq("swiper_id", userId),
-    supabase
-      .from("profiles")
-      .select("interested_in, membership_tier, membership_status, membership_expires_at")
-      .eq("id", userId)
-      .maybeSingle(),
-    supabase
-      .from("user_settings")
-      .select("age_min, age_max, distance_radius, require_bio, min_photos")
-      .eq("user_id", userId)
-      .maybeSingle(),
-    supabase.from("blocked_users").select("blocked_id").eq("blocker_id", userId),
-    supabase.from("blocked_users").select("blocker_id").eq("blocked_id", userId),
-    supabase
-      .from("swipes")
-      .select("direction")
-      .eq("swiper_id", userId)
-      .gte("created_at", todayStart.toISOString()),
-    supabase
-      .from("swipes")
-      .select("swiper_id")
-      .eq("swiped_id", userId)
-      .in("direction", ["like", "super"]),
-  ]);
-
-  // Compute daily limits based on viewer's tier
-  const myTier = (me?.membership_tier ?? "free") as MembershipTier;
-  const myStatus = (me as { membership_status?: string } | null)?.membership_status ?? "inactive";
-  const myExp = (me as { membership_expires_at?: string | null } | null)?.membership_expires_at;
-  const myActive = myStatus === "active" && (!myExp || new Date(myExp).getTime() > Date.now());
-  const ent = getEntitlements(myActive ? myTier : "free");
-  const likesUsedToday = (todaySwipes ?? []).filter(
-    (s) => s.direction === "like" || s.direction === "super",
-  ).length;
-  const superUsedToday = (todaySwipes ?? []).filter((s) => s.direction === "super").length;
-  const likesLimit = ent.dailyLikes; // -1 unlimited
-  const likesRemaining = likesLimit < 0 ? Infinity : Math.max(0, likesLimit - likesUsedToday);
-  const dailyLimits: DailyLimits = {
-    likesUsed: likesUsedToday,
-    likesLimit,
-    likesRemaining: Number.isFinite(likesRemaining) ? likesRemaining : 9999,
-    superLikesUsed: superUsedToday,
-    superLikesLimit: ent.dailySuperLikes,
-    superLikesRemaining: Math.max(0, ent.dailySuperLikes - superUsedToday),
-  };
-
-  const excluded = new Set<string>((mySwipes ?? []).map((s) => s.swiped_id as string));
-  excluded.add(userId);
-  (blocksA ?? []).forEach((b) => excluded.add(b.blocked_id as string));
-  (blocksB ?? []).forEach((b) => excluded.add(b.blocker_id as string));
-  const likedMe = new Set<string>((likedMeRows ?? []).map((r) => r.swiper_id as string));
-
-  let q = supabase
-    .from("profiles")
-    .select(
-      "id,name,age,birthdate,city,country,bio,interests,is_verified,gender,last_active_at,is_seed,is_incognito,membership_tier,membership_status,membership_expires_at",
-    )
-    .eq("onboarding_completed", true)
-    .eq("is_paused", false)
-    .order("is_seed", { ascending: true })
-    .limit(100);
-
-  const genderFilter = filters ? mapGenderFilter(filters.gender) : null;
-  if (genderFilter) {
-    q = q.in("gender", genderFilter);
-  } else {
-    const interestedIn = (me?.interested_in ?? []) as string[];
-    if (interestedIn.length) q = q.in("gender", interestedIn);
-  }
-
-  const ageMin = filters?.ageMin ?? mySettings?.age_min ?? 18;
-  const ageMax = filters?.ageMax ?? mySettings?.age_max ?? 80;
-  const distanceMax = filters?.distance ?? mySettings?.distance_radius ?? 200;
-  const requireBio = filters?.hasBio ?? mySettings?.require_bio ?? false;
-
-  if (ageMin > 18) q = q.gte("age", ageMin);
-  if (ageMax < 80) q = q.lte("age", ageMax);
-  if (filters?.verifiedOnly) q = q.eq("is_verified", true);
-  if (requireBio) q = q.not("bio", "is", null).neq("bio", "");
-
-  const { data: rows } = await q;
-  let candidates = (rows ?? [])
-    .filter((r) => !excluded.has(r.id))
-    .filter((r) => !r.is_incognito || likedMe.has(r.id));
-
-  // Resolve viewer coordinates. We never read other users' lat/lng on the
-  // client; distances are computed server-side via the compute_distances_km RPC.
-  let myCoords = userCoords ?? null;
-  if (!myCoords) {
-    const { data: locData } = await (supabase.rpc as any)("get_my_location");
-    const loc = Array.isArray(locData) ? locData[0] : locData;
-    if (loc?.latitude != null && loc?.longitude != null) {
-      myCoords = { lat: loc.latitude as number, lng: loc.longitude as number };
+  // Resolve viewer coords (server-side path if not provided by caller).
+  let coords = userCoords ?? null;
+  if (!coords) {
+    const { data: locData } = await (supabase.rpc as unknown as (
+      fn: string,
+    ) => Promise<{ data: unknown }>)("get_my_location");
+    const loc = Array.isArray(locData) ? (locData[0] as { latitude?: number; longitude?: number }) : (locData as { latitude?: number; longitude?: number } | null);
+    if (loc && loc.latitude != null && loc.longitude != null) {
+      coords = { lat: loc.latitude, lng: loc.longitude };
     }
   }
 
-  let distanceById = new Map<string, number>();
-  if (myCoords && candidates.length) {
-    const { data: dists } = await (supabase.rpc as any)("compute_distances_km", {
-      _viewer_lat: myCoords.lat,
-      _viewer_lng: myCoords.lng,
-      _ids: candidates.map((r) => r.id),
-    });
-    (dists as Array<{ id: string; distance_km: number }> | null)?.forEach((d) =>
-      distanceById.set(d.id, d.distance_km ?? 0),
-    );
-  }
-  const withDistance = candidates.map((r) => ({ ...r, _distance: distanceById.get(r.id) ?? 0 }));
-  candidates =
-    myCoords && distanceMax < 200
-      ? withDistance.filter((r) => r._distance <= distanceMax)
-      : withDistance;
-
-
-  if (filters?.onlineNow) {
-    const now = Date.now();
-    candidates = candidates.filter((r) => {
-      const t = r.last_active_at ? new Date(r.last_active_at as string).getTime() : 0;
-      return now - t <= ONLINE_WINDOW_MS;
-    });
+  const filterPayload: Record<string, unknown> = {};
+  if (filters) {
+    if (filters.gender) filterPayload.gender = filters.gender;
+    if (filters.ageMin != null) filterPayload.ageMin = filters.ageMin;
+    if (filters.ageMax != null) filterPayload.ageMax = filters.ageMax;
+    if (filters.distance != null) filterPayload.distance = filters.distance;
+    if (filters.hasBio != null) filterPayload.hasBio = filters.hasBio;
+    if (filters.verifiedOnly != null) filterPayload.verifiedOnly = filters.verifiedOnly;
+    if (filters.onlineNow != null) filterPayload.onlineNow = filters.onlineNow;
   }
 
-  if (!candidates.length) {
-    return { items: [], dailyLimits };
+  const { data, error } = await (supabase.rpc as unknown as (
+    fn: string,
+    args: Record<string, unknown>,
+  ) => Promise<{ data: unknown; error: unknown }>)("get_discovery_feed", {
+    _filters: filterPayload,
+    _viewer_lat: coords?.lat ?? null,
+    _viewer_lng: coords?.lng ?? null,
+    _limit: 100,
+  });
+  if (error) {
+    console.error("get_discovery_feed failed", error);
+    return { items: [], dailyLimits: DEFAULT_LIMITS };
   }
+  const resp = (data as FeedResponse | null) ?? { candidates: [], daily_limits: { likes_used: 0, likes_limit: 5, super_used: 0, super_limit: 0 } };
 
-  const candidateOrder = new Map(candidates.map((r, i) => [r.id, i]));
-  const { data: activeBoosts } = await supabase
-    .from("boosts")
-    .select("profile_id,expires_at")
-    .in("profile_id", candidates.map((r) => r.id))
-    .gt("expires_at", new Date().toISOString());
-  const boostedIds = new Set((activeBoosts ?? []).map((b) => b.profile_id as string));
-  const nowMs = Date.now();
-  const tierRank = (r: typeof candidates[number]) => {
-    if (boostedIds.has(r.id)) return 3;
-    const expires = r.membership_expires_at ? new Date(r.membership_expires_at as string).getTime() : 0;
-    const active = r.membership_status === "active" && (!expires || expires > nowMs);
-    if (!active) return 0;
-    if (r.membership_tier === "elite") return 2;
-    if (r.membership_tier === "plus") return 1;
-    return 0;
+  const dl = resp.daily_limits;
+  const likesRemaining = dl.likes_limit < 0 ? Infinity : Math.max(0, dl.likes_limit - dl.likes_used);
+  const dailyLimits: DailyLimits = {
+    likesUsed: dl.likes_used,
+    likesLimit: dl.likes_limit,
+    likesRemaining: Number.isFinite(likesRemaining) ? (likesRemaining as number) : 9999,
+    superLikesUsed: dl.super_used,
+    superLikesLimit: dl.super_limit,
+    superLikesRemaining: Math.max(0, dl.super_limit - dl.super_used),
   };
-  candidates = [...candidates].sort((a, b) => {
-    const rA = tierRank(a);
-    const rB = tierRank(b);
-    if (rA !== rB) return rB - rA;
-    return (candidateOrder.get(a.id) ?? 0) - (candidateOrder.get(b.id) ?? 0);
-  });
 
-  const ids = candidates.map((r) => r.id);
-  const { data: photos } = await supabase
-    .from("profile_photos")
-    .select("profile_id,storage_path,position")
-    .in("profile_id", ids)
-    .order("position", { ascending: true });
+  // Flatten all photo paths and sign in one batch.
+  const candidates = resp.candidates ?? [];
+  const allPaths: string[] = [];
+  const ranges: Array<{ start: number; end: number }> = [];
+  for (const c of candidates) {
+    const paths = c.photos ?? [];
+    ranges.push({ start: allPaths.length, end: allPaths.length + paths.length });
+    for (const p of paths) allPaths.push(p);
+  }
+  const signed = allPaths.length
+    ? await signPhotos(allPaths, 3600, { width: 800, quality: 72, resize: "cover" })
+    : [];
 
-  const paths = (photos ?? []).map((p) => p.storage_path as string);
-  const signed = await signPhotos(paths, 3600, { width: 800, quality: 72, resize: "cover" });
-  const byProfile: Record<string, string[]> = {};
-  (photos ?? []).forEach((p, i) => {
-    const url = signed[i];
-    if (!url) return;
-    (byProfile[p.profile_id as string] ??= []).push(url);
-  });
-
-  const minPhotos = Math.max(1, mySettings?.min_photos ?? 1);
   const now = Date.now();
-  const items: DiscoverProfile[] = candidates
-    .filter((r) => (byProfile[r.id]?.length ?? 0) >= minPhotos)
-    .map((r) => {
-      const t = r.last_active_at ? new Date(r.last_active_at as string).getTime() : 0;
-      return {
-        id: r.id,
-        name: r.name ?? "",
-        age: r.age ?? computeAge(r.birthdate as string | null),
-        city: r.city ?? "",
-        country: r.country ?? "",
-        bio: r.bio ?? "",
-        photos: byProfile[r.id] ?? [],
-        interests: (r.interests as string[]) ?? [],
-        is_verified: !!r.is_verified,
-        gender: r.gender as string | null,
-        isOnline: t > 0 && now - t <= ONLINE_WINDOW_MS,
-        lastActiveAt: (r.last_active_at as string | null) ?? null,
-        distance: (r as { _distance?: number })._distance ?? 0,
-      };
-    });
+  const items: DiscoverProfile[] = candidates.map((c, idx) => {
+    const { start, end } = ranges[idx];
+    const photos = signed.slice(start, end).filter(Boolean) as string[];
+    const t = c.last_active_at ? new Date(c.last_active_at).getTime() : 0;
+    return {
+      id: c.id,
+      name: c.name ?? "",
+      age: c.age ?? 0,
+      city: c.city ?? "",
+      country: c.country ?? "",
+      bio: c.bio ?? "",
+      photos,
+      interests: c.interests ?? [],
+      is_verified: !!c.is_verified,
+      gender: c.gender,
+      isOnline: t > 0 && now - t <= ONLINE_WINDOW_MS,
+      lastActiveAt: c.last_active_at,
+      distance: c.distance_km ?? 0,
+    };
+  });
 
   return { items, dailyLimits };
 }
@@ -286,7 +170,6 @@ async function fetchDiscovery(
 export function useDiscovery(options: DiscoveryOptions = {}) {
   const { user } = useAuth();
   const { filters, userCoords } = options;
-  
 
   const queryKey = useMemo(
     () => ["discovery", user?.id ?? null, filters, userCoords] as const,
@@ -295,10 +178,12 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
 
   const { data, isLoading, refetch } = useQuery({
     queryKey,
-    queryFn: () => fetchDiscovery(user!.id, filters, userCoords),
+    queryFn: () => fetchDiscovery(filters, userCoords),
     enabled: !!user,
-    staleTime: 30_000,
-    gcTime: 5 * 60_000,
+    // Always refetch on mount — short freshness window so paused/deleted
+    // profiles don't linger in the deck.
+    staleTime: 0,
+    gcTime: 60_000,
     refetchOnWindowFocus: false,
   });
 
@@ -310,13 +195,11 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     await refetch();
   }, [refetch]);
 
-
-
   const swipe = useCallback(
     async (
       targetId: string,
       direction: "like" | "pass" | "super",
-      options?: { firstImpressionMessage?: string },
+      opts?: { firstImpressionMessage?: string },
     ): Promise<{
       matched: boolean;
       matchId?: string;
@@ -325,11 +208,11 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       remainingFirstImpressions?: number;
     }> => {
       if (!user) return { matched: false };
-      const fiMsg = options?.firstImpressionMessage?.trim().slice(0, 280) || null;
-
-      // All credit checks, daily-limit enforcement, swipe insertion, and
-      // credit consumption happen atomically server-side via insert_swipe.
-      const { data, error } = await (supabase.rpc as any)("insert_swipe", {
+      const fiMsg = opts?.firstImpressionMessage?.trim().slice(0, 280) || null;
+      const { data, error } = await (supabase.rpc as unknown as (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ data: unknown; error: unknown }>)("insert_swipe", {
         _target_id: targetId,
         _direction: direction,
         _first_impression_message: fiMsg,
@@ -367,20 +250,13 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     [user],
   );
 
-
   const rewind = useCallback(async (): Promise<{
     success: boolean;
     swipedId?: string;
     error?: string;
   }> => {
     const { data } = await supabase.rpc("rewind_last_swipe");
-    const res = data as {
-      success: boolean;
-      swiped_id?: string;
-      error?: string;
-    } | null;
-    // Don't reload: caller manages the local card stack so the rewound card
-    // can animate back into place from where it flew off.
+    const res = data as { success: boolean; swiped_id?: string; error?: string } | null;
     if (res?.success) return { success: true, swipedId: res.swiped_id };
     return { success: false, error: res?.error };
   }, []);
