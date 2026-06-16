@@ -48,6 +48,7 @@ function SeedsAdmin() {
   const toggleAll = useServerFn(toggleAllSeeds);
   const stats = useServerFn(getSeedStats);
   const setThr = useServerFn(setSeedThreshold);
+  const generate = useServerFn(generateSeeds);
 
   const [city, setCity] = useState<string>("");
   const [gender, setGender] = useState<string>("");
