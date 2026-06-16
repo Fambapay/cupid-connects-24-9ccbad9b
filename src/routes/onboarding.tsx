@@ -1852,14 +1852,9 @@ function CompletionScreen({ onContinue }: { onContinue: () => void }) {
       >
         Já podes começar a descobrir pessoas perto de ti
       </motion.p>
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25, delay: 0.6 }}
-        className="mt-10 w-full max-w-xs"
-      >
+      <div className="mt-10 w-full max-w-xs" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
         <PrimaryButton onClick={onContinue}>Como funciona a app</PrimaryButton>
-      </motion.div>
+      </div>
     </motion.div>
   );
 }
