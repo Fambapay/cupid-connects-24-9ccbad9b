@@ -537,7 +537,7 @@ function Landing() {
           <div className="ll-container">
             <div className="ll-footer-inner">
               <Link to="/" className="ll-logo" aria-label="Hunie">
-                <img src={"/icon-192.png"} alt="Logótipo Hunie" className="ll-logo-img" />
+                <img src={hunieMarkTransparent.url} alt="Logótipo Hunie" className="ll-logo-img" />
               </Link>
 
               <div className="ll-footer-links">
