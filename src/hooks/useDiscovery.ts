@@ -167,6 +167,28 @@ async function fetchDiscovery(
   return { items, dailyLimits };
 }
 
+// Persist locally-swiped IDs so they don't reappear if the user navigates
+// away and back before the server-side insert is reflected by the feed RPC.
+// Scoped per-user; cleared on rewind.
+const SWIPED_KEY_PREFIX = "hunie:swiped:";
+function readSwiped(uid: string | undefined): Set<string> {
+  if (!uid || typeof sessionStorage === "undefined") return new Set();
+  try {
+    const raw = sessionStorage.getItem(SWIPED_KEY_PREFIX + uid);
+    return new Set(raw ? (JSON.parse(raw) as string[]) : []);
+  } catch {
+    return new Set();
+  }
+}
+function writeSwiped(uid: string | undefined, set: Set<string>) {
+  if (!uid || typeof sessionStorage === "undefined") return;
+  try {
+    sessionStorage.setItem(SWIPED_KEY_PREFIX + uid, JSON.stringify(Array.from(set)));
+  } catch {
+    /* quota — ignore */
+  }
+}
+
 export function useDiscovery(options: DiscoveryOptions = {}) {
   const { user } = useAuth();
   const { filters, userCoords } = options;
@@ -180,20 +202,44 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     queryKey,
     queryFn: () => fetchDiscovery(filters, userCoords),
     enabled: !!user,
-    // Always refetch on mount — short freshness window so paused/deleted
-    // profiles don't linger in the deck.
     staleTime: 0,
     gcTime: 60_000,
     refetchOnWindowFocus: false,
   });
 
-  const items: DiscoverProfile[] = data?.items ?? [];
+  // Filter locally-swiped IDs so back/forward navigation never resurrects a
+  // profile already actioned on this device, even if the server-side insert
+  // is still in flight or the cached feed is served first.
+  const rawItems: DiscoverProfile[] = data?.items ?? [];
+  const items: DiscoverProfile[] = useMemo(() => {
+    const swiped = readSwiped(user?.id);
+    if (!swiped.size) return rawItems;
+    return rawItems.filter((p) => !swiped.has(p.id));
+  }, [rawItems, user?.id]);
   const dailyLimits = data?.dailyLimits ?? DEFAULT_LIMITS;
   const loading = !!user && isLoading;
 
   const reload = useCallback(async () => {
     await refetch();
   }, [refetch]);
+
+  const markSwipedLocal = useCallback(
+    (targetId: string) => {
+      const set = readSwiped(user?.id);
+      set.add(targetId);
+      writeSwiped(user?.id, set);
+    },
+    [user?.id],
+  );
+
+  const unmarkSwipedLocal = useCallback(
+    (targetId: string) => {
+      const set = readSwiped(user?.id);
+      set.delete(targetId);
+      writeSwiped(user?.id, set);
+    },
+    [user?.id],
+  );
 
   const swipe = useCallback(
     async (
@@ -208,6 +254,8 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       remainingFirstImpressions?: number;
     }> => {
       if (!user) return { matched: false };
+      // Mark BEFORE the RPC so a fast back-navigation can't reveal the card.
+      markSwipedLocal(targetId);
       const fiMsg = opts?.firstImpressionMessage?.trim().slice(0, 280) || null;
       const { data, error } = await (supabase.rpc as unknown as (
         fn: string,
@@ -219,6 +267,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       });
       if (error) {
         console.error("insert_swipe failed", error);
+        unmarkSwipedLocal(targetId);
         return { matched: false, reason: "insert_failed" };
       }
       const res = data as {
@@ -230,6 +279,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
         remaining_first_impressions?: number | null;
       } | null;
       if (!res?.success) {
+        unmarkSwipedLocal(targetId);
         const reasonMap: Record<string, string> = {
           insufficient_super_like: "insufficient_credits",
           insufficient_first_impression: "insufficient_credits",
@@ -247,7 +297,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
         remainingFirstImpressions: res.remaining_first_impressions ?? undefined,
       };
     },
-    [user],
+    [user, markSwipedLocal, unmarkSwipedLocal],
   );
 
   const rewind = useCallback(async (): Promise<{
@@ -257,9 +307,12 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
   }> => {
     const { data } = await supabase.rpc("rewind_last_swipe");
     const res = data as { success: boolean; swiped_id?: string; error?: string } | null;
-    if (res?.success) return { success: true, swipedId: res.swiped_id };
+    if (res?.success) {
+      if (res.swiped_id) unmarkSwipedLocal(res.swiped_id);
+      return { success: true, swipedId: res.swiped_id };
+    }
     return { success: false, error: res?.error };
-  }, []);
+  }, [unmarkSwipedLocal]);
 
   return { items, loading, swipe, rewind, reload, dailyLimits };
 }
