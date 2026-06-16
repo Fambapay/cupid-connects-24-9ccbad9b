@@ -85,7 +85,7 @@ function discountPct(country: CountryCode, kind: PackKind, pricePerUnit: number)
 function ShopPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
-  const { credits } = useCredits();
+  const { credits, error: creditsError, reload: reloadCredits } = useCredits();
   const { country } = useCountry();
   const [tab, setTab] = useState<PackKind>(search.tab ?? "boost");
 
