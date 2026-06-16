@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { RefreshCw, SlidersHorizontal } from "lucide-react";
+import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
 
 interface EmptyDiscoveryProps {
   loading?: boolean;
@@ -126,7 +127,7 @@ export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters }: Em
           }}
         />
         <motion.img
-          src={"/icon-192.png"}
+          src={hunieMarkTransparent.url}
           alt="Logótipo Hunie"
           width={132}
           height={132}
