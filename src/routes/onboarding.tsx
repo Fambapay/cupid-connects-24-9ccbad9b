@@ -2000,8 +2000,8 @@ function TutorialCarousel({ onFinish }: { onFinish: () => void }) {
 
       {/* CTA */}
       <div
-        className="px-5 pb-6 pt-2"
-        style={{ paddingBottom: "max(env(safe-area-inset-bottom), 24px)" }}
+        className="px-5 pt-2"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <PrimaryButton onClick={next}>
           <span className="inline-flex items-center gap-2">
