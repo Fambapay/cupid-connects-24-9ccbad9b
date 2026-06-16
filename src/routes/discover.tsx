@@ -96,7 +96,6 @@ function Discover() {
 
   // Free users browse the full feed; the daily-likes counter (5/day) gates the like action itself.
   const visible = mapped;
-  void index;
 
   const performSwipe = async (
     target: { id: string; name: string; photo?: string | null },
