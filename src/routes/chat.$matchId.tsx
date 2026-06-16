@@ -415,10 +415,11 @@ function ChatRoom() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
                 }}
-                placeholder="Type a message"
+                placeholder="Escreve uma mensagem"
                 autoCapitalize="sentences"
                 spellCheck={false}
                 enterKeyHint="send"
+                maxLength={2000}
                 className="block h-10 min-w-0 flex-1 appearance-none bg-transparent px-1 py-0 text-[16px] text-white outline-none placeholder:text-white/40 [-webkit-appearance:none]"
                 style={{ lineHeight: "40px", WebkitTextFillColor: "currentColor" }}
               />
