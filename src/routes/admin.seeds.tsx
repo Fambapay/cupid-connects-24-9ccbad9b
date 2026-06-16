@@ -262,3 +262,40 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
     </div>
   );
 }
+
+type GenInput = { city: string; count: number; gender: "feminino" | "masculino" | "nao_binario" };
+
+function SeedGenerator({ onGenerate, pending }: { onGenerate: (v: GenInput) => void; pending: boolean }) {
+  const [city, setCity] = useState<string>("Maputo");
+  const [gender, setGender] = useState<GenInput["gender"]>("feminino");
+  const [count, setCount] = useState<number>(20);
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-3">
+      <p className="text-sm font-medium">Gerar seeds</p>
+      <Select value={city} onValueChange={(v) => setCity(v)}>
+        <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+        <SelectContent>
+          {CITIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+        </SelectContent>
+      </Select>
+      <Select value={gender} onValueChange={(v) => setGender(v as GenInput["gender"])}>
+        <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+        <SelectContent>
+          {GENDERS.map((g) => <SelectItem key={g.v} value={g.v}>{g.l}</SelectItem>)}
+        </SelectContent>
+      </Select>
+      <Input
+        type="number"
+        min={1}
+        max={50}
+        value={count}
+        onChange={(e) => setCount(Math.max(1, Math.min(50, Number(e.target.value) || 1)))}
+        className="w-24"
+      />
+      <Button onClick={() => onGenerate({ city, gender, count })} disabled={pending}>
+        {pending ? "A gerar…" : "Gerar"}
+      </Button>
+      <p className="text-xs text-muted-foreground">Máx 50 por vez. Cria auth users + perfil + fotos.</p>
+    </div>
+  );
+}
