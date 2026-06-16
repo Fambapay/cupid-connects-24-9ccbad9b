@@ -14,6 +14,17 @@ export interface MatchSummary {
   hasMessages: boolean;
 }
 
+interface RawSummary {
+  match_id: string;
+  other_id: string;
+  name: string;
+  photo_path: string | null;
+  last_message: string | null;
+  last_message_at: string;
+  unread: number;
+  has_messages: boolean;
+}
+
 export function useMatches() {
   const { user } = useAuth();
   const [matches, setMatches] = useState<MatchSummary[]>([]);
@@ -27,121 +38,42 @@ export function useMatches() {
     }
     setLoading(true);
 
-    const [{ data: rows }, { data: blocksA }, { data: blocksB }] = await Promise.all([
-      supabase
-        .from("matches")
-        .select("id,user_a,user_b,last_message_at,created_at")
-        .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
-        .order("last_message_at", { ascending: false }),
-      supabase.from("blocked_users").select("blocked_id").eq("blocker_id", user.id),
-      supabase.from("blocked_users").select("blocker_id").eq("blocked_id", user.id),
-    ]);
+    const { data, error } = await (supabase.rpc as unknown as (
+      fn: string,
+    ) => Promise<{ data: unknown; error: unknown }>)("get_match_summaries");
 
-    const blocked = new Set<string>();
-    (blocksA ?? []).forEach((b) => blocked.add(b.blocked_id as string));
-    (blocksB ?? []).forEach((b) => blocked.add(b.blocker_id as string));
-
-    const list = (rows ?? []).filter((m) => {
-      const otherId = (m.user_a === user.id ? m.user_b : m.user_a) as string;
-      return !blocked.has(otherId);
-    });
-    if (!list.length) {
+    if (error) {
+      console.error("get_match_summaries failed", error);
       setMatches([]);
       setLoading(false);
       return;
     }
 
-    const otherIds = list.map((m) => (m.user_a === user.id ? m.user_b : m.user_a) as string);
+    const rows = (data as RawSummary[] | null) ?? [];
+    if (!rows.length) {
+      setMatches([]);
+      setLoading(false);
+      return;
+    }
 
-    const matchIds = list.map((m) => m.id as string);
-    const [{ data: profiles }, { data: photos }, { data: lastMsgs }, { data: reads }, { data: unreadMsgs }] = await Promise.all([
-      supabase.from("profiles").select("id,name").in("id", otherIds),
-      supabase
-        .from("profile_photos")
-        .select("profile_id,storage_path,position")
-        .in("profile_id", otherIds)
-        .order("position", { ascending: true }),
-      supabase
-        .from("messages")
-        .select("match_id,content,created_at,sender_id")
-        .in("match_id", matchIds)
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("match_reads")
-        .select("match_id,last_read_at")
-        .eq("user_id", user.id)
-        .in("match_id", matchIds),
-      supabase
-        .from("messages")
-        .select("match_id,created_at,sender_id")
-        .in("match_id", matchIds)
-        .neq("sender_id", user.id),
-    ]);
-
-    const firstPhotoByProfile: Record<string, string> = {};
-    (photos ?? []).forEach((p) => {
-      const pid = p.profile_id as string;
-      if (!firstPhotoByProfile[pid]) firstPhotoByProfile[pid] = p.storage_path as string;
-    });
-    const paths = otherIds.map((id) => firstPhotoByProfile[id]).filter(Boolean);
-    const signed = await signPhotos(paths, 3600, { width: 160, height: 160, resize: "cover", quality: 70 });
+    const paths = rows.map((r) => r.photo_path).filter(Boolean) as string[];
+    const signed = paths.length
+      ? await signPhotos(paths, 3600, { width: 160, height: 160, resize: "cover", quality: 70 })
+      : [];
     const signedByPath: Record<string, string> = {};
     paths.forEach((p, i) => (signedByPath[p] = signed[i] ?? ""));
 
-    const nameById: Record<string, string> = {};
-    (profiles ?? []).forEach((p) => (nameById[p.id as string] = (p.name as string) ?? ""));
-
-    const lastByMatch: Record<string, { content: string; at: string }> = {};
-    (lastMsgs ?? []).forEach((m) => {
-      const mid = m.match_id as string;
-      if (!lastByMatch[mid]) {
-        lastByMatch[mid] = { content: m.content as string, at: m.created_at as string };
-      }
-    });
-
-    const readByMatch: Record<string, string> = {};
-    (reads ?? []).forEach((r) => (readByMatch[r.match_id as string] = r.last_read_at as string));
-
-    // Backfill: for matches without a read record, seed one now so old
-    // conversations don't show as unread retroactively.
-    const missingReads = matchIds.filter((id) => !readByMatch[id]);
-    if (missingReads.length) {
-      const nowIso = new Date().toISOString();
-      await supabase
-        .from("match_reads")
-        .upsert(
-          missingReads.map((mid) => ({ match_id: mid, user_id: user.id, last_read_at: nowIso })),
-          { onConflict: "match_id,user_id" },
-        );
-      missingReads.forEach((mid) => (readByMatch[mid] = nowIso));
-    }
-
-    const unreadByMatch: Record<string, number> = {};
-    (unreadMsgs ?? []).forEach((m) => {
-      const mid = m.match_id as string;
-      const readAt = readByMatch[mid];
-      if (readAt && new Date(m.created_at as string) > new Date(readAt)) {
-        unreadByMatch[mid] = (unreadByMatch[mid] ?? 0) + 1;
-      }
-    });
-
-
     setMatches(
-      list.map((m) => {
-        const otherId = (m.user_a === user.id ? m.user_b : m.user_a) as string;
-        const path = firstPhotoByProfile[otherId];
-        const last = lastByMatch[m.id as string];
-        return {
-          matchId: m.id as string,
-          otherId,
-          name: nameById[otherId] ?? "Alguém",
-          photo: path ? signedByPath[path] : "",
-          lastMessage: last?.content ?? null,
-          lastMessageAt: last?.at ?? (m.last_message_at as string),
-          unread: unreadByMatch[m.id as string] ?? 0,
-          hasMessages: !!last,
-        };
-      }),
+      rows.map((r) => ({
+        matchId: r.match_id,
+        otherId: r.other_id,
+        name: r.name,
+        photo: r.photo_path ? signedByPath[r.photo_path] ?? "" : "",
+        lastMessage: r.last_message,
+        lastMessageAt: r.last_message_at,
+        unread: r.unread,
+        hasMessages: r.has_messages,
+      })),
     );
     setLoading(false);
   }, [user]);
@@ -152,9 +84,20 @@ export function useMatches() {
 
   useEffect(() => {
     if (!user) return;
+    // Filter realtime to only my matches; messages don't support filtered
+    // wildcard inserts here so we listen broadly and let load() de-dupe.
     const ch = supabase
       .channel(`matches-${user.id}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "matches" }, () => load())
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "matches", filter: `user_a=eq.${user.id}` },
+        () => load(),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "matches", filter: `user_b=eq.${user.id}` },
+        () => load(),
+      )
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () =>
         load(),
       )
