@@ -113,9 +113,10 @@
   --gradient-flame: linear-gradient(135deg, #FF4FA3, #B13CFF);
   --gradient-grape: linear-gradient(135deg, #B13CFF, #E935A0);
   --gradient-overlay: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0) 75%);
-  --gradient-aurora: radial-gradient(60% 50% at 20% 0%, oklch(0.60 0.30 305 / 0.35), transparent 60%),
-                     radial-gradient(50% 40% at 90% 20%, oklch(0.69 0.24 1 / 0.30), transparent 60%),
-                     radial-gradient(55% 45% at 50% 100%, oklch(0.62 0.28 340 / 0.28), transparent 65%);
+  --gradient-aurora: radial-gradient(60% 50% at 20% 0%, oklch(0.60 0.30 305 / 0.38), transparent 60%),
+                     radial-gradient(50% 40% at 90% 20%, oklch(0.69 0.24 1 / 0.32), transparent 60%),
+                     radial-gradient(70% 55% at 50% 100%, oklch(0.62 0.28 340 / 0.42), transparent 70%),
+                     radial-gradient(80% 50% at 50% 85%, oklch(0.60 0.30 305 / 0.28), transparent 75%);
 
   /* Shadows */
   --shadow-card: 0 40px 100px -30px rgba(0,0,0,0.7), 0 12px 40px -12px rgba(0,0,0,0.5);
