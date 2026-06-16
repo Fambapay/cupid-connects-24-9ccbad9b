@@ -640,7 +640,7 @@ function PrimaryButton({
 // Welcome ─────
 function WelcomeStep({ onStart }: { onStart: () => void }) {
   return (
-    <div className="flex flex-1 flex-col px-6 pb-6">
+    <div className="flex flex-1 flex-col px-6">
       <div className="flex flex-1 flex-col items-center justify-center text-center">
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
@@ -659,14 +659,9 @@ function WelcomeStep({ onStart }: { onStart: () => void }) {
           Vamos criar o teu perfil em menos de 2 minutos
         </motion.p>
       </div>
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25, delay: 0.2 }}
-        className="space-y-4 pb-2"
-      >
+      <CtaBar staggerDelay={0.2}>
         <PrimaryButton onClick={onStart}>Começar</PrimaryButton>
-      </motion.div>
+      </CtaBar>
     </div>
   );
 }
