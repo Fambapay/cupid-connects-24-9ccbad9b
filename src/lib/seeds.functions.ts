@@ -159,3 +159,89 @@ export const setSeedThreshold = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// ─── Generate seeds (creates auth users + profiles + photos) ────────────────
+export const generateSeeds = createServerFn({ method: "POST" })
+  .middleware([requireAdmin])
+  .inputValidator((input) =>
+    z
+      .object({
+        city: z.string().min(1).max(60),
+        count: z.number().int().min(1).max(50),
+        gender: z.enum(["feminino", "masculino", "nao_binario"]),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = context.supabaseAdmin;
+    const { buildSeedProfiles } = await import("./seeds-pool.server");
+    const profiles = buildSeedProfiles(data);
+
+    let inserted = 0;
+    let skipped = 0;
+    const errors: string[] = [];
+
+    for (const p of profiles) {
+      const slug = `${p.name}-${p.city}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[^a-z0-9]+/g, "-");
+      const email = `seed-${slug}@seeds.hunie.local`;
+
+      const { data: userRes, error: uErr } = await sb.auth.admin.createUser({
+        email,
+        email_confirm: true,
+        password: crypto.randomUUID(),
+        user_metadata: { is_seed: true, name: p.name },
+      });
+      if (uErr || !userRes?.user) {
+        errors.push(`${p.name}: ${uErr?.message ?? "no user"}`);
+        skipped++;
+        continue;
+      }
+      const id = userRes.user.id;
+
+      const { error: pErr } = await sb.from("profiles").upsert(
+        {
+          id,
+          name: p.name,
+          age: p.age,
+          birthdate: p.birthdate,
+          city: p.city,
+          country: p.country,
+          latitude: p.latitude,
+          longitude: p.longitude,
+          bio: p.bio,
+          gender: p.gender,
+          interests: p.interests,
+          interested_in: [],
+          is_verified: true,
+          is_paused: false,
+          is_incognito: false,
+          membership_tier: "free",
+          membership_status: "inactive",
+          onboarding_completed: true,
+          onboarding_step: 99,
+          is_seed: true,
+          seed_active: true,
+          last_active_at: p.last_active_at,
+        },
+        { onConflict: "id" },
+      );
+      if (pErr) {
+        errors.push(`${p.name}: ${pErr.message}`);
+        skipped++;
+        continue;
+      }
+
+      const photoRows = p.photos.map((url, i) => ({
+        profile_id: id,
+        storage_path: url,
+        position: i,
+      }));
+      await sb.from("profile_photos").insert(photoRows);
+      inserted++;
+    }
+
+    return { inserted, skipped, errors: errors.slice(0, 5) };
+  });
