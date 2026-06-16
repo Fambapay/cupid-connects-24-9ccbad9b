@@ -215,7 +215,7 @@ function EmptyLikes({ onDiscover, onBoost }: { onDiscover: () => void; onBoost: 
       </div>
 
       <motion.img
-        src={"/icon-192.png"}
+        src={hunieMarkTransparent.url}
         alt=""
         aria-hidden
         className="relative mt-2 h-8 w-8 opacity-80"
