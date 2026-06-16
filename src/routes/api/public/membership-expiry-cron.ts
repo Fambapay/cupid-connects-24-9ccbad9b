@@ -171,9 +171,11 @@ export const Route = createFileRoute('/api/public/membership-expiry-cron')({
           }
 
           let sent = 0
-          for (const p of profiles ?? []) {
-            const { data: u } = await supabaseAdmin.auth.admin.getUserById(p.id)
-            const email = u?.user?.email
+          const profileList = profiles ?? []
+          const { getEmailsForUserIds } = await import('@/lib/admin-emails.server')
+          const emailMap = await getEmailsForUserIds(supabaseAdmin, profileList.map((p) => p.id))
+          for (const p of profileList) {
+            const email = emailMap.get(p.id)
             if (!email) continue
             const r = await sendForUser({
               userId: p.id,
@@ -185,7 +187,7 @@ export const Route = createFileRoute('/api/public/membership-expiry-cron')({
             })
             if ('sent' in r) sent++
           }
-          results.push({ window: daysLeft, processed: profiles?.length ?? 0, sent })
+          results.push({ window: daysLeft, processed: profileList.length, sent })
         }
 
         return Response.json({ ok: true, results })
