@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { timingSafeEqual } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
 import { sanitizePayload } from "@/lib/pricing";
 
-function safeEqual(a: string, b: string) {
-  const ab = Buffer.from(a);
-  const bb = Buffer.from(b);
-  if (ab.length !== bb.length) return false;
-  return timingSafeEqual(ab, bb);
+function verifySignature(secret: string, body: string, signature: string) {
+  const expected = createHmac("sha256", secret).update(body).digest("hex");
+  const a = Buffer.from(signature.trim().replace(/^sha256=/i, ""));
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
 }
 
 export const Route = createFileRoute("/api/public/debito-webhook")({
@@ -18,17 +19,18 @@ export const Route = createFileRoute("/api/public/debito-webhook")({
           return new Response("Webhook not configured", { status: 503 });
         }
 
-        const provided =
-          request.headers.get("x-webhook-secret") ??
+        const signature =
           request.headers.get("x-debito-signature") ??
+          request.headers.get("x-webhook-signature") ??
           "";
-        if (!safeEqual(provided, secret)) {
-          return new Response("Unauthorized", { status: 401 });
+        const body = await request.text();
+        if (!signature || !verifySignature(secret, body, signature)) {
+          return new Response("Invalid signature", { status: 401 });
         }
 
         let payload: Record<string, unknown> = {};
         try {
-          payload = (await request.json()) as Record<string, unknown>;
+          payload = JSON.parse(body) as Record<string, unknown>;
         } catch {
           return new Response("Bad payload", { status: 400 });
         }
