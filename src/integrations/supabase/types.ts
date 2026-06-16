@@ -992,6 +992,15 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_discovery_feed: {
+        Args: {
+          _filters?: Json
+          _limit?: number
+          _viewer_lat?: number
+          _viewer_lng?: number
+        }
+        Returns: Json
+      }
       get_my_location: {
         Args: never
         Returns: {
