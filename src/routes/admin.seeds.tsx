@@ -9,6 +9,7 @@ import {
   toggleAllSeeds,
   getSeedStats,
   setSeedThreshold,
+  generateSeeds,
 } from "@/lib/seeds.functions";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
