@@ -1001,6 +1001,7 @@ export type Database = {
         }
         Returns: Json
       }
+      get_match_summaries: { Args: never; Returns: Json }
       get_my_location: {
         Args: never
         Returns: {
@@ -1009,6 +1010,7 @@ export type Database = {
         }[]
       }
       get_my_phone: { Args: never; Returns: string }
+      get_unread_chats_count: { Args: never; Returns: number }
       grant_credits: {
         Args: { _pack_kind: string; _quantity: number; _user_id: string }
         Returns: Json
