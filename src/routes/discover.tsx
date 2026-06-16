@@ -274,9 +274,9 @@ function Discover() {
       </main>
 
 
-      {!isPremium && bannerVisible && (
+      {!isPremium && bannerVisible && items.length > 0 && (
         <div onClick={(e) => e.stopPropagation()}>
-          <BrowseBanner count={Math.max(3, Math.min(items.length, 12))} onActivate={openPaywall} />
+          <BrowseBanner count={items.length} onActivate={openPaywall} />
         </div>
       )}
 
