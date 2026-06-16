@@ -419,7 +419,6 @@ function OnboardingPage() {
         className="relative flex min-h-[100svh] flex-col"
         style={{
           paddingTop: "env(safe-area-inset-top)",
-          paddingBottom: "env(safe-area-inset-bottom)",
         }}
       >
         {/* Top bar */}
