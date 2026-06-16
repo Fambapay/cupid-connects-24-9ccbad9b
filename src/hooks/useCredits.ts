@@ -21,30 +21,40 @@ export function useCredits() {
   const cached = user ? creditsCache.get(user.id) ?? EMPTY_CREDITS : EMPTY_CREDITS;
   const [credits, setCredits] = useState<Credits>(cached);
   const [loading, setLoading] = useState(!user ? false : !creditsCache.has(user.id));
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!user) {
       setCredits(EMPTY_CREDITS);
       setLoading(false);
+      setError(null);
       return;
     }
-    // Lazy daily/weekly refill for active members — no-op if already refilled today.
-    await supabase.rpc("refill_my_credits");
-    const { data } = await supabase
-      .from("user_credits")
-      .select("boost_balance, super_like_balance, first_impression_balance")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    const next = data
-      ? {
-          boost_balance: (data as Credits).boost_balance ?? 0,
-          super_like_balance: (data as Credits).super_like_balance ?? 0,
-          first_impression_balance: (data as Credits).first_impression_balance ?? 0,
-        }
-      : EMPTY_CREDITS;
-    creditsCache.set(user.id, next);
-    setCredits(next);
-    setLoading(false);
+    setError(null);
+    try {
+      // Lazy daily/weekly refill for active members — no-op if already refilled today.
+      await supabase.rpc("refill_my_credits");
+      const { data, error: qErr } = await supabase
+        .from("user_credits")
+        .select("boost_balance, super_like_balance, first_impression_balance")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (qErr) throw qErr;
+      const next = data
+        ? {
+            boost_balance: (data as Credits).boost_balance ?? 0,
+            super_like_balance: (data as Credits).super_like_balance ?? 0,
+            first_impression_balance: (data as Credits).first_impression_balance ?? 0,
+          }
+        : EMPTY_CREDITS;
+      creditsCache.set(user.id, next);
+      setCredits(next);
+    } catch (e) {
+      console.error("useCredits load failed", e);
+      setError(e instanceof Error ? e.message : "Falha ao carregar créditos");
+    } finally {
+      setLoading(false);
+    }
   }, [user]);
 
   useEffect(() => {
