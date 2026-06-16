@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { m, LazyMotion, domAnimation } from "framer-motion";
-import flameAsset from "@/assets/hunie-logo.png.asset.json";
+import flameAsset from "@/assets/hunie-mark-transparent.png.asset.json";
 
 const flameIcon = flameAsset.url;
 

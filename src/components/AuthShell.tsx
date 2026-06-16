@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import logoAsset from "@/assets/hunie-logo.png.asset.json";
+import logoAsset from "@/assets/hunie-mark-transparent.png.asset.json";
 
 export function AuthShell({
   title,
