@@ -205,10 +205,12 @@ export const Route = createFileRoute('/api/public/reactivation-cron')({
 
           let emailed = 0
           let pushed = 0
-          for (const p of profiles ?? []) {
+          const profileList = profiles ?? []
+          const { getEmailsForUserIds } = await import('@/lib/admin-emails.server')
+          const emailMap = await getEmailsForUserIds(supabaseAdmin, profileList.map((p) => p.id))
+          for (const p of profileList) {
             // Email
-            const { data: u } = await supabaseAdmin.auth.admin.getUserById(p.id)
-            const email = u?.user?.email
+            const email = emailMap.get(p.id)
             if (email) {
               const r = await sendEmail({
                 userId: p.id,
@@ -227,7 +229,7 @@ export const Route = createFileRoute('/api/public/reactivation-cron')({
               console.warn('reactivation push failed', e)
             }
           }
-          results.push({ window: daysInactive, processed: profiles?.length ?? 0, emailed, pushed })
+          results.push({ window: daysInactive, processed: profileList.length, emailed, pushed })
         }
 
         return Response.json({ ok: true, results })
