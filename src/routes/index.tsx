@@ -17,6 +17,7 @@ import { countryFromHost, resolveCountryClient } from "@/lib/country/detect";
 import { getPlanCards } from "@/lib/plans";
 import { CountrySwitcher } from "@/components/CountrySwitcher";
 import { faqData } from "@/components/landing/faqData";
+import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
 
 // Build country-aware <head> at SSR time using the request host.
 // The route is ssr: false so this runs client-side on hydration; we read
