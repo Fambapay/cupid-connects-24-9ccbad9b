@@ -554,7 +554,7 @@ function OnboardingPage() {
 
 function StepScroll({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-1 min-h-0 flex-col overflow-y-auto px-6 pb-6">
+    <div className="flex flex-1 min-h-0 flex-col overflow-y-auto px-6 pb-4">
       {children}
     </div>
   );
