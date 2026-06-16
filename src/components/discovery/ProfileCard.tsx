@@ -588,7 +588,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                   lineHeight: 1,
                 }}
               >
-                {profile.name}
+                {profile.name.split(' ')[0]}
               </h2>
               <span style={{ fontSize: 30, fontWeight: 400, opacity: 0.95 }}>
                 {profile.age}

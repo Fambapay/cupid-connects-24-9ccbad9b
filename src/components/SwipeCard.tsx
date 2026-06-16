@@ -93,7 +93,7 @@ export function SwipeCard({ profile, onSwipe, isTop, offset }: Props) {
           <div className="flex items-end justify-between gap-3">
             <div className="min-w-0">
               <h2 className="font-display text-[34px] font-bold leading-none tracking-tight text-white drop-shadow-sm">
-                {profile.name}
+                {profile.name.split(' ')[0]}
                 <span className="ml-2 align-baseline text-[28px] font-light text-white/95">
                   {profile.age}
                 </span>
