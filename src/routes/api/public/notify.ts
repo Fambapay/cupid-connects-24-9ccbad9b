@@ -13,23 +13,12 @@ export const Route = createFileRoute('/api/public/notify')({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const secret = request.headers.get('x-notify-secret') || ''
         const envSecret = process.env.PUSH_WEBHOOK_SECRET || ''
-        let ok = !!envSecret && safeEqual(secret, envSecret)
-        if (!ok) {
-          // Fallback: compare against app_config (kept in sync by DB triggers).
-          // Import admin client lazily so the server-only module is never
-          // referenced before the request reaches this handler.
-          const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
-          const { data } = await supabaseAdmin
-            .from('app_config')
-            .select('value')
-            .eq('key', 'notify_webhook_secret')
-            .maybeSingle()
-          const cfgSecret = (data?.value as string | null)?.toString().replace(/^"|"$/g, '') || ''
-          ok = !!cfgSecret && safeEqual(secret, cfgSecret)
+        if (!envSecret) {
+          return new Response('Webhook not configured', { status: 503 })
         }
-        if (!ok) {
+        const provided = request.headers.get('x-notify-secret') || ''
+        if (!safeEqual(provided, envSecret)) {
           return new Response('Unauthorized', { status: 401 })
         }
 

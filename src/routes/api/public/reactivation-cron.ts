@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { render } from '@react-email/components'
 import { createFileRoute } from '@tanstack/react-router'
+import { timingSafeEqual } from 'crypto'
 import { supabaseAdmin } from '@/integrations/supabase/client.server'
 import { TEMPLATES } from '@/lib/email-templates/registry'
 import { sendWebPush } from '@/lib/push/send.server'
@@ -17,6 +18,13 @@ function generateToken(): string {
   return Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
+function safeEqual(a: string, b: string): boolean {
+  const ab = Buffer.from(a)
+  const bb = Buffer.from(b)
+  if (ab.length !== bb.length) return false
+  return timingSafeEqual(ab, bb)
+}
+
 function authorized(request: Request): boolean {
   const secret = process.env.CRON_SECRET || ''
   if (!secret) return false
@@ -25,7 +33,7 @@ function authorized(request: Request): boolean {
     request.headers.get('apikey') ||
     request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') ||
     ''
-  return header === secret
+  return safeEqual(header, secret)
 }
 
 async function ensureUnsubToken(email: string): Promise<string | null> {

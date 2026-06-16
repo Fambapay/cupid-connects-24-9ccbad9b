@@ -26,14 +26,18 @@ export function useLikedMe() {
   const canSeeWhoLiked = entitlements.canSeeWhoLiked;
   const [likers, setLikers] = useState<Liker[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!user) {
       setLikers([]);
       setLoading(false);
+      setError(null);
       return;
     }
     setLoading(true);
+    setError(null);
+    try {
 
     const [
       { data: incoming },
@@ -155,11 +159,16 @@ export function useLikedMe() {
         .filter((x): x is Liker => !!x),
     );
     setLoading(false);
+    } catch (e) {
+      console.error("useLikedMe load failed", e);
+      setError(e instanceof Error ? e.message : "Falha ao carregar likes");
+      setLoading(false);
+    }
   }, [user, canSeeWhoLiked]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  return { likers, loading, reload: load };
+  return { likers, loading, error, reload: load };
 }

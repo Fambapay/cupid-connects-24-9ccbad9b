@@ -41,18 +41,18 @@ function ChatList() {
         >
           Chat
         </h1>
-        <div className="flex items-center gap-1 rounded-full bg-white/[0.06] px-1.5 py-1.5 ring-1 ring-white/10">
+        <div className="flex items-center gap-1 rounded-full bg-white/[0.06] p-1 ring-1 ring-white/10">
           <Link
             to="/settings"
             aria-label="Definições de segurança"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-white/90 active:bg-white/10"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-white/90 active:bg-white/10"
           >
             <Shield className="h-[18px] w-[18px]" strokeWidth={2.2} />
           </Link>
           <Link
             to="/matches"
             aria-label="Ver todos os matches"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-white/90 active:bg-white/10"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-white/90 active:bg-white/10"
           >
             <MessagesSquare className="h-[18px] w-[18px]" strokeWidth={2.2} />
           </Link>

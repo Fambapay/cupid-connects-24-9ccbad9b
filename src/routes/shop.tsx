@@ -85,7 +85,7 @@ function discountPct(country: CountryCode, kind: PackKind, pricePerUnit: number)
 function ShopPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
-  const { credits } = useCredits();
+  const { credits, error: creditsError, reload: reloadCredits } = useCredits();
   const { country } = useCountry();
   const [tab, setTab] = useState<PackKind>(search.tab ?? "boost");
 
@@ -102,7 +102,15 @@ function ShopPage() {
   const tabCount = tab === "boost" ? credits.boost_balance : credits.super_like_balance;
 
   return (
-    <div className="min-h-screen bg-background pb-28 text-foreground">
+    <div className="min-h-[100dvh] bg-background pb-28 text-foreground">
+      {creditsError && (
+        <div role="alert" className="mx-4 mt-3 flex items-center justify-between gap-3 rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive ring-1 ring-destructive/30">
+          <span>Não conseguimos carregar os teus créditos.</span>
+          <button type="button" onClick={() => reloadCredits()} className="font-semibold underline underline-offset-2">
+            Tentar de novo
+          </button>
+        </div>
+      )}
       {/* Header */}
       <header
         className="sticky top-0 z-30 bg-background"
