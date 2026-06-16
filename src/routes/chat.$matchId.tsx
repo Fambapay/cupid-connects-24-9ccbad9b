@@ -143,15 +143,20 @@ function ChatRoom() {
     };
   }, []);
 
-  // Typing indicator over broadcast channel
+  // RT-01: Typing indicator. Only subscribe after we know the peer id so we
+  // can reject any broadcast that doesn't claim to be from the actual peer
+  // of this match — stops a third party (or self) from spoofing "is typing".
   useEffect(() => {
-    if (!matchId || !user) return;
+    if (!matchId || !user || !peer?.id) return;
+    const peerId = peer.id;
     const ch = supabase.channel(`typing-${matchId}`, {
       config: { broadcast: { self: false } },
     });
     ch.on("broadcast", { event: "typing" }, (payload) => {
       const senderId = (payload.payload as { userId?: string })?.userId;
-      if (!senderId || senderId === user.id) return;
+      // Must claim to be the peer AND must not be us. Self echo is already
+      // filtered by `self: false`, but defense-in-depth.
+      if (!senderId || senderId === user.id || senderId !== peerId) return;
       setTyping(true);
       if (typingTimerRef.current) window.clearTimeout(typingTimerRef.current);
       typingTimerRef.current = window.setTimeout(() => setTyping(false), 3000);
@@ -162,8 +167,9 @@ function ChatRoom() {
       if (typingTimerRef.current) window.clearTimeout(typingTimerRef.current);
       supabase.removeChannel(ch);
       typingChannelRef.current = null;
+      setTyping(false);
     };
-  }, [matchId, user]);
+  }, [matchId, user, peer?.id]);
 
   const broadcastTyping = useCallback(() => {
     const ch = typingChannelRef.current;

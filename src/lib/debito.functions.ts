@@ -254,8 +254,10 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
       throw new Error("Missing Debito Pay credentials");
     }
 
-    const minuteBucket = Math.floor(Date.now() / 60_000);
-    const idemKey = `${userId}:${plan_tier ?? pack_id}:${period}:${method}:${minuteBucket}`;
+    // PAY-01: Stable idempotency key tied to the payment row (not a 60s bucket).
+    // Each pending DB row represents exactly one charge intent, so network retries
+    // with the same key are deduped by the orchestrator — no double-charge window.
+    const idemKey = `pay:${row.id}`;
 
     const orchestratorBody: Record<string, unknown> = {
       action: "process",
