@@ -42,12 +42,20 @@ function ChatList() {
           Chat
         </h1>
         <div className="flex items-center gap-1 rounded-full bg-white/[0.06] px-1.5 py-1.5 ring-1 ring-white/10">
-          <button className="flex h-8 w-8 items-center justify-center rounded-full text-white/90 active:bg-white/10">
+          <Link
+            to="/settings"
+            aria-label="Definições de segurança"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-white/90 active:bg-white/10"
+          >
             <Shield className="h-[18px] w-[18px]" strokeWidth={2.2} />
-          </button>
-          <button className="flex h-8 w-8 items-center justify-center rounded-full text-white/90 active:bg-white/10">
+          </Link>
+          <Link
+            to="/matches"
+            aria-label="Ver todos os matches"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-white/90 active:bg-white/10"
+          >
             <MessagesSquare className="h-[18px] w-[18px]" strokeWidth={2.2} />
-          </button>
+          </Link>
         </div>
       </header>
 
@@ -57,7 +65,7 @@ function ChatList() {
             className="text-[15px] uppercase tracking-tight text-white"
             style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 800 }}
           >
-            New Matches
+            Novos matches
           </h2>
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {newMatches.map((m) => (
@@ -91,7 +99,7 @@ function ChatList() {
           className="text-[15px] uppercase tracking-tight text-white"
           style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 800 }}
         >
-          Messages
+          Mensagens
         </h2>
 
 
