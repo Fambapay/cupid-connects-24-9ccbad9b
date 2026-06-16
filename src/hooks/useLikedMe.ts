@@ -26,6 +26,7 @@ export function useLikedMe() {
   const canSeeWhoLiked = entitlements.canSeeWhoLiked;
   const [likers, setLikers] = useState<Liker[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!user) {
