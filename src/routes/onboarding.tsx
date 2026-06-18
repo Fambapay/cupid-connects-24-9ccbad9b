@@ -72,7 +72,7 @@ type Gender = "man" | "woman" | "nonbinary";
 type ExtendedGender = Gender | "transwoman" | "transman" | "genderfluid" | "agender" | "other";
 type InterestedIn = "men" | "women" | "everyone";
 
-const STEP_COUNT = 10;
+const STEP_COUNT = 11;
 type StepId =
   | "welcome"
   | "name"
@@ -81,6 +81,7 @@ type StepId =
   | "interested"
   | "photos"
   | "bio"
+  | "height"
   | "interests"
   | "location"
   | "done";
@@ -92,9 +93,11 @@ const STEPS: StepId[] = [
   "interested",
   "photos",
   "bio",
+  "height",
   "interests",
   "location",
 ];
+
 
 const AVAILABLE_INTERESTS = [
   "Viajar", "Música", "Cinema", "Séries", "Cozinhar", "Café",
