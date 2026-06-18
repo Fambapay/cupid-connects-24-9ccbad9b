@@ -72,7 +72,7 @@ type Gender = "man" | "woman" | "nonbinary";
 type ExtendedGender = Gender | "transwoman" | "transman" | "genderfluid" | "agender" | "other";
 type InterestedIn = "men" | "women" | "everyone";
 
-const STEP_COUNT = 10;
+const STEP_COUNT = 11;
 type StepId =
   | "welcome"
   | "name"
@@ -81,6 +81,7 @@ type StepId =
   | "interested"
   | "photos"
   | "bio"
+  | "height"
   | "interests"
   | "location"
   | "done";
@@ -92,9 +93,11 @@ const STEPS: StepId[] = [
   "interested",
   "photos",
   "bio",
+  "height",
   "interests",
   "location",
 ];
+
 
 const AVAILABLE_INTERESTS = [
   "Viajar", "Música", "Cinema", "Séries", "Cozinhar", "Café",
@@ -143,6 +146,7 @@ interface DraftState {
   interested: InterestedIn | null;
   bio: string;
   city: string;
+  height: number | null;
   interests: string[];
   latitude: number | null;
   longitude: number | null;
@@ -158,10 +162,12 @@ const initialDraft: DraftState = {
   interested: null,
   bio: "",
   city: "",
+  height: null,
   interests: [],
   latitude: null,
   longitude: null,
 };
+
 
 function OnboardingPage() {
   const { user } = useAuth();
@@ -223,9 +229,11 @@ function OnboardingPage() {
         interests: d.interests.length ? d.interests : ((profile as { interests?: string[] | null }).interests ?? []),
         latitude: d.latitude ?? ((profile as { latitude?: number | null }).latitude ?? null),
         longitude: d.longitude ?? ((profile as { longitude?: number | null }).longitude ?? null),
+        height: d.height ?? ((profile as { height_cm?: number | null }).height_cm ?? null),
         day, month, year,
       };
     });
+
   }, [profile, hydrated]);
 
   // Persist draft locally
@@ -239,7 +247,7 @@ function OnboardingPage() {
   useEffect(() => {
     if (!hydrated || !user) return;
     const t = window.setTimeout(() => {
-      const { name, bio, city, gender, interested, interests, latitude, longitude, day, month, year, stepIdx } = draft;
+      const { name, bio, city, gender, interested, interests, latitude, longitude, day, month, year, stepIdx, height } = draft;
       const birthdate =
         day && month && year
           ? `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
@@ -263,7 +271,9 @@ function OnboardingPage() {
         longitude,
         birthdate,
         age,
+        height_cm: height,
       };
+
       supabase.from("profiles").update(patch).eq("id", user.id).then(() => {});
     }, 600);
     return () => window.clearTimeout(t);
@@ -298,6 +308,10 @@ function OnboardingPage() {
       case "photos":
         if (photos.length < 1) return "Adiciona pelo menos 1 foto";
         break;
+      case "height":
+        if (!d.height || d.height < 120 || d.height > 230) return "Indica a tua altura";
+        break;
+
       case "location": {
         const hasCoords = d.latitude != null && d.longitude != null;
         const hasCity = d.city.trim().length >= 2;
@@ -333,7 +347,7 @@ function OnboardingPage() {
 
   const finish = useCallback(async () => {
     if (!user) return;
-    const { day, month, year, name, bio, city, gender, interested, interests, latitude, longitude } = draft;
+    const { day, month, year, name, bio, city, gender, interested, interests, latitude, longitude, height } = draft;
 
     // Comprehensive validation before submit
     if (!name.trim() || name.trim().length < 2) {
@@ -362,6 +376,11 @@ function OnboardingPage() {
       toast({ title: "Perfil incompleto", description: "Adiciona pelo menos 1 foto", variant: "destructive" });
       return;
     }
+    if (!height || height < 120 || height > 230) {
+      toast({ title: "Perfil incompleto", description: "Indica a tua altura", variant: "destructive" });
+      return;
+    }
+
     const hasCoords = latitude != null && longitude != null;
     const hasCity = city.trim().length >= 2;
     if (!hasCoords && !hasCity) {
@@ -389,7 +408,9 @@ function OnboardingPage() {
         longitude,
         birthdate,
         age,
+        height_cm: height,
         onboarding_completed: true,
+
       })
       .eq("id", user.id);
 
@@ -521,6 +542,14 @@ function OnboardingPage() {
                     onNext={goNext}
                   />
                 )}
+                {stepId === "height" && (
+                  <HeightStep
+                    value={draft.height}
+                    onChange={(v) => set("height", v)}
+                    onNext={goNext}
+                  />
+                )}
+
                 {stepId === "interests" && (
                   <InterestsStep
                     value={draft.interests}
@@ -1511,7 +1540,73 @@ function BioStep({
   );
 }
 
+// Height ─────
+function HeightStep({
+  value,
+  onChange,
+  onNext,
+}: {
+  value: number | null;
+  onChange: (v: number | null) => void;
+  onNext: () => void;
+}) {
+  const MIN = 140;
+  const MAX = 220;
+  const current = value ?? 170;
+  const canNext = !!value && value >= 120 && value <= 230;
+  const feet = Math.floor(current / 30.48);
+  const inches = Math.round((current / 2.54) - feet * 12);
+  return (
+    <div className="flex flex-1 min-h-0 flex-col">
+      <StepScroll>
+        <Heading
+          title="Qual é a tua altura?"
+          subtitle="Aparece no teu perfil para encontrares matches mais compatíveis"
+        />
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, delay: 0.12 }}
+          className="mt-12 flex flex-col items-center"
+        >
+          <div className="flex items-baseline gap-2">
+            <span className="text-gradient-sunset text-[72px] font-bold leading-none tracking-tight">
+              {current}
+            </span>
+            <span className="text-xl font-medium text-muted-foreground">cm</span>
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {feet}′{inches}″
+          </p>
+          <div className="mt-10 w-full">
+            <input
+              type="range"
+              min={MIN}
+              max={MAX}
+              step={1}
+              value={current}
+              onChange={(e) => onChange(parseInt(e.target.value, 10))}
+              className="hunie-range w-full"
+              aria-label="Altura em centímetros"
+            />
+            <div className="mt-2 flex justify-between text-[11px] uppercase tracking-wider text-muted-foreground">
+              <span>{MIN} cm</span>
+              <span>{MAX} cm</span>
+            </div>
+          </div>
+        </motion.div>
+      </StepScroll>
+      <CtaBar>
+        <PrimaryButton disabled={!canNext} onClick={onNext}>
+          Continuar
+        </PrimaryButton>
+      </CtaBar>
+    </div>
+  );
+}
+
 // Location ─────
+
 function LocationStep({
   value,
   onChange,

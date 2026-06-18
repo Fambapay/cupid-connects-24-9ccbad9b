@@ -418,3 +418,34 @@
   border: 1px solid rgba(255,255,255,0.10);
   backdrop-filter: blur(14px);
 }
+
+/* Onboarding height range slider */
+.hunie-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--brand-pink), var(--brand-purple));
+  outline: none;
+  touch-action: manipulation;
+}
+.hunie-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 2px solid color-mix(in oklab, var(--brand-pink) 70%, white);
+  box-shadow: 0 6px 16px -4px color-mix(in oklab, var(--brand-pink) 60%, transparent);
+  cursor: pointer;
+}
+.hunie-range::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 2px solid color-mix(in oklab, var(--brand-pink) 70%, white);
+  box-shadow: 0 6px 16px -4px color-mix(in oklab, var(--brand-pink) 60%, transparent);
+  cursor: pointer;
+}
