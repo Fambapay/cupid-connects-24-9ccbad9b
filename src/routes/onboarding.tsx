@@ -347,7 +347,7 @@ function OnboardingPage() {
 
   const finish = useCallback(async () => {
     if (!user) return;
-    const { day, month, year, name, bio, city, gender, interested, interests, latitude, longitude } = draft;
+    const { day, month, year, name, bio, city, gender, interested, interests, latitude, longitude, height } = draft;
 
     // Comprehensive validation before submit
     if (!name.trim() || name.trim().length < 2) {
