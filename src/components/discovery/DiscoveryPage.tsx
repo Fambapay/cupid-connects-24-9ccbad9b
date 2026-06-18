@@ -203,7 +203,6 @@ export const DiscoveryPage = ({
           {showTopBar && (
             <DiscoverTopBar
               onOpenFilters={onOpenFilters}
-              logoSrc={hunieMarkTransparent.url}
               onBoost={onBoost}
               boostActive={boostActive}
               boostMultiplier={boostMultiplier}
