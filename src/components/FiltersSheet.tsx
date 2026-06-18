@@ -163,10 +163,9 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
 
               {/* Toggles list (iOS-style grouped) */}
               <GroupedList>
-                <ToggleRow icon={<BadgeCheck size={17} strokeWidth={2.2} />} tint="var(--brand-pink)" label="Apenas verificados" value={local.verifiedOnly} onChange={(v) => update('verifiedOnly', v)} />
+                <ToggleRow icon={<BadgeCheck size={17} strokeWidth={2.2} />} tint="var(--brand-pink)" label="Apenas verificados" value={isPremium && local.verifiedOnly} onChange={(v) => { if (!isPremium) { onUpgrade?.(); return; } update('verifiedOnly', v); }} locked={!isPremium} />
                 <ToggleRow icon={<Circle size={11} strokeWidth={0} fill="#22c55e" />} tint="#22c55e" label="Online agora" value={local.onlineNow} onChange={(v) => update('onlineNow', v)} />
-                <ToggleRow icon={<FileText size={17} strokeWidth={2.2} />} tint="var(--brand-purple)" label="Tem bio" value={local.hasBio} onChange={(v) => update('hasBio', v)} />
-                <ToggleRow icon={<Camera size={17} strokeWidth={2.2} />} tint="var(--brand-magenta)" label="Com fotos" value={local.withPhotos} onChange={(v) => update('withPhotos', v)} last />
+                <ToggleRow icon={<FileText size={17} strokeWidth={2.2} />} tint="var(--brand-purple)" label="Tem bio" value={isPremium && local.hasBio} onChange={(v) => { if (!isPremium) { onUpgrade?.(); return; } update('hasBio', v); }} locked={!isPremium} last />
               </GroupedList>
 
 
