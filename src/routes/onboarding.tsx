@@ -146,6 +146,7 @@ interface DraftState {
   interested: InterestedIn | null;
   bio: string;
   city: string;
+  height: number | null;
   interests: string[];
   latitude: number | null;
   longitude: number | null;
@@ -161,10 +162,12 @@ const initialDraft: DraftState = {
   interested: null,
   bio: "",
   city: "",
+  height: null,
   interests: [],
   latitude: null,
   longitude: null,
 };
+
 
 function OnboardingPage() {
   const { user } = useAuth();
