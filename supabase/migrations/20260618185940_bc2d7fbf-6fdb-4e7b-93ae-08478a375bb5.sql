@@ -1,0 +1,2 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS height_cm smallint;
+ALTER TABLE public.profiles ADD CONSTRAINT profiles_height_cm_range CHECK (height_cm IS NULL OR (height_cm BETWEEN 100 AND 250));

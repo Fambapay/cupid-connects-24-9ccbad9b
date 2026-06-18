@@ -625,6 +625,7 @@ export type Database = {
           country: string | null
           created_at: string
           gender: string | null
+          height_cm: number | null
           id: string
           interested_in: string[]
           interests: string[]
@@ -653,6 +654,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           gender?: string | null
+          height_cm?: number | null
           id: string
           interested_in?: string[]
           interests?: string[]
@@ -681,6 +683,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           gender?: string | null
+          height_cm?: number | null
           id?: string
           interested_in?: string[]
           interests?: string[]
