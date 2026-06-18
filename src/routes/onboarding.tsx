@@ -542,6 +542,14 @@ function OnboardingPage() {
                     onNext={goNext}
                   />
                 )}
+                {stepId === "height" && (
+                  <HeightStep
+                    value={draft.height}
+                    onChange={(v) => set("height", v)}
+                    onNext={goNext}
+                  />
+                )}
+
                 {stepId === "interests" && (
                   <InterestsStep
                     value={draft.interests}
