@@ -4,7 +4,7 @@ import { ProfileCard, type ProfileCardHandle } from "./ProfileCard";
 import { SwipeActions } from "./SwipeActions";
 import { DiscoverTopBar } from "./DiscoverTopBar";
 import { EmptyDiscovery } from "./EmptyDiscovery";
-import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
+
 import type { DiscoveryProfile, SwipeDirection } from "./types";
 
 interface DiscoveryPageProps {
@@ -203,7 +203,6 @@ export const DiscoveryPage = ({
           {showTopBar && (
             <DiscoverTopBar
               onOpenFilters={onOpenFilters}
-              logoSrc={hunieMarkTransparent.url}
               onBoost={onBoost}
               boostActive={boostActive}
               boostMultiplier={boostMultiplier}
