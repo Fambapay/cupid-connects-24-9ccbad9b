@@ -247,7 +247,7 @@ function OnboardingPage() {
   useEffect(() => {
     if (!hydrated || !user) return;
     const t = window.setTimeout(() => {
-      const { name, bio, city, gender, interested, interests, latitude, longitude, day, month, year, stepIdx } = draft;
+      const { name, bio, city, gender, interested, interests, latitude, longitude, day, month, year, stepIdx, height } = draft;
       const birthdate =
         day && month && year
           ? `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
@@ -271,7 +271,9 @@ function OnboardingPage() {
         longitude,
         birthdate,
         age,
+        height_cm: height,
       };
+
       supabase.from("profiles").update(patch).eq("id", user.id).then(() => {});
     }, 600);
     return () => window.clearTimeout(t);
