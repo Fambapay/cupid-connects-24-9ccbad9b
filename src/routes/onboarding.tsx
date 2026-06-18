@@ -376,6 +376,11 @@ function OnboardingPage() {
       toast({ title: "Perfil incompleto", description: "Adiciona pelo menos 1 foto", variant: "destructive" });
       return;
     }
+    if (!height || height < 120 || height > 230) {
+      toast({ title: "Perfil incompleto", description: "Indica a tua altura", variant: "destructive" });
+      return;
+    }
+
     const hasCoords = latitude != null && longitude != null;
     const hasCity = city.trim().length >= 2;
     if (!hasCoords && !hasCity) {
