@@ -305,7 +305,7 @@ const GroupedList = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-const ToggleRow = ({ icon, tint = 'var(--brand-pink)', label, value, onChange, last }: { icon: ReactNode; tint?: string; label: string; value: boolean; onChange: (v: boolean) => void; last?: boolean }) => (
+const ToggleRow = ({ icon, tint = 'var(--brand-pink)', label, value, onChange, last, locked }: { icon: ReactNode; tint?: string; label: string; value: boolean; onChange: (v: boolean) => void; last?: boolean; locked?: boolean }) => (
   <button
     onClick={() => onChange(!value)}
     className="flex w-full items-center justify-between px-3.5 py-3 active:bg-white/5 transition-colors"
@@ -322,9 +322,16 @@ const ToggleRow = ({ icon, tint = 'var(--brand-pink)', label, value, onChange, l
       >
         {icon}
       </span>
-      <span>{label}</span>
+      <span className="flex items-center gap-1.5">
+        {label}
+        {locked && <Lock size={11} style={{ color: 'var(--brand-pink)' }} />}
+      </span>
     </span>
-    <IOSSwitch checked={value} />
+    {locked ? (
+      <span className="text-[12px] font-semibold uppercase tracking-wider" style={{ color: 'var(--brand-pink)' }}>Premium</span>
+    ) : (
+      <IOSSwitch checked={value} />
+    )}
   </button>
 );
 
