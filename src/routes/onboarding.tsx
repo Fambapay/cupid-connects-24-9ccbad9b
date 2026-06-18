@@ -408,7 +408,9 @@ function OnboardingPage() {
         longitude,
         birthdate,
         age,
+        height_cm: height,
         onboarding_completed: true,
+
       })
       .eq("id", user.id);
 
