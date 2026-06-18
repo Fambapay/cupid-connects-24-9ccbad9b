@@ -101,7 +101,10 @@ async function fetchDiscovery(
     if (filters.hasBio != null) filterPayload.hasBio = filters.hasBio;
     if (filters.verifiedOnly != null) filterPayload.verifiedOnly = filters.verifiedOnly;
     if (filters.onlineNow != null) filterPayload.onlineNow = filters.onlineNow;
+    if (filters.heightMin != null) filterPayload.heightMin = filters.heightMin;
+    if (filters.heightMax != null) filterPayload.heightMax = filters.heightMax;
   }
+
 
   const { data, error } = await (supabase.rpc as unknown as (
     fn: string,
