@@ -308,6 +308,10 @@ function OnboardingPage() {
       case "photos":
         if (photos.length < 1) return "Adiciona pelo menos 1 foto";
         break;
+      case "height":
+        if (!d.height || d.height < 120 || d.height > 230) return "Indica a tua altura";
+        break;
+
       case "location": {
         const hasCoords = d.latitude != null && d.longitude != null;
         const hasCity = d.city.trim().length >= 2;
