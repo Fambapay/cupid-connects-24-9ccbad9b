@@ -1540,7 +1540,73 @@ function BioStep({
   );
 }
 
+// Height ─────
+function HeightStep({
+  value,
+  onChange,
+  onNext,
+}: {
+  value: number | null;
+  onChange: (v: number | null) => void;
+  onNext: () => void;
+}) {
+  const MIN = 140;
+  const MAX = 220;
+  const current = value ?? 170;
+  const canNext = !!value && value >= 120 && value <= 230;
+  const feet = Math.floor(current / 30.48);
+  const inches = Math.round((current / 2.54) - feet * 12);
+  return (
+    <div className="flex flex-1 min-h-0 flex-col">
+      <StepScroll>
+        <Heading
+          title="Qual é a tua altura?"
+          subtitle="Aparece no teu perfil para encontrares matches mais compatíveis"
+        />
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, delay: 0.12 }}
+          className="mt-12 flex flex-col items-center"
+        >
+          <div className="flex items-baseline gap-2">
+            <span className="text-gradient-sunset text-[72px] font-bold leading-none tracking-tight">
+              {current}
+            </span>
+            <span className="text-xl font-medium text-muted-foreground">cm</span>
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {feet}′{inches}″
+          </p>
+          <div className="mt-10 w-full">
+            <input
+              type="range"
+              min={MIN}
+              max={MAX}
+              step={1}
+              value={current}
+              onChange={(e) => onChange(parseInt(e.target.value, 10))}
+              className="hunie-range w-full"
+              aria-label="Altura em centímetros"
+            />
+            <div className="mt-2 flex justify-between text-[11px] uppercase tracking-wider text-muted-foreground">
+              <span>{MIN} cm</span>
+              <span>{MAX} cm</span>
+            </div>
+          </div>
+        </motion.div>
+      </StepScroll>
+      <CtaBar>
+        <PrimaryButton disabled={!canNext} onClick={onNext}>
+          Continuar
+        </PrimaryButton>
+      </CtaBar>
+    </div>
+  );
+}
+
 // Location ─────
+
 function LocationStep({
   value,
   onChange,
