@@ -229,9 +229,11 @@ function OnboardingPage() {
         interests: d.interests.length ? d.interests : ((profile as { interests?: string[] | null }).interests ?? []),
         latitude: d.latitude ?? ((profile as { latitude?: number | null }).latitude ?? null),
         longitude: d.longitude ?? ((profile as { longitude?: number | null }).longitude ?? null),
+        height: d.height ?? ((profile as { height_cm?: number | null }).height_cm ?? null),
         day, month, year,
       };
     });
+
   }, [profile, hydrated]);
 
   // Persist draft locally
