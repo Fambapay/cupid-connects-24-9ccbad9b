@@ -10,10 +10,15 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "cap:sync": "cap sync android",
-    "cap:open": "cap open android",
+    "cap:sync": "cap sync",
+    "cap:sync:android": "cap sync android",
+    "cap:sync:ios": "cap sync ios",
+    "cap:open:android": "cap open android",
+    "cap:open:ios": "cap open ios",
     "android": "cap sync android && cap open android",
-    "android:build": "cd android && ./gradlew bundleRelease"
+    "android:build": "cd android && ./gradlew bundleRelease",
+    "ios": "cap sync ios && cap open ios",
+    "ios:pod": "cd ios/App && pod install"
   },
   "dependencies": {
     "@block65/webcrypto-web-push": "^1.0.2",
