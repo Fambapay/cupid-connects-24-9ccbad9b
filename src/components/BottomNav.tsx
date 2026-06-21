@@ -126,7 +126,7 @@ export const BottomNavBase = ({
                 animate={{ scale: isPressed || isDragging ? 1.08 : 1 }}
                 transition={{ type: "spring", stiffness: 560, damping: 34, mass: 0.5 }}
               >
-                <div className="w-full h-full nav-active-pill" style={{ borderRadius: "20px" }} />
+                <div className="w-full h-full nav-active-pill" style={{ borderRadius: "9999px" }} />
               </motion.div>
 
               {/* Transparent drag handle — on top of active tab, captures gestures */}
