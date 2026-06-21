@@ -23,44 +23,44 @@
   transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* ── Liquid Glass Pill ────────────────────────────────────── */
+/* ── Liquid Glass Pill (Apple-style native) ───────────────── */
 .tab-bar-pill {
   pointer-events: auto;
   width: 100%;
-  height: 56px;
+  height: 60px;
   box-sizing: border-box;
   border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: space-around;
   gap: 2px;
-  padding: 4px 8px;
+  padding: 5px 6px;
   position: relative;
   isolation: isolate;
 
-  /* Deep liquid transparency */
+  /* Neutral dark glass — lets content behind tint naturally */
   background:
     linear-gradient(180deg,
-      rgba(255, 255, 255, 0.14) 0%,
-      rgba(255, 255, 255, 0.06) 40%,
-      rgba(255, 255, 255, 0.03) 100%
+      rgba(28, 28, 32, 0.55) 0%,
+      rgba(18, 18, 22, 0.65) 100%
     );
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%) brightness(1.05);
 
-  /* Luminous edge */
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  /* Hairline edge */
+  border: 1px solid rgba(255, 255, 255, 0.08);
 
-  /* Soft volumetric glow */
+  /* Volumetric depth */
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.25),
-    0 8px 32px rgba(0, 0, 0, 0.28),
-    0 2px 8px rgba(0, 0, 0, 0.18);
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.04),
+    0 12px 32px rgba(0, 0, 0, 0.45),
+    0 4px 12px rgba(0, 0, 0, 0.28);
 
   transition: box-shadow 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Specular ridge — top light band */
+/* Top specular sheen — thin glossy band */
 .tab-bar-pill::before {
   content: '';
   position: absolute;
@@ -69,14 +69,14 @@
   pointer-events: none;
   background:
     linear-gradient(180deg,
-      rgba(255, 255, 255, 0.35) 0%,
-      rgba(255, 255, 255, 0.08) 35%,
-      transparent 60%
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 255, 255, 0.04) 18%,
+      transparent 40%
     );
   z-index: 1;
 }
 
-/* Chromatic fringe — faint brand refraction */
+/* Bottom inner shadow — gives depth at the base */
 .tab-bar-pill::after {
   content: '';
   position: absolute;
@@ -84,33 +84,28 @@
   border-radius: inherit;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 80% 40% at 50% 0%,
-      rgba(177, 60, 255, 0.12) 0%,
-      transparent 60%
-    ),
-    radial-gradient(ellipse 60% 30% at 80% 20%,
-      rgba(255, 79, 163, 0.08) 0%,
-      transparent 50%
+    linear-gradient(0deg,
+      rgba(0, 0, 0, 0.18) 0%,
+      transparent 30%
     );
-  mix-blend-mode: screen;
-  z-index: 2;
+  z-index: 1;
 }
 
 /* ── Active pill (Hunie liquid gradient) ──────────────────── */
 .tab-bar-pill .nav-active-pill {
   background:
     linear-gradient(135deg,
-      rgba(236, 72, 153, 0.28) 0%,
-      rgba(147, 51, 234, 0.26) 50%,
-      rgba(79, 70, 229, 0.24) 100%
+      rgba(236, 72, 153, 0.32) 0%,
+      rgba(168, 85, 247, 0.30) 55%,
+      rgba(99, 102, 241, 0.28) 100%
     );
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 9999px;
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.18),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.12),
-    0 0 18px rgba(236, 72, 153, 0.22),
-    0 6px 18px rgba(79, 70, 229, 0.18);
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.18),
+    0 0 22px rgba(236, 72, 153, 0.28),
+    0 6px 18px rgba(99, 102, 241, 0.22);
   transform: translateZ(0);
   will-change: transform;
 }
