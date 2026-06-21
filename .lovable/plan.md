@@ -1,143 +1,108 @@
-# Angola localization (MZ + AO, future ZA/PT)
+## Objectivo
 
-A single reusable country layer powers landing copy, pricing, payments, SEO and onboarding. No duplicate pages, no separate app.
+Transformar o Hunie (TanStack Start PWA) numa app Android nativa via Capacitor, mantendo a versão web intacta. No fim ficas com um projeto que abre no Android Studio e gera AAB para a Play Store.
 
-## 1. Country config (single source of truth)
+## Limitação importante do ambiente Lovable
 
-New `src/lib/country/config.ts`:
+O sandbox do Lovable **não tem Android SDK nem Android Studio**. Isso significa:
 
-```ts
-export type CountryCode = "MZ" | "AO" | "ZA" | "PT";
+- Posso instalar Capacitor, criar `capacitor.config.ts`, scripts npm, plugins, código de bridge nativo, e preparar tudo no repo.
+- **Não posso correr `npx cap add android` aqui** (precisa de Java + Android SDK). Tu vais correr esse comando **uma vez** localmente no teu Mac/PC depois de clonar o repo do GitHub. A partir daí a pasta `android/` fica versionada e qualquer sync funciona.
+- Não posso gerar o AAB nem abrir Android Studio — esses passos são na tua máquina.
 
-export const COUNTRY_CONFIG = {
-  MZ: {
-    enabled: true,
-    name: "Moçambique",
-    flag: "🇲🇿",
-    currency: "MZN",
-    locale: "pt-MZ",
-    phonePrefix: "+258",
-    phoneExample: "+258 84 123 4567",
-    payments: ["mpesa", "emola", "visa", "mastercard"],
-    cities: ["Maputo", "Matola", "Beira", "Nampula", "Chimoio", "Tete", "Pemba", "Quelimane", "Nacala", "Inhambane", "Xai-Xai", "Lichinga"],
-    heroCities: ["Maputo.", "Matola.", "Beira.", "Nampula.", "Chimoio.", "Tete.", "Pemba."],
-  },
-  AO: {
-    enabled: true,
-    name: "Angola",
-    flag: "🇦🇴",
-    currency: "AOA",
-    locale: "pt-AO",
-    phonePrefix: "+244",
-    phoneExample: "+244 923 456 789",
-    payments: ["multicaixa_express", "referencia_mc", "unitel_money", "visa", "mastercard"],
-    cities: ["Luanda", "Benguela", "Huambo", "Lobito", "Lubango", "Cabinda", "Namibe", "Malanje", "Kuito", "Soyo"],
-    heroCities: ["Luanda.", "Benguela.", "Huambo.", "Lobito.", "Lubango."],
-  },
-  ZA: { enabled: false, /* scaffold: ZAR, en-ZA, ["card","eft","ozow"] */ … },
-  PT: { enabled: false, /* scaffold: EUR, pt-PT, ["mbway","multibanco","card"] */ … },
-} as const;
+Vou deixar um `MOBILE.md` com o passo-a-passo exacto para correres localmente.
 
-export const DEFAULT_COUNTRY: CountryCode = "MZ";
-export const formatPrice = (amount: number, country: CountryCode) =>
-  new Intl.NumberFormat(COUNTRY_CONFIG[country].locale, {
-    style: "currency", currency: COUNTRY_CONFIG[country].currency,
-    maximumFractionDigits: 0,
-  }).format(amount);
+## O que vou fazer no repo
+
+### 1. Dependências e config Capacitor
+- `bun add @capacitor/core @capacitor/cli @capacitor/android @capacitor/app @capacitor/status-bar @capacitor/splash-screen @capacitor/keyboard @capacitor/haptics @capacitor/push-notifications @capacitor/camera @capacitor/preferences`
+- `capacitor.config.ts` na raiz:
+  - `appId: "com.hunie.app"`, `appName: "Hunie"`
+  - `webDir: "dist"` (output do build TanStack Start client)
+  - `server.androidScheme: "https"`, `server.url` apontando para `https://hunie.app` (modo produção a servir o site real — mais simples porque a app é SSR/server functions; descrito abaixo)
+  - StatusBar overlay, SplashScreen 1500ms, Keyboard `resize: "native"`
+
+### 2. Estratégia web→nativo
+A app usa **TanStack Start com server functions**, que precisa de servidor Node. Há duas abordagens:
+
+**A. Hybrid remoto (recomendado, default):** o APK carrega `https://hunie.app` dentro do WebView Capacitor. Mantém auth, pagamentos, SSR, sem duplicar backend. Os plugins nativos (push FCM, câmera, haptics) funcionam normalmente via bridge.
+
+**B. Fully bundled:** exigia portar tudo para SPA estática + chamar Supabase directamente. Trabalho enorme e regressão funcional. **Não recomendado.**
+
+Vou implementar **A** com fallback: build script para variante "bundled web preview" caso queiras testar offline-ish.
+
+### 3. Scripts npm
+```json
+"cap:sync": "cap sync android",
+"cap:open": "cap open android",
+"android": "cap sync android && cap open android",
+"android:build": "cd android && ./gradlew bundleRelease"
 ```
 
-## 2. Country-aware pricing
+### 4. Camada de bridge (`src/lib/native/`)
+- `platform.ts` — `isNative()`, `getPlatform()`
+- `haptics.ts` — substitui o stub actual em `src/hooks/useNativePlatform.ts` por chamadas reais ao `@capacitor/haptics` quando nativo, no-op no web
+- `statusBar.ts` — edge-to-edge + cor dinâmica do tema escuro
+- `keyboard.ts` — listeners para ajustar viewport no chat
+- `push.ts` — registo FCM, envio do token para Supabase (`push_subscriptions` com novo campo `fcm_token` + `platform`)
+- `camera.ts` — wrap de `Camera.getPhoto` que devolve File compatível com `usePhotoUpload`
+- `deepLinks.ts` — listener `App.addListener('appUrlOpen')` → `router.navigate`
+- `init.ts` — bootstrap único chamado em `__root.tsx`
 
-`src/lib/pricing.ts` keeps a catalog per country. Fixed AOA values you confirmed:
+### 5. Push notifications nativas
+- Migration: adicionar colunas `fcm_token text`, `platform text` em `push_subscriptions` (opcionais, não quebra Web Push existente)
+- Server function `registerFcmToken` (protegida) que faz upsert
+- No bridge: pedir permissão, registar, enviar token
+- O `send.server.ts` actual usa Web Push (VAPID). Para FCM vou adicionar um stub `sendFcmPush()` que precisa de `FCM_SERVER_KEY` — deixo TODO documentado porque exige criar projecto Firebase (passo manual teu).
 
-| Plan / Pack          | MZN    | AOA      |
-|----------------------|--------|----------|
-| Select / mês         | 199    | 1 500    |
-| Select / ano         | 1 590  | 12 000   |
-| Plus / mês           | 599    | 4 500    |
-| Plus / ano           | 4 790  | 36 000   |
-| Elite / mês          | 999    | 7 500    |
-| Elite / ano          | 7 990  | 60 000   |
-| Boost 1 / 5 / 15     | 99 / 399 / 999 | 750 / 3 000 / 7 500 |
-| Super Like 1 / 5 / 25| 49 / 199 / 899 | 400 / 1 500 / 6 800 |
+### 6. UI / safe areas
+- `styles.css`: já usas `env(safe-area-inset-*)`. Adicionar variantes para Android navigation bar (`env(safe-area-inset-bottom)` cobre).
+- `AppShell.tsx`: confirmar padding bottom respeita gesture nav.
+- Status bar transparente com conteúdo por baixo.
 
-Helpers updated to `(tier, period, country)` / `(packId, country)`. **Server `createDebitoPayment` recomputes amount from this catalog using the request country** — client never sends price.
+### 7. Documentação `MOBILE.md`
+Passos locais que precisas correr **uma vez**:
+1. Instalar Android Studio + JDK 17
+2. `git pull` o repo com os ficheiros novos
+3. `bun install`
+4. `bun run build`
+5. `npx cap add android` (cria a pasta `android/`)
+6. `npx cap sync android`
+7. Configurar `android/app/src/main/res/` com icon e splash (gerar com `@capacitor/assets`)
+8. Em `AndroidManifest.xml`: permissões `INTERNET`, `CAMERA`, `READ_MEDIA_IMAGES`, `POST_NOTIFICATIONS`, `VIBRATE`
+9. Firebase: criar projecto, baixar `google-services.json` → `android/app/`
+10. Assinar release keystore
+11. `./gradlew bundleRelease` → `.aab` em `android/app/build/outputs/bundle/release/`
+12. Upload Play Console
 
-## 3. Country detection
+### 8. Pagamentos
+Mantém arquitectura actual (KambaPay / e-Mola / Multicaixa via webhooks). Nada muda — Play Store permite payment processors externos para apps de dating em mercados específicos, mas vais precisar declarar isso no Play Console. O sistema de entitlement já existe (`profiles.membership_*` + `activate_membership_debito` RPC); a app nativa só consulta o mesmo backend.
 
-`src/lib/country/detect.ts`:
+### 9. Deep links
+- `capacitor.config.ts` + `AndroidManifest` intent filter para `https://hunie.app/*` e `hunie://`
+- Bridge `deepLinks.ts` mapeia para rotas TanStack
 
-- **Server (SSR / serverFn / route handler)**: read `Host` header → if starts with `ao.` ⇒ AO. Else read `cf-ipcountry` (Cloudflare auto-injects on Workers) and map known codes. Else fallback to `DEFAULT_COUNTRY`.
-- **Client**: same host check, then localStorage override `hunie:country`, then hydrate from SSR-provided value via `<CountryProvider>` in `__root.tsx`.
-- **Manual override**: small `CountrySwitcher` (footer + auth pages) writes to localStorage and reloads. Subdomain still wins when present.
-- Server function `getCountry` exposes the resolved country to client hydration.
+### 10. Segurança
+Nada de secrets no bundle Android. Tudo o que é sensível continua server-side (server functions / webhooks). `VITE_*` mantidas (publishable Supabase key é OK pública).
 
-`useCountry()` hook returns `{ country, config, setCountry }`.
+## O que **tu** tens de fazer depois
 
-## 4. Landing dynamic content
+1. Clonar repo localmente, correr `npx cap add android` (one-time)
+2. Criar projecto Firebase + descarregar `google-services.json`
+3. Adicionar secret `FCM_SERVER_KEY` no Lovable Cloud (eu peço quando estiver na hora)
+4. Gerar icons/splash com `npx @capacitor/assets generate`
+5. Conta Google Play Console ($25)
+6. Build + upload AAB
 
-`src/components/landing/EditorialHero.tsx`, `CidadesSection.tsx`, `FaqSection.tsx`, `ComoFunciona.tsx` rewritten to read from `useCountry()`:
+## Migrations DB
 
-- Hero pill: `{flag} Feito em {name}` (MZ keeps "Feito em Moçambique"; AO becomes "Pensado para Angola").
-- Typewriter cycles `config.heroCities`.
-- Subtitle, trust line, rotator strings come from a per-country `landingCopy` map in `src/lib/country/copy.ts`.
-- Cidades grid maps `config.cities`.
-- FAQ pulls from `faqData[country]` (MZ keeps current; AO variant references Multicaixa, Unitel Money, Kz).
-- New `Testimonials` already present? — add localized testimonial set per country (3 names: Joana/Marco/Inês for AO with Luanda/Benguela/Lubango locations).
+Uma migration: adicionar `fcm_token`, `platform` em `push_subscriptions` (nullable, idempotente).
 
-## 5. SEO per country
+## Ficheiros criados/alterados
 
-`src/routes/index.tsx` `head()` becomes country-aware via loader:
+**Novos:** `capacitor.config.ts`, `MOBILE.md`, `src/lib/native/{platform,haptics,statusBar,keyboard,push,camera,deepLinks,init}.ts`
+**Alterados:** `package.json` (deps + scripts), `src/routes/__root.tsx` (init nativo), `src/hooks/useNativePlatform.ts` (real impl), `src/lib/haptics.ts` (delega para bridge), `src/hooks/usePhotoUpload.ts` (opção câmera nativa), `src/styles.css` (safe areas)
 
-- AO: `title: "Hunie — Namoro em Angola. Comunidade verificada em Luanda, Benguela e Huambo."`, description tuned for AO, `og:locale: "pt_AO"`, canonical `https://ao.hunie.app/`.
-- MZ: keeps current copy, canonical `https://hunie.app/`.
-- `__root.tsx` `og:locale` becomes dynamic via loader-driven head, JSON-LD `areaServed` switches between Mozambique/Angola.
-- `public/robots.txt` and `sitemap.xml` add `ao.hunie.app` host entries.
+## Confirmas?
 
-## 6. Payment methods
-
-- `PAYMENT_METHODS` union extended: `mpesa | emola | multicaixa_express | referencia_mc | unitel_money | visa | mastercard`.
-- `DebitoCheckoutSheet`, `PaywallSheet`, `CreditShopSheet`, `ProfileBundles` filter methods through `config.payments`.
-- New labels + icons (text-only badges for MC Express / Ref MC / Unitel Money — no logo assets fetched).
-- Backend (`src/lib/debito.functions.ts`) Zod schema accepts the new method codes; for AO methods it **inserts a `debito_payments` row with `status="pending"` and returns a friendly "em breve" message** without calling the MZ orchestrator (per your "UI + config only" answer). MZ methods unchanged.
-- Phone validation per country: `normalizePhone(raw, country)` uses MZ regex for MZ, AO regex (`9[1-9]XXXXXXX`) for AO.
-
-## 7. Onboarding / forms
-
-- Phone input placeholder + prefix from `config.phoneExample` / `phonePrefix`.
-- Currency-bearing strings (`"Desde 149 MZN/mês"`, settings, paywalls) routed through `formatPrice` + the catalog so AO sees `Desde 1 500 Kz/mês`.
-
-## 8. Data model
-
-No schema change. `debito_payments` already stores amount + currency. We add `currency` derivation server-side from country. (Optional follow-up migration: add `country CHAR(2)` to `debito_payments` and `profiles` — not in this PR; flagged as TODO.)
-
-## 9. Files
-
-**New**
-- `src/lib/country/config.ts`
-- `src/lib/country/detect.ts` + `detect.server.ts`
-- `src/lib/country/context.tsx` (`CountryProvider`, `useCountry`)
-- `src/lib/country/copy.ts` (landing + onboarding strings per country)
-- `src/lib/country/country.functions.ts` (`getCountry` serverFn)
-- `src/components/CountrySwitcher.tsx`
-- `src/components/landing/faqData.ao.ts` (or merge into existing as map)
-
-**Edited**
-- `src/lib/pricing.ts` — per-country catalog + helpers
-- `src/lib/plans.ts` — `formatPrice` delegates to country formatter
-- `src/lib/debito.functions.ts` — accept country, recompute amount/currency, accept AO methods as pending-only
-- `src/components/landing/EditorialHero.tsx`, `CidadesSection.tsx`, `FaqSection.tsx`, `ComoFunciona.tsx`
-- `src/components/DebitoCheckoutSheet.tsx`, `paywall/PaywallSheet.tsx`, `paywall/PaywallFlow.tsx`, `paywall/CreditShopSheet.tsx`, `ProfileBundles.tsx`
-- `src/components/PhoneVerificationModal.tsx` — country-aware phone format
-- `src/routes/__root.tsx` — wrap with `CountryProvider`, dynamic og:locale, JSON-LD areaServed
-- `src/routes/index.tsx`, `membership.tsx`, `shop.tsx`, `discover.tsx` — country-aware head() + copy
-- `src/routes/sitemap[.]xml.ts`, `public/robots.txt`
-
-## 10. Out of scope (deferred)
-
-- Real PSP integration for Multicaixa / Unitel Money (waits on provider contract).
-- ZA / PT user-visible enablement — config stubs only, hidden in switcher.
-- `country` column on `debito_payments`/`profiles` (will land when AO charging goes live).
-- DNS: you'll connect `ao.hunie.app` in Project Settings → Domains after merge.
-
-Ready to implement on approval.
+Avança e implemento tudo numa só passagem? Ou preferes começar só pelo Capacitor + config + bridge mínimo e fazer push/câmera num segundo turno?

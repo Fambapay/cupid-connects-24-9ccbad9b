@@ -708,32 +708,38 @@ export type Database = {
       }
       push_subscriptions: {
         Row: {
-          auth: string
+          auth: string | null
           created_at: string
           endpoint: string
+          fcm_token: string | null
           id: string
           last_used_at: string
-          p256dh: string
+          p256dh: string | null
+          platform: string | null
           user_agent: string | null
           user_id: string
         }
         Insert: {
-          auth: string
+          auth?: string | null
           created_at?: string
           endpoint: string
+          fcm_token?: string | null
           id?: string
           last_used_at?: string
-          p256dh: string
+          p256dh?: string | null
+          platform?: string | null
           user_agent?: string | null
           user_id: string
         }
         Update: {
-          auth?: string
+          auth?: string | null
           created_at?: string
           endpoint?: string
+          fcm_token?: string | null
           id?: string
           last_used_at?: string
-          p256dh?: string
+          p256dh?: string | null
+          platform?: string | null
           user_agent?: string | null
           user_id?: string
         }

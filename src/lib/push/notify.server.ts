@@ -184,7 +184,9 @@ async function notifyOne(kind: NotifyKind, r: Recipient, ctx: NotifyContext) {
       .eq('user_id', r.user_id)
 
     for (const sub of subs || []) {
-      const res = await sendWebPush(sub, payload)
+      if (!sub.p256dh || !sub.auth) continue // native FCM subs handled elsewhere
+      const webSub = { id: sub.id, endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth }
+      const res = await sendWebPush(webSub, payload)
       if (res.ok) pushSucceeded = true
       if (res.expired) {
         await supabaseAdmin.from('push_subscriptions').delete().eq('id', sub.id)

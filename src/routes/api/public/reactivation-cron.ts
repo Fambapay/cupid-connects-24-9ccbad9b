@@ -163,7 +163,9 @@ async function sendPush(userId: string, daysInactive: number, name: string | nul
     : 'Provavelmente já tens likes para ver.'
 
   for (const sub of subs) {
-    const res = await sendWebPush(sub, { title, body, url: '/discover' })
+    if (!sub.p256dh || !sub.auth) continue
+    const webSub = { id: sub.id, endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth }
+    const res = await sendWebPush(webSub, { title, body, url: '/discover' })
     if (res.expired) {
       await supabaseAdmin.from('push_subscriptions').delete().eq('id', sub.id)
     } else if (res.ok) {
