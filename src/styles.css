@@ -450,24 +450,6 @@
   cursor: pointer;
 }
 
-/* ============================================================
-   Premium page transitions — iOS-style fluid navigation
-   ============================================================ */
-@keyframes page-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-.page-transition {
-  animation: page-in 280ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity;
-}
-@media (prefers-reduced-motion: reduce) {
-  .page-transition { animation: none; }
-}
 
 /* Smoother active-press feedback for all interactive elements */
 button, [role="button"], a {

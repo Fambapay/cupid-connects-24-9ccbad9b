@@ -4,7 +4,6 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
-  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -172,24 +171,11 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  // Group top-level tab routes so switching between sub-routes of the same
-  // section (e.g. /chat → /chat/$matchId) doesn't replay the page transition.
-  const transitionKey = (() => {
-    if (pathname.startsWith("/discover")) return "tab:discover";
-    if (pathname.startsWith("/matches")) return "tab:matches";
-    if (pathname.startsWith("/chat")) return "tab:chat";
-    if (pathname.startsWith("/profile") || pathname.startsWith("/settings"))
-      return "tab:profile";
-    return pathname;
-  })();
 
   return (
     <QueryClientProvider client={queryClient}>
       <CountryProvider>
-        <div key={transitionKey} className="page-transition">
-          <Outlet />
-        </div>
+        <Outlet />
         <GlobalNotifiers />
         <PushPromptGate />
         <Toaster position="top-center" richColors />
