@@ -1,4 +1,4 @@
-# Hunie — Build Android (Capacitor)
+# Hunie — Build Mobile (Capacitor: Android + iOS)
 
 Este projeto está preparado para gerar uma app Android nativa via Capacitor,
 mantendo a versão web intacta. O sandbox da Lovable **não tem Android SDK**,
