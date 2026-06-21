@@ -8,13 +8,14 @@
   -webkit-touch-callout: none;
 }
 
-/* Wrapper fixo no fundo da viewport — floating com margens */
+/* Wrapper fixo no fundo da viewport — hug bottom on iOS above the home indicator */
 .tab-bar {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: calc(7px + env(safe-area-inset-bottom));
-  padding: 0 14px 0;
+  /* Use safe-area when present (iOS home indicator), else a tiny gap */
+  bottom: max(env(safe-area-inset-bottom), 6px);
+  padding: 0 16px;
   background: transparent;
   z-index: 9999;
   pointer-events: none;
