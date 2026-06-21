@@ -12,13 +12,13 @@ import { PeerProfileSheet } from "@/components/chat/PeerProfileSheet";
 import { getActivityStatus } from "@/lib/activityStatus";
 import { useSubscription } from "@/hooks/useSubscription";
 
-import { requireMembership } from "@/lib/authGuard";
+import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
 
 
 export const Route = createFileRoute("/chat/$matchId")({
   ssr: false,
-  beforeLoad: requireMembership,
+  beforeLoad: requireAuthAndOnboarding,
   component: ChatRoom,
 });
 
