@@ -8,13 +8,14 @@
   -webkit-touch-callout: none;
 }
 
-/* Wrapper fixo no fundo da viewport — floating com margens */
+/* Wrapper fixo no fundo da viewport — hug bottom on iOS above the home indicator */
 .tab-bar {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: calc(7px + env(safe-area-inset-bottom));
-  padding: 0 14px 0;
+  /* Use safe-area when present (iOS home indicator), else a tiny gap */
+  bottom: max(env(safe-area-inset-bottom), 6px);
+  padding: 0 16px;
   background: transparent;
   z-index: 9999;
   pointer-events: none;
@@ -27,37 +28,36 @@
 .tab-bar-pill {
   pointer-events: auto;
   width: 100%;
-  height: 60px;
+  height: 56px;
   box-sizing: border-box;
   border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: space-around;
   gap: 2px;
-  padding: 5px 6px;
+  padding: 4px 5px;
   position: relative;
   isolation: isolate;
+  overflow: hidden;
 
-  /* Neutral dark glass — lets content behind tint naturally */
+  /* Dark neutral glass — true Apple-style */
   background:
     linear-gradient(180deg,
-      rgba(28, 28, 32, 0.55) 0%,
-      rgba(18, 18, 22, 0.65) 100%
+      rgba(36, 36, 42, 0.62) 0%,
+      rgba(16, 16, 20, 0.72) 100%
     );
-  backdrop-filter: blur(28px) saturate(180%) brightness(1.05);
+  -webkit-backdrop-filter: blur(32px) saturate(190%);
+  backdrop-filter: blur(32px) saturate(190%);
 
   /* Hairline edge */
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.09);
 
   /* Volumetric depth */
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.04),
-    0 12px 32px rgba(0, 0, 0, 0.45),
-    0 4px 12px rgba(0, 0, 0, 0.28);
-
-  transition: box-shadow 240ms cubic-bezier(0.22, 1, 0.36, 1);
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 10px 28px rgba(0, 0, 0, 0.42),
+    0 2px 8px rgba(0, 0, 0, 0.22);
 }
 
 /* Top specular sheen — thin glossy band */
@@ -69,14 +69,14 @@
   pointer-events: none;
   background:
     linear-gradient(180deg,
-      rgba(255, 255, 255, 0.18) 0%,
-      rgba(255, 255, 255, 0.04) 18%,
-      transparent 40%
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.03) 22%,
+      transparent 45%
     );
   z-index: 1;
 }
 
-/* Bottom inner shadow — gives depth at the base */
+/* Bottom inner shadow */
 .tab-bar-pill::after {
   content: '';
   position: absolute;
@@ -85,8 +85,8 @@
   pointer-events: none;
   background:
     linear-gradient(0deg,
-      rgba(0, 0, 0, 0.18) 0%,
-      transparent 30%
+      rgba(0, 0, 0, 0.22) 0%,
+      transparent 32%
     );
   z-index: 1;
 }
@@ -95,17 +95,17 @@
 .tab-bar-pill .nav-active-pill {
   background:
     linear-gradient(135deg,
-      rgba(236, 72, 153, 0.32) 0%,
-      rgba(168, 85, 247, 0.30) 55%,
-      rgba(99, 102, 241, 0.28) 100%
+      rgba(244, 114, 182, 0.38) 0%,
+      rgba(168, 85, 247, 0.34) 55%,
+      rgba(99, 102, 241, 0.30) 100%
     );
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 9999px;
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.30),
     inset 0 -1px 1px rgba(0, 0, 0, 0.18),
-    0 0 22px rgba(236, 72, 153, 0.28),
-    0 6px 18px rgba(99, 102, 241, 0.22);
+    0 0 24px rgba(236, 72, 153, 0.32),
+    0 6px 18px rgba(99, 102, 241, 0.24);
   transform: translateZ(0);
   will-change: transform;
 }
