@@ -59,10 +59,15 @@ export function useAuth() {
       lovable.auth.signInWithOAuth("google", {
         redirect_uri: `${window.location.origin}/discover`,
       }),
-    resetPasswordForEmail: (email: string) =>
-      supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      }),
+    resetPasswordForEmail: (email: string) => {
+      const origin =
+        typeof window !== "undefined" && window.location.origin.startsWith("http")
+          ? window.location.origin
+          : "https://hunie.app";
+      return supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${origin}/reset-password`,
+      });
+    },
     updatePassword: (password: string) => supabase.auth.updateUser({ password }),
     signOut: async () => {
       await supabase.auth.signOut();
