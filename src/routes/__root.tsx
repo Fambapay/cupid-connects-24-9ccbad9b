@@ -19,6 +19,16 @@ import { useHeartbeat } from "@/hooks/useHeartbeat";
 import { PushPermissionPrompt } from "@/components/PushPermissionPrompt";
 import { supabase } from "@/integrations/supabase/client";
 import { CountryProvider } from "@/lib/country/context";
+import { initNative } from "@/lib/native/init";
+import { setupNativePush } from "@/lib/native/push";
+import { isNative } from "@/lib/native/platform";
+
+function NativeBoot() {
+  useEffect(() => {
+    void initNative();
+  }, []);
+  return null;
+}
 
 function GlobalNotifiers() {
   useNewMessageNotifier();
@@ -39,7 +49,12 @@ function PushPromptGate() {
       sub.subscription.unsubscribe();
     };
   }, []);
-  return authed ? <PushPermissionPrompt /> : null;
+  useEffect(() => {
+    if (authed && isNative()) {
+      void setupNativePush();
+    }
+  }, [authed]);
+  return authed && !isNative() ? <PushPermissionPrompt /> : null;
 }
 
 function NotFoundComponent() {
@@ -175,6 +190,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CountryProvider>
+        <NativeBoot />
         <Outlet />
         <GlobalNotifiers />
         <PushPromptGate />
