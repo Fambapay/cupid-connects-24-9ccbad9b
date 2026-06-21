@@ -299,7 +299,7 @@ async function callTransactionalSend(
       message_id: messageId,
       to: recipientEmail,
       from: 'Hunie <noreply@hunie.app>',
-      sender_domain: 'suporte.hunie.app',
+      sender_domain: 'dating.hunie.app',
       subject,
       html,
       text,
