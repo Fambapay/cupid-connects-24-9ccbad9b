@@ -41,15 +41,20 @@ export function useAuth() {
     isAuthenticated: !!session,
     signInWithPassword: (email: string, password: string) =>
       supabase.auth.signInWithPassword({ email, password }),
-    signUp: (email: string, password: string, name?: string) =>
-      supabase.auth.signUp({
+    signUp: (email: string, password: string, name?: string) => {
+      const origin =
+        typeof window !== "undefined" && window.location.origin.startsWith("http")
+          ? window.location.origin
+          : "https://hunie.app";
+      return supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/onboarding?step=1`,
+          emailRedirectTo: `${origin}/onboarding?step=1`,
           data: name ? { name } : undefined,
         },
-      }),
+      });
+    },
     signInWithGoogle: () =>
       lovable.auth.signInWithOAuth("google", {
         redirect_uri: `${window.location.origin}/discover`,
