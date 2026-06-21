@@ -187,7 +187,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CountryProvider>
-        <div key={transitionKey} className="page-transition contents">
+        <div key={transitionKey} className="page-transition">
           <Outlet />
         </div>
         <GlobalNotifiers />
