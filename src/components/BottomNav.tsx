@@ -63,6 +63,12 @@ export const BottomNavBase = ({
     return onLiquidGlassReady((ready) => {
       console.log('[BottomNav] LiquidGlass ready ->', ready);
       setNativeGlassReady(ready);
+      // When native glass is active we MUST punch a transparent hole through
+      // the HTML so the UIGlassEffect (sitting behind the WebView) is visible.
+      // Without this, body's solid background paints over the native glass.
+      if (typeof document !== 'undefined') {
+        document.documentElement.classList.toggle('native-glass-active', ready);
+      }
     });
   }, [useNativeGlass]);
 

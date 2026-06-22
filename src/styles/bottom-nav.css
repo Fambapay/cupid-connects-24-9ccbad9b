@@ -76,6 +76,16 @@
   display: none !important;
 }
 
+/* ── Native glass mode: make html/body transparent so UIGlassEffect (sitting
+   BEHIND the WebView) is actually visible. Without this, the body's solid
+   background paints on top of the native glass and the effect never shows.
+   Individual pages/cards keep their own backgrounds, so only the strip behind
+   the transparent pill reveals the native blur. ─────────────────────────── */
+html.native-glass-active,
+html.native-glass-active body {
+  background: transparent !important;
+}
+
 /* Top specular sheen — thin glossy band */
 .tab-bar-pill::before {
   content: '';
