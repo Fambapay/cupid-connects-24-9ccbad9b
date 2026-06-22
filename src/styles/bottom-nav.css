@@ -8,13 +8,16 @@
   -webkit-touch-callout: none;
 }
 
-/* Wrapper fixo no fundo da viewport — hug bottom on iOS above the home indicator */
+/* Wrapper fixo no fundo da viewport.
+   Em iOS o home indicator ocupa ~34px de safe-area; antes púnhamos o pill
+   por cima de toda a safe-area, ficando muito alto. Agora ancoramos o
+   pill MAIS perto do bordo inferior — sobrepõe parte da safe-area mas
+   deixa folga suficiente acima do home indicator (~10px). */
 .tab-bar {
   position: fixed;
   left: 0;
   right: 0;
-  /* Use safe-area when present (iOS home indicator), else a tiny gap */
-  bottom: max(env(safe-area-inset-bottom), 6px);
+  bottom: max(calc(env(safe-area-inset-bottom) - 22px), 6px);
   padding: 0 16px;
   background: transparent;
   z-index: 9999;
