@@ -41,11 +41,13 @@ export const BottomNavBase = ({
 }: BottomNavProps) => {
   const pointerStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const navRef = useRef<HTMLElement | null>(null);
+  const pillRef = useRef<HTMLDivElement | null>(null);
   const pillContainerRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [isPressed, setIsPressed] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const pillX = useMotionValue(0);
+  const useNativeGlass = isLiquidGlassSupported();
 
   const handleTabChange = (tab: Tab) => {
     hapticTap();
