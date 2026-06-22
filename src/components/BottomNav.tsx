@@ -12,7 +12,7 @@ import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { hapticTap } from "@/hooks/useNativePlatform";
 import { useLikesCount } from "@/hooks/useLikesCount";
 import { useUnreadChats } from "@/hooks/useUnreadChats";
-import { LiquidGlass, isLiquidGlassSupported } from "@/lib/native/liquidGlass";
+import { LiquidGlass, isLiquidGlassSupported, onLiquidGlassReady } from "@/lib/native/liquidGlass";
 
 type Tab = "discover" | "likes" | "chat" | "profile";
 
@@ -48,6 +48,8 @@ export const BottomNavBase = ({
   const [isDragging, setIsDragging] = useState(false);
   const pillX = useMotionValue(0);
   const useNativeGlass = isLiquidGlassSupported();
+  const [nativeGlassReady, setNativeGlassReady] = useState(false);
+  useEffect(() => onLiquidGlassReady(setNativeGlassReady), []);
 
   const handleTabChange = (tab: Tab) => {
     hapticTap();
@@ -218,7 +220,7 @@ export const BottomNavBase = ({
     <nav ref={navRef} className="tab-bar" style={bottomStyle}>
       <div
         ref={pillRef}
-        className={`tab-bar-pill${useNativeGlass ? " tab-bar-pill--native" : ""}`}
+        className={`tab-bar-pill${nativeGlassReady ? " tab-bar-pill--native" : ""}`}
       >
         <div ref={pillContainerRef} className="relative flex items-stretch w-full h-full">
           {/* Draggable active pill — slides between tabs */}
