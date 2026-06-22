@@ -49,7 +49,22 @@ export const BottomNavBase = ({
   const pillX = useMotionValue(0);
   const useNativeGlass = isLiquidGlassSupported();
   const [nativeGlassReady, setNativeGlassReady] = useState(false);
-  useEffect(() => onLiquidGlassReady(setNativeGlassReady), []);
+  useEffect(() => {
+    // Diagnostics — confirms WebView platform detection at mount time.
+    import('@capacitor/core').then(({ Capacitor }) => {
+      console.log('[BottomNav] platform diagnostics', {
+        'Capacitor.getPlatform()': Capacitor.getPlatform(),
+        'Capacitor.isNativePlatform()': Capacitor.isNativePlatform(),
+        useNativeGlass,
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'n/a',
+        href: typeof location !== 'undefined' ? location.href : 'n/a',
+      });
+    });
+    return onLiquidGlassReady((ready) => {
+      console.log('[BottomNav] LiquidGlass ready ->', ready);
+      setNativeGlassReady(ready);
+    });
+  }, [useNativeGlass]);
 
   const handleTabChange = (tab: Tab) => {
     hapticTap();
