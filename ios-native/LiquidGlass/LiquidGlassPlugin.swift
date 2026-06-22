@@ -45,14 +45,15 @@ public class LiquidGlassPlugin: CAPPlugin {
             guard let gv = self.glassView else { call.resolve(); return }
             let frame = self.frame(from: call)
             let radius = CGFloat(call.getDouble("cornerRadius") ?? Double(gv.layer.cornerRadius))
-            // Animate small position/size changes for buttery drag follow.
-            UIView.animate(withDuration: 0.18,
-                           delay: 0,
-                           options: [.curveEaseOut, .allowUserInteraction, .beginFromCurrentState],
-                           animations: {
-                gv.frame = frame
-            }, completion: nil)
-            self.applyCornerRadius(radius)
+            // Pixel-perfect tracking: disable implicit Core Animation so the
+            // glass jumps to the exact frame the JS rAF computed this tick.
+            // The JS side already drives smooth 60/120fps updates.
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            gv.frame = frame
+            gv.layer.cornerRadius = radius
+            gv.layer.cornerCurve = .continuous
+            CATransaction.commit()
             call.resolve()
         }
     }
