@@ -12,6 +12,7 @@ import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { hapticTap } from "@/hooks/useNativePlatform";
 import { useLikesCount } from "@/hooks/useLikesCount";
 import { useUnreadChats } from "@/hooks/useUnreadChats";
+import { LiquidGlass, isLiquidGlassSupported } from "@/lib/native/liquidGlass";
 
 type Tab = "discover" | "likes" | "chat" | "profile";
 
@@ -40,11 +41,13 @@ export const BottomNavBase = ({
 }: BottomNavProps) => {
   const pointerStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const navRef = useRef<HTMLElement | null>(null);
+  const pillRef = useRef<HTMLDivElement | null>(null);
   const pillContainerRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [isPressed, setIsPressed] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const pillX = useMotionValue(0);
+  const useNativeGlass = isLiquidGlassSupported();
 
   const handleTabChange = (tab: Tab) => {
     hapticTap();
@@ -100,6 +103,46 @@ export const BottomNavBase = ({
     return () => controls.stop();
   }, [activeIndex, tabWidth, isDragging, pillX]);
 
+  // Native Apple Liquid Glass — iOS only. Renders a UIGlassEffect (iOS 26+)
+  // or UIVisualEffectView (fallback) BEHIND the WebView, tracking the pill's
+  // bounding rect. The CSS pill becomes transparent so the native glass shows.
+  useEffect(() => {
+    if (!useNativeGlass) return;
+    const el = pillRef.current;
+    if (!el) return;
+    let raf = 0;
+    const sync = (first = false) => {
+      const r = el.getBoundingClientRect();
+      const rect = {
+        x: r.left,
+        y: r.top,
+        width: r.width,
+        height: r.height,
+        cornerRadius: r.height / 2,
+      };
+      if (first) LiquidGlass.show(rect);
+      else LiquidGlass.update(rect);
+    };
+    sync(true);
+    const onChange = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => sync(false));
+    };
+    const ro = new ResizeObserver(onChange);
+    ro.observe(el);
+    window.addEventListener("resize", onChange);
+    window.addEventListener("orientationchange", onChange);
+    window.addEventListener("scroll", onChange, { passive: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      window.removeEventListener("resize", onChange);
+      window.removeEventListener("orientationchange", onChange);
+      window.removeEventListener("scroll", onChange);
+      LiquidGlass.hide();
+    };
+  }, [useNativeGlass]);
+
   const bottomStyle = dockToBottom
     ? { bottom: "0px" }
     : bottomOffsetPx
@@ -108,7 +151,10 @@ export const BottomNavBase = ({
 
   return (
     <nav ref={navRef} className="tab-bar" style={bottomStyle}>
-      <div className="tab-bar-pill">
+      <div
+        ref={pillRef}
+        className={`tab-bar-pill${useNativeGlass ? " tab-bar-pill--native" : ""}`}
+      >
         <div ref={pillContainerRef} className="relative flex items-stretch w-full h-full">
           {/* Draggable active pill — slides between tabs */}
           {tabWidth > 0 && (
