@@ -54,18 +54,47 @@ const setReady = (v: boolean) => {
   listeners.forEach((l) => l(v))
 }
 
+let showCallCount = 0
+let updateCallCount = 0
+
 export const LiquidGlass: LiquidGlassPlugin = {
   async show(rect) {
-    if (!isLiquidGlassSupported()) return
-    try { await native.show(rect); setReady(true) } catch { setReady(false) }
+    showCallCount += 1
+    console.log(`[LiquidGlass] show() call #${showCallCount}`, {
+      platform: getPlatform(),
+      supported: isLiquidGlassSupported(),
+      rect,
+    })
+    if (!isLiquidGlassSupported()) {
+      console.warn('[LiquidGlass] show() SKIPPED — platform is not iOS:', getPlatform())
+      return
+    }
+    try {
+      await native.show(rect)
+      console.log('[LiquidGlass] native.show() ✅ resolved OK — bridge reachable')
+      setReady(true)
+    } catch (err) {
+      console.error('[LiquidGlass] native.show() ❌ FAILED', err)
+      setReady(false)
+    }
   },
   async update(rect) {
+    updateCallCount += 1
+    if (updateCallCount <= 3 || updateCallCount % 60 === 0) {
+      console.log(`[LiquidGlass] update() call #${updateCallCount}`, { platform: getPlatform(), rect })
+    }
     if (!isLiquidGlassSupported()) return
-    try { await native.update(rect) } catch { setReady(false) }
+    try {
+      await native.update(rect)
+    } catch (err) {
+      console.error('[LiquidGlass] native.update() ❌ FAILED', err)
+      setReady(false)
+    }
   },
   async hide() {
+    console.log('[LiquidGlass] hide() called', { platform: getPlatform() })
     if (!isLiquidGlassSupported()) return
-    try { await native.hide() } catch { /* noop */ }
+    try { await native.hide() } catch (err) { console.error('[LiquidGlass] native.hide() ❌ FAILED', err) }
     setReady(false)
   },
 }
