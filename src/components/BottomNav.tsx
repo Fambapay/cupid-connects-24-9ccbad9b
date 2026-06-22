@@ -110,38 +110,103 @@ export const BottomNavBase = ({
     if (!useNativeGlass) return;
     const el = pillRef.current;
     if (!el) return;
+
     let raf = 0;
-    const sync = (first = false) => {
+    let burstTimer: number | null = null;
+    let lastKey = "";
+    let started = false;
+
+    const syncNow = () => {
       const r = el.getBoundingClientRect();
+      // Round to device pixels to avoid sub-pixel jitter between web/native.
+      const dpr = window.devicePixelRatio || 1;
+      const round = (v: number) => Math.round(v * dpr) / dpr;
       const rect = {
-        x: r.left,
-        y: r.top,
-        width: r.width,
-        height: r.height,
-        cornerRadius: r.height / 2,
+        x: round(r.left),
+        y: round(r.top),
+        width: round(r.width),
+        height: round(r.height),
+        cornerRadius: round(r.height / 2),
       };
-      if (first) LiquidGlass.show(rect);
-      else LiquidGlass.update(rect);
+      // Skip no-op updates to avoid spamming the bridge.
+      const key = `${rect.x}|${rect.y}|${rect.width}|${rect.height}`;
+      if (key === lastKey) return;
+      lastKey = key;
+      if (!started) {
+        started = true;
+        LiquidGlass.show(rect);
+      } else {
+        LiquidGlass.update(rect);
+      }
     };
-    sync(true);
-    const onChange = () => {
+
+    const schedule = () => {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => sync(false));
+      raf = requestAnimationFrame(syncNow);
     };
-    const ro = new ResizeObserver(onChange);
+
+    /** safe-area / rotation transitions animate over ~400ms in iOS.
+     *  Run a short rAF-burst so the pill stays glued to the glass the
+     *  whole way through, then stop. */
+    const burst = (duration = 600) => {
+      const start = performance.now();
+      const tick = () => {
+        syncNow();
+        if (performance.now() - start < duration) {
+          burstTimer = requestAnimationFrame(tick) as unknown as number;
+        } else {
+          burstTimer = null;
+        }
+      };
+      if (burstTimer != null) cancelAnimationFrame(burstTimer);
+      burstTimer = requestAnimationFrame(tick) as unknown as number;
+    };
+
+    // Initial show (after layout settles)
+    schedule();
+
+    // 1) Element-level resize (pill width changes, font load, etc.)
+    const ro = new ResizeObserver(schedule);
     ro.observe(el);
-    window.addEventListener("resize", onChange);
-    window.addEventListener("orientationchange", onChange);
-    window.addEventListener("scroll", onChange, { passive: true });
+
+    // 2) Window resize / page scroll
+    window.addEventListener("resize", schedule);
+    window.addEventListener("scroll", schedule, { passive: true });
+
+    // 3) visualViewport — fires for keyboard show/hide, pinch-zoom,
+    //    and (on iOS) for safe-area changes during rotation.
+    const vv = window.visualViewport;
+    vv?.addEventListener("resize", schedule);
+    vv?.addEventListener("scroll", schedule);
+
+    // 4) Rotation — orientationchange is unreliable; matchMedia fires
+    //    reliably and BEFORE the safe-area transition completes, so we
+    //    kick off a burst to track every intermediate frame.
+    const portrait = window.matchMedia("(orientation: portrait)");
+    const onOrient = () => burst(700);
+    portrait.addEventListener?.("change", onOrient);
+    window.addEventListener("orientationchange", onOrient);
+
+    // 5) Page becomes visible again (returning from background) — re-sync
+    //    in case the WebView was resized while hidden.
+    const onVisible = () => { if (!document.hidden) burst(400); };
+    document.addEventListener("visibilitychange", onVisible);
+
     return () => {
       cancelAnimationFrame(raf);
+      if (burstTimer != null) cancelAnimationFrame(burstTimer);
       ro.disconnect();
-      window.removeEventListener("resize", onChange);
-      window.removeEventListener("orientationchange", onChange);
-      window.removeEventListener("scroll", onChange);
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener("scroll", schedule);
+      vv?.removeEventListener("resize", schedule);
+      vv?.removeEventListener("scroll", schedule);
+      portrait.removeEventListener?.("change", onOrient);
+      window.removeEventListener("orientationchange", onOrient);
+      document.removeEventListener("visibilitychange", onVisible);
       LiquidGlass.hide();
     };
   }, [useNativeGlass]);
+
 
   const bottomStyle = dockToBottom
     ? { bottom: "0px" }
