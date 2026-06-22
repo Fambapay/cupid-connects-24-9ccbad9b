@@ -60,6 +60,19 @@
     0 2px 8px rgba(0, 0, 0, 0.22);
 }
 
+/* ── Native mode: WebView pill is transparent, native UIGlassEffect renders behind ── */
+.tab-bar-pill--native {
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+.tab-bar-pill--native::before,
+.tab-bar-pill--native::after {
+  display: none !important;
+}
+
 /* Top specular sheen — thin glossy band */
 .tab-bar-pill::before {
   content: '';
