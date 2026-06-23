@@ -1,52 +1,20 @@
-/**
- * Spring physics presets for framer-motion transitions.
- * Use these instead of `ease: 'linear'` or generic durations for native-feel motion.
- */
-
+// Springs que espelham as named springs do iOS / SwiftUI — o "Apple feel".
 export const spring = {
-  gentle: { type: 'spring', stiffness: 200, damping: 28, mass: 0.8 },
-  snappy: { type: 'spring', stiffness: 400, damping: 30, mass: 0.7 },
-  bouncy: { type: 'spring', stiffness: 380, damping: 22, mass: 1.0 },
-  stiff: { type: 'spring', stiffness: 500, damping: 35, mass: 0.6 },
+  smooth: { type: "spring", visualDuration: 0.45, bounce: 0 },
+  snappy: { type: "spring", visualDuration: 0.4,  bounce: 0.18 },
+  bouncy: { type: "spring", visualDuration: 0.5,  bounce: 0.32 },
+  micro:  { type: "spring", visualDuration: 0.18, bounce: 0.15 },
+  sheet:  { type: "spring", visualDuration: 0.5,  bounce: 0.12 },
 } as const;
 
-/** Page-level transition presets. */
-type PageVariant = {
-  initial: Record<string, number | string>;
-  animate: Record<string, number | string>;
-  exit: Record<string, number | string>;
-  transition: { duration: number; ease: string | number[] };
+export const fade = {
+  initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 },
 };
 
-export const pageTransitions: Record<'slide' | 'slideBack' | 'fade', PageVariant> = {
-  slide: {
-    initial: { opacity: 1, x: '100%' },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0.5, x: '-30%' },
-    transition: { duration: 0.38, ease: [0.32, 0.72, 0, 1] },
-  },
-  slideBack: {
-    initial: { opacity: 0.5, x: '-30%' },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 1, x: '100%' },
-    transition: { duration: 0.38, ease: [0.32, 0.72, 0, 1] },
-  },
-  fade: {
-    initial: { opacity: 0, scale: 0.99 },
-    animate: { opacity: 1, scale: 1 },
-    exit: { opacity: 0, scale: 0.995 },
-    transition: { duration: 0.18, ease: [0.32, 0.72, 0, 1] },
+export const stagger = {
+  container: { animate: { transition: { staggerChildren: 0.04 } } },
+  item: {
+    initial: { opacity: 0, y: 12 },
+    animate: { opacity: 1, y: 0, transition: spring.snappy },
   },
 };
-
-/**
- * iOS-style modal/sheet presentation. Use as `initial/animate/exit` on a
- * full-screen overlay container. Pair with `useShellPresenting()` to
- * shrink the shell behind it.
- */
-export const sheetPresentation = {
-  initial: { y: '100%', opacity: 1 },
-  animate: { y: 0, opacity: 1 },
-  exit: { y: '100%', opacity: 1 },
-  transition: { type: 'spring', stiffness: 380, damping: 36, mass: 0.9 },
-} as const;
