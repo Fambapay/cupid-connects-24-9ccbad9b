@@ -404,7 +404,7 @@ function ChatRoom() {
       <div className="relative shrink-0">
         <form
           onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-          className="overflow-hidden px-3 pt-2"
+          className="overflow-hidden px-3 pt-2 pb-3"
           style={{ background: "#000" }}
         >
           <div className="flex w-full items-center gap-2">
