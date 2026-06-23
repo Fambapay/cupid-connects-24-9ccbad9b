@@ -406,7 +406,7 @@ function ChatRoom() {
         <form
           onSubmit={(e) => { e.preventDefault(); handleSend(); }}
           className="overflow-hidden px-3 pt-2"
-          style={{ background: "#000" }}
+          style={{ background: "#000", paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
         >
           <div className="flex w-full items-center gap-2">
 
