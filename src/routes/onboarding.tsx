@@ -783,29 +783,50 @@ function WelcomeStep({ onStart }: { onStart: () => void }) {
   return (
     <div className="flex flex-1 flex-col px-6">
       <div className="flex flex-1 flex-col items-center justify-center text-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
-          className="mb-7 grid h-[72px] w-[72px] place-items-center rounded-[22px]"
-          style={{
-            background:
-              "linear-gradient(150deg, #FF5C8A 0%, #9B5BFF 100%)",
-            boxShadow:
-              "0 24px 50px -16px rgba(255,92,138,0.7), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -10px 20px rgba(0,0,0,0.15)",
-          }}
-        >
-          <Heart
-            className="h-[34px] w-[34px] text-white"
-            fill="currentColor"
-            strokeWidth={0}
-            style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.18))" }}
-          />
-        </motion.div>
+        <div className="relative mb-7">
+          {/* Pulsing halo rings */}
+          {[0, 0.8, 1.6].map((delay, i) => (
+            <motion.span
+              key={i}
+              aria-hidden
+              className="absolute left-1/2 top-1/2 h-[72px] w-[72px] -translate-x-1/2 -translate-y-1/2 rounded-[22px]"
+              style={{
+                border: "1.5px solid rgba(255,92,138,0.55)",
+              }}
+              initial={{ scale: 1, opacity: 0.6 }}
+              animate={{ scale: 2.2, opacity: 0 }}
+              transition={{ duration: 2.4, repeat: Infinity, delay, ease: "easeOut" }}
+            />
+          ))}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.6, rotate: -12 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 260, damping: 16, mass: 1.1 }}
+            className="relative grid h-[72px] w-[72px] place-items-center rounded-[22px]"
+            style={{
+              background:
+                "linear-gradient(150deg, #FF5C8A 0%, #9B5BFF 100%)",
+              boxShadow:
+                "0 24px 50px -16px rgba(255,92,138,0.7), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -10px 20px rgba(0,0,0,0.15)",
+            }}
+          >
+            <motion.div
+              animate={{ scale: [1, 1.12, 1] }}
+              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Heart
+                className="h-[34px] w-[34px] text-white"
+                fill="currentColor"
+                strokeWidth={0}
+                style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.18))" }}
+              />
+            </motion.div>
+          </motion.div>
+        </div>
         <motion.h1
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1, ease: [0.32, 0.72, 0, 1] }}
+          initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.7, delay: 0.25, ease: [0.32, 0.72, 0, 1] }}
           className="max-w-[300px] text-[36px] font-bold leading-[1.05] tracking-[-0.038em]"
           style={{
             fontFamily:
