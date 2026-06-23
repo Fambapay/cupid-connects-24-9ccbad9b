@@ -1,8 +1,11 @@
+import { useRef } from "react";
 import { createFileRoute, Link, Outlet, useMatchRoute } from "@tanstack/react-router";
 import { MessageCircle, Sparkles, Compass, Shield, MessagesSquare } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 import { AppShell } from "@/components/AppShell";
 import { useMatches } from "@/hooks/useMatches";
 import { SwipeableConversationItem } from "@/components/chat/SwipeableConversationItem";
+import { Stagger, StaggerItem, PressableScale } from "@/components/motion";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
