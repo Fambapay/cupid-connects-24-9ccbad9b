@@ -106,21 +106,20 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between px-5 pb-3 pt-1">
+            <div className="grid grid-cols-3 items-center px-5 pb-3 pt-1">
               <button
                 onClick={onClose}
-                className="text-[15px] font-medium text-white/65 active:opacity-60"
-                style={{ minWidth: 56 }}
+                className="text-left text-[15px] font-medium text-white/65 active:opacity-60"
               >
                 Cancelar
               </button>
-              <h2 className="text-[17px] font-semibold tracking-tight text-white">
+              <h2 className="text-center text-[17px] font-semibold tracking-tight text-white">
                 Filtros
               </h2>
               <button
                 onClick={reset}
-                className="text-[15px] font-medium active:opacity-60"
-                style={{ minWidth: 56, textAlign: 'right', color: 'var(--brand-pink)' }}
+                className="text-right text-[15px] font-medium active:opacity-60"
+                style={{ color: 'var(--brand-pink)' }}
               >
                 Repor
               </button>
