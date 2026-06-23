@@ -245,13 +245,11 @@ function Discover() {
   };
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
+    <div className="relative h-[100dvh] overflow-hidden bg-background text-foreground">
       <h1 className="sr-only">Descobrir matches verificados na Hunie</h1>
       <main
-        className="relative w-full overflow-hidden"
+        className="relative h-full w-full overflow-hidden"
         style={{
-          height: "100svh",
-          paddingBottom: "calc(78px + env(safe-area-inset-bottom, 0px))",
           pointerEvents: "auto",
         }}
       >
