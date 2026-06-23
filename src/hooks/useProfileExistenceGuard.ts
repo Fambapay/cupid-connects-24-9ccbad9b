@@ -17,6 +17,8 @@ export function useProfileExistenceGuard() {
     let pollTimer: ReturnType<typeof setInterval> | null = null;
     let currentUserId: string | null = null;
 
+    let cleanupFocus: (() => void) | null = null;
+
     async function kick() {
       if (cancelled) return;
       invalidateOnboardingCache();
@@ -49,6 +51,10 @@ export function useProfileExistenceGuard() {
         clearInterval(pollTimer);
         pollTimer = null;
       }
+      if (cleanupFocus) {
+        cleanupFocus();
+        cleanupFocus = null;
+      }
       currentUserId = null;
     }
 
@@ -57,7 +63,6 @@ export function useProfileExistenceGuard() {
       teardown();
       currentUserId = userId;
 
-      // Realtime DELETE listener — fires the instant the row goes away.
       channel = supabase
         .channel(`profile-self-${userId}`)
         .on(
@@ -67,20 +72,14 @@ export function useProfileExistenceGuard() {
         )
         .subscribe();
 
-      // Belt-and-suspenders: in case realtime is unavailable, re-check on
-      // tab focus and every 60s.
+      // Belt-and-suspenders: re-check on tab focus and every 60s in case
+      // realtime is unavailable.
       const onFocus = () => void verifyExists(userId);
       window.addEventListener("focus", onFocus);
+      cleanupFocus = () => window.removeEventListener("focus", onFocus);
       pollTimer = setInterval(() => void verifyExists(userId), 60_000);
 
-      // Initial check.
       void verifyExists(userId);
-
-      const prevTeardown = teardown;
-      teardown = () => {
-        window.removeEventListener("focus", onFocus);
-        prevTeardown();
-      };
     }
 
     void supabase.auth.getUser().then(({ data }) => {
