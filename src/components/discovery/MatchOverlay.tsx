@@ -257,52 +257,54 @@ export function MatchOverlay({
               transition={{ delayChildren: 0.75 }}
             >
               <StaggerItem>
-                <PressableScale
-                  as="button"
-                  type="button"
-                  onClick={onSendMessage}
-                  disabled={sending}
-                  className="group relative inline-flex h-[52px] w-full items-center justify-center gap-2 overflow-hidden rounded-full text-[15px] font-semibold text-white disabled:opacity-70"
-                  style={{
-                    background: `linear-gradient(150deg, ${ROSE} 0%, ${PLUM} 100%)`,
-                    boxShadow:
-                      "0 18px 36px -14px rgba(255,92,138,0.7), 0 2px 0 rgba(255,255,255,0.10) inset, 0 -10px 22px rgba(0,0,0,0.18) inset",
-                    letterSpacing: "-0.01em",
-                  }}
-                >
-                  {/* Specular highlight */}
-                  <span
-                    aria-hidden
-                    className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-full"
+                <PressableScale className="w-full">
+                  <button
+                    type="button"
+                    onClick={onSendMessage}
+                    disabled={sending}
+                    className="group relative inline-flex h-[52px] w-full items-center justify-center gap-2 overflow-hidden rounded-full text-[15px] font-semibold text-white disabled:opacity-70"
                     style={{
-                      background:
-                        "linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 100%)",
+                      background: `linear-gradient(150deg, ${ROSE} 0%, ${PLUM} 100%)`,
+                      boxShadow:
+                        "0 18px 36px -14px rgba(255,92,138,0.7), 0 2px 0 rgba(255,255,255,0.10) inset, 0 -10px 22px rgba(0,0,0,0.18) inset",
+                      letterSpacing: "-0.01em",
                     }}
-                  />
-                  <MessageCircle
-                    className="relative h-[17px] w-[17px]"
-                    strokeWidth={2.4}
-                  />
-                  <span className="relative">
-                    {sending ? "A abrir conversa…" : "Enviar mensagem"}
-                  </span>
+                  >
+                    {/* Specular highlight */}
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-full"
+                      style={{
+                        background:
+                          "linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 100%)",
+                      }}
+                    />
+                    <MessageCircle
+                      className="relative h-[17px] w-[17px]"
+                      strokeWidth={2.4}
+                    />
+                    <span className="relative">
+                      {sending ? "A abrir conversa…" : "Enviar mensagem"}
+                    </span>
+                  </button>
                 </PressableScale>
               </StaggerItem>
 
               <StaggerItem>
-                <PressableScale
-                  as="button"
-                  type="button"
-                  onClick={onClose}
-                  className="inline-flex h-[46px] w-full items-center justify-center rounded-full text-[14px] font-medium text-white/75"
-                  style={{
-                    background: "rgba(255,255,255,0.05)",
-                    border: "0.5px solid rgba(255,255,255,0.12)",
-                    backdropFilter: "blur(20px) saturate(180%)",
-                    letterSpacing: "-0.005em",
-                  }}
-                >
-                  Continuar a descobrir
+                <PressableScale className="w-full">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="inline-flex h-[46px] w-full items-center justify-center rounded-full text-[14px] font-medium text-white/75"
+                    style={{
+                      background: "rgba(255,255,255,0.05)",
+                      border: "0.5px solid rgba(255,255,255,0.12)",
+                      backdropFilter: "blur(20px) saturate(180%)",
+                      letterSpacing: "-0.005em",
+                    }}
+                  >
+                    Continuar a descobrir
+                  </button>
                 </PressableScale>
               </StaggerItem>
             </Stagger>
