@@ -324,15 +324,26 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     // Velocity tracking for fling detection
     const sampleRef = useRef<{ x: number; y: number; t: number }>({ x: 0, y: 0, t: 0 });
     const velocityRef = useRef<{ vx: number; vy: number }>({ vx: 0, vy: 0 });
+    const downRef = useRef<{ x: number; y: number; t: number; rectX: number; rectW: number } | null>(null);
+    const movedRef = useRef(false);
 
     const onPointerDown = (e: React.PointerEvent) => {
       if (!isTop || detailOpen) return;
       if (e.pointerType === "mouse" && e.button !== 0) return;
       cancelAnim();
       draggingRef.current = true;
+      movedRef.current = false;
       startRef.current = { x: e.clientX - x.get(), y: e.clientY - y.get() };
       sampleRef.current = { x: e.clientX, y: e.clientY, t: performance.now() };
       velocityRef.current = { vx: 0, vy: 0 };
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      downRef.current = {
+        x: e.clientX,
+        y: e.clientY,
+        t: performance.now(),
+        rectX: rect.left,
+        rectW: rect.width,
+      };
       (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
     };
     const onPointerMove = (e: React.PointerEvent) => {
@@ -341,6 +352,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       const rawY = e.clientY - startRef.current.y;
       // Allow up freely (scaled), rubber-band downward
       const ny = rawY <= 0 ? rawY * 0.7 : Math.pow(rawY, 0.7) * 0.5;
+      if (Math.abs(nx) > 6 || Math.abs(rawY) > 6) movedRef.current = true;
       x.set(nx);
       y.set(ny);
       // Velocity sample (exponential smoothing)
@@ -365,11 +377,28 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       const goUp = (dy < -180 && vy < -350 && Math.abs(vx) < Math.abs(vy)) || vy < flingY;
       const goRight = dx > swipeX || vx > flingX;
       const goLeft = dx < -swipeX || vx < -flingX;
+      // Tap detection — navigate photos
+      const down = downRef.current;
+      const tappedQuickly =
+        !movedRef.current &&
+        down &&
+        performance.now() - down.t < 350 &&
+        !goUp && !goRight && !goLeft;
+      if (tappedQuickly && down) {
+        const relX = down.x - down.rectX;
+        const isLeft = relX < down.rectW / 2;
+        if (isLeft) goPrevPhoto();
+        else goNextPhoto();
+        animateTo(0, 0, false);
+        return;
+      }
       if (goUp) flyOut("up", { x: vx, y: vy });
       else if (goRight && vx >= -flingX) flyOut("right", { x: vx, y: vy });
       else if (goLeft && vx <= flingX) flyOut("left", { x: vx, y: vy });
       else animateTo(0, 0, false, undefined, { x: vx, y: vy });
     };
+
+
 
 
     const goPrevPhoto = useCallback(
