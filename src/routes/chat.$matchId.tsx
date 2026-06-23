@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ChevronLeft, Send } from "lucide-react";
 import { useMessages, type ChatMessage } from "@/hooks/useMessages";
@@ -11,6 +11,7 @@ import { ChatActionsMenu } from "@/components/chat/ChatActionsMenu";
 import { PeerProfileSheet } from "@/components/chat/PeerProfileSheet";
 import { getActivityStatus } from "@/lib/activityStatus";
 import { useSubscription } from "@/hooks/useSubscription";
+import { chat as chatMotion } from "@/lib/motion";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
