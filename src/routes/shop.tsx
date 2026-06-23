@@ -233,7 +233,7 @@ function ShopPage() {
 
                 <div className="mt-4 flex items-center justify-between text-[11px]">
                   <span className="text-muted-foreground">
-                    Tens <b className="text-white">{tabCount}</b> disponíve{tabCount === 1 ? "l" : "is"}
+                    Tens <b className="text-foreground">{tabCount}</b> disponíve{tabCount === 1 ? "l" : "is"}
                   </span>
                   <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/15 px-2 py-0.5 font-semibold text-orange-300">
                     <Flame size={10} /> Procurado agora
