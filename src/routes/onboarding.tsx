@@ -432,14 +432,15 @@ function OnboardingPage() {
   const progress = ((draft.stepIdx) / (STEP_COUNT - 1)) * 100;
 
   return (
-    <div className="relative min-h-[100svh] overflow-hidden bg-background text-foreground">
-      {/* Ambient brand glow */}
-      <div className="pointer-events-none absolute inset-0 bg-aurora opacity-80" />
+    <div className="relative min-h-[100dvh] overflow-hidden bg-background text-foreground">
+      {/* Ambient brand glow — extends to full device viewport including safe-area zones */}
+      <div className="pointer-events-none fixed inset-0 bg-aurora opacity-80" />
 
       <div
-        className="relative flex min-h-[100svh] flex-col"
+        className="relative flex min-h-[100dvh] flex-col"
         style={{
           paddingTop: "env(safe-area-inset-top)",
+          paddingBottom: "env(safe-area-inset-bottom)",
         }}
       >
         {/* Top bar */}
