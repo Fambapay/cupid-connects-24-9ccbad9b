@@ -155,8 +155,14 @@ export function SwipeableConversationItem({
       ref={containerRef}
       layout={reduced ? false : "position"}
       transition={spring.smooth}
-      initial={isNew && !reduced ? { opacity: 0, y: 10 } : false}
-      animate={isNew && !reduced ? { opacity: 1, y: 0, transition: chatMotion.bubbleIn } : undefined}
+      initial={reduced ? false : isNew ? { opacity: 0, y: 10 } : { opacity: 0, y: 8 }}
+      animate={
+        reduced
+          ? undefined
+          : isNew
+            ? { opacity: 1, y: 0, transition: chatMotion.bubbleIn }
+            : { opacity: 1, y: 0, transition: { ...spring.snappy, delay: mountDelay } }
+      }
       exit={reduced ? { opacity: 0 } : { opacity: 0, height: 0, marginTop: 0, marginBottom: 0 }}
       className="relative overflow-hidden rounded-2xl"
     >
