@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Heart, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { signPhoto } from "@/lib/photos";
+import { match as matchMotion, spring } from "@/lib/motion";
+import { Stagger, StaggerItem, PressableScale } from "@/components/motion";
 
 const ROSE = "#FF5C8A";
 const PLUM = "#9B5BFF";
@@ -30,6 +32,7 @@ export function MatchOverlay({
 }: Props) {
   const { user } = useAuth();
   const [myPhoto, setMyPhoto] = useState<string | null>(null);
+  const reduce = useReducedMotion();
 
   useEffect(() => {
     if (!open || !user) return;
@@ -60,10 +63,10 @@ export function MatchOverlay({
       {open && (
         <motion.div
           key="match-overlay"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.28, ease: APPLE_EASE }}
+          initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
+          animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+          exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
+          transition={reduce ? { duration: 0.2 } : spring.smooth}
           className="fixed inset-0 z-[10000] flex flex-col items-center justify-center px-7"
           onClick={onClose}
           style={{
@@ -124,33 +127,42 @@ export function MatchOverlay({
             className="relative flex w-full max-w-[340px] flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Photos */}
-            <div className="relative mb-9 h-[188px] w-[280px]">
+            {/* Photos — meet in the centre from opposite sides with spring settle. */}
+            <div
+              className="relative mb-9 h-[188px]"
+              style={{ width: 144 * 2 - matchMotion.photoOverlap }}
+            >
               <PhotoBubble
                 src={myPhoto}
                 fallbackInitial="Tu"
                 className="left-0 top-2"
-                rotate={-6}
-                delay={0.12}
+                rotate={-4}
+                fromSide="left"
+                delay={reduce ? 0.1 : 0.12}
+                reduce={!!reduce}
               />
               <PhotoBubble
                 src={targetPhoto ?? null}
                 fallbackInitial={targetName[0] ?? "?"}
                 className="right-0 top-2"
-                rotate={6}
-                delay={0.22}
+                rotate={4}
+                fromSide="right"
+                delay={reduce ? 0.15 : 0.18}
+                reduce={!!reduce}
               />
-              {/* Center heart badge — Apple capsule */}
+              {/* Center heart badge — pulse subtil quando o título aparece. */}
               <motion.div
-                initial={{ scale: 0.4, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{
-                  delay: 0.5,
-                  type: "spring",
-                  stiffness: 320,
-                  damping: 22,
-                  mass: 0.8,
-                }}
+                initial={reduce ? { opacity: 0 } : { scale: 0, opacity: 0 }}
+                animate={
+                  reduce
+                    ? { opacity: 1 }
+                    : { scale: [0, 1.1, 1], opacity: [0, 1, 1] }
+                }
+                transition={
+                  reduce
+                    ? { delay: 0.45, duration: 0.2 }
+                    : { delay: 0.45, duration: 0.55, times: [0, 0.6, 1], ease: [0.32, 0.72, 0, 1] }
+                }
                 className="absolute left-1/2 top-1/2 z-10 grid h-[60px] w-[60px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full"
                 style={{
                   background: `linear-gradient(150deg, ${ROSE} 0%, ${PLUM} 100%)`,
@@ -167,6 +179,7 @@ export function MatchOverlay({
                 />
               </motion.div>
             </div>
+
 
             {/* Eyebrow — refined, monochrome */}
             <motion.div
@@ -196,16 +209,15 @@ export function MatchOverlay({
               />
             </motion.div>
 
-            {/* Title — refined gradient, tighter tracking */}
+            {/* Title — bounce pop after photos settle. */}
             <motion.h2
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: 0.7,
-                type: "spring",
-                stiffness: 260,
-                damping: 24,
-              }}
+              initial={reduce ? { opacity: 0 } : { scale: 0.5, opacity: 0 }}
+              animate={reduce ? { opacity: 1 } : { scale: 1, opacity: 1 }}
+              transition={
+                reduce
+                  ? { delay: 0.5, duration: 0.25 }
+                  : { delay: 0.5, ...matchMotion.titlePop }
+              }
               className="mt-3 text-center text-[44px] font-bold leading-[1.02] tracking-[-0.035em]"
               style={{
                 fontFamily:
@@ -222,9 +234,9 @@ export function MatchOverlay({
             </motion.h2>
 
             <motion.p
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.78, duration: 0.4, ease: APPLE_EASE }}
+              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 6 }}
+              animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.4, ease: APPLE_EASE }}
               className="mt-3 max-w-[300px] text-center text-[14.5px] leading-[1.45] text-white/65"
               style={{
                 fontFamily:
@@ -237,56 +249,65 @@ export function MatchOverlay({
               gostam-se. Manda já o primeiro recado.
             </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.92, duration: 0.45, ease: APPLE_EASE }}
+            {/* Buttons — stagger in last. Orquestração declarativa via delay,
+                nunca setTimeout (sincroniza com o clock do Framer Motion). */}
+            <Stagger
+              stagger={0.08}
               className="mt-8 flex w-full max-w-[320px] flex-col gap-2.5"
+              transition={{ delayChildren: 0.75 }}
             >
-              <button
-                type="button"
-                onClick={onSendMessage}
-                disabled={sending}
-                className="group relative inline-flex h-[52px] items-center justify-center gap-2 overflow-hidden rounded-full text-[15px] font-semibold text-white transition-transform active:scale-[0.975] disabled:opacity-70"
-                style={{
-                  background: `linear-gradient(150deg, ${ROSE} 0%, ${PLUM} 100%)`,
-                  boxShadow:
-                    "0 18px 36px -14px rgba(255,92,138,0.7), 0 2px 0 rgba(255,255,255,0.10) inset, 0 -10px 22px rgba(0,0,0,0.18) inset",
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                {/* Specular highlight */}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-full"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 100%)",
-                  }}
-                />
-                <MessageCircle
-                  className="relative h-[17px] w-[17px]"
-                  strokeWidth={2.4}
-                />
-                <span className="relative">
-                  {sending ? "A abrir conversa…" : "Enviar mensagem"}
-                </span>
-              </button>
+              <StaggerItem>
+                <PressableScale className="w-full">
+                  <button
+                    type="button"
+                    onClick={onSendMessage}
+                    disabled={sending}
+                    className="group relative inline-flex h-[52px] w-full items-center justify-center gap-2 overflow-hidden rounded-full text-[15px] font-semibold text-white disabled:opacity-70"
+                    style={{
+                      background: `linear-gradient(150deg, ${ROSE} 0%, ${PLUM} 100%)`,
+                      boxShadow:
+                        "0 18px 36px -14px rgba(255,92,138,0.7), 0 2px 0 rgba(255,255,255,0.10) inset, 0 -10px 22px rgba(0,0,0,0.18) inset",
+                      letterSpacing: "-0.01em",
+                    }}
+                  >
+                    {/* Specular highlight */}
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-full"
+                      style={{
+                        background:
+                          "linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 100%)",
+                      }}
+                    />
+                    <MessageCircle
+                      className="relative h-[17px] w-[17px]"
+                      strokeWidth={2.4}
+                    />
+                    <span className="relative">
+                      {sending ? "A abrir conversa…" : "Enviar mensagem"}
+                    </span>
+                  </button>
+                </PressableScale>
+              </StaggerItem>
 
-              <button
-                type="button"
-                onClick={onClose}
-                className="inline-flex h-[46px] items-center justify-center rounded-full text-[14px] font-medium text-white/75 transition-transform active:scale-[0.98]"
-                style={{
-                  background: "rgba(255,255,255,0.05)",
-                  border: "0.5px solid rgba(255,255,255,0.12)",
-                  backdropFilter: "blur(20px) saturate(180%)",
-                  letterSpacing: "-0.005em",
-                }}
-              >
-                Continuar a descobrir
-              </button>
-            </motion.div>
+              <StaggerItem>
+                <PressableScale className="w-full">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="inline-flex h-[46px] w-full items-center justify-center rounded-full text-[14px] font-medium text-white/75"
+                    style={{
+                      background: "rgba(255,255,255,0.05)",
+                      border: "0.5px solid rgba(255,255,255,0.12)",
+                      backdropFilter: "blur(20px) saturate(180%)",
+                      letterSpacing: "-0.005em",
+                    }}
+                  >
+                    Continuar a descobrir
+                  </button>
+                </PressableScale>
+              </StaggerItem>
+            </Stagger>
           </div>
         </motion.div>
       )}
@@ -294,30 +315,43 @@ export function MatchOverlay({
   );
 }
 
+
 function PhotoBubble({
   src,
   fallbackInitial,
   className,
   rotate,
+  fromSide,
   delay,
+  reduce,
 }: {
   src: string | null;
   fallbackInitial: string;
   className?: string;
   rotate: number;
+  fromSide: "left" | "right";
   delay: number;
+  reduce: boolean;
 }) {
+  const initial = reduce
+    ? { opacity: 0, rotate }
+    : {
+        x: fromSide === "left" ? "-120%" : "120%",
+        rotate: fromSide === "left" ? -8 : 8,
+        opacity: 0,
+      };
+  const animate = reduce
+    ? { opacity: 1, rotate }
+    : { x: 0, rotate, opacity: 1 };
   return (
     <motion.div
-      initial={{ scale: 0.5, opacity: 0, y: 24, rotate: 0 }}
-      animate={{ scale: 1, opacity: 1, y: 0, rotate }}
-      transition={{
-        delay,
-        type: "spring",
-        stiffness: 240,
-        damping: 22,
-        mass: 0.85,
-      }}
+      initial={initial}
+      animate={animate}
+      transition={
+        reduce
+          ? { delay, duration: 0.3 }
+          : { delay, ...matchMotion.photoSettle }
+      }
       className={`absolute h-[178px] w-[144px] overflow-hidden rounded-[30px] ${className ?? ""}`}
       style={{
         boxShadow:
@@ -350,3 +384,4 @@ function PhotoBubble({
     </motion.div>
   );
 }
+

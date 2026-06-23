@@ -58,3 +58,14 @@ export const swipe = {
   flyDistance: 1.5,     // múltiplo da largura para sair de cena
 } as const;
 
+/**
+ * Tunables para o ecrã "It's a Match".
+ * O `photoSettle` é o overshoot que dá o batimento emocional ao encontro
+ * das duas fotos; o `titlePop` é o bounce mais marcado do título.
+ */
+export const match = {
+  photoSettle: { type: "spring", visualDuration: 0.55, bounce: 0.22 },
+  titlePop:    { type: "spring", visualDuration: 0.5,  bounce: 0.35 },
+  photoOverlap: 24, // px de sobreposição quando as fotos assentam
+} as const;
+
