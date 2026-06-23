@@ -122,9 +122,11 @@ function LikesPage() {
                     <Heart className="h-4 w-4" fill="currentColor" />
                   </div>
                 </div>
-              </button>
+                  </button>
+                </PressableScale>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         )}
       </section>
     </AppShell>
