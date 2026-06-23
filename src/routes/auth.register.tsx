@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Eye, EyeOff, Loader2, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -54,9 +54,7 @@ function RegisterPage() {
     setError(null);
     try {
       const result = await signInWithGoogle();
-      if (result.error) {
-        setError(result.error.message);
-      }
+      if (result.error) setError(result.error.message);
     } catch {
       setError("Erro ao iniciar sessão com Google");
     } finally {
@@ -75,7 +73,6 @@ function RegisterPage() {
         setError(err.message);
         return;
       }
-      // Fire-and-forget welcome email; don't block navigation on failure.
       sendTransactionalEmail({
         templateName: "welcome",
         recipientEmail: email,
@@ -90,104 +87,151 @@ function RegisterPage() {
   };
 
   return (
-    <AuthShell title="Criar conta">
+    <AuthShell
+      title={step === 1 ? "Criar conta" : "Define a tua palavra-passe"}
+      subtitle={step === 1 ? "Começa a tua jornada em segundos." : email}
+    >
       {step === 1 ? (
-        <div className="space-y-4">
+        <>
           <button
             type="button"
             onClick={handleGoogle}
             disabled={googleBusy}
             style={{ color: "#1f1f1f" }}
-            className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-white font-semibold shadow-md transition-transform active:scale-[0.98] disabled:opacity-60"
+            className="group relative flex h-12 w-full items-center justify-center gap-2.5 overflow-hidden rounded-full bg-white text-sm font-semibold shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)] transition-all hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.5)] active:scale-[0.98] disabled:opacity-60"
           >
             {googleBusy ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
               <>
                 <GoogleIcon />
-                Continuar com Google
+                <span>Continuar com Google</span>
               </>
             )}
           </button>
 
-          <div className="flex items-center gap-3 py-2">
-            <div className="h-px flex-1 bg-foreground/10" />
-            <span className="text-xs text-muted-foreground">ou</span>
-            <div className="h-px flex-1 bg-foreground/10" />
+          <div className="flex items-center gap-3 py-4">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-foreground/15" />
+            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">ou com email</span>
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-foreground/15" />
           </div>
 
           <form onSubmit={onEmailNext} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label className="text-xs">Email</Label>
-              <Input
-                type="email"
-                autoFocus
-                value={email}
-                onBlur={() => {
-                  if (email && !emailRe.test(email)) setEmailError("Email inválido");
-                }}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setEmailError(null);
-                }}
-                required
-                className="h-12 rounded-xl bg-white/5"
-              />
-              {emailError && <p className="text-sm text-destructive">{emailError}</p>}
-            </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            <Field label="Email">
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
+                <Input
+                  type="email"
+                  autoFocus
+                  value={email}
+                  onBlur={() => {
+                    if (email && !emailRe.test(email)) setEmailError("Email inválido");
+                  }}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setEmailError(null);
+                  }}
+                  required
+                  placeholder="tu@exemplo.com"
+                  className="h-12 rounded-full border-white/10 bg-white/5 pl-11 pr-4 text-sm transition-colors focus-visible:border-white/30 focus-visible:bg-white/[0.07]"
+                />
+              </div>
+              {emailError && (
+                <p className="px-1 pt-1 text-xs text-destructive">{emailError}</p>
+              )}
+            </Field>
+            {error && (
+              <p className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-2.5 text-xs text-destructive">
+                {error}
+              </p>
+            )}
             <Button
               type="submit"
-              className="h-14 w-full rounded-2xl bg-gradient-sunset text-base font-semibold text-white shadow-glow active:scale-[0.98]"
+              className="group h-12 w-full rounded-full bg-gradient-sunset text-sm font-semibold text-white shadow-glow transition-transform hover:shadow-[0_16px_40px_-8px_rgba(255,79,163,0.55)] active:scale-[0.98]"
             >
-              Continuar
+              <span className="inline-flex items-center gap-2">
+                Continuar
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </span>
             </Button>
           </form>
-        </div>
+        </>
       ) : (
         <form onSubmit={submit} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label className="text-xs">Palavra-passe</Label>
+          <Field label="Palavra-passe">
             <div className="relative">
+              <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
               <Input
                 type={show ? "text" : "password"}
                 autoFocus
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="h-12 rounded-xl bg-white/5 pr-12"
+                placeholder="••••••••"
+                className="h-12 rounded-full border-white/10 bg-white/5 pl-11 pr-12 text-sm transition-colors focus-visible:border-white/30 focus-visible:bg-white/[0.07]"
               />
               <button
                 type="button"
                 onClick={() => setShow((s) => !s)}
-                className="absolute inset-y-0 right-3 my-auto text-muted-foreground"
+                aria-label={show ? "Esconder palavra-passe" : "Mostrar palavra-passe"}
+                className="absolute inset-y-0 right-4 my-auto text-muted-foreground transition-colors hover:text-foreground"
               >
                 {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-          </div>
-          <ul className="space-y-1.5 text-sm">
+          </Field>
+          <ul className="space-y-2 px-1 text-xs">
             <Req ok={reqLen}>Mínimo 8 caracteres</Req>
             <Req ok={reqUpper}>Uma letra maiúscula</Req>
             <Req ok={reqNum}>Um número</Req>
           </ul>
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button
-            type="submit"
-            disabled={busy || !passOk}
-            className="h-14 w-full rounded-2xl bg-gradient-sunset text-base font-semibold text-white shadow-glow active:scale-[0.98]"
-          >
-            {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : "Criar conta"}
-          </Button>
+          {error && (
+            <p className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-2.5 text-xs text-destructive">
+              {error}
+            </p>
+          )}
+          <div className="flex items-center gap-3 pt-1">
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              className="inline-flex h-12 items-center justify-center rounded-full border border-white/10 px-4 text-muted-foreground transition-colors hover:text-foreground"
+              aria-label="Voltar"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </button>
+            <Button
+              type="submit"
+              disabled={busy || !passOk}
+              className="group h-12 flex-1 rounded-full bg-gradient-sunset text-sm font-semibold text-white shadow-glow transition-transform hover:shadow-[0_16px_40px_-8px_rgba(255,79,163,0.55)] active:scale-[0.98]"
+            >
+              {busy ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <span className="inline-flex items-center gap-2">
+                  Criar conta
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </span>
+              )}
+            </Button>
+          </div>
         </form>
       )}
-      <p className="mt-5 text-center text-sm text-muted-foreground">
+      <div className="mt-6 border-t border-white/5 pt-4 text-center text-xs text-muted-foreground">
         Já tens conta?{" "}
-        <Link to="/auth/login" className="font-semibold text-foreground">
+        <Link to="/auth/login" className="font-semibold text-gradient-sunset">
           Entrar
         </Link>
-      </p>
+      </div>
     </AuthShell>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{label}</Label>
+      {children}
+    </div>
   );
 }
 
@@ -212,11 +256,11 @@ function Req({ ok, children }: { ok: boolean; children: React.ReactNode }) {
     >
       <span
         className={cn(
-          "grid h-4 w-4 place-items-center rounded-full border",
-          ok ? "border-transparent bg-gradient-sunset" : "border-white/20",
+          "grid h-4 w-4 place-items-center rounded-full border transition-all",
+          ok ? "border-transparent bg-gradient-sunset" : "border-white/15",
         )}
       >
-        {ok && <Check className="h-3 w-3 text-white" />}
+        {ok && <Check className="h-2.5 w-2.5 text-white" strokeWidth={3} />}
       </span>
       {children}
     </li>
