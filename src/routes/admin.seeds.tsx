@@ -10,6 +10,7 @@ import {
   getSeedStats,
   setSeedThreshold,
   generateSeeds,
+  populateExistingUsers,
 } from "@/lib/seeds.functions";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
