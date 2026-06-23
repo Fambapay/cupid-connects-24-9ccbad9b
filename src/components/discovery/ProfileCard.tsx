@@ -11,6 +11,7 @@ import {
   motion,
   useMotionValue,
   useMotionValueEvent,
+  useReducedMotion,
   animate,
   type MotionValue,
 } from "framer-motion";
