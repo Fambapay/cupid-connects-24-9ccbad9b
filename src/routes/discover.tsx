@@ -41,6 +41,7 @@ export const Route = createFileRoute("/discover")({
 });
 
 function Discover() {
+  useForceDarkTheme();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isPremium, entitlements } = useSubscription();
