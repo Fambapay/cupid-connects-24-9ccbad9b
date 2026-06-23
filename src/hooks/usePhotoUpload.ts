@@ -174,6 +174,13 @@ export function usePhotoUpload() {
       const contentType = compressed.type || file.type || "image/jpeg";
       const path = `${currentUser.id}/${makeUploadId()}.${extensionForType(contentType, file.name)}`;
 
+      // Ensure the parent profile row exists (FK target). New users may hit
+      // this before handle_new_user has run, or if signup happened via an
+      // alternate flow that bypassed the trigger.
+      await supabase
+        .from("profiles")
+        .upsert({ id: currentUser.id }, { onConflict: "id", ignoreDuplicates: true });
+
       const { error: upErr } = await supabase.storage
         .from(BUCKET)
         .upload(path, compressed, { upsert: false, contentType });
