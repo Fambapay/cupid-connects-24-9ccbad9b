@@ -14,7 +14,7 @@ import {
   animate,
   type MotionValue,
 } from "framer-motion";
-import { MapPin, ChevronDown, ArrowUp } from "lucide-react";
+import { MapPin, ArrowUp, X, ChevronLeft, ChevronRight } from "lucide-react";
 import type { DiscoveryProfile, SwipeDirection } from "./types";
 
 interface ProfileCardProps {
@@ -324,15 +324,26 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     // Velocity tracking for fling detection
     const sampleRef = useRef<{ x: number; y: number; t: number }>({ x: 0, y: 0, t: 0 });
     const velocityRef = useRef<{ vx: number; vy: number }>({ vx: 0, vy: 0 });
+    const downRef = useRef<{ x: number; y: number; t: number; rectX: number; rectW: number } | null>(null);
+    const movedRef = useRef(false);
 
     const onPointerDown = (e: React.PointerEvent) => {
       if (!isTop || detailOpen) return;
       if (e.pointerType === "mouse" && e.button !== 0) return;
       cancelAnim();
       draggingRef.current = true;
+      movedRef.current = false;
       startRef.current = { x: e.clientX - x.get(), y: e.clientY - y.get() };
       sampleRef.current = { x: e.clientX, y: e.clientY, t: performance.now() };
       velocityRef.current = { vx: 0, vy: 0 };
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      downRef.current = {
+        x: e.clientX,
+        y: e.clientY,
+        t: performance.now(),
+        rectX: rect.left,
+        rectW: rect.width,
+      };
       (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
     };
     const onPointerMove = (e: React.PointerEvent) => {
@@ -341,6 +352,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       const rawY = e.clientY - startRef.current.y;
       // Allow up freely (scaled), rubber-band downward
       const ny = rawY <= 0 ? rawY * 0.7 : Math.pow(rawY, 0.7) * 0.5;
+      if (Math.abs(nx) > 6 || Math.abs(rawY) > 6) movedRef.current = true;
       x.set(nx);
       y.set(ny);
       // Velocity sample (exponential smoothing)
@@ -365,6 +377,21 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       const goUp = (dy < -180 && vy < -350 && Math.abs(vx) < Math.abs(vy)) || vy < flingY;
       const goRight = dx > swipeX || vx > flingX;
       const goLeft = dx < -swipeX || vx < -flingX;
+      // Tap detection — navigate photos
+      const down = downRef.current;
+      const tappedQuickly =
+        !movedRef.current &&
+        down &&
+        performance.now() - down.t < 350 &&
+        !goUp && !goRight && !goLeft;
+      if (tappedQuickly && down) {
+        const relX = down.x - down.rectX;
+        const isLeft = relX < down.rectW / 2;
+        if (isLeft) goPrevPhoto();
+        else goNextPhoto();
+        animateTo(0, 0, false);
+        return;
+      }
       if (goUp) flyOut("up", { x: vx, y: vy });
       else if (goRight && vx >= -flingX) flyOut("right", { x: vx, y: vy });
       else if (goLeft && vx <= flingX) flyOut("left", { x: vx, y: vy });
@@ -372,15 +399,17 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     };
 
 
-    const onClickPhoto = (e: React.MouseEvent) => {
-      if (detailOpen) return;
-      const moved = Math.abs(x.get()) + Math.abs(y.get());
-      if (moved > 6) return;
-      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-      const isLeft = e.clientX - rect.left < rect.width / 2;
-      if (isLeft) setPhotoIdx((i) => Math.max(0, i - 1));
-      else setPhotoIdx((i) => Math.min(photos.length - 1, i + 1));
-    };
+
+
+    const goPrevPhoto = useCallback(
+      () => setPhotoIdx((i) => Math.max(0, i - 1)),
+      [],
+    );
+    const goNextPhoto = useCallback(
+      () => setPhotoIdx((i) => Math.min(photos.length - 1, i + 1)),
+      [photos.length],
+    );
+
 
 
 
@@ -399,7 +428,6 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
-          onClick={onClickPhoto}
           style={{
             position: "absolute",
             inset: 0,
@@ -410,6 +438,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             transformStyle: "preserve-3d",
           }}
         >
+
           <div
             ref={photoWrapRef}
             style={{
@@ -729,6 +758,14 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 380, damping: 36 }}
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.6 }}
+            onDragEnd={(_, info) => {
+              if (info.offset.y > 120 || info.velocity.y > 600) {
+                setDetailOpen(false);
+              }
+            }}
             style={{
               position: "absolute",
               inset: 0,
@@ -736,42 +773,152 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               background: "#0a0a0a",
               color: "#fff",
               overflowY: "auto",
-              paddingBottom: 120,
+              paddingBottom: 140,
               borderRadius: 0,
+              touchAction: "pan-y",
             }}
           >
-            {profile.photos[0] && (
-              <img
-                src={profile.photos[0]}
-                alt=""
+            {/* Drag handle */}
+            <div
+              style={{
+                position: "sticky",
+                top: 0,
+                zIndex: 5,
+                display: "flex",
+                justifyContent: "center",
+                paddingTop: 8,
+                pointerEvents: "none",
+              }}
+            >
+              <div
                 style={{
-                  width: "100%",
-                  height: "55%",
-                  objectFit: "cover",
-                  display: "block",
+                  width: 44,
+                  height: 5,
+                  borderRadius: 999,
+                  background: "rgba(255,255,255,0.4)",
                 }}
               />
-            )}
+            </div>
+
+            {/* Photo carousel */}
+            <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: "#111", marginTop: -22 }}>
+              {photos.map((src, i) => (
+                <img
+                  key={i + src}
+                  src={src}
+                  alt=""
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    opacity: i === photoIdx ? 1 : 0,
+                    transition: "opacity 150ms linear",
+                  }}
+                />
+              ))}
+              {photos.length > 1 && (
+                <>
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 14,
+                      left: 10,
+                      right: 10,
+                      display: "flex",
+                      gap: 4,
+                      zIndex: 2,
+                    }}
+                  >
+                    {photos.map((_, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          flex: 1,
+                          height: 3,
+                          borderRadius: 2,
+                          background: i === photoIdx ? "#fff" : "rgba(255,255,255,0.35)",
+                          transition: "background 120ms",
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    onClick={goPrevPhoto}
+                    aria-label="Foto anterior"
+                    disabled={photoIdx === 0}
+                    style={{
+                      position: "absolute",
+                      left: 8,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      width: 40,
+                      height: 40,
+                      borderRadius: "50%",
+                      border: "none",
+                      background: "rgba(0,0,0,0.45)",
+                      color: "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      opacity: photoIdx === 0 ? 0.3 : 1,
+                      cursor: "pointer",
+                    }}
+                  >
+                    <ChevronLeft size={22} />
+                  </button>
+                  <button
+                    onClick={goNextPhoto}
+                    aria-label="Próxima foto"
+                    disabled={photoIdx === photos.length - 1}
+                    style={{
+                      position: "absolute",
+                      right: 8,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      width: 40,
+                      height: 40,
+                      borderRadius: "50%",
+                      border: "none",
+                      background: "rgba(0,0,0,0.45)",
+                      color: "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      opacity: photoIdx === photos.length - 1 ? 0.3 : 1,
+                      cursor: "pointer",
+                    }}
+                  >
+                    <ChevronRight size={22} />
+                  </button>
+                </>
+              )}
+            </div>
+
             <button
               onClick={() => setDetailOpen(false)}
               style={{
-                position: "absolute",
-                top: 12,
+                position: "fixed",
+                top: 14,
                 right: 16,
-                width: 40,
-                height: 40,
+                width: 42,
+                height: 42,
                 borderRadius: "50%",
-                border: "none",
-                background: "rgba(0,0,0,0.6)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                background: "rgba(0,0,0,0.65)",
+                backdropFilter: "blur(14px)",
+                WebkitBackdropFilter: "blur(14px)",
                 color: "#fff",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
+                zIndex: 40,
               }}
               aria-label="Fechar"
             >
-              <ChevronDown size={22} />
+              <X size={22} />
             </button>
 
             <div style={{ padding: "20px 20px 0" }}>
@@ -869,6 +1016,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             )}
           </motion.div>
         )}
+
       </div>
     );
   },
