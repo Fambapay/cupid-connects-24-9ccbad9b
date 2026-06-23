@@ -187,6 +187,38 @@
   --profile-glow-opacity: 0;
 }
 
+/* Light-mode component overrides */
+.light .hunie-card {
+  background: var(--profile-card-bg, #ffffff);
+  border-color: var(--profile-card-border, rgba(0,0,0,0.06));
+  box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, 0 6px 18px -10px rgba(0,0,0,0.08);
+}
+.light .hunie-card:hover {
+  border-color: color-mix(in oklab, var(--brand-pink) 22%, rgba(0,0,0,0.10));
+}
+.light .hunie-card .hunie-divider {
+  border-color: rgba(0,0,0,0.06);
+}
+.light .hunie-row:active { background: rgba(0,0,0,0.04); }
+.light .hunie-section-label { color: rgba(0,0,0,0.55); }
+.light .hunie-glass-btn {
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 4px 10px -4px rgba(0,0,0,0.10);
+  backdrop-filter: none;
+}
+.light .hunie-input {
+  background: #ffffff;
+  border-color: rgba(0,0,0,0.08);
+}
+.light .hunie-input:hover { background: #fafafa; }
+.light .hunie-input:focus,
+.light .hunie-input:focus-visible {
+  background: #ffffff;
+  border-color: color-mix(in oklab, var(--brand-pink) 55%, transparent);
+}
+
+
 
 
 

@@ -248,16 +248,15 @@ function SettingsPage() {
 
   return (
     <div
-      className="h-[100dvh] overflow-y-auto overflow-x-hidden bg-background overscroll-y-contain"
-      style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
+      className="h-[100dvh] overflow-y-auto overflow-x-hidden overscroll-y-contain"
+      style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y', background: 'var(--profile-bg)' }}
     >
       {/* Header */}
       <div
-        className="sticky top-0 z-10 border-b border-white/[0.06]"
+        className="sticky top-0 z-10 border-b border-border"
         style={{
           paddingTop: 'env(safe-area-inset-top, 0px)',
-          background:
-            'linear-gradient(180deg, rgba(16,14,22,0.92) 0%, rgba(16,14,22,0.78) 100%)',
+          background: 'color-mix(in oklab, var(--profile-bg) 88%, transparent)',
           backdropFilter: 'blur(18px) saturate(140%)',
         }}
       >
@@ -265,6 +264,7 @@ function SettingsPage() {
           aria-hidden
           className="pointer-events-none absolute left-1/2 top-0 h-[140px] w-[360px] -translate-x-1/2 rounded-full"
           style={{
+            opacity: 'var(--profile-glow-opacity, 1)',
             background:
               'radial-gradient(closest-side, color-mix(in oklab, var(--brand-pink) 18%, transparent) 0%, transparent 70%)',
             filter: 'blur(24px)',
@@ -278,8 +278,9 @@ function SettingsPage() {
               whileTap={{ scale: 0.9 }}
               aria-label="Voltar"
             >
-              <ArrowLeft className="h-5 w-5 text-white" />
+              <ArrowLeft className="h-5 w-5 text-foreground" />
             </motion.button>
+
             <h2
               className="text-[28px] tracking-tight text-foreground"
               style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}
@@ -289,7 +290,7 @@ function SettingsPage() {
           </div>
           <motion.button
             onClick={goBack}
-            className="rounded-full px-4 py-2 text-[13px] font-semibold bg-white/10 text-foreground border border-white/15 hover:bg-white/15"
+            className="rounded-full px-4 py-2 text-[13px] font-semibold bg-foreground text-background border border-foreground/10 active:opacity-90"
             whileTap={{ scale: 0.95 }}
           >
             Concluído
@@ -374,7 +375,7 @@ function SettingsPage() {
         <motion.div className="mt-6" variants={itemVariants}>
           <SectionHeader label="Definições da conta" />
           <div className="hunie-card overflow-hidden">
-            <div className="w-full p-4 flex items-center justify-between border-b border-white/[0.06]">
+            <div className="w-full p-4 flex items-center justify-between border-b border-border">
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-muted-foreground" />
                 <span className="text-[15px] text-foreground font-medium">Email</span>
@@ -399,7 +400,7 @@ function SettingsPage() {
           <SectionHeader icon={Compass} label="Descoberta" />
           <div className="hunie-card overflow-hidden">
             <button onClick={handleEnableLocation} disabled={locationLoading}
-              className="w-full p-4 border-b border-white/[0.06] flex items-center justify-between transition-colors hover:bg-white/[0.02] disabled:opacity-60">
+              className="w-full p-4 border-b border-border flex items-center justify-between transition-colors hover:bg-muted/40 disabled:opacity-60">
               <div className="flex items-center gap-3">
                 <MapPin className="w-5 h-5 text-muted-foreground" />
                 <div className="text-left">
@@ -420,12 +421,12 @@ function SettingsPage() {
               ) : locationPermission === 'denied' ? (
                 <span className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide">Bloqueada</span>
               ) : (
-                <span className="px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-foreground text-[12px] font-bold">Ativar</span>
+                <span className="px-3 py-1.5 rounded-full bg-muted border border-border text-foreground text-[12px] font-bold">Ativar</span>
               )}
             </button>
 
             {/* Distance */}
-            <div className="p-4 border-b border-white/[0.06]">
+            <div className="p-4 border-b border-border">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-[15px] text-foreground font-medium">Distância máxima</span>
                 <span className="text-[13px] font-semibold text-foreground tabular-nums tracking-tight">{distanceValue} km</span>
@@ -438,7 +439,7 @@ function SettingsPage() {
             </div>
 
             {/* Age */}
-            <div className="p-4 border-b border-white/[0.06]">
+            <div className="p-4 border-b border-border">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-[15px] text-foreground font-medium">Faixa etária</span>
                 <span className="text-[13px] font-semibold text-foreground tabular-nums tracking-tight">{ageMin}–{ageMax}</span>
@@ -450,7 +451,7 @@ function SettingsPage() {
               </div>
             </div>
 
-            <button onClick={() => setInterestedSheet(true)} className="w-full p-4 flex items-center justify-between transition-colors hover:bg-white/[0.02]">
+            <button onClick={() => setInterestedSheet(true)} className="w-full p-4 flex items-center justify-between transition-colors hover:bg-muted/40">
               <div className="flex items-center gap-3">
                 <Heart className="w-5 h-5 text-muted-foreground" />
                 <span className="text-[15px] text-foreground font-medium">Interessado em</span>
@@ -476,7 +477,7 @@ function SettingsPage() {
             As tuas preferências mostram primeiro pessoas que combinam contigo. Não bloqueiam ninguém — continuas a poder dar match com outros perfis.
           </p>
           <div className="hunie-card overflow-hidden">
-            <div className="p-4 border-b border-white/[0.06]">
+            <div className="p-4 border-b border-border">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-[15px] text-foreground font-medium">Nº mínimo de fotos</span>
                 <span className="text-[13px] font-semibold text-foreground tabular-nums tracking-tight">{minPhotosValue}</span>
@@ -487,13 +488,13 @@ function SettingsPage() {
                 min={1} max={6} step={1} disabled={!isPremium} />
               <div className="flex justify-between mt-2 text-[13px] text-muted-foreground"><span>1</span><span>6</span></div>
             </div>
-            <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
+            <div className="p-4 border-b border-border flex items-center justify-between">
               <span className="text-[15px] text-foreground font-medium">Tem bio</span>
               <Switch checked={requireBio} onCheckedChange={handleRequireBioChange} disabled={!isPremium} />
             </div>
             {['Interesses', 'À procura de', 'Idiomas', 'Signo', 'Educação', 'Planos de família'].map((label, i, arr) => (
               <button key={label} onClick={() => (isPremium ? soon() : goUpgrade())}
-                className={`w-full p-4 flex items-center justify-between transition-colors hover:bg-white/[0.02] ${i < arr.length - 1 ? 'border-b border-white/[0.06]' : ''}`}>
+                className={`w-full p-4 flex items-center justify-between transition-colors hover:bg-muted/40 ${i < arr.length - 1 ? 'border-b border-border' : ''}`}>
                 <span className="text-[15px] text-foreground font-medium">{label}</span>
                 <div className="flex items-center gap-1 text-muted-foreground">
                   <span className="text-[14px]">Selecionar</span>
@@ -519,7 +520,7 @@ function SettingsPage() {
           <SectionHeader icon={Eye} label="Quem te vê" />
           <div className="hunie-card overflow-hidden">
             <motion.button onClick={() => handleVisibilityChange('standard')} disabled={saving}
-              className="w-full p-4 flex items-center justify-between border-b border-white/[0.06] transition-colors hover:bg-white/[0.02]" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between border-b border-border transition-colors hover:bg-muted/40" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${visibilityMode === 'standard' ? 'bg-brand-purple' : 'bg-card border border-border'}`}>
                   <Eye className={`w-5 h-5 ${visibilityMode === 'standard' ? 'text-white' : 'text-muted-foreground'}`} />
@@ -536,7 +537,7 @@ function SettingsPage() {
               )}
             </motion.button>
             <motion.button onClick={() => handleVisibilityChange('hidden')} disabled={saving}
-              className="w-full p-4 flex items-center justify-between transition-colors hover:bg-white/[0.02]" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between transition-colors hover:bg-muted/40" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${visibilityMode === 'hidden' ? 'bg-brand-purple' : 'bg-card border border-border'}`}>
                   <EyeOff className={`w-5 h-5 ${visibilityMode === 'hidden' ? 'text-white' : 'text-muted-foreground'}`} />
@@ -616,7 +617,7 @@ function SettingsPage() {
           <SectionHeader icon={Ban} label="Conexões" />
           <div className="hunie-card overflow-hidden">
             <motion.button onClick={() => setShowBlockedUsers(true)}
-              className="w-full p-4 flex items-center justify-between transition-colors hover:bg-white/[0.02]" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between transition-colors hover:bg-muted/40" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
                   <Ban className="w-5 h-5 text-destructive" />
@@ -631,7 +632,7 @@ function SettingsPage() {
           </div>
           <motion.div className="mt-3" variants={itemVariants}>
             <motion.button onClick={handleInstallApp}
-              className="w-full p-4 flex items-center justify-between hunie-card transition-colors hover:bg-white/[0.02]" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between hunie-card transition-colors hover:bg-muted/40" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
                   <Download className="w-5 h-5 text-success" />
@@ -651,7 +652,7 @@ function SettingsPage() {
           <SectionHeader icon={Crown} label="Conta" />
           <div className="hunie-card overflow-hidden">
             <motion.button onClick={() => goUpgrade()}
-              className="w-full p-4 flex items-center justify-between border-b border-white/[0.06] transition-colors hover:bg-white/[0.02]" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between border-b border-border transition-colors hover:bg-muted/40" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isPremium ? 'bg-amber-500' : 'bg-amber-500/10'}`}>
                   <Crown className={`w-5 h-5 ${isPremium ? 'text-white' : 'text-amber-500'}`} />
@@ -670,7 +671,7 @@ function SettingsPage() {
             </motion.button>
 
             <motion.button onClick={handleLogout}
-              className="w-full p-4 flex items-center justify-between border-b border-white/[0.06] transition-colors hover:bg-white/[0.02]" whileTap={{ scale: 0.99 }}>
+              className="w-full p-4 flex items-center justify-between border-b border-border transition-colors hover:bg-muted/40" whileTap={{ scale: 0.99 }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center">
                   <LogOut className="w-5 h-5 text-muted-foreground" />
@@ -682,7 +683,7 @@ function SettingsPage() {
 
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <motion.button className="w-full p-4 flex items-center justify-between transition-colors hover:bg-white/[0.02]" whileTap={{ scale: 0.99 }}>
+                <motion.button className="w-full p-4 flex items-center justify-between transition-colors hover:bg-muted/40" whileTap={{ scale: 0.99 }}>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
                       <Trash2 className="w-5 h-5 text-destructive" />
@@ -700,7 +701,7 @@ function SettingsPage() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel className="bg-card border-border text-foreground hover:bg-white/[0.02] rounded-xl">Cancelar</AlertDialogCancel>
+                  <AlertDialogCancel className="bg-card border-border text-foreground hover:bg-muted/40 rounded-xl">Cancelar</AlertDialogCancel>
                   <AlertDialogAction onClick={handleDeleteAccount} disabled={deleting}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl">
                     {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Eliminar'}
@@ -733,7 +734,7 @@ function SettingsPage() {
               { key: 'everyone' as const, label: 'Todos' },
             ]).map(({ key, label }) => (
               <button key={key} onClick={() => setInterested(key)}
-                className="w-full p-4 rounded-xl bg-background border border-border flex items-center justify-between hover:bg-white/[0.02] transition-colors">
+                className="w-full p-4 rounded-xl bg-background border border-border flex items-center justify-between hover:bg-muted/40 transition-colors">
                 <span className="text-[15px] text-foreground font-medium">{label}</span>
                 {interestedKey === key && <Check className="w-5 h-5 text-brand-purple" />}
               </button>
