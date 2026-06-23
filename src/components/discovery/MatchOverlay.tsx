@@ -127,33 +127,42 @@ export function MatchOverlay({
             className="relative flex w-full max-w-[340px] flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Photos */}
-            <div className="relative mb-9 h-[188px] w-[280px]">
+            {/* Photos — meet in the centre from opposite sides with spring settle. */}
+            <div
+              className="relative mb-9 h-[188px]"
+              style={{ width: 144 * 2 - matchMotion.photoOverlap }}
+            >
               <PhotoBubble
                 src={myPhoto}
                 fallbackInitial="Tu"
                 className="left-0 top-2"
-                rotate={-6}
-                delay={0.12}
+                rotate={-4}
+                fromSide="left"
+                delay={reduce ? 0.1 : 0.12}
+                reduce={!!reduce}
               />
               <PhotoBubble
                 src={targetPhoto ?? null}
                 fallbackInitial={targetName[0] ?? "?"}
                 className="right-0 top-2"
-                rotate={6}
-                delay={0.22}
+                rotate={4}
+                fromSide="right"
+                delay={reduce ? 0.15 : 0.18}
+                reduce={!!reduce}
               />
-              {/* Center heart badge — Apple capsule */}
+              {/* Center heart badge — pulse subtil quando o título aparece. */}
               <motion.div
-                initial={{ scale: 0.4, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{
-                  delay: 0.5,
-                  type: "spring",
-                  stiffness: 320,
-                  damping: 22,
-                  mass: 0.8,
-                }}
+                initial={reduce ? { opacity: 0 } : { scale: 0, opacity: 0 }}
+                animate={
+                  reduce
+                    ? { opacity: 1 }
+                    : { scale: [0, 1.1, 1], opacity: [0, 1, 1] }
+                }
+                transition={
+                  reduce
+                    ? { delay: 0.45, duration: 0.2 }
+                    : { delay: 0.45, duration: 0.55, times: [0, 0.6, 1], ease: [0.32, 0.72, 0, 1] }
+                }
                 className="absolute left-1/2 top-1/2 z-10 grid h-[60px] w-[60px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full"
                 style={{
                   background: `linear-gradient(150deg, ${ROSE} 0%, ${PLUM} 100%)`,
@@ -170,6 +179,7 @@ export function MatchOverlay({
                 />
               </motion.div>
             </div>
+
 
             {/* Eyebrow — refined, monochrome */}
             <motion.div
