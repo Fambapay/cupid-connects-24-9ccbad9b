@@ -148,7 +148,7 @@ export function usePhotoUpload() {
     };
   }, [user, load]);
 
-  const upload = async (file: File) => {
+  const upload = async (file: File, opts?: { position?: number }) => {
     // Fetch the current user directly from supabase to avoid race conditions
     // where the local `useAuth` state hasn't hydrated yet on mount.
     const { data: authData } = await supabase.auth.getUser();
