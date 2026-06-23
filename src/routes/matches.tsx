@@ -65,14 +65,15 @@ function LikesPage() {
             onBoost={() => navigate({ to: "/shop" })}
           />
         ) : (
-          <div className="mt-4 grid grid-cols-2 gap-3">
+          <Stagger className="mt-4 grid grid-cols-2 gap-3">
             {likers.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => !isPremium && navigate({ to: "/membership" })}
-                className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-card text-left"
-              >
+              <StaggerItem key={p.id}>
+                <PressableScale>
+                  <button
+                    type="button"
+                    onClick={() => !isPremium && navigate({ to: "/membership" })}
+                    className="group relative block aspect-[3/4] w-full overflow-hidden rounded-2xl bg-card text-left"
+                  >
                 {p.photo ? (
                   <img
                     src={p.photo}
