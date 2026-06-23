@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Lock, X, BadgeCheck, Circle, FileText, Camera, Sparkles } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { hapticTap } from '@/hooks/useNativePlatform';
+import { useCardRise } from '@/components/motion';
 
 export interface DiscoveryFilters {
   gender: 'todos' | 'feminino' | 'masculino' | 'nao_binario';
