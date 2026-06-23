@@ -94,7 +94,7 @@ function ChatList() {
         </section>
       )}
 
-      <section className={`${newMatches.length > 0 ? "mt-5" : "mt-2"} px-4`}>
+      <section className={`${newMatches.length > 0 ? "mt-3" : "mt-1"} px-4`}>
         <h2
           className="text-[15px] uppercase tracking-tight text-white/70"
           style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}
