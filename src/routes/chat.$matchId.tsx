@@ -113,31 +113,29 @@ function ChatRoom() {
   useEffect(() => {
     const vv = window.visualViewport;
     const root = document.documentElement;
-    const setVh = () => {
-      if (document.activeElement === inputRef.current && inputHasTextRef.current) return;
+    const setKb = () => {
       const winH = window.innerHeight;
       const vH = vv ? vv.height : winH;
       const vTop = vv ? vv.offsetTop : 0;
-      root.style.setProperty("--chat-top", `${vTop}px`);
-      root.style.setProperty("--chat-vh", `${vH}px`);
+      const keyboardInset = Math.max(0, winH - vH - vTop);
+      root.style.setProperty("--chat-kb", `${keyboardInset}px`);
       if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0);
     };
-    setVh();
-    vv?.addEventListener("resize", setVh);
-    vv?.addEventListener("scroll", setVh);
-    window.addEventListener("resize", setVh);
-    window.addEventListener("scroll", setVh, { passive: true });
+    setKb();
+    vv?.addEventListener("resize", setKb);
+    vv?.addEventListener("scroll", setKb);
+    window.addEventListener("resize", setKb);
+    window.addEventListener("scroll", setKb, { passive: true });
     const prevBody = document.body.style.overflow;
     const prevHtml = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
     return () => {
-      vv?.removeEventListener("resize", setVh);
-      vv?.removeEventListener("scroll", setVh);
-      window.removeEventListener("resize", setVh);
-      window.removeEventListener("scroll", setVh);
-      root.style.removeProperty("--chat-top");
-      root.style.removeProperty("--chat-vh");
+      vv?.removeEventListener("resize", setKb);
+      vv?.removeEventListener("scroll", setKb);
+      window.removeEventListener("resize", setKb);
+      window.removeEventListener("scroll", setKb);
+      root.style.removeProperty("--chat-kb");
       document.body.style.overflow = prevBody;
       document.documentElement.style.overflow = prevHtml;
     };
