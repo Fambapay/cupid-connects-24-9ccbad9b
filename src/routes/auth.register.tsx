@@ -9,6 +9,7 @@ import { AuthShell } from "@/components/AuthShell";
 import { cn } from "@/lib/utils";
 import { redirectIfAuthenticated } from "@/lib/authGuard";
 import { sendTransactionalEmail } from "@/lib/email/send";
+import { useForceDarkTheme } from "@/lib/theme";
 
 export const Route = createFileRoute("/auth/register")({
   ssr: false,
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/auth/register")({
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function RegisterPage() {
+  useForceDarkTheme();
   const { signUp, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
 

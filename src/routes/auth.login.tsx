@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthShell } from "@/components/AuthShell";
 import { redirectIfAuthenticated } from "@/lib/authGuard";
+import { useForceDarkTheme } from "@/lib/theme";
 
 export const Route = createFileRoute("/auth/login")({
   ssr: false,
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/auth/login")({
 });
 
 function LoginPage() {
+  useForceDarkTheme();
   const { signInWithPassword, signInWithGoogle } = useAuth();
   const router = useRouter();
   const navigate = useNavigate();

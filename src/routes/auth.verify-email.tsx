@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthShell } from "@/components/AuthShell";
+import { useForceDarkTheme } from "@/lib/theme";
 
 export const Route = createFileRoute("/auth/verify-email")({
   ssr: false,
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/auth/verify-email")({
 });
 
 function VerifyEmail() {
+  useForceDarkTheme();
   const { email: searchEmail } = Route.useSearch();
   const navigate = useNavigate();
   const [email, setEmail] = useState<string | undefined>(searchEmail);

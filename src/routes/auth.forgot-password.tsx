@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthShell } from "@/components/AuthShell";
+import { useForceDarkTheme } from "@/lib/theme";
 
 export const Route = createFileRoute("/auth/forgot-password")({
   ssr: false,
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/auth/forgot-password")({
 });
 
 function ForgotPage() {
+  useForceDarkTheme();
   const { resetPasswordForEmail } = useAuth();
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
