@@ -297,19 +297,21 @@ export function ProfileView({
             to={a.to}
             {...('search' in a && a.search ? { search: a.search } : {})}
             onClick={() => hapticTap()}
-            className="group relative isolate overflow-hidden rounded-2xl p-3 flex flex-col items-center text-center min-h-[118px] active:scale-[0.97] transition-transform"
+            className="quick-action-card group relative isolate overflow-hidden rounded-2xl p-3 flex flex-col items-center text-center min-h-[118px] active:scale-[0.97] transition-transform"
             style={{
+              ['--tint' as any]: a.color,
               background: `linear-gradient(160deg, ${a.color}1f 0%, ${a.color}0a 60%, rgba(255,255,255,0.02) 100%)`,
               border: `1px solid ${a.color}3d`,
             }}
           >
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 rounded-2xl"
+              className="quick-action-glow pointer-events-none absolute inset-0 rounded-2xl"
               style={{
                 background: `radial-gradient(60% 45% at 50% 22%, ${a.color}26 0%, transparent 70%)`,
               }}
             />
+
             <div
               className="relative h-11 w-11 rounded-full grid place-items-center mb-2"
               style={{
