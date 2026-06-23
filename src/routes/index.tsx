@@ -110,8 +110,10 @@ export const Route = createFileRoute("/")({
 });
 
 function LandingGate() {
+  useForceDarkTheme();
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
+
 
   useEffect(() => {
     let cancelled = false;
