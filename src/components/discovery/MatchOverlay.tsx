@@ -209,16 +209,15 @@ export function MatchOverlay({
               />
             </motion.div>
 
-            {/* Title — refined gradient, tighter tracking */}
+            {/* Title — bounce pop after photos settle. */}
             <motion.h2
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: 0.7,
-                type: "spring",
-                stiffness: 260,
-                damping: 24,
-              }}
+              initial={reduce ? { opacity: 0 } : { scale: 0.5, opacity: 0 }}
+              animate={reduce ? { opacity: 1 } : { scale: 1, opacity: 1 }}
+              transition={
+                reduce
+                  ? { delay: 0.5, duration: 0.25 }
+                  : { delay: 0.5, ...matchMotion.titlePop }
+              }
               className="mt-3 text-center text-[44px] font-bold leading-[1.02] tracking-[-0.035em]"
               style={{
                 fontFamily:
@@ -235,9 +234,9 @@ export function MatchOverlay({
             </motion.h2>
 
             <motion.p
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.78, duration: 0.4, ease: APPLE_EASE }}
+              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 6 }}
+              animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.4, ease: APPLE_EASE }}
               className="mt-3 max-w-[300px] text-center text-[14.5px] leading-[1.45] text-white/65"
               style={{
                 fontFamily:
@@ -250,62 +249,70 @@ export function MatchOverlay({
               gostam-se. Manda já o primeiro recado.
             </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.92, duration: 0.45, ease: APPLE_EASE }}
+            {/* Buttons — stagger in last. Orquestração declarativa via delay,
+                nunca setTimeout (sincroniza com o clock do Framer Motion). */}
+            <Stagger
+              stagger={0.08}
               className="mt-8 flex w-full max-w-[320px] flex-col gap-2.5"
+              transition={{ delayChildren: 0.75 }}
             >
-              <button
-                type="button"
-                onClick={onSendMessage}
-                disabled={sending}
-                className="group relative inline-flex h-[52px] items-center justify-center gap-2 overflow-hidden rounded-full text-[15px] font-semibold text-white transition-transform active:scale-[0.975] disabled:opacity-70"
-                style={{
-                  background: `linear-gradient(150deg, ${ROSE} 0%, ${PLUM} 100%)`,
-                  boxShadow:
-                    "0 18px 36px -14px rgba(255,92,138,0.7), 0 2px 0 rgba(255,255,255,0.10) inset, 0 -10px 22px rgba(0,0,0,0.18) inset",
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                {/* Specular highlight */}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-full"
+              <StaggerItem>
+                <PressableScale
+                  as="button"
+                  type="button"
+                  onClick={onSendMessage}
+                  disabled={sending}
+                  className="group relative inline-flex h-[52px] w-full items-center justify-center gap-2 overflow-hidden rounded-full text-[15px] font-semibold text-white disabled:opacity-70"
                   style={{
-                    background:
-                      "linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 100%)",
+                    background: `linear-gradient(150deg, ${ROSE} 0%, ${PLUM} 100%)`,
+                    boxShadow:
+                      "0 18px 36px -14px rgba(255,92,138,0.7), 0 2px 0 rgba(255,255,255,0.10) inset, 0 -10px 22px rgba(0,0,0,0.18) inset",
+                    letterSpacing: "-0.01em",
                   }}
-                />
-                <MessageCircle
-                  className="relative h-[17px] w-[17px]"
-                  strokeWidth={2.4}
-                />
-                <span className="relative">
-                  {sending ? "A abrir conversa…" : "Enviar mensagem"}
-                </span>
-              </button>
+                >
+                  {/* Specular highlight */}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-full"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 100%)",
+                    }}
+                  />
+                  <MessageCircle
+                    className="relative h-[17px] w-[17px]"
+                    strokeWidth={2.4}
+                  />
+                  <span className="relative">
+                    {sending ? "A abrir conversa…" : "Enviar mensagem"}
+                  </span>
+                </PressableScale>
+              </StaggerItem>
 
-              <button
-                type="button"
-                onClick={onClose}
-                className="inline-flex h-[46px] items-center justify-center rounded-full text-[14px] font-medium text-white/75 transition-transform active:scale-[0.98]"
-                style={{
-                  background: "rgba(255,255,255,0.05)",
-                  border: "0.5px solid rgba(255,255,255,0.12)",
-                  backdropFilter: "blur(20px) saturate(180%)",
-                  letterSpacing: "-0.005em",
-                }}
-              >
-                Continuar a descobrir
-              </button>
-            </motion.div>
+              <StaggerItem>
+                <PressableScale
+                  as="button"
+                  type="button"
+                  onClick={onClose}
+                  className="inline-flex h-[46px] w-full items-center justify-center rounded-full text-[14px] font-medium text-white/75"
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "0.5px solid rgba(255,255,255,0.12)",
+                    backdropFilter: "blur(20px) saturate(180%)",
+                    letterSpacing: "-0.005em",
+                  }}
+                >
+                  Continuar a descobrir
+                </PressableScale>
+              </StaggerItem>
+            </Stagger>
           </div>
         </motion.div>
       )}
     </AnimatePresence>
   );
 }
+
 
 function PhotoBubble({
   src,
