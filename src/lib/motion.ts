@@ -69,3 +69,13 @@ export const match = {
   photoOverlap: 24, // px de sobreposição quando as fotos assentam
 } as const;
 
+/**
+ * Tunables para o chat (iMessage-style — function-first, discreto).
+ * `bubbleIn` aplica-se a mensagens NOVAS (durante a sessão), nunca ao
+ * histórico já carregado no primeiro paint — senão a lista "explode" ao abrir.
+ */
+export const chat = {
+  bubbleIn:  { type: "spring", visualDuration: 0.32, bounce: 0.12 },
+  sentNudge: 700, // velocidade sintética do "empurrão" ao enviar
+} as const;
+

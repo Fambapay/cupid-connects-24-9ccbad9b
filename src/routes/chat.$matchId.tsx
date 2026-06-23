@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ChevronLeft, Send } from "lucide-react";
 import { useMessages, type ChatMessage } from "@/hooks/useMessages";
@@ -11,6 +11,7 @@ import { ChatActionsMenu } from "@/components/chat/ChatActionsMenu";
 import { PeerProfileSheet } from "@/components/chat/PeerProfileSheet";
 import { getActivityStatus } from "@/lib/activityStatus";
 import { useSubscription } from "@/hooks/useSubscription";
+import { chat as chatMotion } from "@/lib/motion";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
@@ -37,23 +38,65 @@ function ChatRoom() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const inputHasTextRef = useRef(false);
+  // IDs that were already present when the chat opened. Bubbles for these
+  // never animate — otherwise the whole history "explodes" on open. New
+  // messages (sent or received during the session) get the spring-in.
+  const seenIdsRef = useRef<Set<string>>(new Set());
+  // Force a re-render when seenIdsRef populates after first messages load.
+  const [, setSeenTick] = useState(0);
+  // Tracks whether the on-screen keyboard is open (drives smooth vs instant
+  // scroll). Smooth animations fight the visualViewport reflow on iOS.
+  const keyboardOpenRef = useRef(false);
 
   const activity = peer ? getActivityStatus(true, peer.lastActiveAt) : null;
+
+  const isNearBottom = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return true;
+    return el.scrollHeight - el.scrollTop - el.clientHeight < 160;
+  }, []);
 
   const scrollToLatest = useCallback((behavior: ScrollBehavior = "auto") => {
     const el = scrollRef.current;
     if (!el) return;
-    el.scrollTo({ top: el.scrollHeight, behavior });
+    // Smooth fights the viewport reposition when the keyboard is open — force
+    // instant in that case.
+    const b: ScrollBehavior = keyboardOpenRef.current ? "auto" : behavior;
+    el.scrollTo({ top: el.scrollHeight, behavior: b });
     requestAnimationFrame(() => {
       const e = scrollRef.current;
-      if (e) e.scrollTo({ top: e.scrollHeight, behavior });
+      if (e) e.scrollTo({ top: e.scrollHeight, behavior: b });
     });
   }, []);
 
-  // Single effect: scroll on mount, on match change, and on new messages/typing.
+  // Mount / match change → jump to bottom instantly; seed seenIds with the
+  // history so it renders static.
   useLayoutEffect(() => {
+    seenIdsRef.current = new Set(messages.map((m) => m.id));
+    setSeenTick((n) => n + 1);
     scrollToLatest("auto");
-  }, [matchId, messages.length, typing, scrollToLatest]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchId]);
+
+  // New message / typing → auto-scroll only if user is near the bottom (so
+  // someone reading history isn't yanked away). Mark any new IDs as seen
+  // after the bubble has had a frame to animate in.
+  useLayoutEffect(() => {
+    const wasNear = isNearBottom();
+    if (wasNear) scrollToLatest("smooth");
+    const seen = seenIdsRef.current;
+    let added = false;
+    for (const m of messages) {
+      if (!seen.has(m.id)) {
+        // Defer marking until next frame so the Bubble's `initial` motion
+        // still runs on the very first paint of this id.
+        const id = m.id;
+        requestAnimationFrame(() => seen.add(id));
+        added = true;
+      }
+    }
+    if (added) setSeenTick((n) => n + 1);
+  }, [messages.length, typing, isNearBottom, scrollToLatest, messages]);
 
   // Mark conversation as read on open and whenever new messages arrive (debounced)
   useEffect(() => {
@@ -117,6 +160,8 @@ function ChatRoom() {
       const winH = window.innerHeight;
       const vH = vv ? vv.height : winH;
       const keyboardInset = Math.max(0, winH - vH);
+      // Treat anything > 80px of inset as "keyboard open" — covers iOS/Android.
+      keyboardOpenRef.current = keyboardInset > 80;
       root.style.setProperty("--chat-kb", `${keyboardInset}px`);
       root.style.setProperty("--chat-vh", `${vH}px`);
       if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0);
@@ -371,6 +416,7 @@ function ChatRoom() {
                   avatar={peer.photo}
                   name={peer.name}
                   showReadReceipt={r.showReadReceipt}
+                  animateIn={!seenIdsRef.current.has(r.msg.id)}
                 />
               </div>
             );
@@ -481,15 +527,37 @@ type BubbleProps = {
   avatar: string;
   name: string;
   showReadReceipt?: boolean;
+  /** Only true for messages that arrived after the chat was opened. History
+   * is rendered statically — animating it makes the list "explode" on open. */
+  animateIn?: boolean;
 };
 
-function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showReadReceipt }: BubbleProps) {
+function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showReadReceipt, animateIn }: BubbleProps) {
+  const reduce = useReducedMotion();
+  const shouldAnimate = !!animateIn;
+  const initial = shouldAnimate
+    ? reduce
+      ? { opacity: 0 }
+      : { opacity: 0, y: 10, scale: 0.96 }
+    : false;
+  const animate = shouldAnimate
+    ? reduce
+      ? { opacity: 1 }
+      : { opacity: 1, y: 0, scale: 1 }
+    : undefined;
   return (
-    <div
+    <motion.div
+      initial={initial}
+      animate={animate}
+      transition={shouldAnimate ? chatMotion.bubbleIn : undefined}
       className={`flex items-end gap-2 ${me ? "justify-end" : "justify-start"} ${
         isFirstOfGroup ? "mt-3" : "mt-0.5"
       }`}
-      style={{ contain: "layout paint" }}
+      style={{
+        contain: "layout paint",
+        transformOrigin: me ? "bottom right" : "bottom left",
+        willChange: shouldAnimate ? "transform, opacity" : undefined,
+      }}
     >
       {!me &&
         (isLastOfGroup ? (
@@ -518,7 +586,7 @@ function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, show
         )}
 
       </div>
-    </div>
+    </motion.div>
 
   );
 }
@@ -530,7 +598,8 @@ const Bubble = memo(BubbleImpl, (a, b) =>
   a.isFirstOfGroup === b.isFirstOfGroup &&
   a.isLastOfGroup === b.isLastOfGroup &&
   a.avatar === b.avatar &&
-  a.showReadReceipt === b.showReadReceipt,
+  a.showReadReceipt === b.showReadReceipt &&
+  a.animateIn === b.animateIn,
 );
 
 function DateSeparator({ label }: { label: string }) {
