@@ -122,7 +122,7 @@ function ShopPage() {
             onClick={() => {
               navigate({ to: "/profile" });
             }}
-            className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.06]"
+            className="grid h-10 w-10 place-items-center rounded-full bg-[var(--surface-3)]"
             aria-label="Voltar"
           >
             <ArrowLeft size={18} />
@@ -151,7 +151,7 @@ function ShopPage() {
 
         {/* Tabs */}
         <div className="px-4 pb-3">
-          <div className="grid h-12 grid-cols-2 gap-1 rounded-2xl border border-white/10 bg-white/[0.04] p-1">
+          <div className="grid h-12 grid-cols-2 gap-1 rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-1">
             <TabButton
               active={tab === "boost"}
               onClick={() => setTab("boost")}
@@ -184,7 +184,7 @@ function ShopPage() {
           {/* Hero */}
           <div className="mx-4 mt-4">
             <div
-              className="relative overflow-hidden rounded-3xl border border-white/10 p-5"
+              className="relative overflow-hidden rounded-3xl border border-[var(--surface-border)] p-5"
               style={{
                 background:
                   tab === "boost"
@@ -197,7 +197,7 @@ function ShopPage() {
                 style={{ background: tab === "boost" ? "#A855F7" : "#38BDF8" }}
               />
               <div className="relative">
-                <div className="mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-white/10">
+                <div className="mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-[var(--surface-3)]">
                   {tab === "boost" ? (
                     <Zap size={24} fill="#C026D3" stroke="none" />
                   ) : (
@@ -224,9 +224,9 @@ function ShopPage() {
 
                 <div className="mt-4 grid grid-cols-3 gap-2">
                   {copy.benefits.map(({ icon: Icon, label }) => (
-                    <div key={label} className="rounded-xl bg-white/[0.05] px-2 py-2">
-                      <Icon size={14} className="mb-1 text-white/80" />
-                      <div className="text-[11px] leading-tight text-white/80">{label}</div>
+                    <div key={label} className="rounded-xl bg-[var(--surface-2)] px-2 py-2">
+                      <Icon size={14} className="mb-1 text-[color:var(--fg-soft)]" />
+                      <div className="text-[11px] leading-tight text-[color:var(--fg-soft)]">{label}</div>
                     </div>
                   ))}
                 </div>
@@ -296,12 +296,12 @@ function TabButton({
           className={`absolute inset-0 rounded-xl bg-gradient-to-br ${gradient} shadow-lg`}
         />
       )}
-      <span className={`relative z-10 flex min-w-0 items-center gap-1.5 px-2 ${active ? "text-white" : "text-white/70"}`}>
+      <span className={`relative z-10 flex min-w-0 items-center gap-1.5 px-2 ${active ? "text-white" : "text-[color:var(--fg-soft)]"}`}>
         <span className="shrink-0">{icon}</span>
         <span className="truncate text-[13px]">{label}</span>
         <span
           className={`ml-0.5 grid h-[18px] min-w-[18px] shrink-0 place-items-center rounded-full px-1 text-[10px] font-bold leading-none ${
-            active ? "bg-white/25 text-white" : "bg-white/10 text-white/80"
+            active ? "bg-[var(--surface-strong)] text-white" : "bg-[var(--surface-3)] text-[color:var(--fg-soft)]"
           }`}
         >
           {count}
@@ -313,8 +313,8 @@ function TabButton({
 
 function TrustTile({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
-    <div className="flex flex-col items-center gap-1 rounded-xl border border-white/5 bg-white/[0.03] py-3">
-      <span className="text-white/80">{icon}</span>
+    <div className="flex flex-col items-center gap-1 rounded-xl border border-[var(--surface-border-soft)] bg-[var(--surface-1)] py-3">
+      <span className="text-[color:var(--fg-soft)]">{icon}</span>
       <span>{label}</span>
     </div>
   );
@@ -350,8 +350,8 @@ function PackCard({ pack, index, country }: { pack: Pack; index: number; country
       )}
       <div
         className={`relative overflow-hidden rounded-[16px] border ${
-          featured ? "border-transparent" : "border-white/10"
-        } bg-white/[0.04] p-4`}
+          featured ? "border-transparent" : "border-[var(--surface-border)]"
+        } bg-[var(--surface-2)] p-4`}
       >
         {featured && (
           <div
@@ -396,7 +396,7 @@ function PackCard({ pack, index, country }: { pack: Pack; index: number; country
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline gap-1.5">
                 <span className="text-[28px] font-extrabold leading-none">{pack.quantity}</span>
-                <span className="text-sm font-semibold text-white/80">
+                <span className="text-sm font-semibold text-[color:var(--fg-soft)]">
                   {pack.kind === "boost" ? "Boosts" : "Super Likes"}
                 </span>
               </div>

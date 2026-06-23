@@ -248,10 +248,10 @@ export function DebitoCheckoutSheet({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 360, damping: 36 }}
-            className="fixed inset-x-0 bottom-0 max-h-[92dvh] overflow-y-auto overscroll-contain rounded-t-3xl border-t border-white/10 bg-gradient-to-b from-[#1a0a14] to-background p-5 pb-[max(env(safe-area-inset-bottom),24px)] text-foreground shadow-[0_-20px_60px_-10px_rgba(240,70,140,0.3)]"
+            className="fixed inset-x-0 bottom-0 max-h-[92dvh] overflow-y-auto overscroll-contain rounded-t-3xl border-t border-[var(--surface-border)] bg-gradient-to-b from-[#1a0a14] to-background p-5 pb-[max(env(safe-area-inset-bottom),24px)] text-foreground shadow-[0_-20px_60px_-10px_rgba(240,70,140,0.3)]"
             style={{ zIndex: 10011 }}
           >
-            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/15" />
+            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-[var(--surface-strong)]" />
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="mb-1 inline-flex items-center gap-1 rounded-full bg-fuchsia-500/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-fuchsia-300">
@@ -263,14 +263,14 @@ export function DebitoCheckoutSheet({
               <button
                 onClick={handleClose}
                 disabled={stage === "submitting"}
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/[0.06] disabled:opacity-40"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[var(--surface-3)] disabled:opacity-40"
                 aria-label="Fechar"
               >
                 <X size={16} />
               </button>
             </div>
 
-            <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-3">
+            <div className="mt-4 rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-3">
               <div className="flex items-baseline justify-between">
                 <span className="text-xs font-semibold">Total hoje</span>
                 <span className="text-xl font-extrabold">{amountFormatted}</span>
@@ -300,7 +300,7 @@ export function DebitoCheckoutSheet({
                     <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                       Número {paymentLabel(method as PaymentMethodCode)}
                     </label>
-                    <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3">
+                    <div className="flex items-center gap-2 rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] px-3 py-3">
                       <span className="text-sm text-muted-foreground">{config.phonePrefix}</span>
                       <input
                         type="tel"
@@ -331,7 +331,7 @@ export function DebitoCheckoutSheet({
                   )}
                 </motion.button>
 
-                <div className="mt-3 flex items-center justify-center gap-2 text-[11px] text-white/60">
+                <div className="mt-3 flex items-center justify-center gap-2 text-[11px] text-[color:var(--fg-dim)]">
                   <ShieldCheck size={12} className="text-emerald-400" />
                   Pagamento encriptado · {config.currency}
                 </div>
@@ -347,15 +347,15 @@ export function DebitoCheckoutSheet({
                   </p>
                 </div>
                 <div className="mt-4 space-y-2">
-                  <div className="flex items-center justify-between rounded-xl bg-white/[0.06] px-3 py-3">
+                  <div className="flex items-center justify-between rounded-xl bg-[var(--surface-3)] px-3 py-3">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Entidade</span>
                     <span className="font-mono text-base font-bold text-white">{mcReference.entity}</span>
                   </div>
-                  <div className="flex items-center justify-between rounded-xl bg-white/[0.06] px-3 py-3">
+                  <div className="flex items-center justify-between rounded-xl bg-[var(--surface-3)] px-3 py-3">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Referência</span>
                     <span className="font-mono text-base font-bold text-white">{mcReference.number}</span>
                   </div>
-                  <div className="flex items-center justify-between rounded-xl bg-white/[0.06] px-3 py-3">
+                  <div className="flex items-center justify-between rounded-xl bg-[var(--surface-3)] px-3 py-3">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Montante</span>
                     <span className="font-mono text-base font-bold text-white">{amountFormatted}</span>
                   </div>
@@ -365,14 +365,14 @@ export function DebitoCheckoutSheet({
                     {mcReference.instructions}
                   </p>
                 )}
-                <p className="mt-3 text-center text-xs font-mono tabular-nums text-white/70">
+                <p className="mt-3 text-center text-xs font-mono tabular-nums text-[color:var(--fg-soft)]">
                   A aguardar confirmação · {countdown}
                 </p>
               </div>
             )}
 
             {stage === "pending" && !mcReference && (
-              <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center">
+              <div className="mt-5 rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-5 text-center">
                 <div className="relative mx-auto h-16 w-16">
                   <Loader2 size={64} className="animate-spin text-fuchsia-400" />
                 </div>
@@ -385,7 +385,7 @@ export function DebitoCheckoutSheet({
                     Referência: <span className="font-mono text-white">{reference}</span>
                   </p>
                 )}
-                <p className="mt-3 text-xs font-mono tabular-nums text-white/70">
+                <p className="mt-3 text-xs font-mono tabular-nums text-[color:var(--fg-soft)]">
                   Tempo restante: {countdown}
                 </p>
               </div>
@@ -460,8 +460,8 @@ function MethodTile({
       aria-pressed={active}
       className={`relative flex items-center gap-3 overflow-hidden rounded-2xl border px-3 py-3 text-left transition-colors ${
         active
-          ? "border-white/20 bg-white/[0.06]"
-          : "border-white/[0.08] bg-white/[0.025] hover:bg-white/[0.04]"
+          ? "border-[var(--surface-border)] bg-[var(--surface-3)]"
+          : "border-[var(--surface-border-soft)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)]"
       }`}
       style={
         active
@@ -486,7 +486,7 @@ function MethodTile({
           {paymentLabel(m as PaymentMethodCode)}
         </span>
         {brand.sub && (
-          <span className="block truncate text-[10px] font-medium text-white/55">
+          <span className="block truncate text-[10px] font-medium text-[color:var(--fg-dim)]">
             {brand.sub}
           </span>
         )}
