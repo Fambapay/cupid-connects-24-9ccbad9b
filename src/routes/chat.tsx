@@ -85,30 +85,33 @@ function ChatList() {
           >
             Novos matches
           </h2>
-          <div className="mt-3 flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <Stagger className="mt-3 flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {newMatches.map((m) => (
-              <Link
-                key={m.matchId}
-                to="/chat/$matchId"
-                params={{ matchId: m.matchId }}
-                className="relative shrink-0"
-              >
-                <div className="h-32 w-[104px] overflow-hidden rounded-[22px] bg-card ring-1 ring-border">
-                  {m.photo ? (
-                    <img src={m.photo} alt={m.name} className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="h-full w-full bg-gradient-flame" />
-                  )}
-                </div>
-                <span
-                  className="mt-2 block text-center text-[14px] text-foreground"
-                  style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 500 }}
-                >
-                  {m.name}
-                </span>
-              </Link>
+              <StaggerItem key={m.matchId} className="shrink-0">
+                <PressableScale>
+                  <Link
+                    to="/chat/$matchId"
+                    params={{ matchId: m.matchId }}
+                    className="relative block"
+                  >
+                    <div className="h-32 w-[104px] overflow-hidden rounded-[22px] bg-card ring-1 ring-border">
+                      {m.photo ? (
+                        <img src={m.photo} alt={m.name} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="h-full w-full bg-gradient-flame" />
+                      )}
+                    </div>
+                    <span
+                      className="mt-2 block text-center text-[14px] text-foreground"
+                      style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 500 }}
+                    >
+                      {m.name}
+                    </span>
+                  </Link>
+                </PressableScale>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         </section>
       )}
 
