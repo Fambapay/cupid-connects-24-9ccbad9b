@@ -6,6 +6,7 @@ import {
 } from "framer-motion";
 import { useEffect, type ReactNode } from "react";
 import { spring } from "@/lib/motion";
+import { useCardRise } from "./useCardRise";
 
 export interface SheetProps {
   open: boolean;
@@ -19,11 +20,9 @@ export interface SheetProps {
   motionProps?: Omit<HTMLMotionProps<"div">, "children">;
   /** When true (default), the page behind scales down + rounds corners. */
   cardRise?: boolean;
-  /** Selector for the element to apply the card-rise transform to (default `#app-root`). */
+  /** Selector for the element to apply the card-rise transform to (default `#hunie-app-root`). */
   cardRiseTarget?: string;
 }
-
-const CARD_RISE_STYLE_ID = "hunie-sheet-card-rise";
 
 /**
  * Sheet — iOS-style bottom sheet:
@@ -42,47 +41,24 @@ export function Sheet({
   backdropClassName,
   motionProps,
   cardRise = true,
-  cardRiseTarget = "#app-root",
+  cardRiseTarget = "#hunie-app-root",
 }: SheetProps) {
   const reduced = useReducedMotion();
 
-  // Body scroll lock + card-rise class
+  // Body scroll lock while open.
   useEffect(() => {
     if (!open) return;
     const body = document.body;
     const prevOverflow = body.style.overflow;
     body.style.overflow = "hidden";
-    if (cardRise) body.classList.add("hunie-sheet-open");
-
-    // Inject the card-rise CSS once.
-    if (cardRise && !document.getElementById(CARD_RISE_STYLE_ID)) {
-      const style = document.createElement("style");
-      style.id = CARD_RISE_STYLE_ID;
-      style.textContent = `
-        body.hunie-sheet-open ${cardRiseTarget} {
-          transform: scale(0.94);
-          border-radius: 24px;
-          overflow: hidden;
-          transform-origin: 50% 0%;
-          transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1),
-                      border-radius 0.5s cubic-bezier(0.32, 0.72, 0, 1);
-        }
-        @media (prefers-reduced-motion: reduce) {
-          body.hunie-sheet-open ${cardRiseTarget} {
-            transform: none;
-            border-radius: 0;
-            transition: none;
-          }
-        }
-      `;
-      document.head.appendChild(style);
-    }
-
     return () => {
       body.style.overflow = prevOverflow;
-      body.classList.remove("hunie-sheet-open");
     };
-  }, [open, cardRise, cardRiseTarget]);
+  }, [open]);
+
+  // Card-rise on the page behind.
+  useCardRise(open && cardRise, cardRiseTarget);
+
 
   return (
     <AnimatePresence>

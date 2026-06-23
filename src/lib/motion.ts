@@ -18,3 +18,32 @@ export const stagger = {
     animate: { opacity: 1, y: 0, transition: spring.snappy },
   },
 };
+
+/**
+ * iOS push-navigation variants for the screen that ENTERS (drill-in).
+ *
+ * The screen that's LEFT BEHIND should animate in parallel from x: 0 →
+ * "-30%" with `spring.smooth` AND a black overlay should fade 0 → 0.18
+ * over the top. Don't use filter:brightness — an overlay div is just a
+ * compositor pass and is much smoother on mobile.
+ */
+export const pushScreen = {
+  initial: { x: "100%" },
+  animate: { x: 0,      transition: spring.smooth },
+  exit:    { x: "100%", transition: spring.smooth },
+};
+
+/** Companion variants for the back screen during a push (parallax recede). */
+export const pushScreenBehind = {
+  initial: { x: 0 },
+  animate: { x: "-30%", transition: spring.smooth },
+  exit:    { x: 0,      transition: spring.smooth },
+};
+
+/** Companion variants for the black overlay over the back screen. */
+export const pushScreenOverlay = {
+  initial: { opacity: 0 },
+  animate: { opacity: 0.18, transition: spring.smooth },
+  exit:    { opacity: 0,    transition: spring.smooth },
+};
+
