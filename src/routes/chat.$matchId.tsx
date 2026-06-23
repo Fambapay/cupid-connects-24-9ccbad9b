@@ -261,7 +261,7 @@ function ChatRoom() {
       className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none"
       style={{
         height: "var(--chat-vh, 100dvh)",
-        background: "#000",
+        background: "#121212",
         color: "#fff",
       }}
     >
@@ -402,7 +402,7 @@ function ChatRoom() {
         <form
           onSubmit={(e) => { e.preventDefault(); handleSend(); }}
           className="overflow-hidden px-3 pt-2 pb-3"
-          style={{ background: "#000" }}
+          style={{ background: "#121212" }}
         >
           <div className="flex w-full items-center gap-2">
 
