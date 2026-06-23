@@ -197,6 +197,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <CountryProvider>
         <NativeBoot />
+        <ThemeSync />
         <Outlet />
         <GlobalNotifiers />
         <PushPromptGate />
