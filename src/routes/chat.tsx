@@ -84,7 +84,7 @@ function ChatList() {
                 </div>
                 <span
                   className="mt-2 block text-center text-[14px] text-white"
-                  style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
+                  style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 500 }}
                 >
                   {m.name}
                 </span>
