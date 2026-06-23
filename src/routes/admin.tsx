@@ -45,7 +45,7 @@ function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border/60 bg-background px-4 py-3">
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border/60 bg-background px-4 pb-3" style={{ paddingTop: "max(env(safe-area-inset-top), 12px)" }}>
         <div className="flex items-center gap-3">
           <Link to="/discover" className="grid h-9 w-9 place-items-center rounded-full hover:bg-muted" aria-label="Sair">
             <ArrowLeft className="h-5 w-5" />
