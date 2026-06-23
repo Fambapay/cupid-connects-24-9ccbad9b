@@ -145,7 +145,7 @@ function ChatList() {
             </Link>
           </div>
         ) : (
-          <ul className="mt-3 space-y-1">
+          <ul className="mt-3">
             {conversations.map((m) => (
               <SwipeableConversationItem
                 key={m.matchId}
