@@ -234,6 +234,21 @@
   --edit-sheet-backdrop: radial-gradient(120% 80% at 50% 0%, rgba(177,60,255,0.10) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0.35) 100%);
   --edit-sheet-overlay-top: linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 100%);
   --edit-sheet-remove-bg: rgba(0,0,0,0.45);
+
+  /* Generic surface tokens — light */
+  --surface-1: rgba(0,0,0,0.03);
+  --surface-2: rgba(0,0,0,0.05);
+  --surface-3: rgba(0,0,0,0.07);
+  --surface-strong: rgba(0,0,0,0.12);
+  --surface-border: rgba(0,0,0,0.10);
+  --surface-border-soft: rgba(0,0,0,0.06);
+  --fg-strong: #0a0a0a;
+  --fg-soft: rgba(10,10,10,0.78);
+  --fg-dim: rgba(10,10,10,0.55);
+
+  /* Checkout sheet tokens — light */
+  --checkout-sheet-bg: linear-gradient(180deg, #ffffff 0%, #ECECEC 100%);
+  --checkout-sheet-backdrop: rgba(20,16,28,0.45);
 }
 
 /* Light-mode component overrides */
