@@ -148,8 +148,13 @@
     border-color: var(--color-border);
   }
   html, body, #root {
-    height: 100%;
+    min-height: 100lvh;
     background: var(--color-background);
+  }
+  body {
+    /* Pinta o fundo até à borda física do ecrã (atrás da home indicator) */
+    background: var(--color-background);
+    min-height: 100lvh;
   }
   body {
     color: var(--color-foreground);
