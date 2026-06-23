@@ -47,7 +47,7 @@ export function PushPermissionPrompt() {
   if (!visible) return null
 
   return (
-    <div className="fixed inset-x-3 top-3 z-50 mx-auto max-w-md rounded-2xl border border-border/60 bg-card p-4 shadow-2xl shadow-flame/10">
+    <div className="fixed inset-x-3 z-50 mx-auto max-w-md rounded-2xl border border-border/60 bg-card p-4 shadow-2xl shadow-flame/10" style={{ top: 'max(12px, env(safe-area-inset-top))' }}>
       <div className="flex items-start gap-3">
         <div className="rounded-full bg-flame/10 p-2 text-flame">
           <Bell className="h-5 w-5" />
