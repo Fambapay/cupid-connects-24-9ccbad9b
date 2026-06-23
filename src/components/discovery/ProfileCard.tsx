@@ -137,9 +137,9 @@ const StackCard = ({
           left: 0,
           right: 0,
           bottom: 0,
-          height: "55%",
+          height: "30%",
           background:
-            "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0) 100%)",
+            "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0) 100%)",
         }}
       />
     </div>
