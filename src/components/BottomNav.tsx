@@ -378,6 +378,11 @@ export const BottomNavBase = ({
       </div>
     </nav>
   );
+
+  // Portal to <body> so the nav lives OUTSIDE the masked #hunie-app-root
+  // subtree — otherwise the SVG mask would also clip the nav's icons.
+  if (typeof document === "undefined") return navElement;
+  return createPortal(navElement, document.body);
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
