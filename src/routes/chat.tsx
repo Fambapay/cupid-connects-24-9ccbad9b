@@ -37,7 +37,7 @@ function ChatList() {
       <header className="sticky top-0 z-30 flex items-center justify-between bg-background px-4 pb-3 pt-5">
         <h1
           className="text-[34px] leading-none tracking-tight text-white"
-          style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}
+          style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
         >
           Chat
         </h1>
@@ -62,8 +62,8 @@ function ChatList() {
       {newMatches.length > 0 && (
         <section className="mt-2 px-4">
           <h2
-            className="text-[15px] uppercase tracking-tight text-white"
-            style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 800 }}
+            className="text-[15px] uppercase tracking-tight text-white/70"
+            style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}
           >
             Novos matches
           </h2>
@@ -84,7 +84,7 @@ function ChatList() {
                 </div>
                 <span
                   className="mt-2 block text-center text-[14px] text-white"
-                  style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
+                  style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 500 }}
                 >
                   {m.name}
                 </span>
@@ -96,8 +96,8 @@ function ChatList() {
 
       <section className={`${newMatches.length > 0 ? "mt-5" : "mt-2"} px-4`}>
         <h2
-          className="text-[15px] uppercase tracking-tight text-white"
-          style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 800 }}
+          className="text-[15px] uppercase tracking-tight text-white/70"
+          style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}
         >
           Mensagens
         </h2>
