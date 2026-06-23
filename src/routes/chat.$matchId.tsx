@@ -118,8 +118,10 @@ function ChatRoom() {
       const winH = window.innerHeight;
       const vH = vv ? vv.height : winH;
       const vTop = vv ? vv.offsetTop : 0;
+      const keyboardInset = Math.max(0, winH - vH - vTop);
+      const keyboardOpen = keyboardInset > 120;
       root.style.setProperty("--chat-top", `${vTop}px`);
-      root.style.setProperty("--chat-vh", `${vH}px`);
+      root.style.setProperty("--chat-vh", `${keyboardOpen ? vH : winH - vTop}px`);
       if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0);
     };
     setVh();
@@ -403,7 +405,7 @@ function ChatRoom() {
       <div className="relative shrink-0">
         <form
           onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-          className="overflow-hidden px-3 pt-2 pb-3"
+          className="overflow-hidden px-3 pt-2"
           style={{ background: "#000" }}
         >
           <div className="flex w-full items-center gap-2">
