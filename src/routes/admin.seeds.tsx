@@ -151,6 +151,19 @@ function SeedsAdmin() {
       {/* Generator */}
       <SeedGenerator onGenerate={(v) => genMut.mutate(v)} pending={genMut.isPending} />
 
+      {/* Populate existing real users */}
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-3">
+        <div className="flex-1 min-w-[220px]">
+          <p className="text-sm font-medium">Popular contas existentes</p>
+          <p className="text-xs text-muted-foreground">
+            Cria seeds (se faltarem), likes recebidos, novos matches e chats com mensagens para os utilizadores reais.
+          </p>
+        </div>
+        <Button onClick={() => popMut.mutate()} disabled={popMut.isPending}>
+          {popMut.isPending ? "A popular…" : "Popular discover, matches e chats"}
+        </Button>
+      </div>
+
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-3">
         <Button variant="secondary" onClick={() => toggleAllMut.mutate(true)} disabled={toggleAllMut.isPending}>
