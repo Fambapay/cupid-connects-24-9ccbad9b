@@ -245,7 +245,7 @@ function Discover() {
   };
 
   return (
-    <div className="relative h-[100dvh] overflow-hidden bg-background text-foreground">
+    <div className="relative h-[100lvh] overflow-hidden bg-background text-foreground">
       <h1 className="sr-only">Descobrir matches verificados na Hunie</h1>
       <main
         className="relative h-full w-full overflow-hidden"

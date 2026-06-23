@@ -11,18 +11,18 @@ export function AppShell({
   fullHeight?: boolean;
 }) {
   return (
-    <div className="relative min-h-[100dvh] bg-background text-foreground">
+    <div className="relative min-h-[100lvh] bg-background text-foreground">
       {/* Single static aurora layer (was 2 stacked fixed gradients — costly on every paint) */}
       <div
         className="pointer-events-none fixed inset-0 -z-10 bg-aurora opacity-90"
         style={{ contain: "strict" }}
       />
       {fullHeight ? (
-        <div className="screen-scroll mx-auto flex min-h-[100dvh] max-w-md flex-col pt-[env(safe-area-inset-top)]">
+        <div className="screen-scroll mx-auto flex min-h-[100lvh] max-w-md flex-col pt-[env(safe-area-inset-top)]">
           {children}
         </div>
       ) : (
-        <div className="screen-scroll mx-auto min-h-[100dvh] max-w-md pt-[env(safe-area-inset-top)]">{children}</div>
+        <div className="screen-scroll mx-auto min-h-[100lvh] max-w-md pt-[env(safe-area-inset-top)]">{children}</div>
       )}
       {!hideNav && <BottomNav />}
     </div>
