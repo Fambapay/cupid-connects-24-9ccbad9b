@@ -109,14 +109,15 @@ function ChatList() {
           <ul className="mt-3 space-y-3" aria-busy="true" aria-label="A carregar conversas">
             {Array.from({ length: 6 }).map((_, i) => (
               <li key={i} className="flex items-center gap-3 px-1">
-                <div className="h-12 w-12 shrink-0 rounded-full bg-white/[0.06] animate-pulse" />
+                <div className="h-12 w-12 shrink-0 rounded-full bg-muted animate-pulse" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-3.5 w-1/3 rounded bg-white/[0.06] animate-pulse" />
-                  <div className="h-3 w-2/3 rounded bg-white/[0.04] animate-pulse" />
+                  <div className="h-3.5 w-1/3 rounded bg-muted animate-pulse" />
+                  <div className="h-3 w-2/3 rounded bg-muted/60 animate-pulse" />
                 </div>
               </li>
             ))}
           </ul>
+
         ) : conversations.length === 0 && newMatches.length === 0 ? (
           <div className="mt-16 flex flex-col items-center px-6 text-center">
             <div className="relative">
