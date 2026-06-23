@@ -145,35 +145,24 @@
 
 /* ── Light mode overrides ─────────────────────────────────── */
 .light .tab-bar-pill {
-  background:
-    linear-gradient(180deg,
-      rgba(235, 235, 240, 0.92) 0%,
-      rgba(220, 220, 225, 0.96) 100%
-    );
+  background: var(--profile-bg, #ECECEC);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   border: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
     0 10px 28px rgba(0, 0, 0, 0.10),
     0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .light .tab-bar-pill::before {
-  background:
-    linear-gradient(180deg,
-      rgba(255, 255, 255, 0.45) 0%,
-      rgba(255, 255, 255, 0.08) 22%,
-      transparent 45%
-    );
+  display: none;
 }
 
 .light .tab-bar-pill::after {
-  background:
-    linear-gradient(0deg,
-      rgba(0, 0, 0, 0.05) 0%,
-      transparent 32%
-    );
+  display: none;
 }
+
 
 .light .tab-bar-pill .nav-active-pill {
   background:
