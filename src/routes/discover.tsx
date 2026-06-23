@@ -248,9 +248,14 @@ function Discover() {
     <div className="relative h-[100lvh] overflow-hidden bg-background text-foreground">
       <h1 className="sr-only">Descobrir matches verificados na Hunie</h1>
       <main
-        className="relative h-full w-full overflow-hidden"
+        className="relative w-full overflow-hidden"
         style={{
           pointerEvents: "auto",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: `calc(max(env(safe-area-inset-bottom) - 22px, 6px) + 56px + 8px)`,
         }}
       >
         {visible.length > 0 ? (
