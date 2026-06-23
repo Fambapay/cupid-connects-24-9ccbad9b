@@ -13,7 +13,8 @@ import { useEffect, useState, type ReactNode } from "react";
 
 
 import appCss from "../styles.css?url";
-import { MotionConfig } from "framer-motion";
+import { AnimatePresence, MotionConfig } from "framer-motion";
+import { RouteTransition } from "@/components/motion";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { useNewMessageNotifier } from "@/hooks/useNewMessageNotifier";
