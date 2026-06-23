@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { signPhoto } from "@/lib/photos";
 
 const ROSE = "#FF5C8A";
 const PLUM = "#9B5BFF";
@@ -36,12 +37,18 @@ export function MatchOverlay({
     (async () => {
       const { data } = await supabase
         .from("profile_photos")
-        .select("url")
+        .select("storage_path")
         .eq("profile_id", user.id)
         .order("position", { ascending: true })
         .limit(1)
         .maybeSingle();
-      if (!cancel) setMyPhoto((data as { url?: string } | null)?.url ?? null);
+      const path = (data as { storage_path?: string } | null)?.storage_path;
+      if (!path) {
+        if (!cancel) setMyPhoto(null);
+        return;
+      }
+      const url = await signPhoto(path, 3600, { width: 360, height: 440, resize: "cover", quality: 80 });
+      if (!cancel) setMyPhoto(url || null);
     })();
     return () => {
       cancel = true;
@@ -57,7 +64,7 @@ export function MatchOverlay({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.28, ease: APPLE_EASE }}
-          className="fixed inset-0 z-[60] flex flex-col items-center justify-center px-7"
+          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center px-7"
           onClick={onClose}
           style={{
             paddingTop: "max(env(safe-area-inset-top), 24px)",

@@ -199,6 +199,11 @@ function RootComponent() {
           richColors
           offset="calc(env(safe-area-inset-top, 0px) + 12px)"
           mobileOffset="calc(env(safe-area-inset-top, 0px) + 12px)"
+          toastOptions={{
+            unstyled: true,
+            classNames: { toast: "w-[min(94vw,384px)] mx-auto" },
+          }}
+          style={{ width: "min(94vw, 384px)", left: "50%", transform: "translateX(-50%)" }}
         />
       </CountryProvider>
     </QueryClientProvider>
