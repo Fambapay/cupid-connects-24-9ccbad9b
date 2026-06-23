@@ -194,7 +194,7 @@ export const BottomNavBase = ({
       ? { bottom: `${bottomOffsetPx}px` }
       : undefined;
 
-  const navElement = (
+  return (
     <nav ref={navRef} className="tab-bar" style={bottomStyle}>
       <div
         ref={pillRef}
