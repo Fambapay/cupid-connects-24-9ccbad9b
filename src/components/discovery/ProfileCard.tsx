@@ -137,9 +137,9 @@ const StackCard = ({
           left: 0,
           right: 0,
           bottom: 0,
-          height: "30%",
+          height: "55%",
           background:
-            "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0) 100%)",
+            "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0) 100%)",
         }}
       />
     </div>
@@ -385,7 +385,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
 
 
     return (
-      <div className="absolute inset-0 overflow-hidden" style={{ background: "#000", perspective: 1200, padding: "0 22px 28px" }}>
+      <div className="absolute inset-0 overflow-hidden" style={{ background: "#000", perspective: 1200 }}>
         {isTop && nextProfiles[1] && (
           <StackCard profile={nextProfiles[1]} topX={x} topY={y} stackIndex={2} />
         )}
@@ -475,9 +475,9 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 left: 0,
                 right: 0,
                 bottom: 0,
-                height: "30%",
+                height: "55%",
                 background:
-                  "linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0) 100%)",
+                  "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 38%, rgba(0,0,0,0) 100%)",
                 pointerEvents: "none",
               }}
             />
