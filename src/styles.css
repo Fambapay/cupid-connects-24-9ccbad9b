@@ -152,11 +152,6 @@
     background: var(--color-background);
   }
   body {
-    /* Pinta o fundo até à borda física do ecrã (atrás da home indicator) */
-    background: var(--color-background);
-    min-height: 100lvh;
-  }
-  body {
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
