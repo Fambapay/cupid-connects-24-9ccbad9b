@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { AppShell, TopBar } from "@/components/AppShell";
 import { useLikedMe } from "@/hooks/useLikedMe";
 import { useSubscription } from "@/hooks/useSubscription";
-import { useForceDarkTheme } from "@/lib/theme";
+
 import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
 
 
@@ -27,7 +27,6 @@ export const Route = createFileRoute("/matches")({
 });
 
 function LikesPage() {
-  useForceDarkTheme();
   const { likers, loading, error, reload } = useLikedMe();
   const { entitlements } = useSubscription();
   const isPremium = entitlements.canSeeWhoLiked;
@@ -243,7 +242,7 @@ function EmptyLikes({ onDiscover, onBoost }: { onDiscover: () => void; onBoost: 
       </motion.h2>
 
       <motion.p
-        className="relative mt-2 max-w-[280px] text-[14px] leading-relaxed text-white/55"
+        className="relative mt-2 max-w-[280px] text-[14px] leading-relaxed text-muted-foreground"
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.32 }}
@@ -274,12 +273,7 @@ function EmptyLikes({ onDiscover, onBoost }: { onDiscover: () => void; onBoost: 
         <button
           type="button"
           onClick={onBoost}
-          className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-[13px] font-medium text-white/85 transition-transform active:scale-[0.98]"
-          style={{
-            background: "rgba(255,255,255,0.06)",
-            border: "1px solid rgba(255,255,255,0.10)",
-            backdropFilter: "blur(14px)",
-          }}
+          className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card/40 px-5 py-3 text-[13px] font-medium text-foreground/80 backdrop-blur-md transition-transform active:scale-[0.98]"
         >
           <Sparkles className="h-[14px] w-[14px] text-flame" />
           Ativa Boost para 10× mais visibilidade
