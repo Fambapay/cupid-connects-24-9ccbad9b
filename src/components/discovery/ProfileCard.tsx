@@ -14,7 +14,7 @@ import {
   animate,
   type MotionValue,
 } from "framer-motion";
-import { MapPin, ChevronDown, ArrowUp } from "lucide-react";
+import { MapPin, ArrowUp, X, ChevronLeft, ChevronRight } from "lucide-react";
 import type { DiscoveryProfile, SwipeDirection } from "./types";
 
 interface ProfileCardProps {
