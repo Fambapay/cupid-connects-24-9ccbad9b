@@ -149,10 +149,7 @@
   }
   html, body, #root {
     height: 100%;
-    /* Background comes from the native window (UIGlassEffect / system),
-       not from the HTML. Keep the document fully transparent so the
-       native layer is visible through the WebView. */
-    background: transparent;
+    background: var(--color-background);
   }
   body {
     color: var(--color-foreground);
@@ -167,24 +164,14 @@
   }
 }
 
-/* Bottom-nav reserved zone (pill height + outer padding + safe-area + breathing room). */
+/* Bottom-nav reserved zone (tab bar height + safe-area + breathing room).
+   Content stays fully opaque under the native UITabBar so its Liquid Glass
+   material has something to refract. */
 :root {
-  --nav-zone: calc(56px + 16px + env(safe-area-inset-bottom, 0px) + 24px);
+  --nav-zone: calc(56px + env(safe-area-inset-bottom, 0px) + 24px);
 }
 
-/* Per-screen scroll container: fades to transparent over the nav zone,
-   so the native Liquid Glass behind the WebView reads through cleanly. */
 .screen-scroll {
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    #000 calc(100% - var(--nav-zone)),
-    transparent 100%
-  );
-          mask-image: linear-gradient(
-    to bottom,
-    #000 calc(100% - var(--nav-zone)),
-    transparent 100%
-  );
   padding-bottom: var(--nav-zone);
 }
 
