@@ -319,25 +319,37 @@ function PhotoBubble({
   fallbackInitial,
   className,
   rotate,
+  fromSide,
   delay,
+  reduce,
 }: {
   src: string | null;
   fallbackInitial: string;
   className?: string;
   rotate: number;
+  fromSide: "left" | "right";
   delay: number;
+  reduce: boolean;
 }) {
+  const initial = reduce
+    ? { opacity: 0, rotate }
+    : {
+        x: fromSide === "left" ? "-120%" : "120%",
+        rotate: fromSide === "left" ? -8 : 8,
+        opacity: 0,
+      };
+  const animate = reduce
+    ? { opacity: 1, rotate }
+    : { x: 0, rotate, opacity: 1 };
   return (
     <motion.div
-      initial={{ scale: 0.5, opacity: 0, y: 24, rotate: 0 }}
-      animate={{ scale: 1, opacity: 1, y: 0, rotate }}
-      transition={{
-        delay,
-        type: "spring",
-        stiffness: 240,
-        damping: 22,
-        mass: 0.85,
-      }}
+      initial={initial}
+      animate={animate}
+      transition={
+        reduce
+          ? { delay, duration: 0.3 }
+          : { delay, ...matchMotion.photoSettle }
+      }
       className={`absolute h-[178px] w-[144px] overflow-hidden rounded-[30px] ${className ?? ""}`}
       style={{
         boxShadow:
@@ -370,3 +382,4 @@ function PhotoBubble({
     </motion.div>
   );
 }
+
