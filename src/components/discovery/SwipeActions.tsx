@@ -217,7 +217,7 @@ export const SwipeActions = ({
       cb?.();
     };
 
-  const Halo = (ref: React.RefObject<HTMLSpanElement>) => (
+  const Halo = (ref: React.RefObject<HTMLSpanElement | null>) => (
     <span
       ref={ref}
       aria-hidden
