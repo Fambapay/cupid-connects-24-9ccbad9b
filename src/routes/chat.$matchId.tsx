@@ -507,15 +507,16 @@ function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, show
           className="px-4 py-2.5 text-[15px] font-normal leading-snug break-words whitespace-pre-wrap rounded-[22px]"
       style={
             me
-              ? { background: "#F3E7DD", color: "#0a0a0a", fontWeight: 400 }
-              : { background: "#0a0a0a", color: "#fff", border: "1px solid rgba(255,255,255,0.08)", fontWeight: 400 }
+              ? { background: "var(--chat-me-bg)", color: "var(--chat-me-fg)", fontWeight: 400 }
+              : { background: "var(--chat-peer-bg)", color: "var(--chat-peer-fg)", border: "1px solid var(--chat-peer-border)", fontWeight: 400 }
           }
         >
           {msg.content}
         </div>
         {me && showReadReceipt && isLastOfGroup && (
-          <span className="mt-1 px-1 text-[11px] text-white/45">Lido</span>
+          <span className="mt-1 px-1 text-[11px]" style={{ color: "var(--chat-fg)", opacity: 0.45 }}>Lido</span>
         )}
+
       </div>
     </div>
 
