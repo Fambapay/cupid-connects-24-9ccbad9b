@@ -121,7 +121,7 @@ function ChatRoom() {
       const keyboardInset = Math.max(0, winH - vH - vTop);
       const keyboardOpen = keyboardInset > 120;
       root.style.setProperty("--chat-top", `${vTop}px`);
-      root.style.setProperty("--chat-vh", `${keyboardOpen ? vH : winH - vTop}px`);
+      root.style.setProperty("--chat-vh", `${keyboardOpen ? vH + vTop : winH}px`);
       if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0);
     };
     setVh();
