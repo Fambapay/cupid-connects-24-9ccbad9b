@@ -48,7 +48,14 @@ const native = registerPlugin<NativeTabBarPlugin>('NativeTabBar', {
   android: () => noop,
 })
 
-export const isNativeTabBarSupported = (): boolean => Capacitor.isPluginAvailable('NativeTabBar')
+export const isNativeTabBarSupported = (): boolean => {
+  // Capacitor.isPluginAvailable returns true on web/android because we
+  // registered no-op fallbacks. Gate strictly on native iOS where the real
+  // Swift plugin is compiled in, so web + PWA + Android keep the HTML nav.
+  if (!Capacitor.isNativePlatform()) return false
+  if (Capacitor.getPlatform() !== 'ios') return false
+  return Capacitor.isPluginAvailable('NativeTabBar')
+}
 
 export const NativeTabBar: NativeTabBarPlugin = {
   async configure(config) {
