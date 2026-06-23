@@ -724,8 +724,9 @@ function PrimaryButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      whileTap={!disabled ? { scale: 0.975 } : undefined}
-      transition={{ duration: 0 }}
+      whileTap={!disabled ? { scale: 0.96 } : undefined}
+      whileHover={!disabled ? { scale: 1.015, y: -1 } : undefined}
+      transition={{ type: "spring", stiffness: 500, damping: 28 }}
       style={{
         touchAction: "manipulation",
         letterSpacing: "-0.01em",
@@ -745,20 +746,32 @@ function PrimaryButton({
       }}
       className={cn(
         "relative h-[54px] w-full overflow-hidden rounded-full text-[15.5px] font-semibold",
-        "transition-[transform,opacity] duration-150",
       )}
     >
       {!disabled && (
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-1/2"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 100%)",
-            borderTopLeftRadius: 9999,
-            borderTopRightRadius: 9999,
-          }}
-        />
+        <>
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-1/2"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 100%)",
+              borderTopLeftRadius: 9999,
+              borderTopRightRadius: 9999,
+            }}
+          />
+          <motion.span
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 w-1/3"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent)",
+              filter: "blur(2px)",
+            }}
+            animate={{ x: ["-120%", "320%"] }}
+            transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.2 }}
+          />
+        </>
       )}
       <span className="relative">{children}</span>
     </motion.button>
