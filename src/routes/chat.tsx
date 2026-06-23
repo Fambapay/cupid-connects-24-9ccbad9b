@@ -37,7 +37,7 @@ function ChatList() {
       <header className="sticky top-0 z-30 flex items-center justify-between bg-background px-4 pb-3 pt-5">
         <h1
           className="text-[34px] leading-none tracking-tight text-white"
-          style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}
+          style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
         >
           Chat
         </h1>
