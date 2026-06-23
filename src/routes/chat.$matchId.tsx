@@ -416,6 +416,7 @@ function ChatRoom() {
                   avatar={peer.photo}
                   name={peer.name}
                   showReadReceipt={r.showReadReceipt}
+                  animateIn={!seenIdsRef.current.has(r.msg.id)}
                 />
               </div>
             );
