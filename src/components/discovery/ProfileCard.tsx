@@ -758,6 +758,14 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 380, damping: 36 }}
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.6 }}
+            onDragEnd={(_, info) => {
+              if (info.offset.y > 120 || info.velocity.y > 600) {
+                setDetailOpen(false);
+              }
+            }}
             style={{
               position: "absolute",
               inset: 0,
@@ -765,42 +773,152 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               background: "#0a0a0a",
               color: "#fff",
               overflowY: "auto",
-              paddingBottom: 120,
+              paddingBottom: 140,
               borderRadius: 0,
+              touchAction: "pan-y",
             }}
           >
-            {profile.photos[0] && (
-              <img
-                src={profile.photos[0]}
-                alt=""
+            {/* Drag handle */}
+            <div
+              style={{
+                position: "sticky",
+                top: 0,
+                zIndex: 5,
+                display: "flex",
+                justifyContent: "center",
+                paddingTop: 8,
+                pointerEvents: "none",
+              }}
+            >
+              <div
                 style={{
-                  width: "100%",
-                  height: "55%",
-                  objectFit: "cover",
-                  display: "block",
+                  width: 44,
+                  height: 5,
+                  borderRadius: 999,
+                  background: "rgba(255,255,255,0.4)",
                 }}
               />
-            )}
+            </div>
+
+            {/* Photo carousel */}
+            <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: "#111", marginTop: -22 }}>
+              {photos.map((src, i) => (
+                <img
+                  key={i + src}
+                  src={src}
+                  alt=""
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    opacity: i === photoIdx ? 1 : 0,
+                    transition: "opacity 150ms linear",
+                  }}
+                />
+              ))}
+              {photos.length > 1 && (
+                <>
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 14,
+                      left: 10,
+                      right: 10,
+                      display: "flex",
+                      gap: 4,
+                      zIndex: 2,
+                    }}
+                  >
+                    {photos.map((_, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          flex: 1,
+                          height: 3,
+                          borderRadius: 2,
+                          background: i === photoIdx ? "#fff" : "rgba(255,255,255,0.35)",
+                          transition: "background 120ms",
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    onClick={goPrevPhoto}
+                    aria-label="Foto anterior"
+                    disabled={photoIdx === 0}
+                    style={{
+                      position: "absolute",
+                      left: 8,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      width: 40,
+                      height: 40,
+                      borderRadius: "50%",
+                      border: "none",
+                      background: "rgba(0,0,0,0.45)",
+                      color: "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      opacity: photoIdx === 0 ? 0.3 : 1,
+                      cursor: "pointer",
+                    }}
+                  >
+                    <ChevronLeft size={22} />
+                  </button>
+                  <button
+                    onClick={goNextPhoto}
+                    aria-label="Próxima foto"
+                    disabled={photoIdx === photos.length - 1}
+                    style={{
+                      position: "absolute",
+                      right: 8,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      width: 40,
+                      height: 40,
+                      borderRadius: "50%",
+                      border: "none",
+                      background: "rgba(0,0,0,0.45)",
+                      color: "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      opacity: photoIdx === photos.length - 1 ? 0.3 : 1,
+                      cursor: "pointer",
+                    }}
+                  >
+                    <ChevronRight size={22} />
+                  </button>
+                </>
+              )}
+            </div>
+
             <button
               onClick={() => setDetailOpen(false)}
               style={{
-                position: "absolute",
-                top: 12,
+                position: "fixed",
+                top: 14,
                 right: 16,
-                width: 40,
-                height: 40,
+                width: 42,
+                height: 42,
                 borderRadius: "50%",
-                border: "none",
-                background: "rgba(0,0,0,0.6)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                background: "rgba(0,0,0,0.65)",
+                backdropFilter: "blur(14px)",
+                WebkitBackdropFilter: "blur(14px)",
                 color: "#fff",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
+                zIndex: 40,
               }}
               aria-label="Fechar"
             >
-              <ChevronDown size={22} />
+              <X size={22} />
             </button>
 
             <div style={{ padding: "20px 20px 0" }}>
@@ -898,6 +1016,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             )}
           </motion.div>
         )}
+
       </div>
     );
   },
