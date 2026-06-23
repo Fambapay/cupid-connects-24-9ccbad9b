@@ -148,7 +148,7 @@ export function usePhotoUpload() {
     };
   }, [user, load]);
 
-  const upload = async (file: File) => {
+  const upload = async (file: File, opts?: { position?: number }) => {
     // Fetch the current user directly from supabase to avoid race conditions
     // where the local `useAuth` state hasn't hydrated yet on mount.
     const { data: authData } = await supabase.auth.getUser();
@@ -159,7 +159,11 @@ export function usePhotoUpload() {
     // Optimistic preview using local object URL
     const tempId = `temp-${makeUploadId()}`;
     const previewUrl = URL.createObjectURL(file);
-    const tempPos = photos.length;
+    // Prefer caller-provided slot (e.g. when replacing) so position is stable
+    // across optimistic state. Fall back to next available slot based on
+    // current max position to avoid collisions on concurrent uploads.
+    const maxPos = photos.reduce((m, p) => Math.max(m, p.position ?? -1), -1);
+    const tempPos = opts?.position ?? maxPos + 1;
     setPhotos((p) => [
       ...p,
       { id: tempId, storage_path: "", position: tempPos, url: previewUrl },
