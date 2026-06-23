@@ -27,6 +27,7 @@ export const Route = createFileRoute("/matches")({
 });
 
 function LikesPage() {
+  useForceDarkTheme();
   const { likers, loading, error, reload } = useLikedMe();
   const { entitlements } = useSubscription();
   const isPremium = entitlements.canSeeWhoLiked;
