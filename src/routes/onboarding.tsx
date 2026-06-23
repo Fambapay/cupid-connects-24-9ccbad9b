@@ -433,8 +433,22 @@ function OnboardingPage() {
 
   return (
     <div className="relative min-h-[100dvh] overflow-hidden bg-background text-foreground">
-      {/* Ambient brand glow — extends to full device viewport including safe-area zones */}
-      <div className="pointer-events-none fixed inset-0 bg-aurora opacity-80" />
+      {/* Ambient brand glow — refined Apple-style: subtle warm aurora, not loud */}
+      <div
+        className="pointer-events-none fixed inset-0"
+        style={{
+          background:
+            "radial-gradient(120% 70% at 50% 0%, rgba(255,92,138,0.18) 0%, rgba(155,91,255,0.10) 35%, transparent 70%), radial-gradient(80% 60% at 50% 100%, rgba(255,140,90,0.10) 0%, transparent 60%)",
+        }}
+      />
+      <div
+        className="pointer-events-none fixed inset-0 opacity-[0.4]"
+        style={{
+          backgroundImage:
+            "radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)",
+          backgroundSize: "3px 3px",
+        }}
+      />
 
       <div
         className="relative flex min-h-[100dvh] flex-col"
