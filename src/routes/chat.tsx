@@ -63,7 +63,7 @@ function ChatList() {
       {newMatches.length > 0 && (
         <section className="mt-2 px-4">
           <h2
-            className="text-[15px] uppercase tracking-tight text-white/70"
+            className="text-[15px] uppercase tracking-tight text-muted-foreground"
             style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}
           >
             Novos matches
@@ -76,7 +76,7 @@ function ChatList() {
                 params={{ matchId: m.matchId }}
                 className="relative shrink-0"
               >
-                <div className="h-32 w-[104px] overflow-hidden rounded-[22px] bg-card ring-1 ring-white/5">
+                <div className="h-32 w-[104px] overflow-hidden rounded-[22px] bg-card ring-1 ring-border">
                   {m.photo ? (
                     <img src={m.photo} alt={m.name} className="h-full w-full object-cover" />
                   ) : (
@@ -84,7 +84,7 @@ function ChatList() {
                   )}
                 </div>
                 <span
-                  className="mt-2 block text-center text-[14px] text-white"
+                  className="mt-2 block text-center text-[14px] text-foreground"
                   style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 500 }}
                 >
                   {m.name}
@@ -97,11 +97,12 @@ function ChatList() {
 
       <section className={`${newMatches.length > 0 ? "mt-3" : "mt-1"} px-4`}>
         <h2
-          className="text-[15px] uppercase tracking-tight text-white/70"
+          className="text-[15px] uppercase tracking-tight text-muted-foreground"
           style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}
         >
           Mensagens
         </h2>
+
 
 
         {loading && matches.length === 0 ? (
