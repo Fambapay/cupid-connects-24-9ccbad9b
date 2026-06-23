@@ -1518,15 +1518,16 @@ function PhotosStep({
             <DrawerTitle className="text-center text-base">Foto</DrawerTitle>
           </DrawerHeader>
           <div className="space-y-2 px-4 pb-2">
-            <label className="flex w-full items-center gap-3 rounded-xl bg-white/5 px-4 py-3 active:bg-white/10">
+            <label className="relative flex w-full items-center gap-3 rounded-xl bg-white/5 px-4 py-3 active:bg-white/10">
               <Camera className="h-5 w-5" />
               <span className="text-base">Substituir foto</span>
               <input
                 type="file"
                 accept="image/*"
-                className="hidden"
+                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                 onChange={async (e) => {
                   const f = e.target.files?.[0];
+                  e.target.value = "";
                   if (f && actionFor) await handleFile(f, actionFor);
                   setActionFor(null);
                 }}
