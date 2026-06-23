@@ -289,7 +289,7 @@ function SettingsPage() {
           </div>
           <motion.button
             onClick={goBack}
-            className="rounded-full px-4 py-2 text-[13px] font-semibold bg-white/10 text-foreground border border-white/15 hover:bg-white/15"
+            className="rounded-full px-4 py-2 text-[13px] font-semibold bg-foreground text-background border border-foreground/10 active:opacity-90"
             whileTap={{ scale: 0.95 }}
           >
             Concluído
