@@ -20,7 +20,7 @@ export const RouteTransition = forwardRef<HTMLDivElement, RouteTransitionProps>(
         initial={reduced ? { opacity: 1 } : { opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={reduced ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: reduced ? 0 : 0.18, ease: [0.32, 0.72, 0, 1] }}
+        transition={{ duration: reduced ? 0 : 0.12, ease: [0.32, 0.72, 0, 1] }}
         {...rest}
       >
         {children}
