@@ -311,7 +311,7 @@ function ChatRoom() {
               className="rounded-full px-4 py-1.5 text-[15px] text-white"
               style={{
                 fontFamily: "'Montserrat', sans-serif",
-                fontWeight: 800,
+                fontWeight: 600,
                 background: "rgba(255,255,255,0.08)",
                 backdropFilter: "blur(20px) saturate(180%)",
                 WebkitBackdropFilter: "blur(20px) saturate(180%)",
