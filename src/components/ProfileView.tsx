@@ -343,15 +343,19 @@ export function ProfileView({
         <div className="relative mx-5 mb-6">
           <div
             aria-hidden
-            className="absolute -inset-px rounded-[22px] opacity-70 blur-md"
-            style={{ background: `linear-gradient(135deg, ${PINK}, #B13CFF, #FFD66B)` }}
+            className="absolute -inset-px rounded-[22px] blur-md"
+            style={{
+              opacity: 'calc(0.7 * var(--profile-glow-opacity, 1))',
+              background: `linear-gradient(135deg, ${PINK}, #B13CFF, #FFD66B)`,
+            }}
           />
           <div className="relative bg-card border border-border rounded-[20px] p-5 overflow-hidden">
             <div
               aria-hidden
-              className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-20 blur-3xl"
-              style={{ background: PINK }}
+              className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full blur-3xl"
+              style={{ opacity: 'calc(0.20 * var(--profile-glow-opacity, 1))', background: PINK }}
             />
+
 
             <div className="relative flex items-center gap-3 mb-1">
               <div
