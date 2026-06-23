@@ -1606,12 +1606,12 @@ function PhotoSlot({
           <input
             type="file"
             accept="image/*"
-            className="hidden"
+            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
             disabled={disabled}
             onChange={(e) => {
               const f = e.target.files?.[0];
-              if (f) onAdd(f);
               e.target.value = "";
+              if (f) onAdd(f);
             }}
           />
         </label>
