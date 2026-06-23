@@ -14,7 +14,7 @@ export function AppShell({
   className?: string;
 }) {
   return (
-    <div id="hunie-app-root" className={cn("relative min-h-[100lvh] bg-background text-foreground", className)}>
+    <div className={cn("relative min-h-[100lvh] bg-background text-foreground", className)}>
       {/* Single static aurora layer (was 2 stacked fixed gradients — costly on every paint) */}
       <div
         className="pointer-events-none fixed inset-0 -z-10 bg-aurora opacity-90"

@@ -1,11 +1,8 @@
-import { useRef } from "react";
 import { createFileRoute, Link, Outlet, useMatchRoute } from "@tanstack/react-router";
 import { MessageCircle, Sparkles, Compass, Shield, MessagesSquare } from "lucide-react";
-import { AnimatePresence } from "framer-motion";
 import { AppShell } from "@/components/AppShell";
 import { useMatches } from "@/hooks/useMatches";
 import { SwipeableConversationItem } from "@/components/chat/SwipeableConversationItem";
-import { Stagger, StaggerItem, PressableScale } from "@/components/motion";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
@@ -34,20 +31,6 @@ function ChatList() {
   const { matches, loading } = useMatches();
   const newMatches = matches.filter((m) => !m.hasMessages);
   const conversations = matches.filter((m) => m.hasMessages);
-
-  // Track which items were present at first paint. Anything added after that
-  // is "new" and gets its own entry animation instead of re-firing the
-  // mount-stagger cascade across the whole list.
-  const seenConvRef = useRef<Set<string> | null>(null);
-  if (seenConvRef.current === null && !loading) {
-    seenConvRef.current = new Set(conversations.map((c) => c.matchId));
-  }
-  const seenConv = seenConvRef.current ?? new Set<string>();
-
-  const seenNewRef = useRef<Set<string> | null>(null);
-  if (seenNewRef.current === null && !loading) {
-    seenNewRef.current = new Set(newMatches.map((m) => m.matchId));
-  }
 
   return (
     <AppShell className="bg-[var(--profile-bg)]">
@@ -85,33 +68,30 @@ function ChatList() {
           >
             Novos matches
           </h2>
-          <Stagger className="mt-3 flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="mt-3 flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {newMatches.map((m) => (
-              <StaggerItem key={m.matchId} className="shrink-0">
-                <PressableScale>
-                  <Link
-                    to="/chat/$matchId"
-                    params={{ matchId: m.matchId }}
-                    className="relative block"
-                  >
-                    <div className="h-32 w-[104px] overflow-hidden rounded-[22px] bg-card ring-1 ring-border">
-                      {m.photo ? (
-                        <img src={m.photo} alt={m.name} className="h-full w-full object-cover" />
-                      ) : (
-                        <div className="h-full w-full bg-gradient-flame" />
-                      )}
-                    </div>
-                    <span
-                      className="mt-2 block text-center text-[14px] text-foreground"
-                      style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 500 }}
-                    >
-                      {m.name}
-                    </span>
-                  </Link>
-                </PressableScale>
-              </StaggerItem>
+              <Link
+                key={m.matchId}
+                to="/chat/$matchId"
+                params={{ matchId: m.matchId }}
+                className="relative shrink-0"
+              >
+                <div className="h-32 w-[104px] overflow-hidden rounded-[22px] bg-card ring-1 ring-border">
+                  {m.photo ? (
+                    <img src={m.photo} alt={m.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="h-full w-full bg-gradient-flame" />
+                  )}
+                </div>
+                <span
+                  className="mt-2 block text-center text-[14px] text-foreground"
+                  style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 500 }}
+                >
+                  {m.name}
+                </span>
+              </Link>
             ))}
-          </Stagger>
+          </div>
         </section>
       )}
 
@@ -166,25 +146,18 @@ function ChatList() {
           </div>
         ) : (
           <ul className="mt-3">
-            <AnimatePresence initial={false}>
-              {conversations.map((m, i) => {
-                const isNew = seenConv.size > 0 && !seenConv.has(m.matchId);
-                return (
-                  <SwipeableConversationItem
-                    key={m.matchId}
-                    matchId={m.matchId}
-                    otherId={m.otherId}
-                    name={m.name}
-                    photo={m.photo}
-                    lastMessage={m.lastMessage}
-                    lastMessageAt={formatTime(m.lastMessageAt)}
-                    unread={m.unread}
-                    isNew={isNew}
-                    mountDelay={isNew ? 0 : Math.min(i, 10) * 0.04}
-                  />
-                );
-              })}
-            </AnimatePresence>
+            {conversations.map((m) => (
+              <SwipeableConversationItem
+                key={m.matchId}
+                matchId={m.matchId}
+                otherId={m.otherId}
+                name={m.name}
+                photo={m.photo}
+                lastMessage={m.lastMessage}
+                lastMessageAt={formatTime(m.lastMessageAt)}
+                unread={m.unread}
+              />
+            ))}
           </ul>
         )}
       </section>

@@ -358,22 +358,11 @@ const TabButton = ({
       aria-label={label}
     >
       <div className="relative flex items-center z-10">
-        <motion.span
-          className="inline-flex"
-          // SF-Symbol-style pop when this tab becomes active.
-          animate={isActive ? { scale: [1, 1.18, 1] } : { scale: 1 }}
-          transition={
-            isActive
-              ? { type: "spring", visualDuration: 0.5, bounce: 0.32 }
-              : { type: "spring", visualDuration: 0.18, bounce: 0.15 }
-          }
-        >
-          <Icon
-            className={`tab-bar-icon w-[22px] h-[22px] ${shouldAnimate ? "animate-notification-bounce" : ""}`}
-            style={{ fill: "none" }}
-            strokeWidth={isActive ? 2.1 : 1.7}
-          />
-        </motion.span>
+        <Icon
+          className={`tab-bar-icon w-[22px] h-[22px] ${shouldAnimate ? "animate-notification-bounce" : ""}`}
+          style={{ fill: "none" }}
+          strokeWidth={isActive ? 2.1 : 1.7}
+        />
         <AnimatePresence mode="wait">
           {badge !== undefined && badge > 0 && (
             <motion.span

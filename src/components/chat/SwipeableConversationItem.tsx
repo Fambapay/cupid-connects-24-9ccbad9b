@@ -1,7 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { Link } from "@tanstack/react-router";
-import { motion, useMotionValue, useTransform, animate, useReducedMotion } from "framer-motion";
-import { spring, chat as chatMotion } from "@/lib/motion";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { Flag, HeartCrack } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "@/hooks/use-toast";
@@ -49,10 +48,6 @@ interface Props {
   lastMessageAt: string;
   unread?: number;
   onActionTaken?: () => void;
-  /** When true, this row is a brand-new arrival (entered after mount). */
-  isNew?: boolean;
-  /** Stagger delay (s) for the initial mount reveal. Ignored when isNew. */
-  mountDelay?: number;
 }
 
 export function SwipeableConversationItem({
@@ -64,10 +59,7 @@ export function SwipeableConversationItem({
   lastMessageAt,
   unread = 0,
   onActionTaken,
-  isNew = false,
-  mountDelay = 0,
 }: Props) {
-  const reduced = useReducedMotion();
   const x = useMotionValue(0);
   const bgOpacity = useTransform(x, [-ACTION_WIDTH, 0], [1, 0]);
   const [open, setOpen] = useState(false);
@@ -151,21 +143,7 @@ export function SwipeableConversationItem({
   };
 
   return (
-    <motion.li
-      ref={containerRef}
-      layout={reduced ? false : "position"}
-      transition={spring.smooth}
-      initial={reduced ? false : isNew ? { opacity: 0, y: 10 } : { opacity: 0, y: 8 }}
-      animate={
-        reduced
-          ? undefined
-          : isNew
-            ? { opacity: 1, y: 0, transition: chatMotion.bubbleIn }
-            : { opacity: 1, y: 0, transition: { ...spring.snappy, delay: mountDelay } }
-      }
-      exit={reduced ? { opacity: 0 } : { opacity: 0, height: 0, marginTop: 0, marginBottom: 0 }}
-      className="relative overflow-hidden rounded-2xl"
-    >
+    <li ref={containerRef} className="relative overflow-hidden rounded-2xl">
       {/* Actions layer (behind) */}
       <motion.div
         style={{ opacity: bgOpacity }}
@@ -320,6 +298,6 @@ export function SwipeableConversationItem({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </motion.li>
+    </li>
   );
 }

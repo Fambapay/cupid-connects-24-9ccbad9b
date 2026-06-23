@@ -4,7 +4,6 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
-  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -13,8 +12,6 @@ import { useEffect, useState, type ReactNode } from "react";
 
 
 import appCss from "../styles.css?url";
-import { AnimatePresence, MotionConfig } from "framer-motion";
-import { RouteTransition } from "@/components/motion";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { useNewMessageNotifier } from "@/hooks/useNewMessageNotifier";
@@ -195,33 +192,26 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MotionConfig reducedMotion="user">
-        <CountryProvider>
-          <NativeBoot />
-          <ThemeSync />
-          <AnimatePresence mode="wait" initial={false}>
-            <RouteTransition key={pathname}>
-              <Outlet />
-            </RouteTransition>
-          </AnimatePresence>
-          <GlobalNotifiers />
-          <PushPromptGate />
-          <Toaster
-            position="top-center"
-            richColors
-            offset="calc(env(safe-area-inset-top, 0px) + 12px)"
-            mobileOffset="calc(env(safe-area-inset-top, 0px) + 12px)"
-            toastOptions={{
-              unstyled: true,
-              classNames: { toast: "flex justify-center w-full" },
-            }}
-          />
-        </CountryProvider>
-      </MotionConfig>
+      <CountryProvider>
+        <NativeBoot />
+        <ThemeSync />
+        <Outlet />
+        <GlobalNotifiers />
+        <PushPromptGate />
+        <Toaster
+          position="top-center"
+          richColors
+          offset="calc(env(safe-area-inset-top, 0px) + 12px)"
+          mobileOffset="calc(env(safe-area-inset-top, 0px) + 12px)"
+          toastOptions={{
+            unstyled: true,
+            classNames: { toast: "flex justify-center w-full" },
+          }}
+        />
+      </CountryProvider>
     </QueryClientProvider>
   );
 }

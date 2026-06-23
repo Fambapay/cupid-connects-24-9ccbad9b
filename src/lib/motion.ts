@@ -1,91 +1,52 @@
-// Springs que espelham as named springs do iOS / SwiftUI — o "Apple feel".
+/**
+ * Spring physics presets for framer-motion transitions.
+ * Use these instead of `ease: 'linear'` or generic durations for native-feel motion.
+ */
+
 export const spring = {
-  smooth: { type: "spring", visualDuration: 0.45, bounce: 0 },
-  snappy: { type: "spring", visualDuration: 0.4,  bounce: 0.18 },
-  bouncy: { type: "spring", visualDuration: 0.5,  bounce: 0.32 },
-  micro:  { type: "spring", visualDuration: 0.18, bounce: 0.15 },
-  sheet:  { type: "spring", visualDuration: 0.5,  bounce: 0.12 },
+  gentle: { type: 'spring', stiffness: 200, damping: 28, mass: 0.8 },
+  snappy: { type: 'spring', stiffness: 400, damping: 30, mass: 0.7 },
+  bouncy: { type: 'spring', stiffness: 380, damping: 22, mass: 1.0 },
+  stiff: { type: 'spring', stiffness: 500, damping: 35, mass: 0.6 },
 } as const;
 
-export const fade = {
-  initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 },
+/** Page-level transition presets. */
+type PageVariant = {
+  initial: Record<string, number | string>;
+  animate: Record<string, number | string>;
+  exit: Record<string, number | string>;
+  transition: { duration: number; ease: string | number[] };
 };
 
-export const stagger = {
-  container: { animate: { transition: { staggerChildren: 0.04 } } },
-  item: {
-    initial: { opacity: 0, y: 12 },
-    animate: { opacity: 1, y: 0, transition: spring.snappy },
+export const pageTransitions: Record<'slide' | 'slideBack' | 'fade', PageVariant> = {
+  slide: {
+    initial: { opacity: 1, x: '100%' },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0.5, x: '-30%' },
+    transition: { duration: 0.38, ease: [0.32, 0.72, 0, 1] },
+  },
+  slideBack: {
+    initial: { opacity: 0.5, x: '-30%' },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 1, x: '100%' },
+    transition: { duration: 0.38, ease: [0.32, 0.72, 0, 1] },
+  },
+  fade: {
+    initial: { opacity: 0, scale: 0.99 },
+    animate: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 0.995 },
+    transition: { duration: 0.18, ease: [0.32, 0.72, 0, 1] },
   },
 };
 
 /**
- * iOS push-navigation variants for the screen that ENTERS (drill-in).
- *
- * The screen that's LEFT BEHIND should animate in parallel from x: 0 →
- * "-30%" with `spring.smooth` AND a black overlay should fade 0 → 0.18
- * over the top. Don't use filter:brightness — an overlay div is just a
- * compositor pass and is much smoother on mobile.
+ * iOS-style modal/sheet presentation. Use as `initial/animate/exit` on a
+ * full-screen overlay container. Pair with `useShellPresenting()` to
+ * shrink the shell behind it.
  */
-export const pushScreen = {
-  initial: { x: "100%" },
-  animate: { x: 0,      transition: spring.smooth },
-  exit:    { x: "100%", transition: spring.smooth },
-};
-
-/** Companion variants for the back screen during a push (parallax recede). */
-export const pushScreenBehind = {
-  initial: { x: 0 },
-  animate: { x: "-30%", transition: spring.smooth },
-  exit:    { x: 0,      transition: spring.smooth },
-};
-
-/** Companion variants for the black overlay over the back screen. */
-export const pushScreenOverlay = {
-  initial: { opacity: 0 },
-  animate: { opacity: 0.18, transition: spring.smooth },
-  exit:    { opacity: 0,    transition: spring.smooth },
-};
-
-/**
- * Tunables para o swipe deck (Tinder-like).
- * Usar com `animate(x, ...)` / `animate(y, ...)` + velocity handoff.
- */
-export const swipe = {
-  commitOffset: 0.35,   // fracção da largura do ecrã para confirmar
-  commitVelocity: 500,  // px/s — flick confirma sem distância
-  maxRotate: 16,        // graus no extremo do drag
-  flyDistance: 1.5,     // múltiplo da largura para sair de cena
+export const sheetPresentation = {
+  initial: { y: '100%', opacity: 1 },
+  animate: { y: 0, opacity: 1 },
+  exit: { y: '100%', opacity: 1 },
+  transition: { type: 'spring', stiffness: 380, damping: 36, mass: 0.9 },
 } as const;
-
-/**
- * Tunables para o ecrã "It's a Match".
- * O `photoSettle` é o overshoot que dá o batimento emocional ao encontro
- * das duas fotos; o `titlePop` é o bounce mais marcado do título.
- */
-export const match = {
-  photoSettle: { type: "spring", visualDuration: 0.55, bounce: 0.22 },
-  titlePop:    { type: "spring", visualDuration: 0.5,  bounce: 0.35 },
-  photoOverlap: 24, // px de sobreposição quando as fotos assentam
-} as const;
-
-/**
- * Tunables para o chat (iMessage-style — function-first, discreto).
- * `bubbleIn` aplica-se a mensagens NOVAS (durante a sessão), nunca ao
- * histórico já carregado no primeiro paint — senão a lista "explode" ao abrir.
- */
-export const chat = {
-  bubbleIn:  { type: "spring", visualDuration: 0.32, bounce: 0.12 },
-  sentNudge: 700, // velocidade sintética do "empurrão" ao enviar
-} as const;
-
-/**
- * Tunables para listas — Fase 5.
- * `revealStagger` curto: o olho lê "lista entrou com vida", não
- * "itens entraram um a um". Stagger lento parece PowerPoint.
- */
-export const list = {
-  revealStagger: 0.04,
-  rowPress: { type: "spring", visualDuration: 0.16, bounce: 0.1 },
-} as const;
-

@@ -11,7 +11,6 @@ import {
   motion,
   useMotionValue,
   useMotionValueEvent,
-  useReducedMotion,
   animate,
   type MotionValue,
 } from "framer-motion";
@@ -59,20 +58,10 @@ const StackCard = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
-  const reduceMotion = useReducedMotion();
   const apply = useCallback(() => {
     rafRef.current = null;
     const el = ref.current;
     if (!el) return;
-    // Reduced motion: no scale promotion / parallax follow — keep static pose.
-    if (reduceMotion) {
-      if (stackIndex === 1) {
-        el.style.transform = `translate3d(0,10px,0) scale(0.94)`;
-      } else {
-        el.style.transform = `translate3d(0,20px,0) scale(0.88)`;
-      }
-      return;
-    }
     const dx = topX.get();
     const dy = topY.get();
     const w = getVW();
@@ -89,7 +78,7 @@ const StackCard = ({
       const ty2 = 20 - progress * 6;
       el.style.transform = `translate3d(${tx2.toFixed(2)}px,${ty2}px,0) scale(${scale2.toFixed(3)})`;
     }
-  }, [stackIndex, topX, topY, reduceMotion]);
+  }, [stackIndex, topX, topY]);
 
   const schedule = useCallback(() => {
     if (rafRef.current != null) return;
@@ -191,7 +180,6 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     const supLabelRef = useRef<HTMLDivElement>(null);
     const draggingRef = useRef(false);
     const startRef = useRef({ x: 0, y: 0 });
-    const reduceMotion = useReducedMotion();
 
     const tickRef = useRef<number | null>(null);
     const tick = useCallback(() => {
@@ -202,55 +190,43 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       const dy = y.get();
       const w = getVW();
       const h = getVH();
-      // Card transform — rotation/3D tilt are the "Tinder signature" but
-      // can trigger motion sickness. In reduced-motion, drop them entirely
-      // (drag/fly-off remain — direct manipulation, no vestibular conflict).
-      const rot = reduceMotion ? 0 : (dx / w) * 30;
-      const rotY = reduceMotion ? 0 : (dx / w) * 7;
-      const rotX = reduceMotion ? 0 : -(dy / h) * 5;
+      // Card transform
+      const rot = (dx / w) * 30;
+      const rotY = (dx / w) * 7;
+      const rotX = -(dy / h) * 5;
       const dist = Math.sqrt(dx * dx + dy * dy);
       const progress = Math.min(1, dist / (w * 0.4));
-      const dragScale = reduceMotion ? 1 : 1 + progress * 0.025;
+      const dragScale = 1 + progress * 0.025;
       const e = entry.get();
       const entryY = e * 10;
-      const entryScale = reduceMotion ? 1 : 1 - e * 0.06;
+      const entryScale = 1 - e * 0.06;
       const scale = dragScale * entryScale;
       el.style.transform = `translate3d(${dx}px,${dy + entryY}px,0) rotate(${rot.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) rotateX(${rotX.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
-      // Parallax layers (skip in reduced motion)
+      // Parallax layers
       if (photoWrapRef.current) {
-        photoWrapRef.current.style.transform = reduceMotion
-          ? "translate3d(0,0,0) scale(1.04)"
-          : `translate3d(${dx * -0.06}px, ${dy * -0.04}px, 0) scale(1.04)`;
+        photoWrapRef.current.style.transform = `translate3d(${dx * -0.06}px, ${dy * -0.04}px, 0) scale(1.04)`;
       }
       if (infoWrapRef.current) {
-        infoWrapRef.current.style.transform = reduceMotion
-          ? "translate3d(0,0,0)"
-          : `translate3d(${dx * 0.04}px, ${dy * 0.02}px, 0)`;
+        infoWrapRef.current.style.transform = `translate3d(${dx * 0.04}px, ${dy * 0.02}px, 0)`;
       }
-      // Labels — opacity-only in reduced motion (no translate/rotate dance).
+      // Labels — opacity + transform combined
       const t = w * 0.25;
       const like = Math.max(0, Math.min(1, dx / t));
       const nope = Math.max(0, Math.min(1, -dx / t));
       const sup = Math.max(0, Math.min(1, -dy / 180));
       if (likeLabelRef.current) {
         likeLabelRef.current.style.opacity = String(like);
-        likeLabelRef.current.style.transform = reduceMotion
-          ? "rotate(-18deg)"
-          : `translate3d(${dx * 0.12}px, ${dy * 0.08}px, 0) rotate(-18deg)`;
+        likeLabelRef.current.style.transform = `translate3d(${dx * 0.12}px, ${dy * 0.08}px, 0) rotate(-18deg)`;
       }
       if (nopeLabelRef.current) {
         nopeLabelRef.current.style.opacity = String(nope);
-        nopeLabelRef.current.style.transform = reduceMotion
-          ? "rotate(18deg)"
-          : `translate3d(${dx * -0.12}px, ${dy * 0.08}px, 0) rotate(18deg)`;
+        nopeLabelRef.current.style.transform = `translate3d(${dx * -0.12}px, ${dy * 0.08}px, 0) rotate(18deg)`;
       }
       if (supLabelRef.current) {
         supLabelRef.current.style.opacity = String(sup);
-        supLabelRef.current.style.transform = reduceMotion
-          ? "translateX(-50%) rotate(-6deg)"
-          : `translate3d(${dx * 0.08}px, ${dy * 0.12}px, 0) translateX(-50%) rotate(-6deg)`;
+        supLabelRef.current.style.transform = `translate3d(${dx * 0.08}px, ${dy * 0.12}px, 0) translateX(-50%) rotate(-6deg)`;
       }
-    }, [x, y, entry, reduceMotion]);
+    }, [x, y, entry]);
 
     const schedule = useCallback(() => {
       if (tickRef.current != null) return;
