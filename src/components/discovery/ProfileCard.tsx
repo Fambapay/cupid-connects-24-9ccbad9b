@@ -372,15 +372,15 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     };
 
 
-    const onClickPhoto = (e: React.MouseEvent) => {
-      if (detailOpen) return;
-      const moved = Math.abs(x.get()) + Math.abs(y.get());
-      if (moved > 6) return;
-      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-      const isLeft = e.clientX - rect.left < rect.width / 2;
-      if (isLeft) setPhotoIdx((i) => Math.max(0, i - 1));
-      else setPhotoIdx((i) => Math.min(photos.length - 1, i + 1));
-    };
+    const goPrevPhoto = useCallback(
+      () => setPhotoIdx((i) => Math.max(0, i - 1)),
+      [],
+    );
+    const goNextPhoto = useCallback(
+      () => setPhotoIdx((i) => Math.min(photos.length - 1, i + 1)),
+      [photos.length],
+    );
+
 
 
 
