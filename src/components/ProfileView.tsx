@@ -93,7 +93,7 @@ export function ProfileView({
     <div
       className="relative min-h-full pb-32"
       style={{
-        background: 'var(--background)',
+        background: 'var(--profile-bg)',
       }}
     >
       {/* Soft gradient backdrop */}
@@ -101,10 +101,12 @@ export function ProfileView({
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[280px]"
         style={{
+          opacity: 'var(--profile-glow-opacity, 1)',
           background:
             'radial-gradient(70% 60% at 50% 0%, rgba(255,79,163,0.22) 0%, rgba(255,79,163,0) 70%)',
         }}
       />
+
 
       <input
         ref={fileRef}
