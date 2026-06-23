@@ -112,6 +112,18 @@ function SeedsAdmin() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const popMut = useMutation({
+    mutationFn: () => populate({ data: {} }),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["seeds"] });
+      qc.invalidateQueries({ queryKey: ["seed-stats"] });
+      toast.success(
+        `Populado: ${res.realUsers} user(s) · +${res.generated} seeds · ${res.likes} likes · ${res.matchesEmpty} matches · ${res.matchesChat} chats (${res.messages} msgs)`,
+      );
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const s = statsQ.data;
   const total = listQ.data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / 20));
