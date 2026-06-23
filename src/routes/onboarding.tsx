@@ -550,10 +550,10 @@ function OnboardingPage() {
               <motion.div
                 key={stepId}
                 custom={dir}
-                initial={{ x: dir * 100 + "%", opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -dir * 100 + "%", opacity: 0 }}
-                transition={{ duration: 0.42, ease: [0.32, 0.72, 0, 1] }}
+                initial={{ x: dir * 60 + "%", opacity: 0, scale: 0.94, filter: "blur(8px)" }}
+                animate={{ x: 0, opacity: 1, scale: 1, filter: "blur(0px)" }}
+                exit={{ x: -dir * 40 + "%", opacity: 0, scale: 0.96, filter: "blur(6px)" }}
+                transition={{ type: "spring", stiffness: 320, damping: 32, mass: 0.9 }}
                 className="absolute inset-0 flex flex-col"
               >
                 {stepId === "welcome" && <WelcomeStep onStart={goNext} />}
