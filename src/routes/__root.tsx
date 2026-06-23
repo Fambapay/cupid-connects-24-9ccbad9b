@@ -22,6 +22,12 @@ import { CountryProvider } from "@/lib/country/context";
 import { initNative } from "@/lib/native/init";
 import { setupNativePush } from "@/lib/native/push";
 import { isNative } from "@/lib/native/platform";
+import { useSystemTheme } from "@/lib/theme";
+
+function ThemeSync() {
+  useSystemTheme();
+  return null;
+}
 
 function NativeBoot() {
   useEffect(() => {
