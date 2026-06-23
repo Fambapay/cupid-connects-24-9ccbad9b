@@ -53,7 +53,7 @@ function BubbleImpl({ msg, isFirstOfGroup, isLastOfGroup, avatar, name }: Props)
       <div className={`flex max-w-[78%] flex-col ${me ? "items-end" : "items-start"}`}>
         <div
           className={[
-            "px-4 py-2.5 text-[15px] leading-snug break-words whitespace-pre-wrap rounded-2xl",
+            "px-4 py-2.5 text-[15px] font-normal leading-snug break-words whitespace-pre-wrap rounded-2xl",
             me
               ? "bg-gradient-flame text-flame-foreground shadow-rose"
               : "bg-muted text-foreground",
