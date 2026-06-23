@@ -449,21 +449,35 @@ function OnboardingPage() {
             <button
               onClick={goBack}
               aria-label="Voltar"
-              className="grid h-9 w-9 place-items-center rounded-full glass"
-              style={{ touchAction: "manipulation" }}
+              className="grid h-9 w-9 place-items-center rounded-full transition-transform active:scale-95"
+              style={{
+                touchAction: "manipulation",
+                background: "rgba(255,255,255,0.06)",
+                border: "0.5px solid rgba(255,255,255,0.12)",
+                backdropFilter: "blur(20px) saturate(180%)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
+              }}
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-[16px] w-[16px]" strokeWidth={2.4} />
             </button>
           ) : (
             <div className="h-9 w-9" />
           )}
           {showProgress && (
-            <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/10">
+            <div
+              className="h-[3px] flex-1 overflow-hidden rounded-full"
+              style={{ background: "rgba(255,255,255,0.08)" }}
+            >
               <motion.div
-                className="h-full rounded-full bg-gradient-sunset"
+                className="h-full rounded-full"
+                style={{
+                  background:
+                    "linear-gradient(90deg, #FFFFFF 0%, #FFD6E4 50%, #FF5C8A 100%)",
+                  boxShadow: "0 0 12px rgba(255,92,138,0.45)",
+                }}
                 initial={false}
                 animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+                transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
               />
             </div>
           )}
@@ -486,10 +500,10 @@ function OnboardingPage() {
               <motion.div
                 key={stepId}
                 custom={dir}
-                initial={{ x: dir * 100 + "%" }}
-                animate={{ x: 0 }}
-                exit={{ x: -dir * 100 + "%" }}
-                transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+                initial={{ x: dir * 100 + "%", opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -dir * 100 + "%", opacity: 0 }}
+                transition={{ duration: 0.42, ease: [0.32, 0.72, 0, 1] }}
                 className="absolute inset-0 flex flex-col"
               >
                 {stepId === "welcome" && <WelcomeStep onStart={goNext} />}
