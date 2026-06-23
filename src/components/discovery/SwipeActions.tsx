@@ -15,39 +15,45 @@ interface SwipeActionsProps {
   dragY?: MotionValue<number>;
 }
 
-const baseBtn: React.CSSProperties = {
+// Apple-style ease (used in SwiftUI .easeInOut variants)
+const ease = (p: number) => {
+  // smootherstep — symmetrical, zero 1st & 2nd derivative at endpoints
+  if (p <= 0) return 0;
+  if (p >= 1) return 1;
+  return p * p * p * (p * (p * 6 - 15) + 10);
+};
+
+type Tone = {
+  /** rgb triplet string */
+  fill: string;
+  /** resting icon color (hex) */
+  rest: string;
+};
+
+const TONES: Record<"pass" | "like" | "sup", Tone> = {
+  pass: { fill: "255,69,89", rest: "#FFFFFF" },
+  like: { fill: "48,209,88", rest: "#FF3B4E" },
+  sup: { fill: "10,160,255", rest: "#A8B5E8" },
+};
+
+const BTN_BASE: React.CSSProperties = {
   position: "relative",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   borderRadius: "50%",
-  border: "1px solid rgba(255,255,255,0.07)",
+  border: "0.5px solid rgba(255,255,255,0.10)",
   cursor: "pointer",
-  background: "rgba(14,14,18,0.78)",
-  backdropFilter: "blur(22px) saturate(180%)",
-  WebkitBackdropFilter: "blur(22px) saturate(180%)",
+  background: "rgba(22,22,26,0.62)",
+  backdropFilter: "blur(28px) saturate(180%)",
+  WebkitBackdropFilter: "blur(28px) saturate(180%)",
   boxShadow:
-    "0 10px 28px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)",
+    "0 12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 0 rgba(0,0,0,0.35)",
   WebkitTapHighlightColor: "transparent",
   overflow: "visible",
+  willChange: "transform",
+  transition: "border-color 220ms cubic-bezier(0.32,0.72,0,1)",
 };
-
-type Tone = {
-  rgb: string; // "255,59,78"
-  icon: string; // resting icon color
-};
-
-const TONE = {
-  pass: { rgb: "255,255,255", icon: "#FFFFFF" } satisfies Tone,
-  passActive: "255,59,78",
-  like: { rgb: "255,59,78", icon: "#FF3B4E" } satisfies Tone,
-  likeActive: "25,210,126",
-  sup: { rgb: "168,181,232", icon: "#A8B5E8" } satisfies Tone,
-  supActive: "31,184,255",
-};
-
-// Smoothstep — premium ease for visual rigging
-const ease = (p: number) => p * p * (3 - 2 * p);
 
 export const SwipeActions = ({
   onSwipe,
@@ -59,75 +65,70 @@ export const SwipeActions = ({
 }: SwipeActionsProps) => {
   const passRef = useRef<HTMLButtonElement>(null);
   const likeRef = useRef<HTMLButtonElement>(null);
-  const superRef = useRef<HTMLButtonElement>(null);
+  const supRef = useRef<HTMLButtonElement>(null);
+
+  // Color-fill overlay layers (separate from button to avoid re-rasterising blur).
+  const passFillRef = useRef<HTMLSpanElement>(null);
+  const likeFillRef = useRef<HTMLSpanElement>(null);
+  const supFillRef = useRef<HTMLSpanElement>(null);
+
+  // Soft outer glow rings.
+  const passGlowRef = useRef<HTMLSpanElement>(null);
+  const likeGlowRef = useRef<HTMLSpanElement>(null);
+  const supGlowRef = useRef<HTMLSpanElement>(null);
+
+  // Active-tone icon overlays (crossfade above the resting icon).
   const passIconRef = useRef<SVGSVGElement>(null);
   const likeIconRef = useRef<SVGSVGElement>(null);
-  const superIconRef = useRef<SVGSVGElement>(null);
-  const passHaloRef = useRef<HTMLSpanElement>(null);
-  const likeHaloRef = useRef<HTMLSpanElement>(null);
-  const superHaloRef = useRef<HTMLSpanElement>(null);
+  const supIconRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
     if (!dragX && !dragY) return;
     let raf: number | null = null;
-    let lastNope = 0,
-      lastLike = 0,
-      lastSup = 0;
+    // Smoothed values for buttery feel.
+    let sLike = 0,
+      sNope = 0,
+      sSup = 0;
 
-    const paint = (
+    const paintOne = (
       btn: HTMLButtonElement | null,
-      halo: HTMLSpanElement | null,
+      fill: HTMLSpanElement | null,
+      glow: HTMLSpanElement | null,
       icon: SVGSVGElement | null,
-      p: number,
-      activeP: number, // recede when a sibling is active
-      restRgb: string,
-      activeRgb: string,
-      restIcon: string,
+      progress: number,
+      recede: number,
+      tone: Tone,
     ) => {
       if (!btn) return;
-      // Active button: lift + scale; sibling buttons: recede + dim.
-      const sibling = activeP > p ? activeP : 0;
-      const scale = 1 + ease(p) * 0.28 - sibling * 0.08;
-      const lift = -ease(p) * 6;
-      btn.style.transform = `translate3d(0,${lift.toFixed(2)}px,0) scale(${scale.toFixed(3)})`;
-      btn.style.opacity = String(1 - sibling * 0.35);
+      const e = ease(progress);
+      const rec = ease(recede);
 
-      // Fill background fades toward the active color.
-      const fillA = ease(p) * 0.85;
-      btn.style.background = `radial-gradient(120% 120% at 50% 30%, rgba(${activeRgb},${(fillA * 0.55).toFixed(3)}) 0%, rgba(14,14,18,${(0.78 - ease(p) * 0.15).toFixed(3)}) 60%)`;
+      // Active button rises & swells; siblings settle back without dimming hard.
+      const scale = 1 + e * 0.22 - rec * 0.06;
+      const lift = -e * 5;
+      btn.style.transform = `translate3d(0,${lift.toFixed(2)}px,0) scale(${scale.toFixed(4)})`;
+
+      // Refined border lights up gently.
       btn.style.borderColor =
-        p > 0.02
-          ? `rgba(${activeRgb},${(0.35 + ease(p) * 0.5).toFixed(3)})`
-          : "rgba(255,255,255,0.07)";
-      btn.style.boxShadow =
-        p > 0.02
-          ? `0 14px 38px rgba(${activeRgb},${(ease(p) * 0.55).toFixed(3)}), 0 0 0 ${(ease(p) * 2.2).toFixed(2)}px rgba(${activeRgb},${(ease(p) * 0.55).toFixed(3)}), inset 0 1px 0 rgba(255,255,255,0.1)`
-          : "0 10px 28px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)";
+        e > 0.02
+          ? `rgba(${tone.fill},${(0.25 + e * 0.55).toFixed(3)})`
+          : "rgba(255,255,255,0.10)";
 
-      // Outer halo pulse ring.
-      if (halo) {
-        const haloScale = 1 + ease(p) * 0.9;
-        const haloAlpha = ease(p) * 0.35;
-        halo.style.transform = `scale(${haloScale.toFixed(3)})`;
-        halo.style.opacity = String(haloAlpha);
-        halo.style.background = `radial-gradient(circle, rgba(${activeRgb},0.55) 0%, rgba(${activeRgb},0) 70%)`;
+      // Inner color wash (separate layer — no blur recompute).
+      if (fill) {
+        fill.style.opacity = (e * 0.9).toFixed(3);
       }
 
-      // Icon morphs from rest tone toward active tone, fills heart/star.
+      // Outer glow ring — slow expand, soft fade.
+      if (glow) {
+        const gScale = 1 + e * 0.55;
+        glow.style.transform = `scale(${gScale.toFixed(3)})`;
+        glow.style.opacity = (e * 0.45).toFixed(3);
+      }
+
+      // Icon crossfade toward active tone.
       if (icon) {
-        const mix = ease(p);
-        const [r1, g1, b1] = restRgb.split(",").map(Number);
-        const [r2, g2, b2] = activeRgb.split(",").map(Number);
-        const r = Math.round(r1 + (r2 - r1) * mix);
-        const g = Math.round(g1 + (g2 - g1) * mix);
-        const b = Math.round(b1 + (b2 - b1) * mix);
-        const color = mix > 0.05 ? `rgb(${r},${g},${b})` : restIcon;
-        icon.style.color = color;
-        icon.setAttribute("stroke", color);
-        // Heart/star fill follows tone for full opacity at threshold.
-        const fill = mix > 0.05 ? `rgba(${r},${g},${b},${(0.2 + mix * 0.8).toFixed(3)})` : "transparent";
-        const filled = icon.getAttribute("data-fillable");
-        if (filled === "true") icon.setAttribute("fill", fill);
+        icon.style.opacity = e.toFixed(3);
       }
     };
 
@@ -136,56 +137,51 @@ export const SwipeActions = ({
       const w = typeof window !== "undefined" ? window.innerWidth : 390;
       const dx = dragX?.get() ?? 0;
       const dy = dragY?.get() ?? 0;
-      const t = w * 0.28;
-      const like = Math.max(0, Math.min(1, dx / t));
-      const nope = Math.max(0, Math.min(1, -dx / t));
-      const sup = Math.max(0, Math.min(1, -dy / 200));
+      const tX = w * 0.30;
+      const tY = 220;
+      const tLike = Math.max(0, Math.min(1, dx / tX));
+      const tNope = Math.max(0, Math.min(1, -dx / tX));
+      const tSup = Math.max(0, Math.min(1, -dy / tY));
 
-      // Critically-damped follow for buttery feel
-      const k = 0.32;
-      lastLike += (like - lastLike) * k;
-      lastNope += (nope - lastNope) * k;
-      lastSup += (sup - lastSup) * k;
+      // First-order smoothing (Apple's spring-like critically-damped feel).
+      const k = 0.22;
+      sLike += (tLike - sLike) * k;
+      sNope += (tNope - sNope) * k;
+      sSup += (tSup - sSup) * k;
 
-      const maxOther = Math.max(lastLike, lastNope, lastSup);
-      paint(
+      paintOne(
         passRef.current,
-        passHaloRef.current,
+        passFillRef.current,
+        passGlowRef.current,
         passIconRef.current,
-        lastNope,
-        Math.max(lastLike, lastSup),
-        TONE.pass.rgb,
-        TONE.passActive,
-        TONE.pass.icon,
+        sNope,
+        Math.max(sLike, sSup),
+        TONES.pass,
       );
-      paint(
+      paintOne(
         likeRef.current,
-        likeHaloRef.current,
+        likeFillRef.current,
+        likeGlowRef.current,
         likeIconRef.current,
-        lastLike,
-        Math.max(lastNope, lastSup),
-        TONE.like.rgb,
-        TONE.likeActive,
-        TONE.like.icon,
+        sLike,
+        Math.max(sNope, sSup),
+        TONES.like,
       );
-      paint(
-        superRef.current,
-        superHaloRef.current,
-        superIconRef.current,
-        lastSup,
-        Math.max(lastLike, lastNope),
-        TONE.sup.rgb,
-        TONE.supActive,
-        TONE.sup.icon,
+      paintOne(
+        supRef.current,
+        supFillRef.current,
+        supGlowRef.current,
+        supIconRef.current,
+        sSup,
+        Math.max(sLike, sNope),
+        TONES.sup,
       );
 
-      // Keep animating while values are still settling.
-      const stillAnimating =
-        Math.abs(like - lastLike) > 0.001 ||
-        Math.abs(nope - lastNope) > 0.001 ||
-        Math.abs(sup - lastSup) > 0.001 ||
-        maxOther > 0.001;
-      if (stillAnimating) raf = requestAnimationFrame(tick);
+      const settling =
+        Math.abs(tLike - sLike) > 0.0005 ||
+        Math.abs(tNope - sNope) > 0.0005 ||
+        Math.abs(tSup - sSup) > 0.0005;
+      if (settling) raf = requestAnimationFrame(tick);
     };
 
     const schedule = () => {
@@ -207,30 +203,87 @@ export const SwipeActions = ({
       const el = e.currentTarget;
       el.animate(
         [
-          { transform: "scale(1)" },
-          { transform: "scale(0.86)" },
-          { transform: "scale(1.06)" },
-          { transform: "scale(1)" },
+          { transform: "translate3d(0,0,0) scale(1)" },
+          { transform: "translate3d(0,1px,0) scale(0.9)" },
+          { transform: "translate3d(0,-2px,0) scale(1.08)" },
+          { transform: "translate3d(0,0,0) scale(1)" },
         ],
-        { duration: 320, easing: "cubic-bezier(0.22,1,0.36,1)" },
+        { duration: 380, easing: "cubic-bezier(0.32,0.72,0,1)" },
       );
       cb?.();
     };
 
-  const Halo = (ref: React.RefObject<HTMLSpanElement | null>) => (
+  const Fill = (
+    ref: React.RefObject<HTMLSpanElement | null>,
+    rgb: string,
+  ) => (
     <span
       ref={ref}
       aria-hidden
       style={{
         position: "absolute",
-        inset: -14,
+        inset: 0,
         borderRadius: "50%",
         opacity: 0,
         pointerEvents: "none",
-        transformOrigin: "center",
-        filter: "blur(2px)",
+        background: `radial-gradient(120% 120% at 50% 28%, rgba(${rgb},0.95) 0%, rgba(${rgb},0.55) 55%, rgba(${rgb},0) 100%)`,
+        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -10px 22px rgba(0,0,0,0.25)`,
       }}
     />
+  );
+
+  const Glow = (
+    ref: React.RefObject<HTMLSpanElement | null>,
+    rgb: string,
+  ) => (
+    <span
+      ref={ref}
+      aria-hidden
+      style={{
+        position: "absolute",
+        inset: -16,
+        borderRadius: "50%",
+        opacity: 0,
+        pointerEvents: "none",
+        background: `radial-gradient(circle, rgba(${rgb},0.6) 0%, rgba(${rgb},0) 70%)`,
+        filter: "blur(4px)",
+      }}
+    />
+  );
+
+  const ActiveIcon = ({
+    refEl,
+    children,
+  }: {
+    refEl: React.RefObject<SVGSVGElement | null>;
+    children: React.ReactNode;
+  }) => (
+    <span
+      style={{
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        pointerEvents: "none",
+      }}
+    >
+      {/* clone receives the ref via React.cloneElement-like wrapper */}
+      <span
+        ref={(node) => {
+          if (!node) return;
+          const svg = node.querySelector("svg") as SVGSVGElement | null;
+          if (svg && refEl) {
+            (refEl as { current: SVGSVGElement | null }).current = svg;
+            svg.style.opacity = "0";
+            svg.style.transition = "none";
+          }
+        }}
+        style={{ display: "flex" }}
+      >
+        {children}
+      </span>
+    </span>
   );
 
   return (
@@ -242,7 +295,7 @@ export const SwipeActions = ({
         gap: 10,
         padding: "16px 22px 20px",
         background:
-          "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.18) 60%, rgba(0,0,0,0) 100%)",
+          "linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.18) 60%, rgba(0,0,0,0) 100%)",
         pointerEvents: "auto",
       }}
     >
@@ -250,7 +303,7 @@ export const SwipeActions = ({
         onClick={press(onRewind)}
         disabled={!canRewind}
         aria-label="Rewind"
-        style={{ ...baseBtn, width: 48, height: 48, opacity: canRewind ? 1 : 0.45 }}
+        style={{ ...BTN_BASE, width: 48, height: 48, opacity: canRewind ? 1 : 0.45 }}
       >
         <RotateCcw size={20} color="#F4A23B" strokeWidth={2.6} />
       </button>
@@ -259,57 +312,54 @@ export const SwipeActions = ({
         ref={passRef}
         onClick={press(() => onSwipe("left"))}
         aria-label="Pass"
-        style={{ ...baseBtn, width: 62, height: 62, willChange: "transform, background, box-shadow" }}
+        style={{ ...BTN_BASE, width: 62, height: 62 }}
       >
-        {Halo(passHaloRef)}
-        <X ref={passIconRef as never} size={30} color="#FFFFFF" strokeWidth={3} />
+        {Glow(passGlowRef, TONES.pass.fill)}
+        {Fill(passFillRef, TONES.pass.fill)}
+        <X size={28} color="#FFFFFF" strokeWidth={2.8} style={{ position: "relative" }} />
+        <ActiveIcon refEl={passIconRef}>
+          <X size={28} color="#FFFFFF" strokeWidth={3} />
+        </ActiveIcon>
       </button>
 
       <button
-        ref={superRef}
+        ref={supRef}
         onClick={press(() => onSwipe("up"))}
         aria-label="Super like"
-        style={{ ...baseBtn, width: 56, height: 56, willChange: "transform, background, box-shadow" }}
+        style={{ ...BTN_BASE, width: 56, height: 56 }}
       >
-        {Halo(superHaloRef)}
-        <Star
-          ref={superIconRef as never}
-          size={24}
-          color="#A8B5E8"
-          strokeWidth={2.4}
-          fill="transparent"
-          data-fillable="true"
-        />
+        {Glow(supGlowRef, TONES.sup.fill)}
+        {Fill(supFillRef, TONES.sup.fill)}
+        <Star size={24} color="#A8B5E8" strokeWidth={2.2} fill="transparent" style={{ position: "relative" }} />
+        <ActiveIcon refEl={supIconRef}>
+          <Star size={24} color="#FFFFFF" strokeWidth={2.2} fill="#FFFFFF" />
+        </ActiveIcon>
       </button>
 
       <button
         ref={likeRef}
         onClick={press(() => onSwipe("right"))}
         aria-label="Like"
-        style={{ ...baseBtn, width: 62, height: 62, willChange: "transform, background, box-shadow" }}
+        style={{ ...BTN_BASE, width: 62, height: 62 }}
       >
-        {Halo(likeHaloRef)}
-        <Heart
-          ref={likeIconRef as never}
-          size={28}
-          color="#FF3B4E"
-          strokeWidth={2.4}
-          fill="#FF3B4E"
-          data-fillable="true"
-        />
+        {Glow(likeGlowRef, TONES.like.fill)}
+        {Fill(likeFillRef, TONES.like.fill)}
+        <Heart size={26} color="#FF3B4E" strokeWidth={2.4} fill="#FF3B4E" style={{ position: "relative" }} />
+        <ActiveIcon refEl={likeIconRef}>
+          <Heart size={26} color="#FFFFFF" strokeWidth={2.4} fill="#FFFFFF" />
+        </ActiveIcon>
       </button>
 
       <button
         onClick={press(onFirstImpression)}
         aria-label="First Impression"
-        style={{
-          ...baseBtn,
-          width: 48,
-          height: 48,
-        }}
+        style={{ ...BTN_BASE, width: 48, height: 48 }}
       >
         <Send size={20} color="#4FA8FF" strokeWidth={2.4} style={{ transform: "translateX(-1px)" }} />
       </button>
     </div>
   );
 };
+
+// Suppress unused param lint while keeping the prop in the API contract.
+void ({} as Pick<SwipeActionsProps, "dailyLimits" | "boostActive" | "boostRemainingMinutes">);
