@@ -427,6 +427,17 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
     });
   }, [router]);
 
+  // On iOS, render the real UITabBar via the native plugin instead of any HTML.
+  if (isNativeTabBarSupported()) {
+    return (
+      <NativeBottomNav
+        activeTab={activeTab}
+        likesCount={likesCount}
+        unreadChats={unreadChats}
+      />
+    );
+  }
+
   return (
     <BottomNavBase
       likesCount={likesCount}
@@ -442,3 +453,60 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
     />
   );
 }
+
+// ─── Native iOS UITabBar wrapper ────────────────────────────────────────────
+
+function NativeBottomNav({
+  activeTab,
+  likesCount,
+  unreadChats,
+}: {
+  activeTab: TabId;
+  likesCount: number;
+  unreadChats: number;
+}) {
+  const navigate = useNavigate();
+
+  // Configure tabs once on mount + wire the tabSelected listener.
+  useEffect(() => {
+    NativeTabBar.configure({
+      tabs: [
+        { id: "discover", title: "Descobrir", sfSymbol: "sparkles" },
+        { id: "likes", title: "Likes", sfSymbol: "heart.fill", badge: likesCount || undefined },
+        { id: "chat", title: "Chat", sfSymbol: "message.fill", badge: unreadChats || undefined },
+        { id: "profile", title: "Perfil", sfSymbol: "person.fill" },
+      ],
+      activeId: activeTab,
+    });
+    NativeTabBar.show();
+
+    const unsubscribe = onTabSelected((id) => {
+      hapticTap();
+      const path = TAB_TO_PATH[id as TabId];
+      if (path) navigate({ to: path });
+    });
+
+    return () => {
+      unsubscribe();
+      NativeTabBar.hide();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Sync active tab when the route changes.
+  useEffect(() => {
+    NativeTabBar.setActiveTab({ id: activeTab });
+  }, [activeTab]);
+
+  // Sync badges.
+  useEffect(() => {
+    NativeTabBar.setBadge({ id: "likes", value: likesCount > 0 ? likesCount : null });
+  }, [likesCount]);
+
+  useEffect(() => {
+    NativeTabBar.setBadge({ id: "chat", value: unreadChats > 0 ? unreadChats : null });
+  }, [unreadChats]);
+
+  return null;
+}
+
