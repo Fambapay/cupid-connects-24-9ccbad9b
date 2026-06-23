@@ -1,4 +1,10 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import { useForceDarkTheme } from '@/lib/theme';
+
+function AuthLayout() {
+  useForceDarkTheme();
+  return <Outlet />;
+}
 
 export const Route = createFileRoute('/auth')({
   beforeLoad: ({ location }) => {
@@ -6,5 +12,6 @@ export const Route = createFileRoute('/auth')({
       throw redirect({ to: '/auth/login' });
     }
   },
-  component: () => <Outlet />,
+  component: AuthLayout,
 });
+
