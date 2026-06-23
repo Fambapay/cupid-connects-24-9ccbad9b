@@ -203,7 +203,7 @@ function RootComponent() {
         <CountryProvider>
           <NativeBoot />
           <ThemeSync />
-          <AnimatePresence mode="popLayout" initial={false}>
+          <AnimatePresence mode="wait" initial={false}>
             <RouteTransition key={pathname}>
               <Outlet />
             </RouteTransition>
