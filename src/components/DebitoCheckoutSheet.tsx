@@ -482,7 +482,7 @@ function MethodTile({
         {isCard ? <CreditCard size={14} /> : brand.initials}
       </span>
       <span className="relative min-w-0 flex-1">
-        <span className="block truncate text-[12.5px] font-bold text-white">
+        <span className="block truncate text-[12.5px] font-bold text-foreground">
           {paymentLabel(m as PaymentMethodCode)}
         </span>
         {brand.sub && (
