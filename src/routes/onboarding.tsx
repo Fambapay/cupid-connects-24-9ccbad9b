@@ -433,39 +433,14 @@ function OnboardingPage() {
 
   return (
     <div className="relative min-h-[100dvh] overflow-hidden bg-background text-foreground">
-      {/* Animated aurora — drifting brand blobs */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <motion.div
-          className="absolute -top-[20%] -left-[15%] h-[70vh] w-[70vh] rounded-full"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(255,92,138,0.38) 0%, rgba(255,92,138,0) 65%)",
-            filter: "blur(40px)",
-          }}
-          animate={{ x: [0, 60, -20, 0], y: [0, 40, 20, 0], scale: [1, 1.15, 0.95, 1] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute -top-[10%] -right-[20%] h-[80vh] w-[80vh] rounded-full"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(155,91,255,0.32) 0%, rgba(155,91,255,0) 65%)",
-            filter: "blur(50px)",
-          }}
-          animate={{ x: [0, -50, 30, 0], y: [0, 60, -10, 0], scale: [1, 1.1, 1.05, 1] }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute -bottom-[20%] left-[10%] h-[60vh] w-[60vh] rounded-full"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(233,53,160,0.26) 0%, rgba(233,53,160,0) 65%)",
-            filter: "blur(45px)",
-          }}
-          animate={{ x: [0, 80, -40, 0], y: [0, -40, 30, 0], scale: [1, 1.2, 0.9, 1] }}
-          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
+      {/* Ambient brand glow — refined Apple-style: subtle warm aurora, not loud */}
+      <div
+        className="pointer-events-none fixed inset-0"
+        style={{
+          background:
+            "radial-gradient(120% 70% at 50% 0%, rgba(255,92,138,0.18) 0%, rgba(155,91,255,0.10) 35%, transparent 70%), radial-gradient(80% 60% at 50% 100%, rgba(255,140,90,0.10) 0%, transparent 60%)",
+        }}
+      />
       <div
         className="pointer-events-none fixed inset-0 opacity-[0.4]"
         style={{
@@ -508,7 +483,7 @@ function OnboardingPage() {
               style={{ background: "rgba(255,255,255,0.08)" }}
             >
               <motion.div
-                className="relative h-full rounded-full"
+                className="h-full rounded-full"
                 style={{
                   background:
                     "linear-gradient(90deg, #FFFFFF 0%, #FFD6E4 50%, #FF5C8A 100%)",
@@ -516,19 +491,8 @@ function OnboardingPage() {
                 }}
                 initial={false}
                 animate={{ width: `${progress}%` }}
-                transition={{ type: "spring", stiffness: 180, damping: 24 }}
-              >
-                <motion.span
-                  aria-hidden
-                  className="absolute inset-y-0 w-1/3 rounded-full"
-                  style={{
-                    background:
-                      "linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent)",
-                  }}
-                  animate={{ x: ["-100%", "300%"] }}
-                  transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-                />
-              </motion.div>
+                transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+              />
             </div>
           )}
           <div className="h-9 w-9" />
@@ -550,10 +514,10 @@ function OnboardingPage() {
               <motion.div
                 key={stepId}
                 custom={dir}
-                initial={{ x: dir * 60 + "%", opacity: 0, scale: 0.94, filter: "blur(8px)" }}
-                animate={{ x: 0, opacity: 1, scale: 1, filter: "blur(0px)" }}
-                exit={{ x: -dir * 40 + "%", opacity: 0, scale: 0.96, filter: "blur(6px)" }}
-                transition={{ type: "spring", stiffness: 320, damping: 32, mass: 0.9 }}
+                initial={{ x: dir * 100 + "%", opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -dir * 100 + "%", opacity: 0 }}
+                transition={{ duration: 0.42, ease: [0.32, 0.72, 0, 1] }}
                 className="absolute inset-0 flex flex-col"
               >
                 {stepId === "welcome" && <WelcomeStep onStart={goNext} />}
@@ -724,9 +688,8 @@ function PrimaryButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      whileTap={!disabled ? { scale: 0.96 } : undefined}
-      whileHover={!disabled ? { scale: 1.015, y: -1 } : undefined}
-      transition={{ type: "spring", stiffness: 500, damping: 28 }}
+      whileTap={!disabled ? { scale: 0.975 } : undefined}
+      transition={{ duration: 0 }}
       style={{
         touchAction: "manipulation",
         letterSpacing: "-0.01em",
@@ -746,32 +709,20 @@ function PrimaryButton({
       }}
       className={cn(
         "relative h-[54px] w-full overflow-hidden rounded-full text-[15.5px] font-semibold",
+        "transition-[transform,opacity] duration-150",
       )}
     >
       {!disabled && (
-        <>
-          <span
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-1/2"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 100%)",
-              borderTopLeftRadius: 9999,
-              borderTopRightRadius: 9999,
-            }}
-          />
-          <motion.span
-            aria-hidden
-            className="pointer-events-none absolute inset-y-0 w-1/3"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent)",
-              filter: "blur(2px)",
-            }}
-            animate={{ x: ["-120%", "320%"] }}
-            transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.2 }}
-          />
-        </>
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-1/2"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 100%)",
+            borderTopLeftRadius: 9999,
+            borderTopRightRadius: 9999,
+          }}
+        />
       )}
       <span className="relative">{children}</span>
     </motion.button>
@@ -783,50 +734,29 @@ function WelcomeStep({ onStart }: { onStart: () => void }) {
   return (
     <div className="flex flex-1 flex-col px-6">
       <div className="flex flex-1 flex-col items-center justify-center text-center">
-        <div className="relative mb-7">
-          {/* Pulsing halo rings */}
-          {[0, 0.8, 1.6].map((delay, i) => (
-            <motion.span
-              key={i}
-              aria-hidden
-              className="absolute left-1/2 top-1/2 h-[72px] w-[72px] -translate-x-1/2 -translate-y-1/2 rounded-[22px]"
-              style={{
-                border: "1.5px solid rgba(255,92,138,0.55)",
-              }}
-              initial={{ scale: 1, opacity: 0.6 }}
-              animate={{ scale: 2.2, opacity: 0 }}
-              transition={{ duration: 2.4, repeat: Infinity, delay, ease: "easeOut" }}
-            />
-          ))}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.6, rotate: -12 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ type: "spring", stiffness: 260, damping: 16, mass: 1.1 }}
-            className="relative grid h-[72px] w-[72px] place-items-center rounded-[22px]"
-            style={{
-              background:
-                "linear-gradient(150deg, #FF5C8A 0%, #9B5BFF 100%)",
-              boxShadow:
-                "0 24px 50px -16px rgba(255,92,138,0.7), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -10px 20px rgba(0,0,0,0.15)",
-            }}
-          >
-            <motion.div
-              animate={{ scale: [1, 1.12, 1] }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <Heart
-                className="h-[34px] w-[34px] text-white"
-                fill="currentColor"
-                strokeWidth={0}
-                style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.18))" }}
-              />
-            </motion.div>
-          </motion.div>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
+          className="mb-7 grid h-[72px] w-[72px] place-items-center rounded-[22px]"
+          style={{
+            background:
+              "linear-gradient(150deg, #FF5C8A 0%, #9B5BFF 100%)",
+            boxShadow:
+              "0 24px 50px -16px rgba(255,92,138,0.7), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -10px 20px rgba(0,0,0,0.15)",
+          }}
+        >
+          <Heart
+            className="h-[34px] w-[34px] text-white"
+            fill="currentColor"
+            strokeWidth={0}
+            style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.18))" }}
+          />
+        </motion.div>
         <motion.h1
-          initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 0.7, delay: 0.25, ease: [0.32, 0.72, 0, 1] }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1, ease: [0.32, 0.72, 0, 1] }}
           className="max-w-[300px] text-[36px] font-bold leading-[1.05] tracking-[-0.038em]"
           style={{
             fontFamily:
@@ -1518,16 +1448,15 @@ function PhotosStep({
             <DrawerTitle className="text-center text-base">Foto</DrawerTitle>
           </DrawerHeader>
           <div className="space-y-2 px-4 pb-2">
-            <label className="relative flex w-full items-center gap-3 rounded-xl bg-white/5 px-4 py-3 active:bg-white/10">
+            <label className="flex w-full items-center gap-3 rounded-xl bg-white/5 px-4 py-3 active:bg-white/10">
               <Camera className="h-5 w-5" />
               <span className="text-base">Substituir foto</span>
               <input
                 type="file"
                 accept="image/*"
-                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                className="hidden"
                 onChange={async (e) => {
                   const f = e.target.files?.[0];
-                  e.target.value = "";
                   if (f && actionFor) await handleFile(f, actionFor);
                   setActionFor(null);
                 }}
@@ -1606,12 +1535,12 @@ function PhotoSlot({
           <input
             type="file"
             accept="image/*"
-            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+            className="hidden"
             disabled={disabled}
             onChange={(e) => {
               const f = e.target.files?.[0];
-              e.target.value = "";
               if (f) onAdd(f);
+              e.target.value = "";
             }}
           />
         </label>

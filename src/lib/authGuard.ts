@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface ProfileGate {
   userId: string;
-  exists: boolean;
   completed: boolean;
   step: number | null;
   membershipActive: boolean;
@@ -28,17 +27,15 @@ async function getProfileGate(userId: string): Promise<ProfileGate> {
   if (profileCache?.userId === userId) return profileCache;
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, onboarding_completed, onboarding_step, membership_status, membership_expires_at")
+    .select("onboarding_completed, onboarding_step, membership_status, membership_expires_at")
     .eq("id", userId)
     .maybeSingle();
-  const exists = !!profile;
   const status = (profile as { membership_status?: string } | null)?.membership_status ?? "inactive";
   const exp = (profile as { membership_expires_at?: string | null } | null)?.membership_expires_at;
   const membershipActive =
     status === "active" && (!exp || new Date(exp).getTime() > Date.now());
   profileCache = {
     userId,
-    exists,
     completed: !!profile?.onboarding_completed,
     step: profile?.onboarding_step ?? null,
     membershipActive,
@@ -51,17 +48,6 @@ export function invalidateOnboardingCache() {
   profileCache = null;
 }
 
-/** Sign out and redirect to /auth — used when the profile no longer exists. */
-async function signOutAndRedirectToAuth(): Promise<never> {
-  profileCache = null;
-  try {
-    await supabase.auth.signOut();
-  } catch {
-    /* noop */
-  }
-  throw redirect({ to: "/auth/login" });
-}
-
 /** Auth + onboarding only — used by /membership, /profile, /settings. */
 export async function requireAuthAndOnboarding() {
   const user = await getCurrentUser();
@@ -69,10 +55,6 @@ export async function requireAuthAndOnboarding() {
   if (!user.email_confirmed_at) throw redirect({ to: "/auth/verify-email" });
 
   const gate = await getProfileGate(user.id);
-  if (!gate.exists) {
-    // Profile was deleted (admin action, account removal, etc.) — kick to /auth.
-    await signOutAndRedirectToAuth();
-  }
   if (!gate.completed) {
     throw redirect({
       to: "/onboarding",
