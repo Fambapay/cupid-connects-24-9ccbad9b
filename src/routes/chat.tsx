@@ -96,8 +96,8 @@ function ChatList() {
 
       <section className={`${newMatches.length > 0 ? "mt-5" : "mt-2"} px-4`}>
         <h2
-          className="text-[15px] uppercase tracking-tight text-white"
-          style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 800 }}
+          className="text-[15px] uppercase tracking-tight text-white/70"
+          style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}
         >
           Mensagens
         </h2>
