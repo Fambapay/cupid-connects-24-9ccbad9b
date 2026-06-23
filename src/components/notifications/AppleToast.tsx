@@ -131,7 +131,7 @@ function AppleToastBase({
                 {title}
               </p>
               <p className="mt-[1px] line-clamp-2 text-[14px] leading-snug text-foreground/85">
-                {body}
+                {resolvedBody}
               </p>
             </div>
           </div>
