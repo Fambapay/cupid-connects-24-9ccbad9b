@@ -194,7 +194,12 @@ function RootComponent() {
         <Outlet />
         <GlobalNotifiers />
         <PushPromptGate />
-        <Toaster position="top-center" richColors />
+        <Toaster
+          position="top-center"
+          richColors
+          offset="calc(env(safe-area-inset-top, 0px) + 12px)"
+          mobileOffset="calc(env(safe-area-inset-top, 0px) + 12px)"
+        />
       </CountryProvider>
     </QueryClientProvider>
   );
