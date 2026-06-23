@@ -218,6 +218,26 @@
   border-color: color-mix(in oklab, var(--brand-pink) 55%, transparent);
 }
 
+/* Quick-action cards (Profile) become plain white in light mode */
+.light .quick-action-card {
+  background: var(--profile-card-bg, #ffffff) !important;
+  border-color: var(--profile-card-border, rgba(0,0,0,0.06)) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, 0 6px 18px -10px rgba(0,0,0,0.08);
+}
+.light .quick-action-card .quick-action-glow { display: none; }
+
+/* Profile bundle cards: lighten gradient + flip text to dark */
+.light .bundle-card {
+  background: var(--profile-card-bg, #ffffff) !important;
+  border-color: var(--profile-card-border, rgba(0,0,0,0.06)) !important;
+  color: #0a0a0a;
+}
+.light .bundle-card .bundle-text-primary { color: #0a0a0a !important; }
+.light .bundle-card .bundle-text-secondary { color: rgba(0,0,0,0.6) !important; }
+.light .bundle-card .bundle-text-muted { color: rgba(0,0,0,0.4) !important; }
+.light .bundle-card .bundle-halo { display: none; }
+
+
 
 
 

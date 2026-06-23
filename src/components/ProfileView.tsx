@@ -297,19 +297,21 @@ export function ProfileView({
             to={a.to}
             {...('search' in a && a.search ? { search: a.search } : {})}
             onClick={() => hapticTap()}
-            className="group relative isolate overflow-hidden rounded-2xl p-3 flex flex-col items-center text-center min-h-[118px] active:scale-[0.97] transition-transform"
+            className="quick-action-card group relative isolate overflow-hidden rounded-2xl p-3 flex flex-col items-center text-center min-h-[118px] active:scale-[0.97] transition-transform"
             style={{
+              ['--tint' as any]: a.color,
               background: `linear-gradient(160deg, ${a.color}1f 0%, ${a.color}0a 60%, rgba(255,255,255,0.02) 100%)`,
               border: `1px solid ${a.color}3d`,
             }}
           >
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 rounded-2xl"
+              className="quick-action-glow pointer-events-none absolute inset-0 rounded-2xl"
               style={{
                 background: `radial-gradient(60% 45% at 50% 22%, ${a.color}26 0%, transparent 70%)`,
               }}
             />
+
             <div
               className="relative h-11 w-11 rounded-full grid place-items-center mb-2"
               style={{
@@ -341,15 +343,19 @@ export function ProfileView({
         <div className="relative mx-5 mb-6">
           <div
             aria-hidden
-            className="absolute -inset-px rounded-[22px] opacity-70 blur-md"
-            style={{ background: `linear-gradient(135deg, ${PINK}, #B13CFF, #FFD66B)` }}
+            className="absolute -inset-px rounded-[22px] blur-md"
+            style={{
+              opacity: 'calc(0.7 * var(--profile-glow-opacity, 1))',
+              background: `linear-gradient(135deg, ${PINK}, #B13CFF, #FFD66B)`,
+            }}
           />
           <div className="relative bg-card border border-border rounded-[20px] p-5 overflow-hidden">
             <div
               aria-hidden
-              className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-20 blur-3xl"
-              style={{ background: PINK }}
+              className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full blur-3xl"
+              style={{ opacity: 'calc(0.20 * var(--profile-glow-opacity, 1))', background: PINK }}
             />
+
 
             <div className="relative flex items-center gap-3 mb-1">
               <div

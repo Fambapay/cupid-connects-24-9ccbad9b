@@ -112,14 +112,15 @@ export function ProfileBundles() {
                   hapticTap();
                   setActive({ bundle: b, price });
                 }}
-                className="relative shrink-0 snap-start w-[260px] text-left rounded-[20px] overflow-hidden border border-white/10 active:scale-[0.98] transition-transform"
+                className="bundle-card relative shrink-0 snap-start w-[260px] text-left rounded-[20px] overflow-hidden border border-white/10 active:scale-[0.98] transition-transform"
                 style={{ background: b.gradient }}
               >
                 <div
                   aria-hidden
-                  className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-40 blur-3xl"
+                  className="bundle-halo pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-40 blur-3xl"
                   style={{ background: b.accent }}
                 />
+
 
                 <div className="relative p-4">
                   <div className="flex items-center justify-between mb-3 min-h-[20px]">
@@ -149,10 +150,10 @@ export function ProfileBundles() {
                       <b.Icon size={22} fill={b.accent} stroke="none" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[15px] font-extrabold tracking-tight text-white leading-tight">
+                      <p className="bundle-text-primary text-[15px] font-extrabold tracking-tight text-white leading-tight">
                         {b.title}
                       </p>
-                      <p className="text-[12px] text-white/70 tracking-tight">{b.subtitle}</p>
+                      <p className="bundle-text-secondary text-[12px] text-white/70 tracking-tight">{b.subtitle}</p>
                     </div>
                   </div>
 
@@ -165,7 +166,7 @@ export function ProfileBundles() {
                         >
                           <Check size={9} color="#fff" strokeWidth={4} />
                         </div>
-                        <span className="text-[12px] text-white/85 tracking-tight">{p}</span>
+                        <span className="bundle-text-secondary text-[12px] text-white/85 tracking-tight">{p}</span>
                       </div>
                     ))}
                   </div>
@@ -173,13 +174,14 @@ export function ProfileBundles() {
                   <div className="flex items-end justify-between gap-2">
                     <div className="min-w-0">
                       {original && (
-                        <p className="text-[11px] text-white/40 line-through leading-none">
+                        <p className="bundle-text-muted text-[11px] text-white/40 line-through leading-none">
                           {formatCountryPrice(original, country)}
                         </p>
                       )}
-                      <p className="text-[20px] font-black tracking-tight text-white leading-tight">
+                      <p className="bundle-text-primary text-[20px] font-black tracking-tight text-white leading-tight">
                         {formatCountryPrice(price, country)}
                       </p>
+
                     </div>
                     <div
                       className="rounded-xl px-3.5 py-2 text-[12px] font-extrabold text-white shadow-lg"
