@@ -47,3 +47,14 @@ export const pushScreenOverlay = {
   exit:    { opacity: 0,    transition: spring.smooth },
 };
 
+/**
+ * Tunables para o swipe deck (Tinder-like).
+ * Usar com `animate(x, ...)` / `animate(y, ...)` + velocity handoff.
+ */
+export const swipe = {
+  commitOffset: 0.35,   // fracção da largura do ecrã para confirmar
+  commitVelocity: 500,  // px/s — flick confirma sem distância
+  maxRotate: 16,        // graus no extremo do drag
+  flyDistance: 1.5,     // múltiplo da largura para sair de cena
+} as const;
+
