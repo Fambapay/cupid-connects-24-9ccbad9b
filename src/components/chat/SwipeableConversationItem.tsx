@@ -184,7 +184,7 @@ export function SwipeableConversationItem({
           to="/chat/$matchId"
           params={{ matchId }}
           onClick={handleRowClick}
-          className="flex items-center gap-3.5 border-b border-white/[0.06] bg-background px-1 py-3 active:bg-white/[0.03]"
+          className="flex items-center gap-3.5 border-b border-border bg-background px-1 py-3 active:bg-muted"
         >
           <div className="relative h-[62px] w-[62px] shrink-0">
             <div className="h-full w-full overflow-hidden rounded-full">
@@ -198,7 +198,7 @@ export function SwipeableConversationItem({
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-2">
               <span
-                className="truncate text-[19px] leading-none tracking-tight text-white"
+                className="truncate text-[19px] leading-none tracking-tight text-foreground"
                 style={{ fontFamily: "-apple-system, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif", fontWeight: 600 }}
               >
                 {name}
@@ -211,12 +211,13 @@ export function SwipeableConversationItem({
               )}
             </div>
             <p
-              className={`mt-0.5 truncate text-[14px] ${unread > 0 ? "text-white/90" : "text-white/55"}`}
+              className={`mt-0.5 truncate text-[14px] ${unread > 0 ? "text-foreground/90" : "text-muted-foreground"}`}
             >
               {lastMessage ?? "Diz olá 👋"}
             </p>
           </div>
         </Link>
+
 
       </motion.div>
 
