@@ -32,6 +32,7 @@ export function MatchOverlay({
 }: Props) {
   const { user } = useAuth();
   const [myPhoto, setMyPhoto] = useState<string | null>(null);
+  const reduce = useReducedMotion();
 
   useEffect(() => {
     if (!open || !user) return;
