@@ -39,6 +39,7 @@ function NativeBoot() {
 function GlobalNotifiers() {
   useNewMessageNotifier();
   useHeartbeat();
+  useProfileExistenceGuard();
   return null;
 }
 
