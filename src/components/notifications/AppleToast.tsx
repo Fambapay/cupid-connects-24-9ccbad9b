@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { m, LazyMotion, domAnimation } from "framer-motion";
 import flameAsset from "@/assets/hunie-mark-transparent.png.asset.json";
 
@@ -9,6 +9,9 @@ interface AppleToastProps {
   title: string;
   body: string;
   avatar?: string;
+  avatarPromise?: Promise<string | undefined>;
+  bodyTemplate?: (name: string) => string;
+  namePromise?: Promise<string | undefined>;
   appName?: string;
   timeLabel?: string;
   onClick?: () => void;
@@ -21,11 +24,43 @@ function AppleToastBase({
   title,
   body,
   avatar,
+  avatarPromise,
+  bodyTemplate,
+  namePromise,
   appName = "Hunie",
   timeLabel = "agora",
   onClick,
   onDismiss,
 }: AppleToastProps) {
+  const [resolvedAvatar, setResolvedAvatar] = useState<string | undefined>(avatar);
+  const [resolvedBody, setResolvedBody] = useState<string>(body);
+
+  useEffect(() => {
+    if (avatar) {
+      setResolvedAvatar(avatar);
+    } else if (avatarPromise) {
+      let cancelled = false;
+      avatarPromise.then((url) => {
+        if (!cancelled && url) setResolvedAvatar(url);
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
+  }, [avatar, avatarPromise]);
+
+  useEffect(() => {
+    if (!namePromise || !bodyTemplate) return;
+    let cancelled = false;
+    namePromise.then((name) => {
+      if (!cancelled && name) setResolvedBody(bodyTemplate(name));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [namePromise, bodyTemplate]);
+
+
   return (
     <LazyMotion features={domAnimation} strict>
       <m.div
@@ -72,7 +107,7 @@ function AppleToastBase({
             {/* Avatar — clean iOS squircle */}
             <div className="relative h-[38px] w-[38px] shrink-0 overflow-hidden rounded-[10px] bg-white/5 ring-1 ring-white/10">
               <img
-                src={avatar || flameIcon}
+                src={resolvedAvatar || flameIcon}
                 alt=""
                 loading="eager"
                 decoding="sync"
@@ -96,7 +131,7 @@ function AppleToastBase({
                 {title}
               </p>
               <p className="mt-[1px] line-clamp-2 text-[14px] leading-snug text-foreground/85">
-                {body}
+                {resolvedBody}
               </p>
             </div>
           </div>
@@ -118,3 +153,4 @@ function AppleToastBase({
 }
 
 export const AppleToast = memo(AppleToastBase);
+
