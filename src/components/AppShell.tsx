@@ -11,7 +11,7 @@ export function AppShell({
   fullHeight?: boolean;
 }) {
   return (
-    <div className="relative h-[100svh] overflow-hidden bg-background text-foreground">
+    <div className="relative h-[100dvh] overflow-hidden bg-background text-foreground">
       {/* Single static aurora layer (was 2 stacked fixed gradients — costly on every paint) */}
       <div
         className="pointer-events-none fixed inset-0 -z-10 bg-aurora opacity-90"
