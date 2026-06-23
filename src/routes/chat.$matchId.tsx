@@ -116,9 +116,9 @@ function ChatRoom() {
     const setKb = () => {
       const winH = window.innerHeight;
       const vH = vv ? vv.height : winH;
-      const vTop = vv ? vv.offsetTop : 0;
-      const keyboardInset = Math.max(0, winH - vH - vTop);
+      const keyboardInset = Math.max(0, winH - vH);
       root.style.setProperty("--chat-kb", `${keyboardInset}px`);
+      root.style.setProperty("--chat-vh", `${vH}px`);
       if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0);
     };
     setKb();
@@ -136,6 +136,7 @@ function ChatRoom() {
       window.removeEventListener("resize", setKb);
       window.removeEventListener("scroll", setKb);
       root.style.removeProperty("--chat-kb");
+      root.style.removeProperty("--chat-vh");
       document.body.style.overflow = prevBody;
       document.documentElement.style.overflow = prevHtml;
     };
@@ -259,8 +260,7 @@ function ChatRoom() {
     <div
       className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none"
       style={{
-        height: "100dvh",
-        paddingBottom: "var(--chat-kb, 0px)",
+        height: "var(--chat-vh, 100dvh)",
         background: "#000",
         color: "#fff",
       }}
