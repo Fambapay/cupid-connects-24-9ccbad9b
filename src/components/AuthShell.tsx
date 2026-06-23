@@ -78,13 +78,13 @@ export function AuthShell({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.08 }}
-          className="mb-6 text-center"
+          className="mb-7 text-center"
         >
-          <h1 className="font-display text-3xl font-bold tracking-tight">
-            <span className="text-gradient-sunset">{title}</span>
+          <h1 className="font-display text-[28px] font-semibold leading-tight tracking-[-0.02em] text-foreground">
+            {title}
           </h1>
           {subtitle && (
-            <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>
+            <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">{subtitle}</p>
           )}
         </motion.div>
 
@@ -93,7 +93,7 @@ export function AuthShell({
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.16 }}
-          className="glass-strong rounded-3xl p-6 shadow-card"
+          className="rounded-[28px] border border-white/[0.06] bg-white/[0.03] p-6 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.6)] backdrop-blur-2xl"
         >
           {children}
         </motion.div>
