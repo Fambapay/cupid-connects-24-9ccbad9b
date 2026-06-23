@@ -63,10 +63,10 @@ export function MatchOverlay({
       {open && (
         <motion.div
           key="match-overlay"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.28, ease: APPLE_EASE }}
+          initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
+          animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+          exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
+          transition={reduce ? { duration: 0.2 } : spring.smooth}
           className="fixed inset-0 z-[10000] flex flex-col items-center justify-center px-7"
           onClick={onClose}
           style={{
