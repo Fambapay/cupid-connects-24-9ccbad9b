@@ -34,7 +34,7 @@ function ChatList() {
 
   return (
     <AppShell className="bg-[var(--profile-bg)]">
-      <header className="sticky top-0 z-30 flex items-center justify-between bg-background px-5 py-4">
+      <header className="sticky top-0 z-30 flex items-center justify-between bg-[var(--profile-bg)] px-5 py-4">
         <h1
           className="text-2xl tracking-tight text-foreground"
           style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}
