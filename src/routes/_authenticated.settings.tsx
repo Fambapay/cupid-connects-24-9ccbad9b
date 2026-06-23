@@ -248,16 +248,15 @@ function SettingsPage() {
 
   return (
     <div
-      className="h-[100dvh] overflow-y-auto overflow-x-hidden bg-background overscroll-y-contain"
-      style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
+      className="h-[100dvh] overflow-y-auto overflow-x-hidden overscroll-y-contain"
+      style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y', background: 'var(--profile-bg)' }}
     >
       {/* Header */}
       <div
         className="sticky top-0 z-10 border-b border-border"
         style={{
           paddingTop: 'env(safe-area-inset-top, 0px)',
-          background:
-            'linear-gradient(180deg, rgba(16,14,22,0.92) 0%, rgba(16,14,22,0.78) 100%)',
+          background: 'color-mix(in oklab, var(--profile-bg) 88%, transparent)',
           backdropFilter: 'blur(18px) saturate(140%)',
         }}
       >
@@ -265,6 +264,7 @@ function SettingsPage() {
           aria-hidden
           className="pointer-events-none absolute left-1/2 top-0 h-[140px] w-[360px] -translate-x-1/2 rounded-full"
           style={{
+            opacity: 'var(--profile-glow-opacity, 1)',
             background:
               'radial-gradient(closest-side, color-mix(in oklab, var(--brand-pink) 18%, transparent) 0%, transparent 70%)',
             filter: 'blur(24px)',
@@ -278,8 +278,9 @@ function SettingsPage() {
               whileTap={{ scale: 0.9 }}
               aria-label="Voltar"
             >
-              <ArrowLeft className="h-5 w-5 text-white" />
+              <ArrowLeft className="h-5 w-5 text-foreground" />
             </motion.button>
+
             <h2
               className="text-[28px] tracking-tight text-foreground"
               style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}
