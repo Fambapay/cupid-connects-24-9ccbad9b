@@ -148,7 +148,15 @@ export function SwipeableConversationItem({
   };
 
   return (
-    <li ref={containerRef} className="relative overflow-hidden rounded-2xl">
+    <motion.li
+      ref={containerRef}
+      layout={reduced ? false : "position"}
+      transition={spring.smooth}
+      initial={isNew && !reduced ? { opacity: 0, y: 10 } : false}
+      animate={isNew && !reduced ? { opacity: 1, y: 0, transition: chatMotion.bubbleIn } : undefined}
+      exit={reduced ? { opacity: 0 } : { opacity: 0, height: 0, marginTop: 0, marginBottom: 0 }}
+      className="relative overflow-hidden rounded-2xl"
+    >
       {/* Actions layer (behind) */}
       <motion.div
         style={{ opacity: bgOpacity }}
