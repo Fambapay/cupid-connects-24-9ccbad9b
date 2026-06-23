@@ -406,11 +406,17 @@ function ChatRoom() {
         <form
           onSubmit={(e) => { e.preventDefault(); handleSend(); }}
           className="overflow-hidden px-3 pt-2 pb-3"
-          style={{ background: "#121212" }}
+          style={{ background: "var(--chat-bg)" }}
         >
           <div className="flex w-full items-center gap-2">
 
-            <div className="flex h-11 min-w-0 flex-1 items-center rounded-full border border-white/10 bg-white/[0.04] px-4">
+            <div
+              className="flex h-11 min-w-0 flex-1 items-center rounded-full px-4"
+              style={{
+                background: "var(--chat-input-bg)",
+                border: "1px solid var(--chat-input-border)",
+              }}
+            >
               <input
                 ref={inputRef}
                 type="text"
@@ -428,15 +434,16 @@ function ChatRoom() {
                 spellCheck={false}
                 enterKeyHint="send"
                 maxLength={2000}
-                className="block h-10 min-w-0 flex-1 appearance-none bg-transparent px-1 py-0 text-[16px] text-white outline-none placeholder:text-white/40 [-webkit-appearance:none]"
-                style={{ lineHeight: "40px", WebkitTextFillColor: "currentColor" }}
+                className="block h-10 min-w-0 flex-1 appearance-none bg-transparent px-1 py-0 text-[16px] outline-none [-webkit-appearance:none] placeholder:[color:var(--chat-input-placeholder)]"
+                style={{ lineHeight: "40px", color: "var(--chat-input-fg)", WebkitTextFillColor: "currentColor" }}
               />
               <motion.button
                 type="submit"
                 whileTap={{ scale: 0.9 }}
                 onMouseDown={(e) => e.preventDefault()}
                 aria-label="Enviar"
-                className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-white/70"
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-full"
+                style={{ color: "var(--chat-input-fg)", opacity: 0.7 }}
               >
                 <Send className="h-4 w-4 translate-x-[1px]" />
               </motion.button>
@@ -444,6 +451,7 @@ function ChatRoom() {
           </div>
         </form>
       </div>
+
 
       <PeerProfileSheet
         open={profileOpen}
