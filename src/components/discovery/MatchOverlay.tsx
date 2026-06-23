@@ -37,12 +37,18 @@ export function MatchOverlay({
     (async () => {
       const { data } = await supabase
         .from("profile_photos")
-        .select("url")
+        .select("storage_path")
         .eq("profile_id", user.id)
         .order("position", { ascending: true })
         .limit(1)
         .maybeSingle();
-      if (!cancel) setMyPhoto((data as { url?: string } | null)?.url ?? null);
+      const path = (data as { storage_path?: string } | null)?.storage_path;
+      if (!path) {
+        if (!cancel) setMyPhoto(null);
+        return;
+      }
+      const url = await signPhoto(path, 3600, { width: 360, height: 440, resize: "cover", quality: 80 });
+      if (!cancel) setMyPhoto(url || null);
     })();
     return () => {
       cancel = true;
