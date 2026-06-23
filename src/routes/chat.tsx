@@ -36,33 +36,34 @@ function ChatList() {
     <AppShell>
       <header className="sticky top-0 z-30 flex items-center justify-between bg-background px-5 py-4">
         <h1
-          className="text-2xl tracking-tight text-white"
+          className="text-2xl tracking-tight text-foreground"
           style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}
         >
           Chat
         </h1>
-        <div className="flex items-center gap-1 rounded-full bg-white/[0.06] p-1 ring-1 ring-white/10">
+        <div className="flex items-center gap-1 rounded-full bg-muted p-1 ring-1 ring-border">
           <Link
             to="/settings"
             aria-label="Definições de segurança"
-            className="flex h-11 w-11 items-center justify-center rounded-full text-white/90 active:bg-white/10"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-foreground/90 active:bg-foreground/10"
           >
             <Shield className="h-[18px] w-[18px]" strokeWidth={2.2} />
           </Link>
           <Link
             to="/matches"
             aria-label="Ver todos os matches"
-            className="flex h-11 w-11 items-center justify-center rounded-full text-white/90 active:bg-white/10"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-foreground/90 active:bg-foreground/10"
           >
             <MessagesSquare className="h-[18px] w-[18px]" strokeWidth={2.2} />
           </Link>
         </div>
       </header>
 
+
       {newMatches.length > 0 && (
         <section className="mt-2 px-4">
           <h2
-            className="text-[15px] uppercase tracking-tight text-white/70"
+            className="text-[15px] uppercase tracking-tight text-muted-foreground"
             style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}
           >
             Novos matches
@@ -75,7 +76,7 @@ function ChatList() {
                 params={{ matchId: m.matchId }}
                 className="relative shrink-0"
               >
-                <div className="h-32 w-[104px] overflow-hidden rounded-[22px] bg-card ring-1 ring-white/5">
+                <div className="h-32 w-[104px] overflow-hidden rounded-[22px] bg-card ring-1 ring-border">
                   {m.photo ? (
                     <img src={m.photo} alt={m.name} className="h-full w-full object-cover" />
                   ) : (
@@ -83,7 +84,7 @@ function ChatList() {
                   )}
                 </div>
                 <span
-                  className="mt-2 block text-center text-[14px] text-white"
+                  className="mt-2 block text-center text-[14px] text-foreground"
                   style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 500 }}
                 >
                   {m.name}
@@ -96,25 +97,27 @@ function ChatList() {
 
       <section className={`${newMatches.length > 0 ? "mt-3" : "mt-1"} px-4`}>
         <h2
-          className="text-[15px] uppercase tracking-tight text-white/70"
+          className="text-[15px] uppercase tracking-tight text-muted-foreground"
           style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}
         >
           Mensagens
         </h2>
 
 
+
         {loading && matches.length === 0 ? (
           <ul className="mt-3 space-y-3" aria-busy="true" aria-label="A carregar conversas">
             {Array.from({ length: 6 }).map((_, i) => (
               <li key={i} className="flex items-center gap-3 px-1">
-                <div className="h-12 w-12 shrink-0 rounded-full bg-white/[0.06] animate-pulse" />
+                <div className="h-12 w-12 shrink-0 rounded-full bg-muted animate-pulse" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-3.5 w-1/3 rounded bg-white/[0.06] animate-pulse" />
-                  <div className="h-3 w-2/3 rounded bg-white/[0.04] animate-pulse" />
+                  <div className="h-3.5 w-1/3 rounded bg-muted animate-pulse" />
+                  <div className="h-3 w-2/3 rounded bg-muted/60 animate-pulse" />
                 </div>
               </li>
             ))}
           </ul>
+
         ) : conversations.length === 0 && newMatches.length === 0 ? (
           <div className="mt-16 flex flex-col items-center px-6 text-center">
             <div className="relative">
