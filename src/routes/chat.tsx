@@ -35,6 +35,20 @@ function ChatList() {
   const newMatches = matches.filter((m) => !m.hasMessages);
   const conversations = matches.filter((m) => m.hasMessages);
 
+  // Track which items were present at first paint. Anything added after that
+  // is "new" and gets its own entry animation instead of re-firing the
+  // mount-stagger cascade across the whole list.
+  const seenConvRef = useRef<Set<string> | null>(null);
+  if (seenConvRef.current === null && !loading) {
+    seenConvRef.current = new Set(conversations.map((c) => c.matchId));
+  }
+  const seenConv = seenConvRef.current ?? new Set<string>();
+
+  const seenNewRef = useRef<Set<string> | null>(null);
+  if (seenNewRef.current === null && !loading) {
+    seenNewRef.current = new Set(newMatches.map((m) => m.matchId));
+  }
+
   return (
     <AppShell className="bg-[var(--profile-bg)]">
       <header className="sticky top-0 z-30 flex items-center justify-between bg-[var(--profile-bg)] px-5 py-4">
