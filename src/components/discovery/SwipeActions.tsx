@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useMotionValueEvent, type MotionValue } from "framer-motion";
+import type { MotionValue } from "framer-motion";
 import { RotateCcw, X, Star, Heart, Send } from "lucide-react";
 import type { SwipeDirection, DailyLimits } from "./types";
 
@@ -27,9 +27,14 @@ const baseBtn: React.CSSProperties = {
   WebkitBackdropFilter: "blur(18px) saturate(160%)",
   boxShadow:
     "0 8px 22px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05)",
-  transition: "transform 120ms cubic-bezier(0.22,1,0.36,1), box-shadow 160ms ease, border-color 160ms ease, background 160ms ease",
+  transition:
+    "box-shadow 140ms ease, border-color 140ms ease",
   WebkitTapHighlightColor: "transparent",
 };
+
+const RESET_SHADOW =
+  "0 8px 22px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05)";
+const RESET_BORDER = "rgba(255,255,255,0.06)";
 
 export const SwipeActions = ({
   onSwipe,
@@ -42,12 +47,12 @@ export const SwipeActions = ({
   const passRef = useRef<HTMLButtonElement>(null);
   const likeRef = useRef<HTMLButtonElement>(null);
   const superRef = useRef<HTMLButtonElement>(null);
-  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!dragX && !dragY) return;
+    let raf: number | null = null;
     const apply = () => {
-      rafRef.current = null;
+      raf = null;
       const w = typeof window !== "undefined" ? window.innerWidth : 390;
       const dx = dragX?.get() ?? 0;
       const dy = dragY?.get() ?? 0;
@@ -56,7 +61,7 @@ export const SwipeActions = ({
       const nope = Math.max(0, Math.min(1, -dx / t));
       const sup = Math.max(0, Math.min(1, -dy / 180));
 
-      const style = (
+      const paint = (
         el: HTMLButtonElement | null,
         p: number,
         color: string,
@@ -68,93 +73,38 @@ export const SwipeActions = ({
           el.style.boxShadow = `0 10px 30px ${color}, inset 0 1px 0 rgba(255,255,255,0.08), 0 0 0 ${(p * 2).toFixed(1)}px ${color}`;
           el.style.borderColor = color;
         } else {
-          el.style.boxShadow =
-            "0 8px 22px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05)";
-          el.style.borderColor = "rgba(255,255,255,0.06)";
+          el.style.boxShadow = RESET_SHADOW;
+          el.style.borderColor = RESET_BORDER;
         }
       };
-      style(passRef.current, nope, "rgba(255,59,78,0.55)");
-      style(likeRef.current, like, "rgba(25,210,126,0.55)");
-      style(superRef.current, sup, "rgba(31,184,255,0.55)");
+      paint(passRef.current, nope, "rgba(255,59,78,0.55)");
+      paint(likeRef.current, like, "rgba(25,210,126,0.55)");
+      paint(superRef.current, sup, "rgba(31,184,255,0.55)");
     };
     const schedule = () => {
-      if (rafRef.current != null) return;
-      rafRef.current = requestAnimationFrame(apply);
+      if (raf != null) return;
+      raf = requestAnimationFrame(apply);
     };
+    const unsubs: Array<() => void> = [];
+    if (dragX) unsubs.push(dragX.on("change", schedule));
+    if (dragY) unsubs.push(dragY.on("change", schedule));
     apply();
     return () => {
-      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+      unsubs.forEach((u) => u());
+      if (raf != null) cancelAnimationFrame(raf);
     };
   }, [dragX, dragY]);
-
-  useMotionValueEvent(dragX ?? ({ get: () => 0, on: () => () => {} } as unknown as MotionValue<number>), "change", () => {
-    if (!dragX) return;
-    if (rafRef.current != null) return;
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = null;
-      const w = typeof window !== "undefined" ? window.innerWidth : 390;
-      const dx = dragX.get();
-      const dy = dragY?.get() ?? 0;
-      const t = w * 0.25;
-      const like = Math.max(0, Math.min(1, dx / t));
-      const nope = Math.max(0, Math.min(1, -dx / t));
-      const sup = Math.max(0, Math.min(1, -dy / 180));
-      const apply = (el: HTMLButtonElement | null, p: number, color: string) => {
-        if (!el) return;
-        const scale = 1 + p * 0.22;
-        el.style.transform = `scale(${scale.toFixed(3)})`;
-        if (p > 0.02) {
-          el.style.boxShadow = `0 10px 30px ${color}, inset 0 1px 0 rgba(255,255,255,0.08), 0 0 0 ${(p * 2).toFixed(1)}px ${color}`;
-          el.style.borderColor = color;
-        } else {
-          el.style.boxShadow =
-            "0 8px 22px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05)";
-          el.style.borderColor = "rgba(255,255,255,0.06)";
-        }
-      };
-      apply(passRef.current, nope, "rgba(255,59,78,0.55)");
-      apply(likeRef.current, like, "rgba(25,210,126,0.55)");
-      apply(superRef.current, sup, "rgba(31,184,255,0.55)");
-    });
-  });
-  useMotionValueEvent(dragY ?? ({ get: () => 0, on: () => () => {} } as unknown as MotionValue<number>), "change", () => {
-    if (!dragY) return;
-    if (rafRef.current != null) return;
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = null;
-      const w = typeof window !== "undefined" ? window.innerWidth : 390;
-      const dx = dragX?.get() ?? 0;
-      const dy = dragY.get();
-      const t = w * 0.25;
-      const like = Math.max(0, Math.min(1, dx / t));
-      const nope = Math.max(0, Math.min(1, -dx / t));
-      const sup = Math.max(0, Math.min(1, -dy / 180));
-      const apply = (el: HTMLButtonElement | null, p: number, color: string) => {
-        if (!el) return;
-        const scale = 1 + p * 0.22;
-        el.style.transform = `scale(${scale.toFixed(3)})`;
-        if (p > 0.02) {
-          el.style.boxShadow = `0 10px 30px ${color}, inset 0 1px 0 rgba(255,255,255,0.08), 0 0 0 ${(p * 2).toFixed(1)}px ${color}`;
-          el.style.borderColor = color;
-        } else {
-          el.style.boxShadow =
-            "0 8px 22px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05)";
-          el.style.borderColor = "rgba(255,255,255,0.06)";
-        }
-      };
-      apply(passRef.current, nope, "rgba(255,59,78,0.55)");
-      apply(likeRef.current, like, "rgba(25,210,126,0.55)");
-      apply(superRef.current, sup, "rgba(31,184,255,0.55)");
-    });
-  });
 
   const press =
     (cb?: () => void) => (e: React.MouseEvent<HTMLButtonElement>) => {
       const el = e.currentTarget;
-      const prev = el.style.transform;
+      el.style.transition =
+        "transform 120ms cubic-bezier(0.22,1,0.36,1), box-shadow 140ms ease, border-color 140ms ease";
       el.style.transform = "scale(0.92)";
       setTimeout(() => {
-        el.style.transform = prev || "";
+        el.style.transform = "";
+        el.style.transition =
+          "box-shadow 140ms ease, border-color 140ms ease";
       }, 120);
       cb?.();
     };
@@ -185,7 +135,7 @@ export const SwipeActions = ({
         ref={passRef}
         onClick={press(() => onSwipe("left"))}
         aria-label="Pass"
-        style={{ ...baseBtn, width: 60, height: 60 }}
+        style={{ ...baseBtn, width: 60, height: 60, willChange: "transform" }}
       >
         <X size={30} color="#FFFFFF" strokeWidth={3} />
       </button>
@@ -194,7 +144,7 @@ export const SwipeActions = ({
         ref={superRef}
         onClick={press(() => onSwipe("up"))}
         aria-label="Super like"
-        style={{ ...baseBtn, width: 56, height: 56 }}
+        style={{ ...baseBtn, width: 56, height: 56, willChange: "transform" }}
       >
         <Star size={24} color="#A8B5E8" strokeWidth={2.4} fill="transparent" />
       </button>
@@ -203,7 +153,7 @@ export const SwipeActions = ({
         ref={likeRef}
         onClick={press(() => onSwipe("right"))}
         aria-label="Like"
-        style={{ ...baseBtn, width: 60, height: 60 }}
+        style={{ ...baseBtn, width: 60, height: 60, willChange: "transform" }}
       >
         <Heart size={28} color="#FF3B4E" strokeWidth={2.4} fill="#FF3B4E" />
       </button>
