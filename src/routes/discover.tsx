@@ -22,6 +22,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { DiscoveryProfile, SwipeDirection } from "@/components/discovery/types";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
+import { useForceDarkTheme } from "@/lib/theme";
 
 export const Route = createFileRoute("/discover")({
   ssr: false,
