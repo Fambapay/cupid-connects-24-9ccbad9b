@@ -114,7 +114,7 @@ function ShopPage() {
       {/* Header */}
       <header
         className="sticky top-0 z-30 bg-background"
-        style={{ paddingTop: "max(var(--sat, 12px), 12px)" }}
+        style={{ paddingTop: "max(env(safe-area-inset-top), 12px)" }}
       >
         <div className="flex items-center gap-3 px-4 pb-3">
           <motion.button
