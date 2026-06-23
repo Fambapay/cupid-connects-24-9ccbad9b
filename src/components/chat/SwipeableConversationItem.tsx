@@ -49,6 +49,8 @@ interface Props {
   lastMessageAt: string;
   unread?: number;
   onActionTaken?: () => void;
+  /** When true, this row is a brand-new arrival (entered after mount). */
+  isNew?: boolean;
 }
 
 export function SwipeableConversationItem({
