@@ -385,7 +385,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
 
 
     return (
-      <div className="absolute inset-0 overflow-hidden" style={{ background: "#000", perspective: 1200 }}>
+      <div className="absolute inset-0 overflow-hidden" style={{ background: "#000", perspective: 1200, padding: "0 10px 10px" }}>
         {isTop && nextProfiles[1] && (
           <StackCard profile={nextProfiles[1]} topX={x} topY={y} stackIndex={2} />
         )}
