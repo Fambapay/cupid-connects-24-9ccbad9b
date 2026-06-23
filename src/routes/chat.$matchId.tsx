@@ -160,6 +160,8 @@ function ChatRoom() {
       const winH = window.innerHeight;
       const vH = vv ? vv.height : winH;
       const keyboardInset = Math.max(0, winH - vH);
+      // Treat anything > 80px of inset as "keyboard open" — covers iOS/Android.
+      keyboardOpenRef.current = keyboardInset > 80;
       root.style.setProperty("--chat-kb", `${keyboardInset}px`);
       root.style.setProperty("--chat-vh", `${vH}px`);
       if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0);
