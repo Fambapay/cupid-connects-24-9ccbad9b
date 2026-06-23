@@ -168,7 +168,7 @@ export function useNewMessageNotifier() {
       )
       .subscribe();
 
-    // New match toast
+    // New match toast — fire instantly, fill in peer info as it arrives
     const matchesCh = supabase
       .channel(`global-matches-${user.id}`)
       .on(
@@ -180,15 +180,20 @@ export function useNewMessageNotifier() {
           if (row.user_a !== user.id && row.user_b !== user.id) return;
           if (currentPathRef.current === "/matches") return;
 
-          const peer = await resolvePeer(row.id);
-          if (!peer) return;
+          const cached = peerCache.current.get(row.id);
+          const peerPromise = cached ? Promise.resolve(cached) : resolvePeer(row.id);
+          const bodyTemplate = (name: string) => `Tu e ${name} deram like. Manda já uma mensagem!`;
+
           toast.custom(
             (t) => (
               <AppleToast
                 toastId={t}
                 title="Novo match 💘"
-                body={`Tu e ${peer.name} deram like. Manda já uma mensagem!`}
-                avatar={peer.photo}
+                body={cached ? bodyTemplate(cached.name) : "Deram like um no outro. Manda já uma mensagem!"}
+                avatar={cached?.photo}
+                avatarPromise={peerPromise.then((p) => p?.photo)}
+                bodyTemplate={bodyTemplate}
+                namePromise={peerPromise.then((p) => p?.name)}
                 appName="Hunie"
                 timeLabel="agora"
                 onClick={() => {
