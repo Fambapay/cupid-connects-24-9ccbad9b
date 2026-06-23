@@ -166,18 +166,25 @@ function ChatList() {
           </div>
         ) : (
           <ul className="mt-3">
-            {conversations.map((m) => (
-              <SwipeableConversationItem
-                key={m.matchId}
-                matchId={m.matchId}
-                otherId={m.otherId}
-                name={m.name}
-                photo={m.photo}
-                lastMessage={m.lastMessage}
-                lastMessageAt={formatTime(m.lastMessageAt)}
-                unread={m.unread}
-              />
-            ))}
+            <AnimatePresence initial={false}>
+              {conversations.map((m, i) => {
+                const isNew = seenConv.size > 0 && !seenConv.has(m.matchId);
+                return (
+                  <SwipeableConversationItem
+                    key={m.matchId}
+                    matchId={m.matchId}
+                    otherId={m.otherId}
+                    name={m.name}
+                    photo={m.photo}
+                    lastMessage={m.lastMessage}
+                    lastMessageAt={formatTime(m.lastMessageAt)}
+                    unread={m.unread}
+                    isNew={isNew}
+                    mountDelay={isNew ? 0 : Math.min(i, 10) * 0.04}
+                  />
+                );
+              })}
+            </AnimatePresence>
           </ul>
         )}
       </section>
