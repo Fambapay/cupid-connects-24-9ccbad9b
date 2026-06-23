@@ -261,8 +261,8 @@ function ChatRoom() {
       className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none"
       style={{
         height: "var(--chat-vh, 100dvh)",
-        background: "#121212",
-        color: "#fff",
+        background: "var(--chat-bg)",
+        color: "var(--chat-fg)",
       }}
     >
       <header className="relative z-10 shrink-0">
@@ -270,14 +270,14 @@ function ChatRoom() {
           <Link
             to="/chat"
             aria-label="Voltar"
-            className="grid h-10 w-10 place-items-center rounded-full text-white active:scale-95"
+            className="grid h-10 w-10 place-items-center rounded-full active:scale-95"
             style={{
-              background: "rgba(255,255,255,0.08)",
+              color: "var(--chat-fg)",
+              background: "var(--chat-glass-bg)",
               backdropFilter: "blur(20px) saturate(180%)",
               WebkitBackdropFilter: "blur(20px) saturate(180%)",
-              border: "1px solid rgba(255,255,255,0.14)",
-              boxShadow:
-                "inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.25), 0 6px 18px rgba(0,0,0,0.35)",
+              border: "1px solid var(--chat-glass-border)",
+              boxShadow: "var(--chat-glass-shadow)",
             }}
           >
             <ChevronLeft className="h-5 w-5" />
@@ -297,7 +297,10 @@ function ChatRoom() {
                   <div className="h-full w-full bg-gradient-flame" />
                 )}
               </div>
-              <span className="absolute -bottom-0.5 -right-0.5 grid h-3.5 w-3.5 place-items-center rounded-full bg-black">
+              <span
+                className="absolute -bottom-0.5 -right-0.5 grid h-3.5 w-3.5 place-items-center rounded-full"
+                style={{ background: "var(--chat-bg)" }}
+              >
                 <span
                   className="h-2.5 w-2.5 rounded-full"
                   style={{ background: activity?.dot ?? "#6b6f76" }}
@@ -305,16 +308,16 @@ function ChatRoom() {
               </span>
             </div>
             <div
-              className="rounded-full px-4 py-1.5 text-[15px] text-white"
+              className="rounded-full px-4 py-1.5 text-[15px]"
               style={{
                 fontFamily: "'Montserrat', sans-serif",
                 fontWeight: 600,
-                background: "rgba(255,255,255,0.08)",
+                color: "var(--chat-fg)",
+                background: "var(--chat-glass-bg)",
                 backdropFilter: "blur(20px) saturate(180%)",
                 WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                border: "1px solid rgba(255,255,255,0.14)",
-                boxShadow:
-                  "inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.25), 0 6px 18px rgba(0,0,0,0.35)",
+                border: "1px solid var(--chat-glass-border)",
+                boxShadow: "var(--chat-glass-shadow)",
               }}
             >
               {peer.name}
@@ -324,18 +327,19 @@ function ChatRoom() {
           <div
             className="grid h-10 w-10 place-items-center rounded-full"
             style={{
-              background: "rgba(255,255,255,0.08)",
+              color: "var(--chat-fg)",
+              background: "var(--chat-glass-bg)",
               backdropFilter: "blur(20px) saturate(180%)",
               WebkitBackdropFilter: "blur(20px) saturate(180%)",
-              border: "1px solid rgba(255,255,255,0.14)",
-              boxShadow:
-                "inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.25), 0 6px 18px rgba(0,0,0,0.35)",
+              border: "1px solid var(--chat-glass-border)",
+              boxShadow: "var(--chat-glass-shadow)",
             }}
           >
             <ChatActionsMenu matchId={matchId} otherUserId={peer.id} otherName={peer.name} />
           </div>
         </div>
       </header>
+
 
 
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3" style={{ WebkitOverflowScrolling: "touch", contain: "layout paint" }}>
@@ -402,11 +406,17 @@ function ChatRoom() {
         <form
           onSubmit={(e) => { e.preventDefault(); handleSend(); }}
           className="overflow-hidden px-3 pt-2 pb-3"
-          style={{ background: "#121212" }}
+          style={{ background: "var(--chat-bg)" }}
         >
           <div className="flex w-full items-center gap-2">
 
-            <div className="flex h-11 min-w-0 flex-1 items-center rounded-full border border-white/10 bg-white/[0.04] px-4">
+            <div
+              className="flex h-11 min-w-0 flex-1 items-center rounded-full px-4"
+              style={{
+                background: "var(--chat-input-bg)",
+                border: "1px solid var(--chat-input-border)",
+              }}
+            >
               <input
                 ref={inputRef}
                 type="text"
@@ -424,15 +434,16 @@ function ChatRoom() {
                 spellCheck={false}
                 enterKeyHint="send"
                 maxLength={2000}
-                className="block h-10 min-w-0 flex-1 appearance-none bg-transparent px-1 py-0 text-[16px] text-white outline-none placeholder:text-white/40 [-webkit-appearance:none]"
-                style={{ lineHeight: "40px", WebkitTextFillColor: "currentColor" }}
+                className="block h-10 min-w-0 flex-1 appearance-none bg-transparent px-1 py-0 text-[16px] outline-none [-webkit-appearance:none] placeholder:[color:var(--chat-input-placeholder)]"
+                style={{ lineHeight: "40px", color: "var(--chat-input-fg)", WebkitTextFillColor: "currentColor" }}
               />
               <motion.button
                 type="submit"
                 whileTap={{ scale: 0.9 }}
                 onMouseDown={(e) => e.preventDefault()}
                 aria-label="Enviar"
-                className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-white/70"
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-full"
+                style={{ color: "var(--chat-input-fg)", opacity: 0.7 }}
               >
                 <Send className="h-4 w-4 translate-x-[1px]" />
               </motion.button>
@@ -440,6 +451,7 @@ function ChatRoom() {
           </div>
         </form>
       </div>
+
 
       <PeerProfileSheet
         open={profileOpen}
@@ -495,15 +507,16 @@ function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, show
           className="px-4 py-2.5 text-[15px] font-normal leading-snug break-words whitespace-pre-wrap rounded-[22px]"
       style={
             me
-              ? { background: "#F3E7DD", color: "#0a0a0a", fontWeight: 400 }
-              : { background: "#0a0a0a", color: "#fff", border: "1px solid rgba(255,255,255,0.08)", fontWeight: 400 }
+              ? { background: "var(--chat-me-bg)", color: "var(--chat-me-fg)", fontWeight: 400 }
+              : { background: "var(--chat-peer-bg)", color: "var(--chat-peer-fg)", border: "1px solid var(--chat-peer-border)", fontWeight: 400 }
           }
         >
           {msg.content}
         </div>
         {me && showReadReceipt && isLastOfGroup && (
-          <span className="mt-1 px-1 text-[11px] text-white/45">Lido</span>
+          <span className="mt-1 px-1 text-[11px]" style={{ color: "var(--chat-fg)", opacity: 0.45 }}>Lido</span>
         )}
+
       </div>
     </div>
 
