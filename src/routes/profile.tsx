@@ -5,7 +5,7 @@ import { AppleToast } from '@/components/notifications/AppleToast';
 import { ProfileView, type ProfileViewData } from '@/components/ProfileView';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
 import { VerificationModal } from '@/components/VerificationModal';
-import { BottomNav } from '@/components/BottomNav';
+import { AppShell } from '@/components/AppShell';
 import { useProfile } from '@/hooks/useProfile';
 import { usePhotoUpload } from '@/hooks/usePhotoUpload';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -114,7 +114,7 @@ function ProfilePage() {
   }, []);
 
   return (
-    <div className="min-h-[100dvh] bg-background">
+    <AppShell>
       <ProfileView
         profile={view}
         superLikeBalance={credits.super_like_balance}
@@ -142,7 +142,6 @@ function ProfilePage() {
           reload();
         }}
       />
-      <BottomNav />
-    </div>
+    </AppShell>
   );
 }

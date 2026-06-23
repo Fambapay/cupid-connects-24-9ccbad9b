@@ -94,7 +94,6 @@ export function ProfileView({
       className="relative min-h-full pb-32"
       style={{
         background: 'var(--background)',
-        paddingTop: 'max(env(safe-area-inset-top), 16px)',
       }}
     >
       {/* Soft gradient backdrop */}
@@ -118,7 +117,7 @@ export function ProfileView({
       />
 
       {/* HEADER */}
-      <div className="relative flex items-center justify-between px-5 pb-5">
+      <div className="relative flex items-center justify-between px-5 pt-4 pb-5">
         <div className="flex items-center gap-3.5 min-w-0">
           <button
             onClick={() => fileRef.current?.click()}
