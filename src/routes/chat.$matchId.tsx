@@ -38,23 +38,65 @@ function ChatRoom() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const inputHasTextRef = useRef(false);
+  // IDs that were already present when the chat opened. Bubbles for these
+  // never animate — otherwise the whole history "explodes" on open. New
+  // messages (sent or received during the session) get the spring-in.
+  const seenIdsRef = useRef<Set<string>>(new Set());
+  // Force a re-render when seenIdsRef populates after first messages load.
+  const [, setSeenTick] = useState(0);
+  // Tracks whether the on-screen keyboard is open (drives smooth vs instant
+  // scroll). Smooth animations fight the visualViewport reflow on iOS.
+  const keyboardOpenRef = useRef(false);
 
   const activity = peer ? getActivityStatus(true, peer.lastActiveAt) : null;
+
+  const isNearBottom = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return true;
+    return el.scrollHeight - el.scrollTop - el.clientHeight < 160;
+  }, []);
 
   const scrollToLatest = useCallback((behavior: ScrollBehavior = "auto") => {
     const el = scrollRef.current;
     if (!el) return;
-    el.scrollTo({ top: el.scrollHeight, behavior });
+    // Smooth fights the viewport reposition when the keyboard is open — force
+    // instant in that case.
+    const b: ScrollBehavior = keyboardOpenRef.current ? "auto" : behavior;
+    el.scrollTo({ top: el.scrollHeight, behavior: b });
     requestAnimationFrame(() => {
       const e = scrollRef.current;
-      if (e) e.scrollTo({ top: e.scrollHeight, behavior });
+      if (e) e.scrollTo({ top: e.scrollHeight, behavior: b });
     });
   }, []);
 
-  // Single effect: scroll on mount, on match change, and on new messages/typing.
+  // Mount / match change → jump to bottom instantly; seed seenIds with the
+  // history so it renders static.
   useLayoutEffect(() => {
+    seenIdsRef.current = new Set(messages.map((m) => m.id));
+    setSeenTick((n) => n + 1);
     scrollToLatest("auto");
-  }, [matchId, messages.length, typing, scrollToLatest]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchId]);
+
+  // New message / typing → auto-scroll only if user is near the bottom (so
+  // someone reading history isn't yanked away). Mark any new IDs as seen
+  // after the bubble has had a frame to animate in.
+  useLayoutEffect(() => {
+    const wasNear = isNearBottom();
+    if (wasNear) scrollToLatest("smooth");
+    const seen = seenIdsRef.current;
+    let added = false;
+    for (const m of messages) {
+      if (!seen.has(m.id)) {
+        // Defer marking until next frame so the Bubble's `initial` motion
+        // still runs on the very first paint of this id.
+        const id = m.id;
+        requestAnimationFrame(() => seen.add(id));
+        added = true;
+      }
+    }
+    if (added) setSeenTick((n) => n + 1);
+  }, [messages.length, typing, isNearBottom, scrollToLatest, messages]);
 
   // Mark conversation as read on open and whenever new messages arrive (debounced)
   useEffect(() => {
