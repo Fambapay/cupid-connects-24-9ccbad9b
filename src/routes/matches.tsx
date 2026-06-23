@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { AppShell, TopBar } from "@/components/AppShell";
 import { useLikedMe } from "@/hooks/useLikedMe";
 import { useSubscription } from "@/hooks/useSubscription";
+import { Stagger, StaggerItem, PressableScale } from "@/components/motion";
 
 import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
 
@@ -64,14 +65,15 @@ function LikesPage() {
             onBoost={() => navigate({ to: "/shop" })}
           />
         ) : (
-          <div className="mt-4 grid grid-cols-2 gap-3">
+          <Stagger className="mt-4 grid grid-cols-2 gap-3">
             {likers.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => !isPremium && navigate({ to: "/membership" })}
-                className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-card text-left"
-              >
+              <StaggerItem key={p.id}>
+                <PressableScale>
+                  <button
+                    type="button"
+                    onClick={() => !isPremium && navigate({ to: "/membership" })}
+                    className="group relative block aspect-[3/4] w-full overflow-hidden rounded-2xl bg-card text-left"
+                  >
                 {p.photo ? (
                   <img
                     src={p.photo}
@@ -120,9 +122,11 @@ function LikesPage() {
                     <Heart className="h-4 w-4" fill="currentColor" />
                   </div>
                 </div>
-              </button>
+                  </button>
+                </PressableScale>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         )}
       </section>
     </AppShell>

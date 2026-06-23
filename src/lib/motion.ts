@@ -79,3 +79,13 @@ export const chat = {
   sentNudge: 700, // velocidade sintética do "empurrão" ao enviar
 } as const;
 
+/**
+ * Tunables para listas — Fase 5.
+ * `revealStagger` curto: o olho lê "lista entrou com vida", não
+ * "itens entraram um a um". Stagger lento parece PowerPoint.
+ */
+export const list = {
+  revealStagger: 0.04,
+  rowPress: { type: "spring", visualDuration: 0.16, bounce: 0.1 },
+} as const;
+
