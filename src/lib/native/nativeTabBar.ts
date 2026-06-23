@@ -48,7 +48,7 @@ const native = registerPlugin<NativeTabBarPlugin>('NativeTabBar', {
   android: () => noop,
 })
 
-export const isNativeTabBarSupported = (): boolean => getPlatform() === 'ios'
+export const isNativeTabBarSupported = (): boolean => Capacitor.isPluginAvailable('NativeTabBar')
 
 export const NativeTabBar: NativeTabBarPlugin = {
   async configure(config) {
