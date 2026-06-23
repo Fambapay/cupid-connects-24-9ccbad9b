@@ -51,6 +51,8 @@ interface Props {
   onActionTaken?: () => void;
   /** When true, this row is a brand-new arrival (entered after mount). */
   isNew?: boolean;
+  /** Stagger delay (s) for the initial mount reveal. Ignored when isNew. */
+  mountDelay?: number;
 }
 
 export function SwipeableConversationItem({
