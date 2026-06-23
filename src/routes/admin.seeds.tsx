@@ -10,6 +10,7 @@ import {
   getSeedStats,
   setSeedThreshold,
   generateSeeds,
+  populateExistingUsers,
 } from "@/lib/seeds.functions";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -49,6 +50,7 @@ function SeedsAdmin() {
   const stats = useServerFn(getSeedStats);
   const setThr = useServerFn(setSeedThreshold);
   const generate = useServerFn(generateSeeds);
+  const populate = useServerFn(populateExistingUsers);
 
   const [city, setCity] = useState<string>("");
   const [gender, setGender] = useState<string>("");
@@ -110,6 +112,18 @@ function SeedsAdmin() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const popMut = useMutation({
+    mutationFn: () => populate({ data: {} }),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["seeds"] });
+      qc.invalidateQueries({ queryKey: ["seed-stats"] });
+      toast.success(
+        `Populado: ${res.realUsers} user(s) · +${res.generated} seeds · ${res.likes} likes · ${res.matchesEmpty} matches · ${res.matchesChat} chats (${res.messages} msgs)`,
+      );
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const s = statsQ.data;
   const total = listQ.data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / 20));
@@ -136,6 +150,19 @@ function SeedsAdmin() {
 
       {/* Generator */}
       <SeedGenerator onGenerate={(v) => genMut.mutate(v)} pending={genMut.isPending} />
+
+      {/* Populate existing real users */}
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-3">
+        <div className="flex-1 min-w-[220px]">
+          <p className="text-sm font-medium">Popular contas existentes</p>
+          <p className="text-xs text-muted-foreground">
+            Cria seeds (se faltarem), likes recebidos, novos matches e chats com mensagens para os utilizadores reais.
+          </p>
+        </div>
+        <Button onClick={() => popMut.mutate()} disabled={popMut.isPending}>
+          {popMut.isPending ? "A popular…" : "Popular discover, matches e chats"}
+        </Button>
+      </div>
 
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-3">
