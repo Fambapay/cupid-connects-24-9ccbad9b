@@ -36,28 +36,29 @@ function ChatList() {
     <AppShell>
       <header className="sticky top-0 z-30 flex items-center justify-between bg-background px-5 py-4">
         <h1
-          className="text-2xl tracking-tight text-white"
+          className="text-2xl tracking-tight text-foreground"
           style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}
         >
           Chat
         </h1>
-        <div className="flex items-center gap-1 rounded-full bg-white/[0.06] p-1 ring-1 ring-white/10">
+        <div className="flex items-center gap-1 rounded-full bg-muted p-1 ring-1 ring-border">
           <Link
             to="/settings"
             aria-label="Definições de segurança"
-            className="flex h-11 w-11 items-center justify-center rounded-full text-white/90 active:bg-white/10"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-foreground/90 active:bg-foreground/10"
           >
             <Shield className="h-[18px] w-[18px]" strokeWidth={2.2} />
           </Link>
           <Link
             to="/matches"
             aria-label="Ver todos os matches"
-            className="flex h-11 w-11 items-center justify-center rounded-full text-white/90 active:bg-white/10"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-foreground/90 active:bg-foreground/10"
           >
             <MessagesSquare className="h-[18px] w-[18px]" strokeWidth={2.2} />
           </Link>
         </div>
       </header>
+
 
       {newMatches.length > 0 && (
         <section className="mt-2 px-4">
