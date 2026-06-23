@@ -112,14 +112,15 @@ export function ProfileBundles() {
                   hapticTap();
                   setActive({ bundle: b, price });
                 }}
-                className="relative shrink-0 snap-start w-[260px] text-left rounded-[20px] overflow-hidden border border-white/10 active:scale-[0.98] transition-transform"
+                className="bundle-card relative shrink-0 snap-start w-[260px] text-left rounded-[20px] overflow-hidden border border-white/10 active:scale-[0.98] transition-transform"
                 style={{ background: b.gradient }}
               >
                 <div
                   aria-hidden
-                  className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-40 blur-3xl"
+                  className="bundle-halo pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-40 blur-3xl"
                   style={{ background: b.accent }}
                 />
+
 
                 <div className="relative p-4">
                   <div className="flex items-center justify-between mb-3 min-h-[20px]">
