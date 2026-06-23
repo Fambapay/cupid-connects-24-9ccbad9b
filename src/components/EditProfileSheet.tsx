@@ -93,18 +93,16 @@ export function EditProfileSheet({
             exit={{ opacity: 0 }}
             onClick={onClose}
             style={{
-              background:
-                'radial-gradient(120% 80% at 50% 0%, rgba(177,60,255,0.18) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.85) 100%)',
+              background: 'var(--edit-sheet-backdrop)',
               backdropFilter: 'blur(8px)',
             }}
           />
-          <motion.div
+          <motion.section
             className="fixed inset-x-0 bottom-0 z-[9999] flex flex-col overflow-hidden rounded-t-[32px]"
             style={{
               height: 'min(92dvh, 92vh)',
-              background:
-                'linear-gradient(180deg, rgba(28,22,38,0.96) 0%, rgba(16,14,22,0.98) 100%)',
-              borderTop: '1px solid rgba(255,255,255,0.08)',
+              background: 'var(--edit-sheet-bg)',
+              borderTop: '1px solid var(--edit-sheet-border)',
               boxShadow:
                 '0 -20px 60px -10px rgba(255,79,163,0.25), 0 -2px 0 rgba(255,255,255,0.04) inset',
               backdropFilter: 'blur(30px) saturate(140%)',
@@ -144,18 +142,24 @@ export function EditProfileSheet({
                 aria-label="Fechar"
                 className="grid h-9 w-9 place-items-center rounded-full transition-colors active:scale-95"
                 style={{
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(255,255,255,0.10)',
+                  background: 'var(--edit-sheet-btn-bg)',
+                  border: '1px solid var(--edit-sheet-btn-border)',
                 }}
               >
-                <X size={18} className="text-white/85" />
+                <X size={18} style={{ color: 'var(--edit-sheet-fg)', opacity: 0.85 }} />
               </button>
-              <h2 className="text-[15px] font-bold tracking-tight text-white">Editar perfil</h2>
+              <h2
+                className="text-[15px] font-bold tracking-tight"
+                style={{ color: 'var(--edit-sheet-fg)' }}
+              >
+                Editar perfil
+              </h2>
               <button
                 onClick={() => { onSave(draft); onClose(); }}
-                className="rounded-full px-4 py-2 text-[13px] font-semibold text-white transition-transform active:scale-[0.97]"
+                className="rounded-full px-4 py-2 text-[13px] font-semibold transition-transform active:scale-[0.97]"
                 style={{
                   backgroundImage: 'linear-gradient(135deg, #FF4FA3 0%, #B13CFF 100%)',
+                  color: '#fff',
                   boxShadow:
                     '0 10px 24px -10px color-mix(in oklab, var(--brand-pink) 70%, transparent), inset 0 1px 0 rgba(255,255,255,0.22)',
                 }}
@@ -182,11 +186,11 @@ export function EditProfileSheet({
                         className="group relative aspect-[3/4] overflow-hidden rounded-2xl transition-all"
                         style={{
                           background: url
-                            ? 'rgba(255,255,255,0.04)'
-                            : 'linear-gradient(160deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.01) 100%)',
+                            ? 'var(--edit-sheet-photo-bg-filled)'
+                            : 'var(--edit-sheet-photo-bg-empty)',
                           border: url
-                            ? '1px solid rgba(255,255,255,0.10)'
-                            : '1px dashed rgba(255,255,255,0.12)',
+                            ? '1px solid var(--edit-sheet-photo-border-filled)'
+                            : 'var(--edit-sheet-photo-border-empty)',
                           boxShadow: url ? '0 6px 16px -10px rgba(0,0,0,0.6)' : 'none',
                         }}
                       >
@@ -196,8 +200,7 @@ export function EditProfileSheet({
                             <div
                               className="pointer-events-none absolute inset-x-0 top-0 h-12"
                               style={{
-                                background:
-                                  'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 100%)',
+                                background: 'var(--edit-sheet-overlay-top)',
                               }}
                             />
                             {isPrimary && (
@@ -218,8 +221,8 @@ export function EditProfileSheet({
                               disabled={photoBusy}
                               className="absolute right-1.5 top-1.5 grid h-7 w-7 place-items-center rounded-full backdrop-blur-md disabled:opacity-60"
                               style={{
-                                background: 'rgba(0,0,0,0.55)',
-                                border: '1px solid rgba(255,255,255,0.14)',
+                                background: 'var(--edit-sheet-remove-bg)',
+                                border: '1px solid var(--edit-sheet-btn-border)',
                               }}
                               aria-label="Remover"
                             >
@@ -235,12 +238,12 @@ export function EditProfileSheet({
                             <div
                               className="grid h-9 w-9 place-items-center rounded-full transition-transform group-hover:scale-105"
                               style={{
-                                background: 'rgba(255,255,255,0.06)',
-                                border: '1px solid rgba(255,255,255,0.14)',
+                                background: 'var(--edit-sheet-btn-bg)',
+                                border: '1px solid var(--edit-sheet-btn-border)',
                                 backdropFilter: 'blur(8px)',
                               }}
                             >
-                              <Plus size={16} className="text-white/80" strokeWidth={2.4} />
+                              <Plus size={16} style={{ color: 'var(--edit-sheet-fg)', opacity: 0.8 }} strokeWidth={2.4} />
                             </div>
                           </button>
                         )}
@@ -248,20 +251,14 @@ export function EditProfileSheet({
                     );
                   })}
                 </div>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  className="hidden"
-                  onChange={(e) => e.target.files && addPhotos(e.target.files)}
-                />
                 <button
                   onClick={() => fileRef.current?.click()}
-                  className="mt-3.5 inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13px] font-semibold text-white/90 transition-colors active:scale-[0.98]"
+                  className="mt-3.5 inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13px] font-semibold transition-colors active:scale-[0.98]"
                   style={{
-                    background: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.10)',
+                    background: 'var(--edit-sheet-btn-bg)',
+                    border: '1px solid var(--edit-sheet-btn-border)',
+                    color: 'var(--edit-sheet-fg)',
+                    opacity: 0.9,
                   }}
                 >
                   <Camera size={14} className="text-flame" /> Carregar fotos
@@ -290,7 +287,10 @@ export function EditProfileSheet({
                   onChange={(e) => setDraft(d => ({ ...d, bio: e.target.value.slice(0, 500) }))}
                   rows={4}
                   placeholder="Conta algo sobre ti..."
-                  className="hunie-input w-full resize-none p-4 text-[14px] leading-relaxed text-white outline-none placeholder:text-white/30"
+                  className="hunie-input w-full resize-none p-4 text-[14px] leading-relaxed outline-none"
+                  style={{
+                    color: 'var(--edit-sheet-fg)',
+                  }}
                 />
               </section>
 
@@ -316,9 +316,10 @@ export function EditProfileSheet({
                                   '0 8px 18px -8px color-mix(in oklab, var(--brand-pink) 70%, transparent), inset 0 1px 0 rgba(255,255,255,0.22)',
                               }
                             : {
-                                background: 'rgba(255,255,255,0.05)',
-                                color: 'rgba(255,255,255,0.85)',
-                                border: '1px solid rgba(255,255,255,0.10)',
+                                background: 'var(--edit-sheet-btn-bg)',
+                                color: 'var(--edit-sheet-fg)',
+                                border: '1px solid var(--edit-sheet-btn-border)',
+                                opacity: 0.85,
                               }
                         }
                       >
@@ -329,7 +330,7 @@ export function EditProfileSheet({
                 </div>
               </section>
             </div>
-          </motion.div>
+          </motion.section>
         </>
       )}
     </AnimatePresence>
@@ -339,11 +340,16 @@ export function EditProfileSheet({
 function SectionHeader({ title, hint }: { title: string; hint?: string }) {
   return (
     <div className="mb-3 flex items-baseline justify-between">
-      <h3 className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/45">
+      <h3
+        className="text-[11px] font-bold uppercase tracking-[0.14em]"
+        style={{ color: 'var(--edit-sheet-fg-muted)', opacity: 0.75 }}
+      >
         {title}
       </h3>
       {hint && (
-        <span className="text-[11px] font-medium text-white/40">{hint}</span>
+        <span className="text-[11px] font-medium" style={{ color: 'var(--edit-sheet-fg-dim)' }}>
+          {hint}
+        </span>
       )}
     </div>
   );
@@ -354,14 +360,18 @@ function Field({
 }: { label: string; value: string; onChange: (v: string) => void; type?: string }) {
   return (
     <label className="block">
-      <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/45">
+      <span
+        className="text-[11px] font-bold uppercase tracking-[0.14em]"
+        style={{ color: 'var(--edit-sheet-fg-muted)', opacity: 0.75 }}
+      >
         {label}
       </span>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="hunie-input mt-2 w-full px-4 py-3 text-[14px] text-white outline-none placeholder:text-white/30"
+        className="hunie-input mt-2 w-full px-4 py-3 text-[14px] outline-none"
+        style={{ color: 'var(--edit-sheet-fg)' }}
       />
     </label>
   );
