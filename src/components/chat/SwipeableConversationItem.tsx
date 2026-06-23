@@ -65,6 +65,7 @@ export function SwipeableConversationItem({
   unread = 0,
   onActionTaken,
   isNew = false,
+  mountDelay = 0,
 }: Props) {
   const reduced = useReducedMotion();
   const x = useMotionValue(0);
