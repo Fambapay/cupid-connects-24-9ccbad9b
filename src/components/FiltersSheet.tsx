@@ -64,6 +64,9 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
   const [local, setLocal] = useState<DiscoveryFilters>(value);
 
   useEffect(() => { if (open) setLocal(value); }, [open, value]);
+  // iOS-style card rise on the page behind while the sheet is open.
+  useCardRise(open);
+
 
   const update = <K extends keyof DiscoveryFilters>(k: K, v: DiscoveryFilters[K]) => {
     hapticTap();
