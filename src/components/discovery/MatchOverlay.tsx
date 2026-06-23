@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Heart, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { signPhoto } from "@/lib/photos";
+import { match as matchMotion, spring } from "@/lib/motion";
+import { Stagger, StaggerItem, PressableScale } from "@/components/motion";
 
 const ROSE = "#FF5C8A";
 const PLUM = "#9B5BFF";
