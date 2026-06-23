@@ -1385,7 +1385,7 @@ function PhotosStep({
 }: {
   onNext: () => void;
   photos: PhotoRow[];
-  upload: (file: File) => Promise<void>;
+  upload: (file: File, opts?: { position?: number }) => Promise<void>;
   remove: (id: string) => Promise<void>;
   loading: boolean;
 }) {
