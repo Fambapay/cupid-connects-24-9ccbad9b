@@ -59,10 +59,20 @@ const StackCard = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
+  const reduceMotion = useReducedMotion();
   const apply = useCallback(() => {
     rafRef.current = null;
     const el = ref.current;
     if (!el) return;
+    // Reduced motion: no scale promotion / parallax follow — keep static pose.
+    if (reduceMotion) {
+      if (stackIndex === 1) {
+        el.style.transform = `translate3d(0,10px,0) scale(0.94)`;
+      } else {
+        el.style.transform = `translate3d(0,20px,0) scale(0.88)`;
+      }
+      return;
+    }
     const dx = topX.get();
     const dy = topY.get();
     const w = getVW();
@@ -79,7 +89,7 @@ const StackCard = ({
       const ty2 = 20 - progress * 6;
       el.style.transform = `translate3d(${tx2.toFixed(2)}px,${ty2}px,0) scale(${scale2.toFixed(3)})`;
     }
-  }, [stackIndex, topX, topY]);
+  }, [stackIndex, topX, topY, reduceMotion]);
 
   const schedule = useCallback(() => {
     if (rafRef.current != null) return;
