@@ -136,6 +136,7 @@ function ChatRoom() {
       window.removeEventListener("resize", setKb);
       window.removeEventListener("scroll", setKb);
       root.style.removeProperty("--chat-kb");
+      root.style.removeProperty("--chat-vh");
       document.body.style.overflow = prevBody;
       document.documentElement.style.overflow = prevHtml;
     };
