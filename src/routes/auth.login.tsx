@@ -107,9 +107,9 @@ function LoginPage() {
       </button>
 
       <div className="flex items-center gap-3 py-4">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white/15" />
+        <div className="h-px flex-1 bg-gradient-to-r from-transparent to-foreground/15" />
         <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">ou com email</span>
-        <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/15" />
+        <div className="h-px flex-1 bg-gradient-to-l from-transparent to-foreground/15" />
       </div>
 
       <form onSubmit={submit} className="space-y-4">
