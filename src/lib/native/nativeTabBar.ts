@@ -1,6 +1,5 @@
-import { registerPlugin } from '@capacitor/core'
+import { registerPlugin, Capacitor } from '@capacitor/core'
 import type { PluginListenerHandle } from '@capacitor/core'
-import { getPlatform } from './platform'
 
 /**
  * NativeTabBar — bridges to the native iOS Capacitor plugin that renders a
