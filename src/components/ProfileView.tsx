@@ -94,7 +94,6 @@ export function ProfileView({
       className="relative min-h-full pb-32"
       style={{
         background: 'var(--background)',
-        paddingTop: 'max(env(safe-area-inset-top), 16px)',
       }}
     >
       {/* Soft gradient backdrop */}
