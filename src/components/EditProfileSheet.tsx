@@ -104,7 +104,7 @@ export function EditProfileSheet({
               background: 'var(--edit-sheet-bg)',
               borderTop: '1px solid var(--edit-sheet-border)',
               boxShadow:
-                '0 -20px 60px -10px rgba(255,79,163,0.25), 0 -2px 0 rgba(255,255,255,0.04) inset',
+                '0 -20px 60px -10px rgba(0,0,0,0.10), 0 -2px 0 rgba(255,255,255,0.04) inset',
               backdropFilter: 'blur(30px) saturate(140%)',
             }}
             initial={{ y: '100%' }}
@@ -112,16 +112,6 @@ export function EditProfileSheet({
             exit={{ y: '100%' }}
             transition={{ type: 'spring', stiffness: 380, damping: 38 }}
           >
-            {/* Top ambient glow */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute left-1/2 top-0 h-[260px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full"
-              style={{
-                background:
-                  'radial-gradient(closest-side, color-mix(in oklab, var(--brand-pink) 22%, transparent) 0%, transparent 70%)',
-                filter: 'blur(24px)',
-              }}
-            />
 
             {/* Handle */}
             <div className="relative shrink-0 flex flex-col items-center pb-1 pt-3">
