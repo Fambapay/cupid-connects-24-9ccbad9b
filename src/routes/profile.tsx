@@ -114,7 +114,7 @@ function ProfilePage() {
   }, []);
 
   return (
-    <div className="min-h-[100dvh] bg-background">
+    <AppShell>
       <ProfileView
         profile={view}
         superLikeBalance={credits.super_like_balance}
@@ -142,7 +142,6 @@ function ProfilePage() {
           reload();
         }}
       />
-      <BottomNav />
-    </div>
+    </AppShell>
   );
 }
