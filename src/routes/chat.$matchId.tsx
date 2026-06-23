@@ -118,6 +118,7 @@ function ChatRoom() {
       const vH = vv ? vv.height : winH;
       const keyboardInset = Math.max(0, winH - vH);
       root.style.setProperty("--chat-kb", `${keyboardInset}px`);
+      root.style.setProperty("--chat-vh", `${vH}px`);
       if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0);
     };
     setKb();
