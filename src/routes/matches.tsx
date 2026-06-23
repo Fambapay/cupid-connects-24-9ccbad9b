@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { AppShell, TopBar } from "@/components/AppShell";
 import { useLikedMe } from "@/hooks/useLikedMe";
 import { useSubscription } from "@/hooks/useSubscription";
+import { Stagger, StaggerItem, PressableScale } from "@/components/motion";
 
 import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
 
