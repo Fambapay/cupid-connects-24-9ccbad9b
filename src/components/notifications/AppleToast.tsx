@@ -74,8 +74,9 @@ function AppleToastBase({
               <img
                 src={avatar || flameIcon}
                 alt=""
-                loading="lazy"
-                decoding="async"
+                loading="eager"
+                decoding="sync"
+                fetchPriority="high"
                 draggable={false}
                 className="h-full w-full object-cover"
               />
