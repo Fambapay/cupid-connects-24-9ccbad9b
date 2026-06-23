@@ -32,9 +32,9 @@ export function AppShell({
   );
 }
 
-export function TopBar({ title }: { title: string }) {
+export function TopBar({ title, className }: { title: string; className?: string }) {
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between bg-background px-5 py-4">
+    <header className={cn("sticky top-0 z-30 flex items-center justify-between bg-[var(--profile-bg)] px-5 py-4", className)}>
       <h1 className="text-2xl tracking-tight" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900 }}>
         <span className="text-foreground">{title}</span>
       </h1>
