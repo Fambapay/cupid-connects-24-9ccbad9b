@@ -64,7 +64,7 @@ export function MatchOverlay({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.28, ease: APPLE_EASE }}
-          className="fixed inset-0 z-[60] flex flex-col items-center justify-center px-7"
+          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center px-7"
           onClick={onClose}
           style={{
             paddingTop: "max(env(safe-area-inset-top), 24px)",
