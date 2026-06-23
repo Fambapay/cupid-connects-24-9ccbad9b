@@ -113,10 +113,23 @@ function LandingGate() {
 
   useEffect(() => {
     let cancelled = false;
+    const isStandalone =
+      typeof window !== "undefined" &&
+      (window.matchMedia?.("(display-mode: standalone)").matches ||
+        // iOS Safari legacy
+        (window.navigator as any).standalone === true);
+
     supabase.auth.getSession().then(({ data }) => {
       if (cancelled) return;
       const session = data.session;
-      if (!session) { setReady(true); return; }
+      if (!session) {
+        if (isStandalone) {
+          navigate({ to: "/auth/login", replace: true });
+          return;
+        }
+        setReady(true);
+        return;
+      }
       (async () => {
         if (!session.user.email_confirmed_at) {
           navigate({ to: "/auth/verify-email", replace: true });
@@ -137,6 +150,7 @@ function LandingGate() {
     });
     return () => { cancelled = true; };
   }, [navigate]);
+
 
   if (!ready) return <Splash />;
   return <Landing />;
