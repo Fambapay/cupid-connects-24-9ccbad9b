@@ -1,8 +1,6 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
-import { useForceDarkTheme } from '@/lib/theme';
 
 function AuthLayout() {
-  useForceDarkTheme();
   return <Outlet />;
 }
 

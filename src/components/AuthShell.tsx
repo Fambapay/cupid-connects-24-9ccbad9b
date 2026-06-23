@@ -15,7 +15,7 @@ export function AuthShell({
   footer?: ReactNode;
 }) {
   return (
-    <div className="relative min-h-[100dvh] overflow-hidden bg-background text-foreground">
+    <div className="relative min-h-[100dvh] overflow-hidden text-foreground" style={{ background: 'var(--profile-bg)' }}>
       {/* Aurora + animated blobs — fixed so they cover the full device viewport (incl. safe-area zones) */}
       <div aria-hidden className="pointer-events-none fixed inset-0 bg-aurora opacity-80" />
       <motion.div
