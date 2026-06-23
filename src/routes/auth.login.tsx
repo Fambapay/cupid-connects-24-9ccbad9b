@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthShell } from "@/components/AuthShell";
 import { redirectIfAuthenticated } from "@/lib/authGuard";
+import { useForceDarkTheme } from "@/lib/theme";
 
 export const Route = createFileRoute("/auth/login")({
   ssr: false,

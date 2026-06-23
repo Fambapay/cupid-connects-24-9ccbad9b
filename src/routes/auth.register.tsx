@@ -9,6 +9,7 @@ import { AuthShell } from "@/components/AuthShell";
 import { cn } from "@/lib/utils";
 import { redirectIfAuthenticated } from "@/lib/authGuard";
 import { sendTransactionalEmail } from "@/lib/email/send";
+import { useForceDarkTheme } from "@/lib/theme";
 
 export const Route = createFileRoute("/auth/register")({
   ssr: false,
