@@ -261,8 +261,8 @@ function ChatRoom() {
       className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none"
       style={{
         height: "var(--chat-vh, 100dvh)",
-        background: "#121212",
-        color: "#fff",
+        background: "var(--chat-bg)",
+        color: "var(--chat-fg)",
       }}
     >
       <header className="relative z-10 shrink-0">
@@ -270,14 +270,14 @@ function ChatRoom() {
           <Link
             to="/chat"
             aria-label="Voltar"
-            className="grid h-10 w-10 place-items-center rounded-full text-white active:scale-95"
+            className="grid h-10 w-10 place-items-center rounded-full active:scale-95"
             style={{
-              background: "rgba(255,255,255,0.08)",
+              color: "var(--chat-fg)",
+              background: "var(--chat-glass-bg)",
               backdropFilter: "blur(20px) saturate(180%)",
               WebkitBackdropFilter: "blur(20px) saturate(180%)",
-              border: "1px solid rgba(255,255,255,0.14)",
-              boxShadow:
-                "inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.25), 0 6px 18px rgba(0,0,0,0.35)",
+              border: "1px solid var(--chat-glass-border)",
+              boxShadow: "var(--chat-glass-shadow)",
             }}
           >
             <ChevronLeft className="h-5 w-5" />
@@ -297,7 +297,10 @@ function ChatRoom() {
                   <div className="h-full w-full bg-gradient-flame" />
                 )}
               </div>
-              <span className="absolute -bottom-0.5 -right-0.5 grid h-3.5 w-3.5 place-items-center rounded-full bg-black">
+              <span
+                className="absolute -bottom-0.5 -right-0.5 grid h-3.5 w-3.5 place-items-center rounded-full"
+                style={{ background: "var(--chat-bg)" }}
+              >
                 <span
                   className="h-2.5 w-2.5 rounded-full"
                   style={{ background: activity?.dot ?? "#6b6f76" }}
@@ -305,16 +308,16 @@ function ChatRoom() {
               </span>
             </div>
             <div
-              className="rounded-full px-4 py-1.5 text-[15px] text-white"
+              className="rounded-full px-4 py-1.5 text-[15px]"
               style={{
                 fontFamily: "'Montserrat', sans-serif",
                 fontWeight: 600,
-                background: "rgba(255,255,255,0.08)",
+                color: "var(--chat-fg)",
+                background: "var(--chat-glass-bg)",
                 backdropFilter: "blur(20px) saturate(180%)",
                 WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                border: "1px solid rgba(255,255,255,0.14)",
-                boxShadow:
-                  "inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.25), 0 6px 18px rgba(0,0,0,0.35)",
+                border: "1px solid var(--chat-glass-border)",
+                boxShadow: "var(--chat-glass-shadow)",
               }}
             >
               {peer.name}
@@ -324,18 +327,19 @@ function ChatRoom() {
           <div
             className="grid h-10 w-10 place-items-center rounded-full"
             style={{
-              background: "rgba(255,255,255,0.08)",
+              color: "var(--chat-fg)",
+              background: "var(--chat-glass-bg)",
               backdropFilter: "blur(20px) saturate(180%)",
               WebkitBackdropFilter: "blur(20px) saturate(180%)",
-              border: "1px solid rgba(255,255,255,0.14)",
-              boxShadow:
-                "inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.25), 0 6px 18px rgba(0,0,0,0.35)",
+              border: "1px solid var(--chat-glass-border)",
+              boxShadow: "var(--chat-glass-shadow)",
             }}
           >
             <ChatActionsMenu matchId={matchId} otherUserId={peer.id} otherName={peer.name} />
           </div>
         </div>
       </header>
+
 
 
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3" style={{ WebkitOverflowScrolling: "touch", contain: "layout paint" }}>
