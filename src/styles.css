@@ -149,9 +149,12 @@
   }
   html, body, #root {
     height: 100%;
+    /* Background comes from the native window (UIGlassEffect / system),
+       not from the HTML. Keep the document fully transparent so the
+       native layer is visible through the WebView. */
+    background: transparent;
   }
   body {
-    background: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -162,6 +165,27 @@
     font-weight: 800;
     letter-spacing: -0.03em;
   }
+}
+
+/* Bottom-nav reserved zone (pill height + outer padding + safe-area + breathing room). */
+:root {
+  --nav-zone: calc(56px + 16px + env(safe-area-inset-bottom, 0px) + 24px);
+}
+
+/* Per-screen scroll container: fades to transparent over the nav zone,
+   so the native Liquid Glass behind the WebView reads through cleanly. */
+.screen-scroll {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 calc(100% - var(--nav-zone)),
+    transparent 100%
+  );
+          mask-image: linear-gradient(
+    to bottom,
+    #000 calc(100% - var(--nav-zone)),
+    transparent 100%
+  );
+  padding-bottom: var(--nav-zone);
 }
 
 @utility bg-gradient-sunset {
