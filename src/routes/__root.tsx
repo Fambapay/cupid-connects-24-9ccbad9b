@@ -15,6 +15,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { useNewMessageNotifier } from "@/hooks/useNewMessageNotifier";
+import { useProfileExistenceGuard } from "@/hooks/useProfileExistenceGuard";
 import { useHeartbeat } from "@/hooks/useHeartbeat";
 import { PushPermissionPrompt } from "@/components/PushPermissionPrompt";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +40,7 @@ function NativeBoot() {
 function GlobalNotifiers() {
   useNewMessageNotifier();
   useHeartbeat();
+  useProfileExistenceGuard();
   return null;
 }
 
