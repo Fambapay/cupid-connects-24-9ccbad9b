@@ -21,6 +21,7 @@ export const Route = createFileRoute("/auth/register")({
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function RegisterPage() {
+  useForceDarkTheme();
   const { signUp, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
 

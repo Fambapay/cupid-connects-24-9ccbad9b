@@ -18,6 +18,7 @@ export const Route = createFileRoute("/auth/login")({
 });
 
 function LoginPage() {
+  useForceDarkTheme();
   const { signInWithPassword, signInWithGoogle } = useAuth();
   const router = useRouter();
   const navigate = useNavigate();

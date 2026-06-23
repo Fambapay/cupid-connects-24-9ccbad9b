@@ -17,6 +17,7 @@ export const Route = createFileRoute("/reset-password")({
 });
 
 function ResetPasswordPage() {
+  useForceDarkTheme();
   const { updatePassword } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();

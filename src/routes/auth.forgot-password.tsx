@@ -15,6 +15,7 @@ export const Route = createFileRoute("/auth/forgot-password")({
 });
 
 function ForgotPage() {
+  useForceDarkTheme();
   const { resetPasswordForEmail } = useAuth();
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);

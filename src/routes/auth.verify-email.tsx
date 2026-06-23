@@ -16,6 +16,7 @@ export const Route = createFileRoute("/auth/verify-email")({
 });
 
 function VerifyEmail() {
+  useForceDarkTheme();
   const { email: searchEmail } = Route.useSearch();
   const navigate = useNavigate();
   const [email, setEmail] = useState<string | undefined>(searchEmail);
