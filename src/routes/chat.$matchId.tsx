@@ -493,10 +493,10 @@ function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, show
       <div className={`flex w-fit max-w-[78%] flex-col ${me ? "ml-auto items-end" : "items-start"}`}>
         <div
           className="px-4 py-2.5 text-[15px] font-normal leading-snug break-words whitespace-pre-wrap rounded-[22px]"
-          style={
+      style={
             me
               ? { background: "#F3E7DD", color: "#0a0a0a", fontWeight: 400 }
-              : { background: "#000", color: "#fff", border: "1px solid rgba(255,255,255,0.06)", fontWeight: 400 }
+              : { background: "#0a0a0a", color: "#fff", border: "1px solid rgba(255,255,255,0.08)", fontWeight: 400 }
           }
         >
           {msg.content}
