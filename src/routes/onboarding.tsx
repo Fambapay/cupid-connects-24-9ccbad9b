@@ -1397,8 +1397,13 @@ function PhotosStep({
 
   const handleFile = async (file: File, replaceId?: string) => {
     try {
-      if (replaceId) await remove(replaceId);
-      await upload(file);
+      let targetPos: number | undefined;
+      if (replaceId) {
+        const existing = photos.find((p) => p.id === replaceId);
+        targetPos = existing?.position;
+        await remove(replaceId);
+      }
+      await upload(file, targetPos !== undefined ? { position: targetPos } : undefined);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Falha no upload";
       toast({ title: "Erro", description: msg, variant: "destructive" });
