@@ -433,14 +433,39 @@ function OnboardingPage() {
 
   return (
     <div className="relative min-h-[100dvh] overflow-hidden bg-background text-foreground">
-      {/* Ambient brand glow — refined Apple-style: subtle warm aurora, not loud */}
-      <div
-        className="pointer-events-none fixed inset-0"
-        style={{
-          background:
-            "radial-gradient(120% 70% at 50% 0%, rgba(255,92,138,0.18) 0%, rgba(155,91,255,0.10) 35%, transparent 70%), radial-gradient(80% 60% at 50% 100%, rgba(255,140,90,0.10) 0%, transparent 60%)",
-        }}
-      />
+      {/* Animated aurora — drifting brand blobs */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <motion.div
+          className="absolute -top-[20%] -left-[15%] h-[70vh] w-[70vh] rounded-full"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(255,92,138,0.38) 0%, rgba(255,92,138,0) 65%)",
+            filter: "blur(40px)",
+          }}
+          animate={{ x: [0, 60, -20, 0], y: [0, 40, 20, 0], scale: [1, 1.15, 0.95, 1] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -top-[10%] -right-[20%] h-[80vh] w-[80vh] rounded-full"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(155,91,255,0.32) 0%, rgba(155,91,255,0) 65%)",
+            filter: "blur(50px)",
+          }}
+          animate={{ x: [0, -50, 30, 0], y: [0, 60, -10, 0], scale: [1, 1.1, 1.05, 1] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -bottom-[20%] left-[10%] h-[60vh] w-[60vh] rounded-full"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(233,53,160,0.26) 0%, rgba(233,53,160,0) 65%)",
+            filter: "blur(45px)",
+          }}
+          animate={{ x: [0, 80, -40, 0], y: [0, -40, 30, 0], scale: [1, 1.2, 0.9, 1] }}
+          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
       <div
         className="pointer-events-none fixed inset-0 opacity-[0.4]"
         style={{
