@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Link } from "@tanstack/react-router";
-import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+import { motion, useMotionValue, useTransform, animate, useReducedMotion } from "framer-motion";
+import { spring, chat as chatMotion } from "@/lib/motion";
 import { Flag, HeartCrack } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "@/hooks/use-toast";
