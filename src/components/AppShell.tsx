@@ -1,14 +1,17 @@
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 import { BottomNav } from "./BottomNav";
 
 export function AppShell({
   children,
   hideNav = false,
   fullHeight = false,
+  className,
 }: {
   children: ReactNode;
   hideNav?: boolean;
   fullHeight?: boolean;
+  className?: string;
 }) {
   return (
     <div className="relative min-h-[100lvh] bg-background text-foreground">

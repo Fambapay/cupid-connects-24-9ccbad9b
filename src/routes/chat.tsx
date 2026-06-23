@@ -33,7 +33,7 @@ function ChatList() {
   const conversations = matches.filter((m) => m.hasMessages);
 
   return (
-    <AppShell>
+    <AppShell className="bg-[var(--profile-bg)]">
       <header className="sticky top-0 z-30 flex items-center justify-between bg-background px-5 py-4">
         <h1
           className="text-2xl tracking-tight text-foreground"

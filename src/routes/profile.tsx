@@ -114,7 +114,7 @@ function ProfilePage() {
   }, []);
 
   return (
-    <AppShell>
+    <AppShell className="bg-[var(--profile-bg)]">
       <ProfileView
         profile={view}
         superLikeBalance={credits.super_like_balance}
