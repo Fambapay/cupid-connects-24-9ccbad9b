@@ -62,12 +62,12 @@
 @keyframes ll-drift-3 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(8vmax,-10vmax) scale(0.95); } }
 
 /* ---------- Content layer ---------- */
-.ll-shell { position: relative; z-index: 1; }
-.ll-container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 22px; }
-@media (min-width: 820px) { .ll-container { padding: 0 36px; } }
+.ll-shell { position: relative; z-index: 1; padding-top: env(safe-area-inset-top, 0px); }
+.ll-container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 22px; padding-left: max(22px, env(safe-area-inset-left, 0px)); padding-right: max(22px, env(safe-area-inset-right, 0px)); }
+@media (min-width: 820px) { .ll-container { padding-left: max(36px, env(safe-area-inset-left, 0px)); padding-right: max(36px, env(safe-area-inset-right, 0px)); } }
 
 /* ---------- Nav (editorial masthead) ---------- */
-.ll-nav { position: sticky; top: 14px; z-index: 50; padding: 0 14px; }
+.ll-nav { position: sticky; top: calc(14px + env(safe-area-inset-top, 0px)); z-index: 50; padding: 0 14px; padding-left: max(14px, env(safe-area-inset-left, 0px)); padding-right: max(14px, env(safe-area-inset-right, 0px)); }
 .ll-nav-inner {
   max-width: 1180px; margin: 0 auto;
   display: flex; align-items: center; justify-content: space-between;
