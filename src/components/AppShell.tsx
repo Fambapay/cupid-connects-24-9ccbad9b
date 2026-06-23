@@ -18,11 +18,11 @@ export function AppShell({
         style={{ contain: "strict" }}
       />
       {fullHeight ? (
-        <div className="mx-auto flex h-full max-w-md flex-col pt-[env(safe-area-inset-top)] pb-[calc(env(safe-area-inset-bottom)+80px)]">
+        <div className="screen-scroll mx-auto flex h-full max-w-md flex-col pt-[env(safe-area-inset-top)]">
           {children}
         </div>
       ) : (
-        <div className="mx-auto h-full max-w-md overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+5rem)] pt-[env(safe-area-inset-top)]">{children}</div>
+        <div className="screen-scroll mx-auto h-full max-w-md overflow-y-auto pt-[env(safe-area-inset-top)]">{children}</div>
       )}
       {!hideNav && <BottomNav />}
     </div>
