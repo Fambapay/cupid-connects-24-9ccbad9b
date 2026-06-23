@@ -188,8 +188,8 @@ function ShopPage() {
               style={{
                 background:
                   tab === "boost"
-                    ? "linear-gradient(160deg, rgba(168,85,247,0.22), rgba(20,20,30,0.6))"
-                    : "linear-gradient(160deg, rgba(56,189,248,0.22), rgba(20,20,30,0.6))",
+                    ? "linear-gradient(160deg, rgba(168,85,247,0.22), var(--card))"
+                    : "linear-gradient(160deg, rgba(56,189,248,0.22), var(--card))",
               }}
             >
               <div
