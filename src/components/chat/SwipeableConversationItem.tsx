@@ -311,6 +311,6 @@ export function SwipeableConversationItem({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </li>
+    </motion.li>
   );
 }
