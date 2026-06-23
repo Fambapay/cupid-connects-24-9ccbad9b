@@ -508,7 +508,7 @@ function OnboardingPage() {
               style={{ background: "rgba(255,255,255,0.08)" }}
             >
               <motion.div
-                className="h-full rounded-full"
+                className="relative h-full rounded-full"
                 style={{
                   background:
                     "linear-gradient(90deg, #FFFFFF 0%, #FFD6E4 50%, #FF5C8A 100%)",
@@ -516,8 +516,19 @@ function OnboardingPage() {
                 }}
                 initial={false}
                 animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-              />
+                transition={{ type: "spring", stiffness: 180, damping: 24 }}
+              >
+                <motion.span
+                  aria-hidden
+                  className="absolute inset-y-0 w-1/3 rounded-full"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent)",
+                  }}
+                  animate={{ x: ["-100%", "300%"] }}
+                  transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                />
+              </motion.div>
             </div>
           )}
           <div className="h-9 w-9" />
