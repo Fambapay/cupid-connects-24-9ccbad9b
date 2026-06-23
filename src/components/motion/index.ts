@@ -6,6 +6,7 @@ export { Stagger, StaggerItem } from "./Stagger";
 export type { StaggerProps, StaggerItemProps } from "./Stagger";
 export { Sheet } from "./Sheet";
 export type { SheetProps } from "./Sheet";
+export { useCardRise } from "./useCardRise";
 export { PageTransition } from "./PageTransition";
 export type { PageTransitionProps } from "./PageTransition";
 export { RouteTransition } from "./RouteTransition";
