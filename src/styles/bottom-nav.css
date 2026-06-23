@@ -76,13 +76,27 @@
   display: none !important;
 }
 
-/* ── Native glass mode: make html/body transparent so UIGlassEffect (sitting
-   BEHIND the WebView) is actually visible. Without this, the body's solid
-   background paints on top of the native glass and the effect never shows.
-   Individual pages/cards keep their own backgrounds, so only the strip behind
-   the transparent pill reveals the native blur. ─────────────────────────── */
-html.native-glass-active,
-html.native-glass-active body {
+/* ── Native glass mode: punch a TRANSPARENT HOLE in the page-content layer
+   so the UIGlassEffect (sitting BEHIND the WebView) becomes visible inside
+   the pill area. We use an SVG mask whose <rect fill="black"> tracks the
+   pill's bounding rect (managed in BottomNav.tsx).
+
+   The BottomNav itself is portaled to <body> (sibling of #hunie-app-root),
+   so the mask does NOT clip the nav's icons — they render normally on top
+   of the native glass. Page backgrounds get transparency only inside the
+   pill rect; the rest of the page renders unchanged. ──────────────────── */
+html.native-glass-mask #hunie-app-root {
+  -webkit-mask-image: url("#hunie-pill-hole");
+          mask-image: url("#hunie-pill-hole");
+  -webkit-mask-mode: alpha;
+          mask-mode: alpha;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+}
+
+/* Ensure html/body don't paint solid over the hole either. */
+html.native-glass-mask,
+html.native-glass-mask body {
   background: transparent !important;
 }
 

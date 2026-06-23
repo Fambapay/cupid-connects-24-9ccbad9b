@@ -191,7 +191,16 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <CountryProvider>
         <NativeBoot />
-        <Outlet />
+        {/* Everything inside #hunie-app-root is the "page content" layer.
+            When native Liquid Glass is active, a CSS mask punches a
+            transparent hole at the pill's rect so the UIGlassEffect
+            sitting BEHIND the WKWebView becomes visible. The BottomNav
+            itself is portaled to <body> (see BottomNav.tsx) so it lives
+            OUTSIDE this masked subtree — otherwise the mask would also
+            clip the nav's icons. */}
+        <div id="hunie-app-root">
+          <Outlet />
+        </div>
         <GlobalNotifiers />
         <PushPromptGate />
         <Toaster position="top-center" richColors />
