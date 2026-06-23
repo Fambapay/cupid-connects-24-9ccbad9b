@@ -260,8 +260,7 @@ function ChatRoom() {
     <div
       className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none"
       style={{
-        height: "100dvh",
-        paddingBottom: "var(--chat-kb, 0px)",
+        height: "var(--chat-vh, 100dvh)",
         background: "#000",
         color: "#fff",
       }}
