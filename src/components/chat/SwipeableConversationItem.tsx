@@ -184,7 +184,7 @@ export function SwipeableConversationItem({
           to="/chat/$matchId"
           params={{ matchId }}
           onClick={handleRowClick}
-          className="flex items-center gap-3.5 border-b border-border bg-background px-1 py-3 active:bg-muted"
+          className="flex items-center gap-3.5 border-b border-border px-1 py-3 active:bg-muted"
         >
           <div className="relative h-[62px] w-[62px] shrink-0">
             <div className="h-full w-full overflow-hidden rounded-full">
