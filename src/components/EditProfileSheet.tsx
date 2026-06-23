@@ -126,7 +126,7 @@ export function EditProfileSheet({
             </div>
 
             {/* Header */}
-            <div className="relative shrink-0 flex items-center justify-between px-5 pb-3 pt-2">
+            <div className="relative shrink-0 grid grid-cols-[auto_1fr_auto] items-center px-5 pb-3 pt-2">
               <button
                 onClick={onClose}
                 aria-label="Fechar"
@@ -139,7 +139,7 @@ export function EditProfileSheet({
                 <X size={18} style={{ color: 'var(--edit-sheet-fg)', opacity: 0.85 }} />
               </button>
               <h2
-                className="text-[15px] font-bold tracking-tight"
+                className="text-[15px] font-bold tracking-tight text-center"
                 style={{ color: 'var(--edit-sheet-fg)' }}
               >
                 Editar perfil
