@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { signPhoto } from "@/lib/photos";
 
 const ROSE = "#FF5C8A";
 const PLUM = "#9B5BFF";
