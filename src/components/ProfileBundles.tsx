@@ -150,10 +150,10 @@ export function ProfileBundles() {
                       <b.Icon size={22} fill={b.accent} stroke="none" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[15px] font-extrabold tracking-tight text-white leading-tight">
+                      <p className="bundle-text-primary text-[15px] font-extrabold tracking-tight text-white leading-tight">
                         {b.title}
                       </p>
-                      <p className="text-[12px] text-white/70 tracking-tight">{b.subtitle}</p>
+                      <p className="bundle-text-secondary text-[12px] text-white/70 tracking-tight">{b.subtitle}</p>
                     </div>
                   </div>
 
@@ -166,7 +166,7 @@ export function ProfileBundles() {
                         >
                           <Check size={9} color="#fff" strokeWidth={4} />
                         </div>
-                        <span className="text-[12px] text-white/85 tracking-tight">{p}</span>
+                        <span className="bundle-text-secondary text-[12px] text-white/85 tracking-tight">{p}</span>
                       </div>
                     ))}
                   </div>
@@ -174,13 +174,14 @@ export function ProfileBundles() {
                   <div className="flex items-end justify-between gap-2">
                     <div className="min-w-0">
                       {original && (
-                        <p className="text-[11px] text-white/40 line-through leading-none">
+                        <p className="bundle-text-muted text-[11px] text-white/40 line-through leading-none">
                           {formatCountryPrice(original, country)}
                         </p>
                       )}
-                      <p className="text-[20px] font-black tracking-tight text-white leading-tight">
+                      <p className="bundle-text-primary text-[20px] font-black tracking-tight text-white leading-tight">
                         {formatCountryPrice(price, country)}
                       </p>
+
                     </div>
                     <div
                       className="rounded-xl px-3.5 py-2 text-[12px] font-extrabold text-white shadow-lg"
