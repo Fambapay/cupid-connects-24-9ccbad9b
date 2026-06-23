@@ -130,10 +130,46 @@ export const BottomNavBase = ({
   // Native Apple Liquid Glass — iOS only. Renders a UIGlassEffect (iOS 26+)
   // or UIVisualEffectView (fallback) BEHIND the WebView, tracking the pill's
   // bounding rect. The CSS pill becomes transparent so the native glass shows.
+  //
+  // CSS MASK HOLE — we also maintain an SVG <mask> with a black rounded-rect
+  // matching the pill, so the page-content layer (#hunie-app-root) gets a
+  // genuinely transparent hole punched through it. Without this, opaque page
+  // backgrounds paint over the native glass and the effect is invisible.
   useEffect(() => {
     if (!useNativeGlass) return;
     const el = pillRef.current;
     if (!el) return;
+
+    // ── SVG mask setup ─────────────────────────────────────────────────
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(SVG_NS, "svg");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("focusable", "false");
+    svg.id = "hunie-pill-mask-svg";
+    svg.style.cssText =
+      "position:fixed;left:0;top:0;width:0;height:0;pointer-events:none;overflow:hidden;";
+    const defs = document.createElementNS(SVG_NS, "defs");
+    const mask = document.createElementNS(SVG_NS, "mask");
+    mask.setAttribute("id", "hunie-pill-hole");
+    mask.setAttribute("maskUnits", "userSpaceOnUse");
+    mask.setAttribute("maskContentUnits", "userSpaceOnUse");
+    mask.setAttribute("x", "0");
+    mask.setAttribute("y", "0");
+    mask.setAttribute("width", String(window.innerWidth));
+    mask.setAttribute("height", String(window.innerHeight));
+    const bg = document.createElementNS(SVG_NS, "rect");
+    bg.setAttribute("x", "0");
+    bg.setAttribute("y", "0");
+    bg.setAttribute("width", "100%");
+    bg.setAttribute("height", "100%");
+    bg.setAttribute("fill", "white"); // visible
+    const hole = document.createElementNS(SVG_NS, "rect");
+    hole.setAttribute("fill", "black"); // transparent hole
+    mask.append(bg, hole);
+    defs.append(mask);
+    svg.append(defs);
+    document.body.appendChild(svg);
+    document.documentElement.classList.add("native-glass-mask");
 
     let raf = 0;
     let burstTimer: number | null = null;
@@ -152,7 +188,18 @@ export const BottomNavBase = ({
         height: round(r.height),
         cornerRadius: round(r.height / 2),
       };
-      // Skip no-op updates to avoid spamming the bridge.
+      // Keep mask viewport in sync (rotation / resize).
+      mask.setAttribute("width", String(window.innerWidth));
+      mask.setAttribute("height", String(window.innerHeight));
+      // Update the rounded-rect hole.
+      hole.setAttribute("x", String(rect.x));
+      hole.setAttribute("y", String(rect.y));
+      hole.setAttribute("width", String(rect.width));
+      hole.setAttribute("height", String(rect.height));
+      hole.setAttribute("rx", String(rect.cornerRadius));
+      hole.setAttribute("ry", String(rect.cornerRadius));
+
+      // Skip no-op native bridge updates.
       const key = `${rect.x}|${rect.y}|${rect.width}|${rect.height}`;
       if (key === lastKey) return;
       lastKey = key;
@@ -169,9 +216,6 @@ export const BottomNavBase = ({
       raf = requestAnimationFrame(syncNow);
     };
 
-    /** safe-area / rotation transitions animate over ~400ms in iOS.
-     *  Run a short rAF-burst so the pill stays glued to the glass the
-     *  whole way through, then stop. */
     const burst = (duration = 600) => {
       const start = performance.now();
       const tick = () => {
@@ -186,34 +230,26 @@ export const BottomNavBase = ({
       burstTimer = requestAnimationFrame(tick) as unknown as number;
     };
 
-    // Initial show (after layout settles)
     schedule();
 
-    // 1) Element-level resize (pill width changes, font load, etc.)
     const ro = new ResizeObserver(schedule);
     ro.observe(el);
 
-    // 2) Window resize / page scroll
     window.addEventListener("resize", schedule);
     window.addEventListener("scroll", schedule, { passive: true });
 
-    // 3) visualViewport — fires for keyboard show/hide, pinch-zoom,
-    //    and (on iOS) for safe-area changes during rotation.
     const vv = window.visualViewport;
     vv?.addEventListener("resize", schedule);
     vv?.addEventListener("scroll", schedule);
 
-    // 4) Rotation — orientationchange is unreliable; matchMedia fires
-    //    reliably and BEFORE the safe-area transition completes, so we
-    //    kick off a burst to track every intermediate frame.
     const portrait = window.matchMedia("(orientation: portrait)");
     const onOrient = () => burst(700);
     portrait.addEventListener?.("change", onOrient);
     window.addEventListener("orientationchange", onOrient);
 
-    // 5) Page becomes visible again (returning from background) — re-sync
-    //    in case the WebView was resized while hidden.
-    const onVisible = () => { if (!document.hidden) burst(400); };
+    const onVisible = () => {
+      if (!document.hidden) burst(400);
+    };
     document.addEventListener("visibilitychange", onVisible);
 
     return () => {
@@ -228,6 +264,8 @@ export const BottomNavBase = ({
       window.removeEventListener("orientationchange", onOrient);
       document.removeEventListener("visibilitychange", onVisible);
       LiquidGlass.hide();
+      svg.remove();
+      document.documentElement.classList.remove("native-glass-mask");
     };
   }, [useNativeGlass]);
 
