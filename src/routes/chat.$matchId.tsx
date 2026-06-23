@@ -252,7 +252,11 @@ function ChatRoom() {
     if (!value) return;
     if (input) input.value = "";
     inputHasTextRef.current = false;
-    inputRef.current?.focus();
+    // Only keep focus if the input was already focused (keyboard open).
+    // Otherwise tapping the send button would re-open the keyboard.
+    if (input && document.activeElement === input) {
+      input.focus();
+    }
     await send(value);
   };
 
