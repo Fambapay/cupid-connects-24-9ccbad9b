@@ -62,7 +62,9 @@ export function SwipeableConversationItem({
   lastMessageAt,
   unread = 0,
   onActionTaken,
+  isNew = false,
 }: Props) {
+  const reduced = useReducedMotion();
   const x = useMotionValue(0);
   const bgOpacity = useTransform(x, [-ACTION_WIDTH, 0], [1, 0]);
   const [open, setOpen] = useState(false);
