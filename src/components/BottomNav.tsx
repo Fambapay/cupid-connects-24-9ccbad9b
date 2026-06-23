@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   motion,
   AnimatePresence,
@@ -8,6 +9,11 @@ import {
   type MotionValue,
 } from "framer-motion";
 import { User, Heart, MessageCircle, Compass, type LucideIcon } from "lucide-react";
+import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
+import { hapticTap } from "@/hooks/useNativePlatform";
+import { useLikesCount } from "@/hooks/useLikesCount";
+import { useUnreadChats } from "@/hooks/useUnreadChats";
+import { LiquidGlass, isLiquidGlassSupported, onLiquidGlassReady } from "@/lib/native/liquidGlass";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { hapticTap } from "@/hooks/useNativePlatform";
 import { useLikesCount } from "@/hooks/useLikesCount";
