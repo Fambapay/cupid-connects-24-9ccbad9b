@@ -10,6 +10,8 @@ interface AppleToastProps {
   body: string;
   avatar?: string;
   avatarPromise?: Promise<string | undefined>;
+  bodyTemplate?: (name: string) => string;
+  namePromise?: Promise<string | undefined>;
   appName?: string;
   timeLabel?: string;
   onClick?: () => void;
@@ -23,27 +25,41 @@ function AppleToastBase({
   body,
   avatar,
   avatarPromise,
+  bodyTemplate,
+  namePromise,
   appName = "Hunie",
   timeLabel = "agora",
   onClick,
   onDismiss,
 }: AppleToastProps) {
   const [resolvedAvatar, setResolvedAvatar] = useState<string | undefined>(avatar);
+  const [resolvedBody, setResolvedBody] = useState<string>(body);
 
   useEffect(() => {
     if (avatar) {
       setResolvedAvatar(avatar);
-      return;
+    } else if (avatarPromise) {
+      let cancelled = false;
+      avatarPromise.then((url) => {
+        if (!cancelled && url) setResolvedAvatar(url);
+      });
+      return () => {
+        cancelled = true;
+      };
     }
-    if (!avatarPromise) return;
+  }, [avatar, avatarPromise]);
+
+  useEffect(() => {
+    if (!namePromise || !bodyTemplate) return;
     let cancelled = false;
-    avatarPromise.then((url) => {
-      if (!cancelled && url) setResolvedAvatar(url);
+    namePromise.then((name) => {
+      if (!cancelled && name) setResolvedBody(bodyTemplate(name));
     });
     return () => {
       cancelled = true;
     };
-  }, [avatar, avatarPromise]);
+  }, [namePromise, bodyTemplate]);
+
 
   return (
     <LazyMotion features={domAnimation} strict>
