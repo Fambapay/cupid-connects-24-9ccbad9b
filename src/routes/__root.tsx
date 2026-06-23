@@ -12,6 +12,7 @@ import { useEffect, useState, type ReactNode } from "react";
 
 
 import appCss from "../styles.css?url";
+import { MotionConfig } from "framer-motion";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { useNewMessageNotifier } from "@/hooks/useNewMessageNotifier";
@@ -195,23 +196,25 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <CountryProvider>
-        <NativeBoot />
-        <ThemeSync />
-        <Outlet />
-        <GlobalNotifiers />
-        <PushPromptGate />
-        <Toaster
-          position="top-center"
-          richColors
-          offset="calc(env(safe-area-inset-top, 0px) + 12px)"
-          mobileOffset="calc(env(safe-area-inset-top, 0px) + 12px)"
-          toastOptions={{
-            unstyled: true,
-            classNames: { toast: "flex justify-center w-full" },
-          }}
-        />
-      </CountryProvider>
+      <MotionConfig reducedMotion="user">
+        <CountryProvider>
+          <NativeBoot />
+          <ThemeSync />
+          <Outlet />
+          <GlobalNotifiers />
+          <PushPromptGate />
+          <Toaster
+            position="top-center"
+            richColors
+            offset="calc(env(safe-area-inset-top, 0px) + 12px)"
+            mobileOffset="calc(env(safe-area-inset-top, 0px) + 12px)"
+            toastOptions={{
+              unstyled: true,
+              classNames: { toast: "flex justify-center w-full" },
+            }}
+          />
+        </CountryProvider>
+      </MotionConfig>
     </QueryClientProvider>
   );
 }
