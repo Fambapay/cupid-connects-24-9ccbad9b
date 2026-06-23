@@ -527,15 +527,37 @@ type BubbleProps = {
   avatar: string;
   name: string;
   showReadReceipt?: boolean;
+  /** Only true for messages that arrived after the chat was opened. History
+   * is rendered statically — animating it makes the list "explode" on open. */
+  animateIn?: boolean;
 };
 
-function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showReadReceipt }: BubbleProps) {
+function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, showReadReceipt, animateIn }: BubbleProps) {
+  const reduce = useReducedMotion();
+  const shouldAnimate = !!animateIn;
+  const initial = shouldAnimate
+    ? reduce
+      ? { opacity: 0 }
+      : { opacity: 0, y: 10, scale: 0.96 }
+    : false;
+  const animate = shouldAnimate
+    ? reduce
+      ? { opacity: 1 }
+      : { opacity: 1, y: 0, scale: 1 }
+    : undefined;
   return (
-    <div
+    <motion.div
+      initial={initial}
+      animate={animate}
+      transition={shouldAnimate ? chatMotion.bubbleIn : undefined}
       className={`flex items-end gap-2 ${me ? "justify-end" : "justify-start"} ${
         isFirstOfGroup ? "mt-3" : "mt-0.5"
       }`}
-      style={{ contain: "layout paint" }}
+      style={{
+        contain: "layout paint",
+        transformOrigin: me ? "bottom right" : "bottom left",
+        willChange: shouldAnimate ? "transform, opacity" : undefined,
+      }}
     >
       {!me &&
         (isLastOfGroup ? (
@@ -564,7 +586,7 @@ function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, show
         )}
 
       </div>
-    </div>
+    </motion.div>
 
   );
 }
@@ -576,7 +598,8 @@ const Bubble = memo(BubbleImpl, (a, b) =>
   a.isFirstOfGroup === b.isFirstOfGroup &&
   a.isLastOfGroup === b.isLastOfGroup &&
   a.avatar === b.avatar &&
-  a.showReadReceipt === b.showReadReceipt,
+  a.showReadReceipt === b.showReadReceipt &&
+  a.animateIn === b.animateIn,
 );
 
 function DateSeparator({ label }: { label: string }) {
