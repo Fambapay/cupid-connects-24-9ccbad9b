@@ -1,17 +1,20 @@
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 import { BottomNav } from "./BottomNav";
 
 export function AppShell({
   children,
   hideNav = false,
   fullHeight = false,
+  className,
 }: {
   children: ReactNode;
   hideNav?: boolean;
   fullHeight?: boolean;
+  className?: string;
 }) {
   return (
-    <div className="relative min-h-[100lvh] bg-background text-foreground">
+    <div className={cn("relative min-h-[100lvh] bg-background text-foreground", className)}>
       {/* Single static aurora layer (was 2 stacked fixed gradients — costly on every paint) */}
       <div
         className="pointer-events-none fixed inset-0 -z-10 bg-aurora opacity-90"
