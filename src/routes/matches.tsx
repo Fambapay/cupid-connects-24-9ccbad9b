@@ -33,7 +33,7 @@ function LikesPage() {
   const isEmpty = !loading && !error && likers.length === 0;
 
   return (
-    <AppShell>
+    <AppShell className="bg-[var(--profile-bg)]">
       <TopBar title="Likes" />
 
       <section className="px-5">
