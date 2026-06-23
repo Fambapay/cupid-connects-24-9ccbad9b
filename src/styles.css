@@ -141,7 +141,14 @@
   --chat-glass-bg: rgba(255,255,255,0.08);
   --chat-glass-border: rgba(255,255,255,0.14);
   --chat-glass-shadow: inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.25), 0 6px 18px rgba(0,0,0,0.35);
+
+  /* Profile surface tokens — dark (default) */
+  --profile-bg: var(--background);
+  --profile-card-bg: var(--card);
+  --profile-card-border: var(--border);
+  --profile-glow-opacity: 1;
 }
+
 
 .light {
   --background: oklch(1 0 0);
@@ -172,7 +179,14 @@
   --chat-glass-bg: #ffffff;
   --chat-glass-border: rgba(0,0,0,0.06);
   --chat-glass-shadow: 0 6px 18px rgba(0,0,0,0.08);
+
+  /* Profile surface tokens — light */
+  --profile-bg: #ECECEC;
+  --profile-card-bg: #ffffff;
+  --profile-card-border: rgba(0,0,0,0.06);
+  --profile-glow-opacity: 0;
 }
+
 
 
 
