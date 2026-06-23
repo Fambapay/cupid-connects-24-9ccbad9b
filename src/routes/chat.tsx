@@ -62,8 +62,8 @@ function ChatList() {
       {newMatches.length > 0 && (
         <section className="mt-2 px-4">
           <h2
-            className="text-[15px] uppercase tracking-tight text-white"
-            style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 800 }}
+            className="text-[15px] uppercase tracking-tight text-white/70"
+            style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}
           >
             Novos matches
           </h2>
