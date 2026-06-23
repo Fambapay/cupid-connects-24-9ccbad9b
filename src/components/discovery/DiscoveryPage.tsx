@@ -185,6 +185,8 @@ export const DiscoveryPage = ({
                 onFirstImpression={() => onFirstImpression?.(current)}
                 onRewind={handleRewind}
                 canRewind={canRewind}
+                dragX={x}
+                dragY={y}
               />
             }
             panelActions={
