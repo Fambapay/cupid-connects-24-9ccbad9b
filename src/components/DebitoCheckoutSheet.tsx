@@ -240,7 +240,7 @@ export function DebitoCheckoutSheet({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={handleClose}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm touch-none"
+            className="fixed inset-0 backdrop-blur-sm bg-[color:var(--checkout-sheet-backdrop)] touch-none"
             style={{ zIndex: 10010 }}
           />
           <motion.div
@@ -248,7 +248,7 @@ export function DebitoCheckoutSheet({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 360, damping: 36 }}
-            className="fixed inset-x-0 bottom-0 max-h-[92dvh] overflow-y-auto overscroll-contain rounded-t-3xl border-t border-[var(--surface-border)] bg-gradient-to-b from-[#1a0a14] to-background p-5 pb-[max(env(safe-area-inset-bottom),24px)] text-foreground shadow-[0_-20px_60px_-10px_rgba(240,70,140,0.3)]"
+            className="fixed inset-x-0 bottom-0 max-h-[92dvh] overflow-y-auto overscroll-contain rounded-t-3xl border-t border-[var(--surface-border)] bg-[image:var(--checkout-sheet-bg)] p-5 pb-[max(env(safe-area-inset-bottom),24px)] text-foreground shadow-[0_-20px_60px_-10px_rgba(240,70,140,0.3)]"
             style={{ zIndex: 10011 }}
           >
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-[var(--surface-strong)]" />
@@ -349,15 +349,15 @@ export function DebitoCheckoutSheet({
                 <div className="mt-4 space-y-2">
                   <div className="flex items-center justify-between rounded-xl bg-[var(--surface-3)] px-3 py-3">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Entidade</span>
-                    <span className="font-mono text-base font-bold text-white">{mcReference.entity}</span>
+                    <span className="font-mono text-base font-bold text-foreground">{mcReference.entity}</span>
                   </div>
                   <div className="flex items-center justify-between rounded-xl bg-[var(--surface-3)] px-3 py-3">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Referência</span>
-                    <span className="font-mono text-base font-bold text-white">{mcReference.number}</span>
+                    <span className="font-mono text-base font-bold text-foreground">{mcReference.number}</span>
                   </div>
                   <div className="flex items-center justify-between rounded-xl bg-[var(--surface-3)] px-3 py-3">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Montante</span>
-                    <span className="font-mono text-base font-bold text-white">{amountFormatted}</span>
+                    <span className="font-mono text-base font-bold text-foreground">{amountFormatted}</span>
                   </div>
                 </div>
                 {mcReference.instructions && (
@@ -382,7 +382,7 @@ export function DebitoCheckoutSheet({
                 </p>
                 {reference && (
                   <p className="mt-2 text-[11px] text-muted-foreground">
-                    Referência: <span className="font-mono text-white">{reference}</span>
+                    Referência: <span className="font-mono text-foreground">{reference}</span>
                   </p>
                 )}
                 <p className="mt-3 text-xs font-mono tabular-nums text-[color:var(--fg-soft)]">
