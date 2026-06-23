@@ -16,18 +16,18 @@ export function AuthShell({
 }) {
   return (
     <div className="relative min-h-[100dvh] overflow-hidden bg-background text-foreground">
-      {/* Aurora + animated blobs */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-aurora opacity-80" />
+      {/* Aurora + animated blobs — fixed so they cover the full device viewport (incl. safe-area zones) */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 bg-aurora opacity-80" />
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute -top-32 -left-24 h-[28rem] w-[28rem] rounded-full blur-3xl"
+        className="pointer-events-none fixed -top-32 -left-24 h-[28rem] w-[28rem] rounded-full blur-3xl"
         style={{ background: "var(--brand-pink)" }}
         animate={{ x: [0, 40, 0], y: [0, 30, 0], opacity: [0.22, 0.38, 0.22] }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute -bottom-40 -right-20 h-[30rem] w-[30rem] rounded-full blur-3xl"
+        className="pointer-events-none fixed -bottom-40 -right-20 h-[30rem] w-[30rem] rounded-full blur-3xl"
         style={{ background: "var(--brand-purple)" }}
         animate={{ x: [0, -30, 0], y: [0, -20, 0], opacity: [0.18, 0.32, 0.18] }}
         transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
@@ -35,12 +35,13 @@ export function AuthShell({
       {/* Grain */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-overlay"
+        className="pointer-events-none fixed inset-0 opacity-[0.05] mix-blend-overlay"
         style={{
           backgroundImage:
             "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>\")",
         }}
       />
+
 
       <div
         className="relative mx-auto flex min-h-[100dvh] w-full max-w-sm flex-col px-6"
