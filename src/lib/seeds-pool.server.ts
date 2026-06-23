@@ -70,13 +70,21 @@ const LIFESTYLE_PHOTOS = [
   "https://images.unsplash.com/photo-1499346030926-9a72daac6c63?w=800&q=80",
 ];
 
-const CITY_COORDS: Record<string, { lat: number; lng: number }> = {
-  Maputo: { lat: -25.9692, lng: 32.5732 },
-  Matola: { lat: -25.9622, lng: 32.4589 },
-  Beira: { lat: -19.8437, lng: 34.8389 },
-  Nampula: { lat: -15.1165, lng: 39.2666 },
-  Quelimane: { lat: -17.8786, lng: 36.8883 },
-  Tete: { lat: -16.1564, lng: 33.5867 },
+const CITY_COORDS: Record<string, { lat: number; lng: number; country?: string }> = {
+  Maputo: { lat: -25.9692, lng: 32.5732, country: "Moçambique" },
+  Matola: { lat: -25.9622, lng: 32.4589, country: "Moçambique" },
+  Beira: { lat: -19.8437, lng: 34.8389, country: "Moçambique" },
+  Nampula: { lat: -15.1165, lng: 39.2666, country: "Moçambique" },
+  Quelimane: { lat: -17.8786, lng: 36.8883, country: "Moçambique" },
+  Tete: { lat: -16.1564, lng: 33.5867, country: "Moçambique" },
+  // Holanda
+  "Roterdão": { lat: 51.9244, lng: 4.4777, country: "NL" },
+  Rotterdam: { lat: 51.9244, lng: 4.4777, country: "NL" },
+  Amsterdão: { lat: 52.3676, lng: 4.9041, country: "NL" },
+  Amsterdam: { lat: 52.3676, lng: 4.9041, country: "NL" },
+  Haia: { lat: 52.0705, lng: 4.3007, country: "NL" },
+  Utrecht: { lat: 52.0907, lng: 5.1214, country: "NL" },
+  Eindhoven: { lat: 51.4416, lng: 5.4697, country: "NL" },
 };
 
 type Gender = "feminino" | "masculino" | "nao_binario";
@@ -159,7 +167,7 @@ export function buildSeedProfiles(args: {
       age,
       birthdate: birthdateFromAge(age),
       city: args.city,
-      country: "Moçambique",
+      country: coords.country ?? "Moçambique",
       latitude: jitter(coords.lat),
       longitude: jitter(coords.lng),
       bio: pick(BIOS),
