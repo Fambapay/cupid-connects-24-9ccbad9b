@@ -20,6 +20,8 @@ import { getPlanCards } from "@/lib/plans";
 import { CountrySwitcher } from "@/components/CountrySwitcher";
 import { faqData } from "@/components/landing/faqData";
 import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
+import { useForceDarkTheme } from "@/lib/theme";
+
 
 // SEO-01: Country-aware <head> resolved at SSR so crawlers (WhatsApp,
 // Twitter, Facebook, LinkedIn) get a real title/description/og:image when
