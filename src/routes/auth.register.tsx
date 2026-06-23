@@ -109,9 +109,9 @@ function RegisterPage() {
           </button>
 
           <div className="flex items-center gap-3 py-2">
-            <div className="h-px flex-1 bg-white/10" />
+            <div className="h-px flex-1 bg-foreground/10" />
             <span className="text-xs text-muted-foreground">ou</span>
-            <div className="h-px flex-1 bg-white/10" />
+            <div className="h-px flex-1 bg-foreground/10" />
           </div>
 
           <form onSubmit={onEmailNext} className="space-y-4">
