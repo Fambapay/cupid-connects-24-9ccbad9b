@@ -50,6 +50,7 @@ function SeedsAdmin() {
   const stats = useServerFn(getSeedStats);
   const setThr = useServerFn(setSeedThreshold);
   const generate = useServerFn(generateSeeds);
+  const populate = useServerFn(populateExistingUsers);
 
   const [city, setCity] = useState<string>("");
   const [gender, setGender] = useState<string>("");
