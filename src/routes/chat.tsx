@@ -34,7 +34,7 @@ function ChatList() {
 
   return (
     <AppShell>
-      <header className="sticky top-0 z-30 flex items-center justify-between bg-background px-4 pb-3" style={{ paddingTop: "max(env(safe-area-inset-top), 20px)" }}>
+      <header className="sticky top-0 z-30 flex items-center justify-between bg-background px-4 pb-1" style={{ paddingTop: "max(env(safe-area-inset-top), 10px)" }}>
         <h1
           className="text-[34px] leading-none tracking-tight text-white"
           style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}
