@@ -433,8 +433,22 @@ function OnboardingPage() {
 
   return (
     <div className="relative min-h-[100dvh] overflow-hidden bg-background text-foreground">
-      {/* Ambient brand glow — extends to full device viewport including safe-area zones */}
-      <div className="pointer-events-none fixed inset-0 bg-aurora opacity-80" />
+      {/* Ambient brand glow — refined Apple-style: subtle warm aurora, not loud */}
+      <div
+        className="pointer-events-none fixed inset-0"
+        style={{
+          background:
+            "radial-gradient(120% 70% at 50% 0%, rgba(255,92,138,0.18) 0%, rgba(155,91,255,0.10) 35%, transparent 70%), radial-gradient(80% 60% at 50% 100%, rgba(255,140,90,0.10) 0%, transparent 60%)",
+        }}
+      />
+      <div
+        className="pointer-events-none fixed inset-0 opacity-[0.4]"
+        style={{
+          backgroundImage:
+            "radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)",
+          backgroundSize: "3px 3px",
+        }}
+      />
 
       <div
         className="relative flex min-h-[100dvh] flex-col"
@@ -449,21 +463,35 @@ function OnboardingPage() {
             <button
               onClick={goBack}
               aria-label="Voltar"
-              className="grid h-9 w-9 place-items-center rounded-full glass"
-              style={{ touchAction: "manipulation" }}
+              className="grid h-9 w-9 place-items-center rounded-full transition-transform active:scale-95"
+              style={{
+                touchAction: "manipulation",
+                background: "rgba(255,255,255,0.06)",
+                border: "0.5px solid rgba(255,255,255,0.12)",
+                backdropFilter: "blur(20px) saturate(180%)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
+              }}
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-[16px] w-[16px]" strokeWidth={2.4} />
             </button>
           ) : (
             <div className="h-9 w-9" />
           )}
           {showProgress && (
-            <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/10">
+            <div
+              className="h-[3px] flex-1 overflow-hidden rounded-full"
+              style={{ background: "rgba(255,255,255,0.08)" }}
+            >
               <motion.div
-                className="h-full rounded-full bg-gradient-sunset"
+                className="h-full rounded-full"
+                style={{
+                  background:
+                    "linear-gradient(90deg, #FFFFFF 0%, #FFD6E4 50%, #FF5C8A 100%)",
+                  boxShadow: "0 0 12px rgba(255,92,138,0.45)",
+                }}
                 initial={false}
                 animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+                transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
               />
             </div>
           )}
@@ -486,10 +514,10 @@ function OnboardingPage() {
               <motion.div
                 key={stepId}
                 custom={dir}
-                initial={{ x: dir * 100 + "%" }}
-                animate={{ x: 0 }}
-                exit={{ x: -dir * 100 + "%" }}
-                transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+                initial={{ x: dir * 100 + "%", opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -dir * 100 + "%", opacity: 0 }}
+                transition={{ duration: 0.42, ease: [0.32, 0.72, 0, 1] }}
                 className="absolute inset-0 flex flex-col"
               >
                 {stepId === "welcome" && <WelcomeStep onStart={goNext} />}
@@ -592,21 +620,30 @@ function StepScroll({ children }: { children: React.ReactNode }) {
 
 function Heading({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <div className="pt-2">
+    <div className="pt-3">
       <motion.h1
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25 }}
-        className="text-3xl font-bold leading-tight tracking-tight"
+        transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
+        className="text-[34px] font-bold leading-[1.05] tracking-[-0.035em]"
+        style={{
+          fontFamily:
+            '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif',
+        }}
       >
         {title}
       </motion.h1>
       {subtitle && (
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, delay: 0.08 }}
-          className="mt-2 text-sm text-muted-foreground"
+          transition={{ duration: 0.4, delay: 0.08, ease: [0.32, 0.72, 0, 1] }}
+          className="mt-2.5 text-[15px] leading-[1.42] text-white/55"
+          style={{
+            fontFamily:
+              '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif',
+            letterSpacing: "-0.005em",
+          }}
         >
           {subtitle}
         </motion.p>
@@ -626,7 +663,7 @@ function CtaBar({
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, delay: staggerDelay }}
+      transition={{ duration: 0.4, delay: staggerDelay, ease: [0.32, 0.72, 0, 1] }}
       className="shrink-0 px-6 pt-2"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
@@ -651,18 +688,43 @@ function PrimaryButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      whileTap={!disabled ? { scale: 0.97 } : undefined}
+      whileTap={!disabled ? { scale: 0.975 } : undefined}
       transition={{ duration: 0 }}
-      style={{ touchAction: "manipulation" }}
+      style={{
+        touchAction: "manipulation",
+        letterSpacing: "-0.01em",
+        ...(disabled
+          ? {
+              background: "rgba(255,255,255,0.06)",
+              border: "0.5px solid rgba(255,255,255,0.10)",
+              color: "rgba(255,255,255,0.45)",
+            }
+          : {
+              background:
+                "linear-gradient(150deg, #FF5C8A 0%, #9B5BFF 100%)",
+              boxShadow:
+                "0 18px 36px -14px rgba(255,92,138,0.7), 0 1px 0 rgba(255,255,255,0.10) inset, 0 -10px 22px rgba(0,0,0,0.18) inset",
+              color: "#fff",
+            }),
+      }}
       className={cn(
-        "h-14 w-full rounded-full text-base font-semibold",
-        "transition-colors",
-        disabled
-          ? "bg-white/10 text-muted-foreground"
-          : "bg-gradient-sunset text-white shadow-glow",
+        "relative h-[54px] w-full overflow-hidden rounded-full text-[15.5px] font-semibold",
+        "transition-[transform,opacity] duration-150",
       )}
     >
-      {children}
+      {!disabled && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-1/2"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 100%)",
+            borderTopLeftRadius: 9999,
+            borderTopRightRadius: 9999,
+          }}
+        />
+      )}
+      <span className="relative">{children}</span>
     </motion.button>
   );
 }
@@ -672,24 +734,58 @@ function WelcomeStep({ onStart }: { onStart: () => void }) {
   return (
     <div className="flex flex-1 flex-col px-6">
       <div className="flex flex-1 flex-col items-center justify-center text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
+          className="mb-7 grid h-[72px] w-[72px] place-items-center rounded-[22px]"
+          style={{
+            background:
+              "linear-gradient(150deg, #FF5C8A 0%, #9B5BFF 100%)",
+            boxShadow:
+              "0 24px 50px -16px rgba(255,92,138,0.7), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -10px 20px rgba(0,0,0,0.15)",
+          }}
+        >
+          <Heart
+            className="h-[34px] w-[34px] text-white"
+            fill="currentColor"
+            strokeWidth={0}
+            style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.18))" }}
+          />
+        </motion.div>
         <motion.h1
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25 }}
-          className="text-gradient-sunset max-w-xs text-4xl font-bold leading-[1.1] tracking-tight"
+          transition={{ duration: 0.5, delay: 0.1, ease: [0.32, 0.72, 0, 1] }}
+          className="max-w-[300px] text-[36px] font-bold leading-[1.05] tracking-[-0.038em]"
+          style={{
+            fontFamily:
+              '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif',
+            backgroundImage:
+              "linear-gradient(180deg, #FFFFFF 0%, #FFE3EC 65%, #FFC2D8 100%)",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
+            filter: "drop-shadow(0 2px 14px rgba(255,92,138,0.22))",
+          }}
         >
           O amor está mais perto do que pensas
         </motion.h1>
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, delay: 0.1 }}
-          className="mt-5 max-w-xs text-base text-muted-foreground"
+          transition={{ duration: 0.45, delay: 0.22, ease: [0.32, 0.72, 0, 1] }}
+          className="mt-5 max-w-[280px] text-[15.5px] leading-[1.42] text-white/60"
+          style={{
+            fontFamily:
+              '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif',
+            letterSpacing: "-0.005em",
+          }}
         >
-          Vamos criar o teu perfil em menos de 2 minutos
+          Vamos criar o teu perfil em menos de 2 minutos.
         </motion.p>
       </div>
-      <CtaBar staggerDelay={0.2}>
+      <CtaBar staggerDelay={0.32}>
         <PrimaryButton onClick={onStart}>Começar</PrimaryButton>
       </CtaBar>
     </div>
