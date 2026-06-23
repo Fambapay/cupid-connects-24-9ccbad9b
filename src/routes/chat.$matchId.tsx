@@ -118,10 +118,8 @@ function ChatRoom() {
       const winH = window.innerHeight;
       const vH = vv ? vv.height : winH;
       const vTop = vv ? vv.offsetTop : 0;
-      const keyboardInset = Math.max(0, winH - vH - vTop);
-      const keyboardOpen = keyboardInset > 120;
       root.style.setProperty("--chat-top", `${vTop}px`);
-      root.style.setProperty("--chat-vh", `${keyboardOpen ? vH + vTop : winH}px`);
+      root.style.setProperty("--chat-vh", `${vH}px`);
       if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0);
     };
     setVh();
@@ -263,7 +261,7 @@ function ChatRoom() {
     <div
       className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none"
       style={{
-        height: "var(--chat-vh, 100lvh)",
+        height: "var(--chat-vh, 100dvh)",
         background: "#000",
         color: "#fff",
       }}
