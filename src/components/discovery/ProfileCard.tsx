@@ -399,7 +399,6 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
-          onClick={onClickPhoto}
           style={{
             position: "absolute",
             inset: 0,
@@ -410,6 +409,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             transformStyle: "preserve-3d",
           }}
         >
+
           <div
             ref={photoWrapRef}
             style={{
