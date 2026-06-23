@@ -167,7 +167,7 @@ export function buildSeedProfiles(args: {
       age,
       birthdate: birthdateFromAge(age),
       city: args.city,
-      country: "Moçambique",
+      country: coords.country ?? "Moçambique",
       latitude: jitter(coords.lat),
       longitude: jitter(coords.lng),
       bio: pick(BIOS),
