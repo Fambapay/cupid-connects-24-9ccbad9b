@@ -31,19 +31,18 @@ export const ReauthenticationEmail = ({
 }: ReauthenticationEmailProps) => (
   <Html lang="pt" dir="ltr">
     <Head />
-    <Preview>O teu código de verificação {siteName}</Preview>
+    <Preview>O teu código secreto do {siteName}</Preview>
     <Body style={main}>
       <Section style={wrapper}>
         <Container style={container}>
           <Brand />
-          <Heading style={h1}>Confirma a tua identidade</Heading>
+          <Heading style={h1}>Prova que és tu 🕵️</Heading>
           <Text style={text}>
-            Usa o código abaixo para confirmares que és mesmo tu:
+            Usa o código abaixo para confirmar que do outro lado do ecrã está mesmo a pessoa certa.
           </Text>
           <Text style={codeStyle}>{token}</Text>
           <Text style={{ ...text, fontSize: '13px', color: '#6b5566' }}>
-            Este código expira em breve. Se não foste tu a pedir, podes
-            ignorar este email em segurança.
+            O código tem validade curta. Se não foste tu, ignora e finge que nunca viste.
           </Text>
           <Footer siteName={siteName} />
         </Container>

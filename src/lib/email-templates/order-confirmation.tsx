@@ -71,10 +71,10 @@ const OrderConfirmationEmail = ({
         <Container style={container}>
           <Brand />
           <Heading style={h1}>
-            {name ? `Obrigado, ${name}! 💖` : 'Compra confirmada! 💖'}
+            {name ? `Obrigado, ${name}! 💖` : 'Compra confirmada 💖'}
           </Heading>
           <Text style={text}>
-            Recebemos a tua compra. Já podes aproveitar tudo na app.
+            Recebemos a tua compra direitinha. Já podes voltar para a app e gastar isso com bom gosto.
           </Text>
 
           <Section style={summaryBox}>
@@ -101,8 +101,7 @@ const OrderConfirmationEmail = ({
           </Section>
 
           <Text style={text}>
-            Se tiveres alguma dúvida, responde a este email — estamos aqui para
-            ajudar.
+            Alguma coisa estranha? Responde a este email que damos uma mão.
           </Text>
           <Footer siteName={SITE_NAME} />
         </Container>
@@ -117,7 +116,7 @@ export const template = {
   displayName: 'Confirmação de compra',
   previewData: {
     name: 'Ana',
-    itemName: 'Super Likes — Pacote 10',
+    itemName: 'Super Likes, pacote de 10',
     quantity: 1,
     amount: '250',
     currency: 'MZN',

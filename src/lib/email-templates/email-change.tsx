@@ -40,34 +40,25 @@ export const EmailChangeEmail = ({
 }: EmailChangeEmailProps) => (
   <Html lang="pt" dir="ltr">
     <Head />
-    <Preview>Confirma a alteração do teu email no {siteName}</Preview>
+    <Preview>Confirma a mudança de email no {siteName}</Preview>
     <Body style={main}>
       <Section style={wrapper}>
         <Container style={container}>
           <Brand />
-          <Heading style={h1}>Confirmar mudança de email</Heading>
+          <Heading style={h1}>Trocar de email 📬</Heading>
           <Text style={text}>
-            Pediste para alterar o email da tua conta {siteName} de{' '}
-            <Link href={`mailto:${oldEmail}`} style={link}>
-              {oldEmail}
-            </Link>{' '}
-            para{' '}
-            <Link href={`mailto:${newEmail}`} style={link}>
-              {newEmail}
-            </Link>
-            .
+            Pediste para mudar o email da tua conta {siteName} de{' '}
+            <Link href={`mailto:${oldEmail}`} style={link}>{oldEmail}</Link> para{' '}
+            <Link href={`mailto:${newEmail}`} style={link}>{newEmail}</Link>.
           </Text>
-          <Text style={text}>
-            Carrega no botão abaixo para confirmares a mudança:
-          </Text>
+          <Text style={text}>Carrega aqui para confirmares.</Text>
           <Section style={buttonWrap}>
             <Button style={button} href={confirmationUrl}>
               Confirmar mudança
             </Button>
           </Section>
           <Text style={{ ...text, fontSize: '13px', color: '#6b5566' }}>
-            Se não foste tu a pedir esta alteração, protege a tua conta o mais
-            rápido possível.
+            Não foste tu a pedir isto? Vai já à app e troca a tua password. Mais vale prevenir.
           </Text>
           <Footer siteName={siteName} />
         </Container>

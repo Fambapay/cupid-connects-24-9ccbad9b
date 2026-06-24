@@ -30,24 +30,22 @@ interface RecoveryEmailProps {
 export const RecoveryEmail = ({ siteName, confirmationUrl }: RecoveryEmailProps) => (
   <Html lang="pt" dir="ltr">
     <Head />
-    <Preview>Repõe a tua password no {siteName}</Preview>
+    <Preview>Vamos arranjar te uma password nova no {siteName}</Preview>
     <Body style={main}>
       <Section style={wrapper}>
         <Container style={container}>
           <Brand />
-          <Heading style={h1}>Repor a tua password</Heading>
+          <Heading style={h1}>Acontece aos melhores 🙈</Heading>
           <Text style={text}>
-            Recebemos um pedido para repor a password da tua conta no{' '}
-            {siteName}. Carrega no botão abaixo para escolher uma nova.
+            Recebemos um pedido para repor a password da tua conta no {siteName}. Carrega no botão e escolhe uma nova. Recomendamos uma que consigas mesmo decorar.
           </Text>
           <Section style={buttonWrap}>
             <Button style={button} href={confirmationUrl}>
-              Repor password
+              Criar nova password
             </Button>
           </Section>
           <Text style={{ ...text, fontSize: '13px', color: '#6b5566' }}>
-            Se não foste tu a pedir isto, podes ignorar este email — a tua
-            password vai continuar igual.
+            Não foste tu? Respira fundo. Ignora este email e a tua password atual continua igualzinha.
           </Text>
           <Footer siteName={siteName} />
         </Container>

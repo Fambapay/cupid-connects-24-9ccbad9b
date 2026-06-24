@@ -30,15 +30,14 @@ interface MagicLinkEmailProps {
 export const MagicLinkEmail = ({ siteName, confirmationUrl }: MagicLinkEmailProps) => (
   <Html lang="pt" dir="ltr">
     <Head />
-    <Preview>O teu link de acesso ao {siteName}</Preview>
+    <Preview>O teu atalho para entrar no {siteName}</Preview>
     <Body style={main}>
       <Section style={wrapper}>
         <Container style={container}>
           <Brand />
-          <Heading style={h1}>O teu link de acesso</Heading>
+          <Heading style={h1}>Entra sem decorar passwords ✨</Heading>
           <Text style={text}>
-            Carrega no botão abaixo para entrares na tua conta {siteName}. Este
-            link expira em breve por motivos de segurança.
+            Aqui está o teu atalho para o {siteName}. Carrega no botão e estás dentro. Avisamos já que dura pouco, por isso é melhor não deixar arrefecer.
           </Text>
           <Section style={buttonWrap}>
             <Button style={button} href={confirmationUrl}>
@@ -46,8 +45,7 @@ export const MagicLinkEmail = ({ siteName, confirmationUrl }: MagicLinkEmailProp
             </Button>
           </Section>
           <Text style={{ ...text, fontSize: '13px', color: '#6b5566' }}>
-            Se não foste tu a pedir este link, podes ignorar este email em
-            segurança.
+            Não foste tu a pedir? Ignora à vontade, ninguém entra sem este link.
           </Text>
           <Footer siteName={siteName} />
         </Container>

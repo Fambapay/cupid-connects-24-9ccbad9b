@@ -35,8 +35,8 @@ interface NotificationProps {
 
 const NotificationEmail = ({
   name,
-  title = 'Tens uma novidade no Hunie',
-  message = 'Abre a app para veres o que aconteceu.',
+  title = 'Anda cá ver isto no Hunie',
+  message = 'Há novidades à tua espera dentro da app.',
   ctaLabel,
   ctaUrl,
 }: NotificationProps) => (
@@ -65,12 +65,12 @@ const NotificationEmail = ({
 
 export const template = {
   component: NotificationEmail,
-  subject: (data) => (data?.title as string) || 'Tens uma novidade no Hunie',
+  subject: (data) => (data?.title as string) || 'Anda cá ver isto no Hunie',
   displayName: 'Notificação',
   previewData: {
     name: 'Ana',
-    title: 'Alguém viu o teu perfil 👀',
-    message: 'Abre a app para descobrires quem mostrou interesse.',
+    title: 'Espreitaram o teu perfil 👀',
+    message: 'Abre a app para descobrires quem ficou curioso.',
     ctaLabel: 'Abrir Hunie',
     ctaUrl: 'https://hunie.app',
   },

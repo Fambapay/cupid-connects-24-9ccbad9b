@@ -34,23 +34,23 @@ interface NewMatchProps {
 const NewMatchEmail = ({ name, matchName }: NewMatchProps) => (
   <Html lang="pt" dir="ltr">
     <Head />
-    <Preview>Tens um novo match no Hunie 💘</Preview>
+    <Preview>Match novo no Hunie 💘</Preview>
     <Body style={main}>
       <Section style={wrapper}>
         <Container style={container}>
           <Brand />
           <Heading style={h1}>
-            {name ? `${name}, é um match! 💘` : 'É um match! 💘'}
+            {name ? `${name}, é match! 💘` : 'É match! 💘'}
           </Heading>
           <Text style={text}>
             {matchName
-              ? `Tu e ${matchName} deram like um no outro.`
-              : 'Acabaste de fazer um novo match.'}{' '}
-            Manda uma mensagem antes que esfrie!
+              ? `Tu e ${matchName} deram like um ao outro.`
+              : 'Acabaste de fazer um match novo.'}{' '}
+            Agora começa a parte difícil: dizer olá sem soar a robô. Acreditamos em ti.
           </Text>
           <Section style={buttonWrap}>
             <Button href={APP_URL} style={button}>
-              Enviar mensagem
+              Mandar mensagem
             </Button>
           </Section>
           <Footer siteName={SITE_NAME} />
@@ -62,7 +62,7 @@ const NewMatchEmail = ({ name, matchName }: NewMatchProps) => (
 
 export const template = {
   component: NewMatchEmail,
-  subject: 'Tens um novo match no Hunie 💘',
+  subject: 'Match novo no Hunie 💘',
   displayName: 'Novo match',
   previewData: { name: 'Ana', matchName: 'Diogo' },
 } satisfies TemplateEntry
