@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useMatchRoute } from "@tanstack/react-router";
-import { MessageCircle, Sparkles, Compass, Shield, MessagesSquare } from "lucide-react";
+import { MessageCircle, Sparkles, Compass } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useMatches } from "@/hooks/useMatches";
 import { SwipeableConversationItem } from "@/components/chat/SwipeableConversationItem";
@@ -41,22 +41,6 @@ function ChatList() {
         >
           Chat
         </h1>
-        <div className="flex items-center gap-1 rounded-full bg-muted p-1 ring-1 ring-border">
-          <Link
-            to="/settings"
-            aria-label="Definições de segurança"
-            className="flex h-11 w-11 items-center justify-center rounded-full text-foreground/90 active:bg-foreground/10"
-          >
-            <Shield className="h-[18px] w-[18px]" strokeWidth={2.2} />
-          </Link>
-          <Link
-            to="/matches"
-            aria-label="Ver todos os matches"
-            className="flex h-11 w-11 items-center justify-center rounded-full text-foreground/90 active:bg-foreground/10"
-          >
-            <MessagesSquare className="h-[18px] w-[18px]" strokeWidth={2.2} />
-          </Link>
-        </div>
       </header>
 
 
