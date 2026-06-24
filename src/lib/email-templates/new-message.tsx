@@ -53,7 +53,7 @@ const NewMessageEmail = ({ name, senderName, preview, matchId }: NewMessageProps
             Ninguém gosta de ficar a falar sozinho. Vai lá responder antes que a conversa caia em silêncio constrangedor.
           </Text>
           <Section style={buttonWrap}>
-            <Button href={`https://hunie.app/chat/${matchId || ''}`} style={button}>
+            <Button href={matchId ? `https://hunie.app/chat/${matchId}` : 'https://hunie.app/chat'} style={button}>
               Responder
             </Button>
           </Section>
