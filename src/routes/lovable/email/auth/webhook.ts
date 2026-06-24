@@ -32,7 +32,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 
 // Configuration
 const SITE_NAME = "Hunie"
-const SENDER_DOMAIN = "dating.hunie.app"
+const SENDER_DOMAIN = "love.hunie.app"
 const ROOT_DOMAIN = "hunie.app"
 const FROM_DOMAIN = "hunie.app"
 
