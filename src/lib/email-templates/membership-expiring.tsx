@@ -47,19 +47,17 @@ const MembershipExpiringEmail = ({
   return (
     <Html lang="pt" dir="ltr">
       <Head />
-      <Preview>O teu Hunie {label} expira em {days}</Preview>
+      <Preview>O teu Hunie {label} acaba daqui a {days}</Preview>
       <Body style={main}>
         <Section style={wrapper}>
           <Container style={container}>
             <Brand />
             <Heading style={h1}>
-              {name ? `${name}, ` : ''}o teu {label} expira em {days}
+              {name ? `${name}, ` : ''}o teu {label} acaba daqui a {days}
             </Heading>
             <Text style={text}>
-              {expiresOn
-                ? `A tua subscrição termina a ${expiresOn}. `
-                : ''}
-              Renova agora para não perderes likes ilimitados, super likes diários, boost e ver quem te deu like.
+              {expiresOn ? `A subscrição termina a ${expiresOn}. ` : ''}
+              Renova agora e fica com likes à vontade, super likes diários, boost e o luxo de ver quem te deu like sem ter de adivinhar.
             </Text>
             <Section style={buttonWrap}>
               <Button href={RENEW_URL} style={button}>
@@ -78,7 +76,7 @@ export const template = {
   component: MembershipExpiringEmail,
   subject: (d: Record<string, any>) => {
     const days = d?.daysLeft === 1 ? '1 dia' : `${d?.daysLeft ?? 3} dias`
-    return `O teu Hunie expira em ${days} — renova já`
+    return `O teu Hunie acaba daqui a ${days}`
   },
   displayName: 'Membership a expirar',
   previewData: { name: 'Ana', tier: 'plus', daysLeft: 3, expiresOn: '12 jun' },

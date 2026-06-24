@@ -36,15 +36,14 @@ export const SignupEmail = ({
 }: SignupEmailProps) => (
   <Html lang="pt" dir="ltr">
     <Head />
-    <Preview>Confirma o teu email para começar a usar o {siteName}</Preview>
+    <Preview>Confirma o teu email e entra no {siteName}</Preview>
     <Body style={main}>
       <Section style={wrapper}>
         <Container style={container}>
           <Brand />
-          <Heading style={h1}>Bem-vindo(a) ao {siteName} 💖</Heading>
+          <Heading style={h1}>Olá! Que bom ter te aqui 💖</Heading>
           <Text style={text}>
-            Estamos quase lá. Confirma o teu email ({recipient}) para ativares a
-            tua conta e começares a conhecer pessoas novas.
+            Só falta uma coisinha. Carrega no botão para confirmares que {recipient} és mesmo tu.
           </Text>
           <Section style={buttonWrap}>
             <Button style={button} href={confirmationUrl}>
@@ -52,8 +51,7 @@ export const SignupEmail = ({
             </Button>
           </Section>
           <Text style={{ ...text, fontSize: '13px', color: '#6b5566' }}>
-            Se não foste tu a criar a conta, podes ignorar este email em
-            segurança.
+            Não foste tu? Sem problema, ignora este email e segue a tua vida tranquila.
           </Text>
           <Footer siteName={siteName} />
         </Container>

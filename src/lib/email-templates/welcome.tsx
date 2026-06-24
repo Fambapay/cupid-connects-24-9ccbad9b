@@ -33,25 +33,23 @@ interface WelcomeProps {
 const WelcomeEmail = ({ name }: WelcomeProps) => (
   <Html lang="pt" dir="ltr">
     <Head />
-    <Preview>Bem-vindo(a) ao Hunie — vamos encontrar o teu match ✨</Preview>
+    <Preview>Bem vinda(o) ao Hunie. Hora de ir conhecer gente ✨</Preview>
     <Body style={main}>
       <Section style={wrapper}>
         <Container style={container}>
           <Brand />
           <Heading style={h1}>
-            {name ? `Olá, ${name}! 💕` : 'Bem-vindo(a) ao Hunie! 💕'}
+            {name ? `Boas, ${name}! 💕` : 'Boas, é bom ter te aqui 💕'}
           </Heading>
           <Text style={text}>
-            Estamos super felizes por te ter aqui. O Hunie foi criado para te ajudar a
-            conhecer pessoas reais e encontrar conexões que importam.
+            O teu lugar no Hunie está pronto. A partir de agora é entre tu, o ecrã e a coragem de dizer olá.
           </Text>
           <Text style={text}>
-            Para começar, completa o teu perfil com fotos e prompts — perfis completos
-            recebem até 5x mais matches.
+            Dica em jeito de conselho de amiga: perfis com fotos boas e prompts honestos recebem muito mais matches que perfis vazios a cheirar a mistério.
           </Text>
           <Section style={buttonWrap}>
             <Button href={APP_URL} style={button}>
-              Começar agora
+              Completar o meu perfil
             </Button>
           </Section>
           <Footer siteName={SITE_NAME} />
@@ -63,7 +61,7 @@ const WelcomeEmail = ({ name }: WelcomeProps) => (
 
 export const template = {
   component: WelcomeEmail,
-  subject: 'Bem-vindo(a) ao Hunie 💕',
-  displayName: 'Boas-vindas',
+  subject: 'Bem vinda(o) ao Hunie 💕',
+  displayName: 'Boas vindas',
   previewData: { name: 'Ana' },
 } satisfies TemplateEntry

@@ -33,18 +33,15 @@ interface InviteEmailProps {
 export const InviteEmail = ({ siteName, siteUrl, confirmationUrl }: InviteEmailProps) => (
   <Html lang="pt" dir="ltr">
     <Head />
-    <Preview>Foste convidado(a) para o {siteName}</Preview>
+    <Preview>Alguém abriu te a porta do {siteName} 💌</Preview>
     <Body style={main}>
       <Section style={wrapper}>
         <Container style={container}>
           <Brand />
-          <Heading style={h1}>Tens um convite 💌</Heading>
+          <Heading style={h1}>Convite em mão 💌</Heading>
           <Text style={text}>
-            Foste convidado(a) para te juntares a{' '}
-            <Link href={siteUrl} style={link}>
-              <strong>{siteName}</strong>
-            </Link>
-            . Aceita o convite para criar a tua conta e começar a explorar.
+            Foste convidada(o) para entrar no{' '}
+            <Link href={siteUrl} style={link}><strong>{siteName}</strong></Link>. Cria a tua conta, espreita os perfis e vê se há alguém ali a fazer o teu género.
           </Text>
           <Section style={buttonWrap}>
             <Button style={button} href={confirmationUrl}>
@@ -52,8 +49,7 @@ export const InviteEmail = ({ siteName, siteUrl, confirmationUrl }: InviteEmailP
             </Button>
           </Section>
           <Text style={{ ...text, fontSize: '13px', color: '#6b5566' }}>
-            Se não estavas à espera deste convite, podes ignorar este email em
-            segurança.
+            Não estavas à espera deste convite? Tudo bem, ignora à vontade.
           </Text>
           <Footer siteName={siteName} />
         </Container>
