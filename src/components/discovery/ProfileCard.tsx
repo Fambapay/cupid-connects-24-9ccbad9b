@@ -801,7 +801,15 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             </div>
 
             {/* Photo carousel */}
-            <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: "#111", marginTop: -22 }}>
+            <div
+              onClick={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const relX = e.clientX - rect.left;
+                if (relX < rect.width / 2) goPrevPhoto();
+                else goNextPhoto();
+              }}
+              style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: "#111", marginTop: -22, cursor: "pointer" }}
+            >
               {photos.map((src, i) => (
                 <img
                   key={i + src}
