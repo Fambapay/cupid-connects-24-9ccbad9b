@@ -213,6 +213,8 @@ export const BottomNavBase = ({
     // Re-sync on every frame while the inner pill animates, so exclusion rects
     // track tab switches (active label can grow/shrink slightly).
     const interval = window.setInterval(schedule, 400);
+    const unsubPillX = pillX.on("change", schedule);
+
 
     const ro = new ResizeObserver(schedule);
     ro.observe(el);
