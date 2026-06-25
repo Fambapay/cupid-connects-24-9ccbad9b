@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence, useDragControls } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls, useMotionValue, useTransform, animate as animateMV } from 'framer-motion';
 import { X, Plus, Trash2, Camera, Star } from 'lucide-react';
 import type { ProfileViewData } from './ProfileView';
 
@@ -32,6 +32,9 @@ export function EditProfileSheet({
   const [draft, setDraft] = useState(profile);
   const fileRef = useRef<HTMLInputElement>(null);
   const dragControls = useDragControls();
+  const y = useMotionValue(0);
+  const backdropOpacity = useTransform(y, [0, 400], [1, 0.35], { clamp: true });
+  const handleScale = useTransform(y, [0, 200], [1, 0.6], { clamp: true });
 
   useEffect(() => { if (open) setDraft(profile); }, [open, profile]);
 
@@ -92,33 +95,42 @@ export function EditProfileSheet({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
             onClick={onClose}
             style={{
               background: 'var(--edit-sheet-backdrop)',
               backdropFilter: 'blur(8px)',
+              opacity: backdropOpacity,
             }}
           />
           <motion.section
-            className="fixed inset-x-0 bottom-0 z-[9999] flex flex-col overflow-hidden rounded-t-[32px]"
+            className="fixed inset-x-0 bottom-0 z-[9999] flex flex-col overflow-hidden rounded-t-[32px] will-change-transform"
             style={{
               height: 'min(92dvh, 92vh)',
               background: 'var(--edit-sheet-bg)',
               borderTop: '1px solid var(--edit-sheet-border)',
               boxShadow:
-                '0 -20px 60px -10px rgba(0,0,0,0.10), 0 -2px 0 rgba(255,255,255,0.04) inset',
+                '0 -24px 70px -12px rgba(0,0,0,0.28), 0 -2px 0 rgba(255,255,255,0.04) inset',
               backdropFilter: 'blur(30px) saturate(140%)',
+              y,
             }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'spring', stiffness: 380, damping: 38 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 36, mass: 0.9 }}
             drag="y"
             dragListener={false}
             dragControls={dragControls}
             dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0, bottom: 0.5 }}
+            dragElastic={{ top: 0, bottom: 0.6 }}
+            dragMomentum={false}
             onDragEnd={(_, info) => {
-              if (info.offset.y > 140 || info.velocity.y > 600) onClose();
+              const shouldClose = info.offset.y > 120 || info.velocity.y > 500;
+              if (shouldClose) {
+                onClose();
+              } else {
+                animateMV(y, 0, { type: 'spring', stiffness: 420, damping: 40, mass: 0.8 });
+              }
             }}
           >
 
@@ -126,13 +138,15 @@ export function EditProfileSheet({
             <div
               className="relative shrink-0 flex flex-col items-center pb-1 pt-3 cursor-grab active:cursor-grabbing touch-none"
               onPointerDown={(e) => dragControls.start(e)}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              <div
+              <motion.div
                 className="h-1 w-10 rounded-full"
                 style={{
                   background:
                     'linear-gradient(90deg, var(--brand-pink), var(--brand-purple))',
                   opacity: 0.7,
+                  scaleX: handleScale,
                 }}
               />
             </div>
