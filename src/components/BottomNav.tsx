@@ -176,32 +176,67 @@ export const BottomNavBase = ({
   }, [useNativeGlass]);
 
   // Native Apple Liquid Glass — INNER sliding pill (id: "inner", above WebView).
-  // Subscribes to pillX so the native glass droplet refracts in real time as
-  // the user drags between tabs.
+  // Optimised path: subscribe to pillX changes (no idle rAF loop), cache the
+  // base rect (no per-frame layout reads), coalesce bursts into one rAF, and
+  // skip sub-pixel deltas. Intensity is pushed via a ref so press/drag state
+  // changes don't tear down the subscription.
+  const intensityRef = useRef(0.92);
+  useEffect(() => {
+    intensityRef.current = isPressed || isDragging ? 1 : 0.92;
+  }, [isPressed, isDragging]);
+
   useEffect(() => {
     if (!useNativeGlass) return;
     const el = innerPillRef.current;
-    if (!el || tabWidth === 0) return;
+    const container = pillContainerRef.current;
+    if (!el || !container || tabWidth === 0) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const round = (v: number) => Math.round(v * dpr) / dpr;
+
+    // Base rect captured from the container — the pill's X is pillX + base.left.
+    // The native glass tracks the pill's actual screen position by composing
+    // these without re-querying the DOM per frame.
+    let baseLeft = 0;
+    let baseTop = 0;
+    let height = 0;
+    let radius = 0;
+
+    const measureBase = () => {
+      const r = el.getBoundingClientRect();
+      // El's translateX === pillX.get(), so subtract it to get the "0" anchor.
+      const tx = pillX.get();
+      baseLeft = r.left - tx;
+      baseTop = r.top;
+      height = r.height;
+      radius = r.height / 2;
+    };
+    measureBase();
 
     let started = false;
-    let lastKey = "";
+    let lastX = NaN;
+    let lastIntensity = NaN;
+    let pending = false;
+    let rafId = 0;
 
-    const sync = () => {
-      const r = el.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      const round = (v: number) => Math.round(v * dpr) / dpr;
+    const flush = () => {
+      pending = false;
+      rafId = 0;
+      const x = pillX.get();
+      const intensity = intensityRef.current;
+      // Sub-pixel guard — skip if nothing meaningful changed.
+      if (Math.abs(x - lastX) < 0.5 && intensity === lastIntensity) return;
+      lastX = x;
+      lastIntensity = intensity;
       const rect = {
         id: "inner" as const,
-        x: round(r.left),
-        y: round(r.top),
-        width: round(r.width),
-        height: round(r.height),
-        cornerRadius: round(r.height / 2),
-        intensity: isPressed || isDragging ? 1 : 0.92,
+        x: round(baseLeft + x),
+        y: round(baseTop),
+        width: round(tabWidth),
+        height: round(height),
+        cornerRadius: round(radius),
+        intensity,
       };
-      const key = `${rect.x}|${rect.y}|${rect.width}|${rect.height}|${rect.intensity}`;
-      if (key === lastKey) return;
-      lastKey = key;
       if (!started) {
         started = true;
         LiquidGlass.show(rect);
@@ -210,16 +245,44 @@ export const BottomNavBase = ({
       }
     };
 
-    // rAF loop tied to pillX motion value for buttery 60/120fps refraction
-    let raf = 0;
-    const loop = () => { sync(); raf = requestAnimationFrame(loop); };
-    raf = requestAnimationFrame(loop);
+    const schedule = () => {
+      if (pending) return;
+      pending = true;
+      rafId = requestAnimationFrame(flush);
+    };
+
+    // Initial paint + subscriptions.
+    schedule();
+    const unsubX = pillX.on("change", schedule);
+
+    // Re-measure base on layout-affecting events (rare).
+    const remeasure = () => { measureBase(); schedule(); };
+    const ro = new ResizeObserver(remeasure);
+    ro.observe(container);
+    window.addEventListener("resize", remeasure);
+    window.addEventListener("orientationchange", remeasure);
+    const vv = window.visualViewport;
+    vv?.addEventListener("resize", remeasure);
+    vv?.addEventListener("scroll", remeasure);
+
+    // Intensity-only updates from the press/drag effect above.
+    const intensityPoll = setInterval(() => {
+      if (intensityRef.current !== lastIntensity) schedule();
+    }, 80);
 
     return () => {
-      cancelAnimationFrame(raf);
+      cancelAnimationFrame(rafId);
+      unsubX();
+      ro.disconnect();
+      window.removeEventListener("resize", remeasure);
+      window.removeEventListener("orientationchange", remeasure);
+      vv?.removeEventListener("resize", remeasure);
+      vv?.removeEventListener("scroll", remeasure);
+      clearInterval(intensityPoll);
       LiquidGlass.hide({ id: "inner" });
     };
-  }, [useNativeGlass, tabWidth, isPressed, isDragging]);
+  }, [useNativeGlass, tabWidth, pillX]);
+
 
 
 
