@@ -48,31 +48,21 @@ export const BottomNavBase = ({
   const pointerStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const navRef = useRef<HTMLElement | null>(null);
   const pillRef = useRef<HTMLDivElement | null>(null);
+  const innerPillRef = useRef<HTMLDivElement | null>(null);
   const pillContainerRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [isPressed, setIsPressed] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [dragHoverIndex, setDragHoverIndex] = useState<number | null>(null);
   const pillX = useMotionValue(0);
   const useNativeGlass = isLiquidGlassSupported();
   const [nativeGlassReady, setNativeGlassReady] = useState(false);
   useEffect(() => {
-    // Diagnostics — confirms WebView platform detection at mount time.
-    import('@capacitor/core').then(({ Capacitor }) => {
-      console.log('[BottomNav] platform diagnostics', {
-        'Capacitor.getPlatform()': Capacitor.getPlatform(),
-        'Capacitor.isNativePlatform()': Capacitor.isNativePlatform(),
-        useNativeGlass,
-        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'n/a',
-        href: typeof location !== 'undefined' ? location.href : 'n/a',
-      });
-    });
     return onLiquidGlassReady((ready) => {
-      console.log('[BottomNav] LiquidGlass ready ->', ready);
       setNativeGlassReady(ready);
-      // The actual transparent hole is punched via the SVG mask attached
-      // to #hunie-app-root (see the native-glass effect below).
     });
   }, [useNativeGlass]);
+
 
   const handleTabChange = (tab: Tab) => {
     hapticTap();
