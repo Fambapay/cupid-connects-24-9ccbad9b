@@ -117,14 +117,16 @@ export function ProfileView({
       initial="hidden"
       animate="visible"
     >
-      {/* Soft gradient backdrop */}
+      {/* Soft gradient backdrop — extends into the safe area (notch) */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[280px]"
+        className="pointer-events-none absolute inset-x-0 -z-0"
         style={{
+          top: 'calc(-1 * env(safe-area-inset-top))',
+          height: 'calc(280px + env(safe-area-inset-top))',
           opacity: 'var(--profile-glow-opacity, 1)',
           background:
-            'radial-gradient(70% 60% at 50% 0%, rgba(255,79,163,0.22) 0%, rgba(255,79,163,0) 70%)',
+            'radial-gradient(70% 60% at 50% 0%, rgba(255,79,163,0.28) 0%, rgba(255,79,163,0) 70%)',
         }}
         variants={itemVariants}
       />
