@@ -75,6 +75,7 @@ export function useMatches() {
         lastMessageAt: r.last_message_at,
         unread: r.unread,
         hasMessages: r.has_messages,
+        lastFromMe: Boolean(r.last_from_me),
       })),
     );
     setLoading(false);
