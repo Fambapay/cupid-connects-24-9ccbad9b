@@ -199,89 +199,144 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
           animate={{ y: 0 }}
           exit={{ y: "100%" }}
           transition={{ type: "spring", stiffness: 360, damping: 36 }}
-          className="fixed inset-x-0 bottom-0 top-[6%] z-[61] flex flex-col overflow-hidden rounded-t-3xl border-t border-white/10 bg-background text-foreground shadow-2xl"
+          className="fixed inset-x-0 bottom-0 top-[4%] z-[61] flex flex-col overflow-hidden rounded-t-[28px] border-t border-white/10 bg-[#0a0a0c] text-white shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.6)]"
         >
+          {/* Ambient glow */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-32 left-1/2 h-[420px] w-[520px] -translate-x-1/2 rounded-full opacity-50 blur-[120px]"
+            style={{
+              background:
+                "radial-gradient(closest-side, rgba(240,70,140,0.55), rgba(177,60,255,0.15) 60%, transparent)",
+            }}
+          />
+
           <div className="mx-auto mt-3 h-1 w-10 rounded-full bg-white/15" />
-          <div className="flex items-start justify-between px-5 pt-3">
-            <div>
-              <h2 className="text-xl font-black">Escolhe o teu plano</h2>
-              <p className="mt-0.5 text-sm text-muted-foreground">
-                Começa hoje — cancela quando quiseres
+
+          {!required && (
+            <button
+              onClick={onClose}
+              aria-label="Fechar"
+              className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full bg-white/[0.08] backdrop-blur-md transition-colors hover:bg-white/[0.14]"
+            >
+              <X size={16} />
+            </button>
+          )}
+
+          <div className="relative flex-1 overflow-y-auto pb-[max(env(safe-area-inset-bottom),200px)]">
+            {/* Hero */}
+            <div className="px-6 pt-8 text-center">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.05, duration: 0.4 }}
+                className="mx-auto mb-5 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/70 backdrop-blur-md"
+              >
+                <Sparkles size={11} className="text-pink-400" />
+                Hunie Membership
+              </motion.div>
+              <h2
+                className="text-[34px] font-black leading-[1.05] tracking-[-0.03em]"
+                style={{ fontFamily: "'Instrument Serif', 'Cormorant', serif", fontWeight: 400 }}
+              >
+                Conhece quem
+                <br />
+                <span className="bg-gradient-to-r from-pink-400 via-fuchsia-400 to-violet-400 bg-clip-text italic text-transparent">
+                  está à tua espera.
+                </span>
+              </h2>
+              <p className="mx-auto mt-3 max-w-[280px] text-[14px] leading-snug text-white/55">
+                Desbloqueia tudo o que torna o Hunie uma experiência diferente.
               </p>
             </div>
-            {!required && (
-              <button
-                onClick={onClose}
-                aria-label="Fechar"
-                className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.06]"
-              >
-                <X size={16} />
-              </button>
-            )}
-          </div>
 
-          {/* Billing toggle */}
-          <div className="mt-4 px-5">
-            <div className="relative mx-auto flex w-full max-w-xs items-center rounded-full bg-white/[0.06] p-1">
-              <button
-                onClick={() => setPeriod("monthly")}
-                className={`relative z-10 flex-1 rounded-full py-2 text-sm font-bold transition-colors ${
-                  period === "monthly" ? "text-white" : "text-white/55"
-                }`}
-              >
-                Mensal
-              </button>
-              <button
-                onClick={() => setPeriod("annual")}
-                className={`relative z-10 flex-1 rounded-full py-2 text-sm font-bold transition-colors ${
-                  period === "annual" ? "text-white" : "text-white/55"
-                }`}
-              >
-                Anual
-              </button>
-              <motion.div
-                layout
-                transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                className="absolute inset-y-1 w-1/2 rounded-full bg-gradient-to-r from-fuchsia-500 to-pink-500"
-                style={{ left: period === "monthly" ? "4px" : "50%" }}
-              />
-            </div>
-            <AnimatePresence>
-              {period === "annual" && (
+            {/* Billing toggle */}
+            <div className="mt-7 px-6">
+              <div className="relative mx-auto flex w-full max-w-[280px] items-center rounded-full border border-white/[0.06] bg-white/[0.04] p-1 backdrop-blur-md">
                 <motion.div
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="mt-2 text-center text-xs font-semibold text-emerald-400"
+                  layout
+                  transition={{ type: "spring", stiffness: 500, damping: 38 }}
+                  className="absolute inset-y-1 w-[calc(50%-4px)] rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.25)]"
+                  style={{ left: period === "monthly" ? "4px" : "calc(50% + 0px)" }}
+                />
+                <button
+                  onClick={() => setPeriod("monthly")}
+                  className={`relative z-10 flex-1 rounded-full py-2 text-[13px] font-semibold transition-colors ${
+                    period === "monthly" ? "text-black" : "text-white/60"
+                  }`}
                 >
-                  💚 Poupa até 33%
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                  Mensal
+                </button>
+                <button
+                  onClick={() => setPeriod("annual")}
+                  className={`relative z-10 flex-1 rounded-full py-2 text-[13px] font-semibold transition-colors ${
+                    period === "annual" ? "text-black" : "text-white/60"
+                  }`}
+                >
+                  Anual
+                  <span className="ml-1 rounded-full bg-emerald-400/90 px-1.5 py-px text-[9px] font-bold text-black">
+                    -33%
+                  </span>
+                </button>
+              </div>
+            </div>
 
-          {/* Plans scroll */}
-          <div className="flex-1 overflow-y-auto px-3 pb-[max(env(safe-area-inset-bottom),120px)] pt-5">
-            <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
-              {planCards.map((plan) => (
-                <PlanCardView
+            {/* Plan rows (Apple-style vertical selectable list) */}
+            <div className="mt-6 flex flex-col gap-2.5 px-4">
+              {planCards.map((plan, i) => (
+                <PlanRow
                   key={plan.tier}
                   plan={plan}
                   period={period}
                   country={country}
-                  onSelect={() => setSelected(plan)}
+                  selected={selectedTier === plan.tier}
+                  onSelect={() => setSelectedTier(plan.tier)}
+                  index={i}
                 />
               ))}
             </div>
-            <p className="mt-6 px-2 text-center text-xs text-muted-foreground">
-              🔒 Pagamento seguro via {paymentSummary}
+
+            {/* Trust row */}
+            <div className="mt-6 flex items-center justify-center gap-4 px-6 text-[11px] text-white/45">
+              <span className="inline-flex items-center gap-1.5">
+                <ShieldCheck size={12} /> Pagamento seguro
+              </span>
+              <span className="h-3 w-px bg-white/15" />
+              <span>Cancela quando quiseres</span>
+            </div>
+            <p className="mt-2 px-6 text-center text-[10.5px] text-white/30">
+              via {paymentSummary} · Renovação automática
             </p>
-            <p className="mt-1 text-center text-[11px] text-muted-foreground/80">
-              Cancela a qualquer momento · Renovação automática
-            </p>
+          </div>
+
+          {/* Sticky CTA */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
+            <div className="h-16 bg-gradient-to-t from-[#0a0a0c] via-[#0a0a0c]/95 to-transparent" />
+            <div className="pointer-events-auto bg-[#0a0a0c] px-5 pb-[max(env(safe-area-inset-bottom),20px)] pt-2">
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setSelected(activePlan)}
+                className="relative flex h-14 w-full items-center justify-center overflow-hidden rounded-full text-[15px] font-bold text-white shadow-[0_12px_40px_-8px_rgba(240,70,140,0.55)]"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #FF4FA3 0%, #E935A0 45%, #B13CFF 100%)",
+                }}
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  Continuar com {activePlan.label}
+                  <ArrowRight size={16} />
+                </span>
+              </motion.button>
+              <p className="mt-2 text-center text-[11px] text-white/45">
+                {period === "annual"
+                  ? `${formatPrice(activePlan.annualPriceMzn, country)} por ano — cobrado hoje`
+                  : `${formatPrice(activePlan.priceMzn, country)} por mês — cobrado hoje`}
+              </p>
+            </div>
           </div>
         </motion.div>
       )}
+
 
       {selected && (
         <DebitoCheckoutSheet
