@@ -23,6 +23,7 @@ import type { DiscoveryProfile, SwipeDirection } from "@/components/discovery/ty
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 import { useForceDarkTheme } from "@/lib/theme";
+import { maybeRequestReview, recordMatch } from "@/lib/native/inAppReview";
 
 export const Route = createFileRoute("/discover")({
   ssr: false,
@@ -127,6 +128,7 @@ function Discover() {
     }
     if (result.matched) {
       setMatched({ id: target.id, name: target.name, photo: target.photo ?? null });
+      recordMatch().catch(() => {});
     }
     return result;
   };
@@ -324,7 +326,10 @@ function Discover() {
         targetName={matched?.name ?? ""}
         targetPhoto={matched?.photo}
         sending={openingChat}
-        onClose={() => setMatched(null)}
+        onClose={async () => {
+          setMatched(null);
+          await maybeRequestReview();
+        }}
         onSendMessage={async () => {
           if (!matched || !user) return;
           setOpeningChat(true);
