@@ -1,4 +1,4 @@
-import { registerPlugin } from '@capacitor/core'
+import { Capacitor, registerPlugin } from '@capacitor/core'
 import { getPlatform } from './platform'
 
 /**
@@ -17,6 +17,16 @@ export interface LiquidGlassRect {
   cornerRadius?: number
   /** 0-1 alpha multiplier on the native glass surface (default 1). */
   intensity?: number
+  /** Native layer placement. `above` lets real iOS glass sit over web pixels. */
+  placement?: 'behind' | 'above'
+  /** Transparent holes in the native glass so pill text/icons stay crisp. */
+  exclusionRects?: Array<{
+    x: number
+    y: number
+    width: number
+    height: number
+    cornerRadius?: number
+  }>
 }
 
 interface LiquidGlassPlugin {
@@ -36,9 +46,16 @@ const native = registerPlugin<LiquidGlassPlugin>('LiquidGlass', {
   android: () => noop,
 })
 
-export const isLiquidGlassSupported = (): boolean => getPlatform() === 'ios'
+export const isLiquidGlassSupported = (): boolean => {
+  try {
+    return Capacitor.isNativePlatform() && getPlatform() === 'ios' && Capacitor.isPluginAvailable('LiquidGlass')
+  } catch {
+    return false
+  }
+}
 
 let nativeReady = false
+const activeSurfaces = new Set<string>()
 export const isLiquidGlassReady = (): boolean => nativeReady
 
 type Listener = (ready: boolean) => void
@@ -59,7 +76,8 @@ export const LiquidGlass: LiquidGlassPlugin = {
     if (!isLiquidGlassSupported()) return
     try {
       await native.show(rect)
-      setReady(true)
+      activeSurfaces.add(rect.id ?? 'default')
+      setReady(activeSurfaces.size > 0)
     } catch (err) {
       console.error('[LiquidGlass] show failed', err)
       setReady(false)
@@ -76,8 +94,8 @@ export const LiquidGlass: LiquidGlassPlugin = {
     try { await native.hide(opts) } catch (err) {
       console.error('[LiquidGlass] hide failed', err)
     }
-    // only fully unready when the default surface is gone
-    if (!opts?.id || opts.id === 'default') setReady(false)
+    activeSurfaces.delete(opts?.id ?? 'default')
+    setReady(activeSurfaces.size > 0)
   },
 }
 
