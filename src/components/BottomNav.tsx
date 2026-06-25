@@ -13,7 +13,6 @@ import { hapticTap } from "@/hooks/useNativePlatform";
 import { useLikesCount } from "@/hooks/useLikesCount";
 import { useUnreadChats } from "@/hooks/useUnreadChats";
 import NativeTabs, { nativeTabsAvailable } from "@/lib/native/nativeTabs";
-import { NativeTabBar, isNativeTabBarSupported, onTabSelected } from "@/lib/native/nativeTabBar";
 
 type Tab = "discover" | "likes" | "chat" | "profile";
 
@@ -483,15 +482,10 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
   const handleTabChange = (t: TabId) => {
     navigate({ to: TAB_TO_PATH[t] });
   };
-
   const [nativeFailed, setNativeFailed] = useState(false);
 
-  // Preferir o novo plugin NativeTabBar (id-based) quando disponível.
-  if (isNativeTabBarSupported()) {
-    return <NativeTabBarBottomNav activeTab={activeTab} likesCount={likesCount} unreadChats={unreadChats} />;
-  }
 
-  // iOS nativo (legacy NativeTabs) → UITabBar com Liquid Glass real. Web/Android/failure → HTML pill.
+  // Web/Android/failure → HTML pill fallback.
   if (nativeTabsAvailable() && !nativeFailed) {
     return (
       <NativeBottomNav
@@ -516,29 +510,6 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
       onTabChange={handleTabChange}
     />
   );
-}
-
-function NativeTabBarBottomNav({ activeTab, likesCount, unreadChats }: { activeTab: TabId; likesCount: number; unreadChats: number }) {
-  const navigate = useNavigate();
-  useEffect(() => {
-    NativeTabBar.configure({
-      tabs: [
-        { id: "discover", title: "Descobrir", sfSymbol: "sparkles" },
-        { id: "likes", title: "Likes", sfSymbol: "heart.fill", badge: likesCount || undefined },
-        { id: "chat", title: "Chat", sfSymbol: "message.fill", badge: unreadChats || undefined },
-        { id: "profile", title: "Perfil", sfSymbol: "person.fill" },
-      ],
-      activeId: activeTab,
-    });
-    NativeTabBar.show();
-    const unsub = onTabSelected((id) => { navigate({ to: TAB_TO_PATH[id as TabId] }); });
-    return () => { unsub(); NativeTabBar.hide(); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  useEffect(() => { NativeTabBar.setActiveTab({ id: activeTab }); }, [activeTab]);
-  useEffect(() => { NativeTabBar.setBadge({ id: "likes", value: likesCount > 0 ? likesCount : null }); }, [likesCount]);
-  useEffect(() => { NativeTabBar.setBadge({ id: "chat", value: unreadChats > 0 ? unreadChats : null }); }, [unreadChats]);
-  return null;
 }
 
 
