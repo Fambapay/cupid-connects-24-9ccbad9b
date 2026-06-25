@@ -24,9 +24,9 @@ export interface PaywallFlowProps {
 
 export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowProps) {
   const [stage, setStage] = useState<Stage>("fomo");
-  const [period, setPeriod] = useState<BillingPeriod>("monthly");
   const [selected, setSelected] = useState<PlanCardConfig | null>(null);
   const [selectedTier, setSelectedTier] = useState<PlanCardConfig["tier"]>("plus");
+
   const { user } = useAuth();
   const { profile, reload } = useProfile();
   const { country, config } = useCountry();
