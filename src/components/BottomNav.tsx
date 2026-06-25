@@ -53,6 +53,7 @@ export const BottomNavBase = ({
   const [isPressed, setIsPressed] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragHoverIndex, setDragHoverIndex] = useState<number | null>(null);
+  const [visualTab, setVisualTab] = useState<Tab>(activeTab);
   const dragHoverIndexRef = useRef<number | null>(null);
   const pillX = useMotionValue(0);
   const useNativeGlass = isLiquidGlassSupported();
@@ -65,6 +66,7 @@ export const BottomNavBase = ({
 
 
   const handleTabChange = (tab: Tab) => {
+    setVisualTab(tab);
     hapticTap();
     onTabChange(tab);
   };
@@ -78,9 +80,13 @@ export const BottomNavBase = ({
 
   const activeIndex = Math.max(
     0,
-    tabs.findIndex((t) => t.id === activeTab),
+    tabs.findIndex((t) => t.id === visualTab),
   );
   const tabWidth = containerWidth / tabs.length;
+
+  useEffect(() => {
+    if (!isDragging) setVisualTab(activeTab);
+  }, [activeTab, isDragging]);
 
   // Measure container
   useLayoutEffect(() => {
@@ -108,7 +114,6 @@ export const BottomNavBase = ({
       type: "tween",
       duration: 0.38,
       ease: [0.32, 0.72, 0, 1],
-      restDelta: 0.001,
     });
     return () => controls.stop();
   }, [activeIndex, tabWidth, isDragging, pillX]);
@@ -260,8 +265,10 @@ export const BottomNavBase = ({
                   dragHoverIndexRef.current = null;
                   setDragHoverIndex(null);
                   hapticTap();
-                  if (tabs[clamped].id !== activeTab) {
-                    onTabChange(tabs[clamped].id);
+                  const nextTab = tabs[clamped].id;
+                  setVisualTab(nextTab);
+                  if (nextTab !== activeTab) {
+                    onTabChange(nextTab);
                   } else {
                     animate(pillX, clamped * tabWidth, {
                       type: "tween",
@@ -275,7 +282,7 @@ export const BottomNavBase = ({
           )}
 
           {tabs.map((tab, index) => {
-            const isActive = activeTab === tab.id;
+            const isActive = visualTab === tab.id;
             const isHover = dragHoverIndex === index && dragHoverIndex !== activeIndex;
             const shouldAnimate = false;
 
