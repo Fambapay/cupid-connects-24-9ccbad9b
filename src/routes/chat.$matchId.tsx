@@ -228,19 +228,24 @@ function ChatRoom() {
 
   if (loading || !peer) {
     return (
-      <div className="fixed inset-0 flex flex-col bg-background" aria-busy="true" aria-label="A carregar conversa">
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
-          <div className="h-9 w-9 rounded-full bg-white/[0.06] animate-pulse" />
-          <div className="h-11 w-11 rounded-full bg-white/[0.08] animate-pulse" />
+      <div
+        className="fixed inset-0 flex flex-col"
+        style={{ background: "var(--chat-bg)", color: "var(--chat-fg)" }}
+        aria-busy="true"
+        aria-label="A carregar conversa"
+      >
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-border/40">
+          <div className="h-9 w-9 rounded-full bg-foreground/5 animate-pulse" />
+          <div className="h-11 w-11 rounded-full bg-foreground/10 animate-pulse" />
           <div className="flex-1 space-y-2">
-            <div className="h-3.5 w-32 rounded bg-white/[0.08] animate-pulse" />
-            <div className="h-3 w-20 rounded bg-white/[0.05] animate-pulse" />
+            <div className="h-3.5 w-32 rounded bg-foreground/10 animate-pulse" />
+            <div className="h-3 w-20 rounded bg-foreground/5 animate-pulse" />
           </div>
         </div>
         <div className="flex-1 flex flex-col gap-3 p-4">
-          <div className="h-10 w-2/3 rounded-2xl bg-white/[0.05] animate-pulse" />
-          <div className="h-10 w-1/2 rounded-2xl bg-white/[0.05] animate-pulse self-end" />
-          <div className="h-10 w-3/5 rounded-2xl bg-white/[0.05] animate-pulse" />
+          <div className="h-10 w-2/3 rounded-2xl bg-foreground/5 animate-pulse" />
+          <div className="h-10 w-1/2 rounded-2xl bg-foreground/5 animate-pulse self-end" />
+          <div className="h-10 w-3/5 rounded-2xl bg-foreground/5 animate-pulse" />
         </div>
       </div>
     );
