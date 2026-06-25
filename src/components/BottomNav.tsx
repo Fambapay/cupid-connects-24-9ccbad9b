@@ -53,6 +53,7 @@ export const BottomNavBase = ({
   const [isPressed, setIsPressed] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragHoverIndex, setDragHoverIndex] = useState<number | null>(null);
+  const [nativeGlassActive, setNativeGlassActive] = useState(false);
   const [visualTab, setVisualTab] = useState<Tab>(activeTab);
   const dragHoverIndexRef = useRef<number | null>(null);
   const pillX = useMotionValue(0);
@@ -116,7 +117,10 @@ export const BottomNavBase = ({
   // not a transparent CSS cutout. We punch transparent holes over every icon +
   // label so text remains crisp per our liquid-glass rule.
   useEffect(() => {
-    if (!useNativeGlass) return;
+    if (!useNativeGlass) {
+      setNativeGlassActive(false);
+      return;
+    }
     const el = pillRef.current;
     if (!el) return;
 
@@ -153,7 +157,9 @@ export const BottomNavBase = ({
       lastKey = key;
       if (!started) {
         started = true;
-        LiquidGlass.show(rect);
+        LiquidGlass.show(rect)
+          .then(() => setNativeGlassActive(true))
+          .catch(() => setNativeGlassActive(false));
       } else {
         LiquidGlass.update(rect);
       }
@@ -180,6 +186,7 @@ export const BottomNavBase = ({
       window.removeEventListener("orientationchange", schedule);
       vv?.removeEventListener("resize", schedule);
       vv?.removeEventListener("scroll", schedule);
+      setNativeGlassActive(false);
       LiquidGlass.hide({ id: "bottom-nav-outer" });
     };
   }, [useNativeGlass]);
@@ -199,7 +206,7 @@ export const BottomNavBase = ({
     <nav ref={navRef} className="tab-bar" style={bottomStyle}>
       <div
         ref={pillRef}
-        className={`tab-bar-pill${useNativeGlass ? " tab-bar-pill--native" : ""}`}
+        className={`tab-bar-pill${nativeGlassActive ? " tab-bar-pill--native" : ""}`}
         data-interacting={isPressed || isDragging}
         data-dragging={isDragging}
       >
