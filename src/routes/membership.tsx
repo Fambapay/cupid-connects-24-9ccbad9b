@@ -23,6 +23,7 @@ export const Route = createFileRoute("/membership")({
 });
 
 function MembershipPage() {
+  useForceDarkTheme();
   const navigate = useNavigate();
   const { required } = Route.useSearch();
   return (
