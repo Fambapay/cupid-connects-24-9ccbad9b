@@ -335,10 +335,9 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
                 </span>
               </motion.button>
               <p className="mt-2 text-center text-[11px] text-white/45">
-                {period === "annual"
-                  ? `${formatPrice(activePlan.annualPriceMzn, country)}/ano · equivale a ${formatPrice(Math.round(activePlan.annualPriceMzn / 12), country)}/mês`
-                  : `${formatPrice(activePlan.priceMzn, country)} hoje · menos que um jantar a dois`}
+                {`${formatPrice(activePlan.priceMzn, country)} hoje · menos que um jantar a dois`}
               </p>
+
             </div>
           </div>
 
