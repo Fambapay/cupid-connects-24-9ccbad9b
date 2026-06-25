@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {
   Body,
+  Button,
   Container,
   Head,
   Heading,
@@ -13,6 +14,8 @@ import type { TemplateEntry } from './registry'
 import {
   Brand,
   Footer,
+  button,
+  buttonWrap,
   container,
   h1,
   main,
@@ -24,6 +27,7 @@ import {
 } from './_shared'
 
 const SITE_NAME = 'Hunie'
+const APP_URL = 'https://hunie.app'
 
 interface OrderProps {
   name?: string
@@ -98,6 +102,12 @@ const OrderConfirmationEmail = ({
                 <strong>{orderId}</strong>
               </div>
             ) : null}
+          </Section>
+
+          <Section style={buttonWrap}>
+            <Button href={APP_URL} style={button}>
+              Voltar à app
+            </Button>
           </Section>
 
           <Text style={text}>
