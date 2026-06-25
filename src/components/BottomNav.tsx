@@ -532,16 +532,13 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
     });
   }, [router]);
 
-  // On iOS, render the real UITabBar via the native plugin instead of any HTML.
-  if (isNativeTabBarSupported()) {
-    return (
-      <NativeBottomNav
-        activeTab={activeTab}
-        likesCount={likesCount}
-        unreadChats={unreadChats}
-      />
-    );
-  }
+  // NOTE: We intentionally do NOT render the system UITabBar on iOS — the
+  // custom BottomNavBase already uses the native Liquid Glass plugin for
+  // refraction and keeps page transitions in sync with the rest of the app.
+  // Mixing UITabBar (instant) with framer-motion page transitions produced
+  // a "broken / not fluid" feel on the simulator.
+  void NativeBottomNav;
+  void isNativeTabBarSupported;
 
   return (
     <BottomNavBase
