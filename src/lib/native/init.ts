@@ -1,5 +1,5 @@
 import { isNative, getPlatform } from './platform'
-import { initAppStateTracking } from './localNotifications'
+import { initAppStateTracking, initLocalNotificationHandlers } from './localNotifications'
 import { setupStatusBar } from './statusBar'
 import { setupKeyboard } from './keyboard'
 import { setupDeepLinks } from './deepLinks'
@@ -31,6 +31,7 @@ export async function initNative() {
     setupDeepLinks(),
     setupBackButton(),
     initAppStateTracking(),
+    initLocalNotificationHandlers(),
   ])
 
   // Hide splash a tick after the first paint

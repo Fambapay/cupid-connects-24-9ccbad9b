@@ -1,5 +1,40 @@
 import { isNative } from './platform'
 
+type NavigateFn = (path: string) => void
+let navigator: NavigateFn | null = null
+
+export function setLocalNotificationNavigator(fn: NavigateFn) {
+  navigator = fn
+}
+
+function routeFromExtra(extra: Record<string, string> | undefined): string | null {
+  if (!extra) return null
+  if (extra.route) return extra.route
+  if (extra.type === 'message' && extra.matchId) return `/chat/${extra.matchId}`
+  if (extra.type === 'match') return '/matches'
+  if (extra.type === 'like') return '/matches'
+  return null
+}
+
+export async function initLocalNotificationHandlers() {
+  if (!isNative()) return
+  try {
+    const { LocalNotifications } = await import('@capacitor/local-notifications')
+    await LocalNotifications.removeAllListeners()
+    await LocalNotifications.addListener('localNotificationActionPerformed', (event) => {
+      const extra = (event.notification?.extra ?? {}) as Record<string, string>
+      const path = routeFromExtra(extra)
+      if (path && navigator) {
+        try { navigator(path) } catch { /* ignore */ }
+      }
+    })
+  } catch {
+    // ignore
+  }
+}
+
+
+
 let permissionGranted = false
 let appInBackground = false
 

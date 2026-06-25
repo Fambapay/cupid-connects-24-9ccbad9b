@@ -22,6 +22,7 @@ import { PushPermissionPrompt } from "@/components/PushPermissionPrompt";
 import { supabase } from "@/integrations/supabase/client";
 import { CountryProvider } from "@/lib/country/context";
 import { initNative } from "@/lib/native/init";
+import { setLocalNotificationNavigator } from "@/lib/native/localNotifications";
 import { setupNativePush } from "@/lib/native/push";
 import { isNative } from "@/lib/native/platform";
 import { useSystemTheme } from "@/lib/theme";
@@ -32,9 +33,13 @@ function ThemeSync() {
 }
 
 function NativeBoot() {
+  const router = useRouter();
   useEffect(() => {
+    setLocalNotificationNavigator((path) => {
+      try { router.navigate({ to: path }); } catch { /* ignore */ }
+    });
     void initNative();
-  }, []);
+  }, [router]);
   return null;
 }
 
