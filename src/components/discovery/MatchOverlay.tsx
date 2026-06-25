@@ -8,6 +8,10 @@ import { signPhoto } from "@/lib/photos";
 const ROSE = "#FF5C8A";
 const PLUM = "#9B5BFF";
 
+// Module-level cache so the user's own photo is fetched once per session
+// and is instantly available when a match overlay opens.
+const myPhotoCache = new Map<string, string>();
+
 interface Props {
   open: boolean;
   targetName: string;
