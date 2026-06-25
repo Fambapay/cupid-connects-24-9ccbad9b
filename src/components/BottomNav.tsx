@@ -12,7 +12,7 @@ import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { hapticTap } from "@/hooks/useNativePlatform";
 import { useLikesCount } from "@/hooks/useLikesCount";
 import { useUnreadChats } from "@/hooks/useUnreadChats";
-import { LiquidGlass, isLiquidGlassSupported, onLiquidGlassReady } from "@/lib/native/liquidGlass";
+import { LiquidGlass, isLiquidGlassSupported } from "@/lib/native/liquidGlass";
 import {
   NativeTabBar,
   isNativeTabBarSupported,
@@ -57,13 +57,6 @@ export const BottomNavBase = ({
   const dragHoverIndexRef = useRef<number | null>(null);
   const pillX = useMotionValue(0);
   const useNativeGlass = isLiquidGlassSupported();
-  const [nativeGlassReady, setNativeGlassReady] = useState(false);
-  useEffect(() => {
-    return onLiquidGlassReady((ready) => {
-      setNativeGlassReady(ready);
-    });
-  }, [useNativeGlass]);
-
 
   const handleTabChange = (tab: Tab) => {
     setVisualTab(tab);
@@ -118,7 +111,10 @@ export const BottomNavBase = ({
     return () => controls.stop();
   }, [activeIndex, tabWidth, isDragging, pillX]);
 
-  // Native Apple Liquid Glass — outer tab bar surface (id: "default", behind WebView).
+  // Native Apple Liquid Glass — outer tab bar surface.
+  // On iOS this is rendered ABOVE the WebView so it is the real Apple material,
+  // not a transparent CSS cutout. We punch transparent holes over every icon +
+  // label so text remains crisp per our liquid-glass rule.
   useEffect(() => {
     if (!useNativeGlass) return;
     const el = pillRef.current;
@@ -133,13 +129,26 @@ export const BottomNavBase = ({
       const dpr = window.devicePixelRatio || 1;
       const round = (v: number) => Math.round(v * dpr) / dpr;
       const rect = {
+        id: "bottom-nav-outer",
         x: round(r.left),
         y: round(r.top),
         width: round(r.width),
         height: round(r.height),
         cornerRadius: round(r.height / 2),
+        intensity: 1,
+        placement: "above" as const,
+        exclusionRects: Array.from(el.querySelectorAll<HTMLElement>("[data-glass-protected]")).map((protectedEl) => {
+          const pr = protectedEl.getBoundingClientRect();
+          return {
+            x: round(pr.left),
+            y: round(pr.top),
+            width: round(pr.width),
+            height: round(pr.height),
+            cornerRadius: round(Math.min(pr.width, pr.height) / 2),
+          };
+        }),
       };
-      const key = `${rect.x}|${rect.y}|${rect.width}|${rect.height}`;
+      const key = `${rect.x}|${rect.y}|${rect.width}|${rect.height}|${rect.exclusionRects.map((protectedRect) => `${protectedRect.x},${protectedRect.y},${protectedRect.width},${protectedRect.height}`).join(";")}`;
       if (key === lastKey) return;
       lastKey = key;
       if (!started) {
@@ -171,7 +180,7 @@ export const BottomNavBase = ({
       window.removeEventListener("orientationchange", schedule);
       vv?.removeEventListener("resize", schedule);
       vv?.removeEventListener("scroll", schedule);
-      LiquidGlass.hide();
+      LiquidGlass.hide({ id: "bottom-nav-outer" });
     };
   }, [useNativeGlass]);
 
@@ -190,7 +199,7 @@ export const BottomNavBase = ({
     <nav ref={navRef} className="tab-bar" style={bottomStyle}>
       <div
         ref={pillRef}
-        className={`tab-bar-pill${nativeGlassReady ? " tab-bar-pill--native" : ""}`}
+        className={`tab-bar-pill${useNativeGlass ? " tab-bar-pill--native" : ""}`}
         data-interacting={isPressed || isDragging}
         data-dragging={isDragging}
       >
@@ -365,7 +374,7 @@ const TabButton = ({
       style={{ background: "none", border: "none" }}
       aria-label={label}
     >
-      <div className="relative flex items-center z-10">
+      <div data-glass-protected="true" className="relative flex items-center z-10">
         <Icon
           className={`tab-bar-icon w-[22px] h-[22px] ${shouldAnimate ? "animate-notification-bounce" : ""}`}
           style={{ fill: "none" }}
@@ -390,6 +399,7 @@ const TabButton = ({
         </AnimatePresence>
       </div>
       <span
+        data-glass-protected="true"
         className="relative text-[10px] leading-none z-10 tracking-wide"
         style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900, opacity: isActive ? 0.95 : 0.6 }}
       >
