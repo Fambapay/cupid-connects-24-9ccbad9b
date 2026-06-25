@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Hunie</string>
+    <string name="title_activity_main">Hunie</string>
+    <string name="package_name">com.hunie.app</string>
+    <string name="custom_url_scheme">com.hunie.app</string>
+</resources>
