@@ -3,9 +3,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   motion,
   AnimatePresence,
-  useMotionValue,
-  useTransform,
   animate,
+  useMotionValue,
   type MotionValue,
 } from "framer-motion";
 import { User, Heart, MessageCircle, Compass, type LucideIcon } from "lucide-react";
@@ -54,6 +53,8 @@ export const BottomNavBase = ({
   const [isPressed, setIsPressed] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragHoverIndex, setDragHoverIndex] = useState<number | null>(null);
+  const [visualTab, setVisualTab] = useState<Tab>(activeTab);
+  const dragHoverIndexRef = useRef<number | null>(null);
   const pillX = useMotionValue(0);
   const useNativeGlass = isLiquidGlassSupported();
   const [nativeGlassReady, setNativeGlassReady] = useState(false);
@@ -65,6 +66,7 @@ export const BottomNavBase = ({
 
 
   const handleTabChange = (tab: Tab) => {
+    setVisualTab(tab);
     hapticTap();
     onTabChange(tab);
   };
@@ -78,13 +80,13 @@ export const BottomNavBase = ({
 
   const activeIndex = Math.max(
     0,
-    tabs.findIndex((t) => t.id === activeTab),
+    tabs.findIndex((t) => t.id === visualTab),
   );
   const tabWidth = containerWidth / tabs.length;
 
-  // Pill refraction intensity follows press/drag state
-  const pillBlur = isPressed || isDragging ? 18 : 10;
-  const pillSat = isPressed || isDragging ? 220 : 160;
+  useEffect(() => {
+    if (!isDragging) setVisualTab(activeTab);
+  }, [activeTab, isDragging]);
 
   // Measure container
   useLayoutEffect(() => {
@@ -109,11 +111,9 @@ export const BottomNavBase = ({
       return;
     }
     const controls = animate(pillX, target, {
-      type: "spring",
-      stiffness: 520,
-      damping: 38,
-      mass: 0.55,
-      restDelta: 0.001,
+      type: "tween",
+      duration: 0.38,
+      ease: [0.32, 0.72, 0, 1],
     });
     return () => controls.stop();
   }, [activeIndex, tabWidth, isDragging, pillX]);
@@ -191,6 +191,8 @@ export const BottomNavBase = ({
       <div
         ref={pillRef}
         className={`tab-bar-pill${nativeGlassReady ? " tab-bar-pill--native" : ""}`}
+        data-interacting={isPressed || isDragging}
+        data-dragging={isDragging}
       >
         <div ref={pillContainerRef} className="relative flex items-stretch w-full h-full">
           {/* Draggable active pill — slides between tabs */}
@@ -206,8 +208,11 @@ export const BottomNavBase = ({
                   padding: "0 4px",
                   willChange: "transform",
                 }}
-                animate={{ scale: isPressed || isDragging ? 1.08 : 1 }}
-                transition={{ type: "spring", stiffness: 560, damping: 34, mass: 0.5 }}
+                animate={{
+                  scaleX: isDragging ? 1.14 : isPressed ? 1.07 : 1,
+                  scaleY: isPressed || isDragging ? 0.96 : 1,
+                }}
+                transition={{ type: "spring", stiffness: 420, damping: 42, mass: 0.7 }}
               >
                 <div
                   ref={innerPillRef}
@@ -228,7 +233,7 @@ export const BottomNavBase = ({
                 }}
                 drag="x"
                 dragConstraints={{ left: 0, right: (tabs.length - 1) * tabWidth }}
-                dragElastic={0.06}
+                dragElastic={0}
                 dragMomentum={false}
                 onPointerDown={() => {
                   setIsPressed(true);
@@ -238,6 +243,7 @@ export const BottomNavBase = ({
                 onPointerCancel={() => setIsPressed(false)}
                 onDragStart={() => {
                   setIsDragging(true);
+                  dragHoverIndexRef.current = activeIndex;
                   setDragHoverIndex(activeIndex);
                 }}
                 onDrag={() => {
@@ -245,25 +251,29 @@ export const BottomNavBase = ({
                   // do NOT navigate yet, only commit on release.
                   const idx = Math.round((pillX.get() ?? 0) / tabWidth);
                   const clamped = Math.max(0, Math.min(tabs.length - 1, idx));
-                  setDragHoverIndex((prev) => {
-                    if (prev !== clamped) hapticTap();
-                    return clamped;
-                  });
+                  if (dragHoverIndexRef.current !== clamped) {
+                    dragHoverIndexRef.current = clamped;
+                    setDragHoverIndex(clamped);
+                    hapticTap();
+                  }
                 }}
                 onDragEnd={() => {
                   const idx = Math.round((pillX.get() ?? 0) / tabWidth);
                   const clamped = Math.max(0, Math.min(tabs.length - 1, idx));
                   setIsDragging(false);
                   setIsPressed(false);
+                  dragHoverIndexRef.current = null;
                   setDragHoverIndex(null);
                   hapticTap();
-                  if (tabs[clamped].id !== activeTab) {
-                    onTabChange(tabs[clamped].id);
+                  const nextTab = tabs[clamped].id;
+                  setVisualTab(nextTab);
+                  if (nextTab !== activeTab) {
+                    onTabChange(nextTab);
                   } else {
                     animate(pillX, clamped * tabWidth, {
-                      type: "spring",
-                      stiffness: 380,
-                      damping: 32,
+                      type: "tween",
+                      duration: 0.28,
+                      ease: [0.32, 0.72, 0, 1],
                     });
                   }
                 }}
@@ -272,7 +282,7 @@ export const BottomNavBase = ({
           )}
 
           {tabs.map((tab, index) => {
-            const isActive = activeTab === tab.id;
+            const isActive = visualTab === tab.id;
             const isHover = dragHoverIndex === index && dragHoverIndex !== activeIndex;
             const shouldAnimate = false;
 
@@ -349,8 +359,8 @@ const TabButton = ({
         pointerStartRef.current = null;
         onTap();
       }}
-      whileTap={{ scale: 0.92 }}
-      transition={{ type: "spring", stiffness: 500, damping: 28 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ duration: 0.14, ease: [0.32, 0.72, 0, 1] }}
       className="tab-bar-item relative flex flex-col items-center justify-center gap-[3px] h-full flex-1 z-10"
       style={{ background: "none", border: "none" }}
       aria-label={label}
