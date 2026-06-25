@@ -303,12 +303,12 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
             <div className="pointer-events-auto bg-[#0a0a0c] px-5 pb-[max(env(safe-area-inset-bottom),20px)] pt-2">
               {fomoData.count > 0 && (
                 <p className="mb-2 flex items-center justify-center gap-1.5 text-[11.5px] font-medium text-pink-300/90">
-                  <Flame size={12} className="text-pink-400" />
                   {fomoData.count === 1
                     ? "1 pessoa já te deu like — vê quem é"
                     : `${fomoData.count} pessoas já te deram like — vê quem são`}
                 </p>
               )}
+
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setSelected(activePlan)}
