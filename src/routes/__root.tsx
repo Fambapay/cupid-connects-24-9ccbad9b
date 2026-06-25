@@ -192,6 +192,30 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function AnimatedOutlet() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // Key by the first top-level segment so transitions only fire when switching
+  // top-level sections (discovery, matches, chat, profile, settings, etc.).
+  // Nested navigation inside the same section (e.g. /chat -> /chat/$matchId)
+  // keeps the same key so layouts can manage their own internal transitions.
+  const sectionKey = pathname.split("/")[1] || "root";
+
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={sectionKey}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+        style={{ minHeight: "100%" }}
+      >
+        <Outlet />
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -200,7 +224,7 @@ function RootComponent() {
       <CountryProvider>
         <NativeBoot />
         <ThemeSync />
-        <Outlet />
+        <AnimatedOutlet />
         <GlobalNotifiers />
         <PushPromptGate />
         <Toaster
@@ -217,5 +241,6 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+
 
 
