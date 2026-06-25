@@ -180,9 +180,9 @@ export const BottomNavBase = ({
   // base rect (no per-frame layout reads), coalesce bursts into one rAF, and
   // skip sub-pixel deltas. Intensity is pushed via a ref so press/drag state
   // changes don't tear down the subscription.
-  const intensityRef = useRef(0.92);
+  const intensityRef = useRef(1);
   useEffect(() => {
-    intensityRef.current = isPressed || isDragging ? 1 : 0.92;
+    intensityRef.current = isPressed || isDragging ? 1.25 : 1;
   }, [isPressed, isDragging]);
 
   useEffect(() => {
