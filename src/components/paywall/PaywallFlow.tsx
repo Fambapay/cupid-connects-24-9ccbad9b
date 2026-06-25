@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Check, ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
+import { X, Check, ArrowRight, Sparkles, ShieldCheck, Heart, Flame, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
