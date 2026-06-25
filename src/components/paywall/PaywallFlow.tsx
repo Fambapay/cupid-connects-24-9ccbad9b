@@ -350,14 +350,11 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
           open={!!selected}
           onClose={() => setSelected(null)}
           title={`Hunie ${selected.label}`}
-          subtitle={
-            period === "annual"
-              ? `Subscrição anual — ${formatPrice(selected.annualPriceMzn, country)}`
-              : `Subscrição mensal — ${formatPrice(selected.priceMzn, country)}`
-          }
-          amountMzn={period === "annual" ? selected.annualPriceMzn : selected.priceMzn}
+          subtitle={`Subscrição mensal — ${formatPrice(selected.priceMzn, country)}`}
+          amountMzn={selected.priceMzn}
           planTier={selected.tier}
-          billingPeriod={period}
+          billingPeriod="monthly"
+
           onSuccess={async () => {
             invalidateOnboardingCache();
             await reload();
