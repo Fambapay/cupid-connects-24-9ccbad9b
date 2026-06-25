@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet, useMatchRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { MessageCircle, Sparkles, Compass } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useMatches } from "@/hooks/useMatches";
