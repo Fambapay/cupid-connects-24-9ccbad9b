@@ -1032,6 +1032,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
         )}
 
       </div>
+      </motion.div>
     );
   },
 );
