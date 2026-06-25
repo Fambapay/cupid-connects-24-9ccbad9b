@@ -371,14 +371,12 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
 
 function PlanRow({
   plan,
-  period,
   country,
   selected,
   onSelect,
   index,
 }: {
   plan: PlanCardConfig;
-  period: BillingPeriod;
   country: import("@/lib/country/config").CountryCode;
   selected: boolean;
   onSelect: () => void;
@@ -386,11 +384,7 @@ function PlanRow({
 }) {
   const isPopular = plan.badge === "Mais popular";
   const isElite = plan.tier === "elite";
-  const price = period === "annual" ? plan.annualPriceMzn : plan.priceMzn;
-  const monthlyEquivalent =
-    period === "annual" ? Math.round(plan.annualPriceMzn / 12) : plan.priceMzn;
-  const fullPrice = plan.priceMzn * 12;
-  const savings = fullPrice - plan.annualPriceMzn;
+  const price = plan.priceMzn;
 
   return (
     <motion.button
@@ -426,9 +420,7 @@ function PlanRow({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
-            <span
-              className="text-[15px] font-bold tracking-tight text-white"
-            >
+            <span className="text-[15px] font-bold tracking-tight text-white">
               Hunie {plan.label}
             </span>
             {isElite && (
@@ -442,19 +434,13 @@ function PlanRow({
           </p>
         </div>
 
-        {/* Radio indicator */}
         <div
           className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border transition-all ${
-            selected
-              ? "border-transparent"
-              : "border-white/25 bg-transparent"
+            selected ? "border-transparent" : "border-white/25 bg-transparent"
           }`}
           style={
             selected
-              ? {
-                  background:
-                    "linear-gradient(135deg, #FF4FA3, #B13CFF)",
-                }
+              ? { background: "linear-gradient(135deg, #FF4FA3, #B13CFF)" }
               : undefined
           }
         >
@@ -462,27 +448,13 @@ function PlanRow({
         </div>
       </div>
 
-      {/* Price */}
       <div className="mt-3 flex items-baseline gap-1.5">
         <span className="text-[26px] font-black tracking-tight text-white">
           {formatPrice(price, country)}
         </span>
-        <span className="text-[12px] text-white/45">
-          /{period === "annual" ? "ano" : "mês"}
-        </span>
-        {period === "annual" && (
-          <span className="ml-auto text-[11px] font-semibold text-emerald-400">
-            poupa {formatPrice(savings, country)}
-          </span>
-        )}
+        <span className="text-[12px] text-white/45">/mês</span>
       </div>
-      {period === "annual" && (
-        <p className="mt-0.5 text-[11px] text-white/40">
-          equivale a {formatPrice(monthlyEquivalent, country)}/mês
-        </p>
-      )}
 
-      {/* Highlights — show always so user can compare without tapping */}
       <ul className="mt-3 grid grid-cols-1 gap-1.5">
         {plan.highlights.slice(0, selected ? plan.highlights.length : 4).map((h) => (
           <li key={h.label} className="flex items-start gap-2 text-[12.5px]">
@@ -507,88 +479,6 @@ function PlanRow({
   );
 }
 
-const TICKER_ITEMS: { icon: typeof Heart; build: (ctx: { pendingLikes: number; city: string | null }) => string | null }[] = [
-  {
-    icon: Heart,
-    build: ({ pendingLikes }) =>
-      pendingLikes > 0
-        ? pendingLikes === 1
-          ? "1 pessoa já te deu like — bloqueado"
-          : `${pendingLikes} pessoas já te deram like — bloqueado`
-        : null,
-  },
-  {
-    icon: Eye,
-    build: () => "O teu perfil aparece menos sem Plus",
-  },
-  {
-    icon: Flame,
-    build: ({ city }) =>
-      city ? `Perfis com Plus em ${city} têm 3x mais matches` : "Plus tem 3x mais matches",
-  },
-  {
-    icon: Heart,
-    build: ({ pendingLikes }) =>
-      pendingLikes > 0 ? "Vê quem é antes que desistam de ti" : null,
-  },
-  {
-    icon: Eye,
-    build: () => "Sem Plus, não sabes quem leu as tuas mensagens",
-  },
-  {
-    icon: Flame,
-    build: () => "Cada swipe sem Super Like é uma hipótese perdida",
-  },
-];
-
-function PersonalTicker({
-  className = "",
-  pendingLikes,
-  city,
-}: {
-  className?: string;
-  pendingLikes: number;
-  city: string | null;
-}) {
-  const events = useMemo(
-    () =>
-      TICKER_ITEMS.map((t) => ({ icon: t.icon, text: t.build({ pendingLikes, city }) }))
-        .filter((e): e is { icon: typeof Heart; text: string } => !!e.text),
-    [pendingLikes, city],
-  );
-  const [idx, setIdx] = useState(0);
-  useEffect(() => {
-    if (events.length <= 1) return;
-    const t = setInterval(() => setIdx((i) => (i + 1) % events.length), 3200);
-    return () => clearInterval(t);
-  }, [events.length]);
-  if (events.length === 0) return null;
-  const Event = events[idx % events.length];
-  const Icon = Event.icon;
-  return (
-    <div className={`mx-auto flex h-9 max-w-[340px] items-center justify-center overflow-hidden px-6 ${className}`}>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={idx}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.04] px-3 py-1.5 backdrop-blur-md"
-        >
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inset-0 animate-ping rounded-full bg-pink-400/70" />
-            <span className="relative h-1.5 w-1.5 rounded-full bg-pink-400" />
-          </span>
-          <Icon size={11} className="text-pink-300" />
-          <span className="truncate text-[11.5px] font-medium text-white/75">
-            {Event.text}
-          </span>
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-}
 
 
 
