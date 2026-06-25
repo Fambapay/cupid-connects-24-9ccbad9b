@@ -34,11 +34,11 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
     () => config.payments.slice(0, 3).map((p) => paymentLabel(p as PaymentMethodCode)).join(" e "),
     [config.payments],
   );
-  const [fomoData, setFomoData] = useState<{ count: number; city: string; avatars: string[] }>({
-    count: 4,
-    city: "perto de ti",
-    avatars: [],
-  });
+  const [fomoData, setFomoData] = useState<{
+    count: number;
+    avatars: string[];
+    loaded: boolean;
+  }>({ count: 0, avatars: [], loaded: false });
 
   useEffect(() => {
     if (!open) {
@@ -51,20 +51,30 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
     if (!open || !user) return;
     let active = true;
     (async () => {
-      const city = profile?.city ?? null;
-      let q = supabase
-        .from("profiles")
-        .select("id, city")
-        .eq("onboarding_completed", true)
-        .neq("id", user.id)
-        .limit(8);
-      if (city) q = q.eq("city", city);
-      const { data } = await q;
-      const count = Math.min(8, Math.max(3, (data?.length ?? 0) || 4));
-      // Pull 3 photos
-      const ids = (data ?? []).slice(0, 3).map((d) => d.id);
+      // Real pending likes: incoming likes/supers the user hasn't responded to yet.
+      const [{ data: incoming }, { data: outgoing }] = await Promise.all([
+        supabase
+          .from("swipes")
+          .select("swiper_id")
+          .eq("swiped_id", user.id)
+          .in("direction", ["like", "super"])
+          .order("created_at", { ascending: false })
+          .limit(50),
+        supabase.from("swipes").select("swiped_id").eq("swiper_id", user.id),
+      ]);
+      const responded = new Set((outgoing ?? []).map((s) => s.swiped_id as string));
+      const pendingIds = Array.from(
+        new Set(
+          (incoming ?? [])
+            .map((s) => s.swiper_id as string)
+            .filter((id) => !responded.has(id)),
+        ),
+      );
+      const count = pendingIds.length;
+
       let avatars: string[] = [];
-      if (ids.length) {
+      if (count > 0) {
+        const ids = pendingIds.slice(0, 3);
         const { data: photos } = await supabase
           .from("profile_photos")
           .select("profile_id,storage_path,position")
@@ -80,13 +90,15 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
         });
         if (paths.length) {
           const { signPhotos } = await import("@/lib/photos");
-          avatars = (await signPhotos(paths, 3600, { width: 200, quality: 60, resize: "cover" })).filter(
-            Boolean,
-          ) as string[];
+          avatars = (
+            await signPhotos(paths, 3600, { width: 200, quality: 60, resize: "cover" })
+          ).filter(Boolean) as string[];
         }
       }
       if (!active) return;
-      setFomoData({ count, city: city ? `em ${city}` : "perto de ti", avatars });
+      setFomoData({ count, avatars, loaded: true });
+      // If there are no real likers, skip the FOMO stage entirely — it would be dishonest.
+      if (count === 0) setStage("plans");
     })();
     return () => {
       active = false;
@@ -94,6 +106,8 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
   }, [open, user, profile?.city]);
 
   if (!open) return null;
+
+  const showFomo = stage === "fomo" && fomoData.loaded && fomoData.count > 0;
 
   return (
     <AnimatePresence>
@@ -105,7 +119,7 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
         className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md"
         onClick={!required ? onClose : undefined}
       />
-      {stage === "fomo" && (
+      {showFomo && (
         <motion.div
           key="fomo"
           initial={{ y: "100%" }}
@@ -124,7 +138,7 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
             </button>
           )}
 
-          {/* Blurred overlapping avatars */}
+          {/* Blurred overlapping avatars of REAL likers */}
           <div className="relative mb-8 flex items-center justify-center">
             {[0, 1, 2].map((i) => {
               const url = fomoData.avatars[i];
@@ -150,24 +164,13 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
           </div>
 
           <h2 className="max-w-xs text-3xl font-black leading-tight">
-            Tens {fomoData.count} pessoas interessadas em ti {fomoData.city}
+            {fomoData.count === 1
+              ? "1 pessoa já gostou de ti"
+              : `${fomoData.count} pessoas já gostaram de ti`}
           </h2>
           <p className="mt-3 max-w-xs text-base text-white/70">
-            Activa o Hunie para ver quem são e começar a dar match
+            Desbloqueia o Hunie para ver quem é e dar match instantâneo
           </p>
-
-          {/* Progress dots */}
-          <div className="mt-7 flex flex-col items-center gap-2">
-            <div className="flex gap-1.5">
-              {[0, 1, 2, 3, 4, 5].map((i) => (
-                <div
-                  key={i}
-                  className={`h-2 w-2 rounded-full ${i < 4 ? "bg-primary" : "bg-white/20"}`}
-                />
-              ))}
-            </div>
-            <p className="text-xs text-white/50">4 de 6 perfis compatíveis encontrados perto de ti</p>
-          </div>
 
           <motion.button
             whileTap={{ scale: 0.97 }}
