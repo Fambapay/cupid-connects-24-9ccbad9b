@@ -1049,64 +1049,91 @@ function ScrollPickerSheet<T extends number>({
   selected: T | null;
   onSelect: (v: T) => void;
 }) {
-  // 3D cylindrical "slot-machine" picker
+  // 3D cylindrical "slot-machine" picker — refs-only updates, zero per-frame re-renders
   const ITEM_H = 46;
   const VISIBLE = 7; // odd number so there's a clear center
   const RADIUS = (ITEM_H * VISIBLE) / 2 / Math.tan(Math.PI / VISIBLE);
+  const STEP_ANGLE = 360 / VISIBLE / 2; // half-turn per visible slot
   const listRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const initialIdx = useMemo(() => {
     const i = items.findIndex((it) => it.value === selected);
     return i >= 0 ? i : Math.floor(items.length / 2);
   }, [items, selected]);
+  const activeIdxRef = useRef<number>(initialIdx);
   const [activeIdx, setActiveIdx] = useState<number>(initialIdx);
   const scrollRaf = useRef<number | null>(null);
   const snapTimer = useRef<number | null>(null);
 
+  const applyTransforms = (pos: number) => {
+    const els = itemRefs.current;
+    for (let i = 0; i < els.length; i++) {
+      const el = els[i];
+      if (!el) continue;
+      const offset = i - pos;
+      const absOff = Math.abs(offset);
+      const angle = offset * STEP_ANGLE;
+      // Hide items past the back of the cylinder
+      if (absOff > VISIBLE / 2 + 0.5) {
+        el.style.opacity = "0";
+        el.style.visibility = "hidden";
+        continue;
+      }
+      const clampedAngle = Math.max(-90, Math.min(90, angle));
+      const opacity = Math.max(0.18, 1 - absOff * 0.3);
+      el.style.visibility = "visible";
+      el.style.opacity = String(opacity);
+      el.style.transform = `rotateX(${-clampedAngle}deg) translateZ(${RADIUS}px)`;
+    }
+  };
+
   useEffect(() => {
     if (!open) return;
+    activeIdxRef.current = initialIdx;
     setActiveIdx(initialIdx);
     const id = requestAnimationFrame(() => {
       if (listRef.current) listRef.current.scrollTop = initialIdx * ITEM_H;
+      applyTransforms(initialIdx);
     });
     return () => cancelAnimationFrame(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialIdx]);
 
-  const handleScroll = () => {
+  const onScrollRaw = () => {
     if (scrollRaf.current) cancelAnimationFrame(scrollRaf.current);
     scrollRaf.current = requestAnimationFrame(() => {
       if (!listRef.current) return;
       const raw = listRef.current.scrollTop / ITEM_H;
+      applyTransforms(raw);
       const idx = Math.max(0, Math.min(items.length - 1, Math.round(raw)));
-      setActiveIdx(idx);
+      if (idx !== activeIdxRef.current) {
+        activeIdxRef.current = idx;
+        setActiveIdx(idx);
+        // soft haptic tick on slot change
+        if (typeof navigator !== "undefined" && navigator.vibrate) {
+          try { navigator.vibrate(4); } catch { /* noop */ }
+        }
+      }
     });
     if (snapTimer.current) window.clearTimeout(snapTimer.current);
     snapTimer.current = window.setTimeout(() => {
       if (!listRef.current) return;
       const idx = Math.round(listRef.current.scrollTop / ITEM_H);
       const clamped = Math.max(0, Math.min(items.length - 1, idx));
-      listRef.current.scrollTo({ top: clamped * ITEM_H, behavior: "smooth" });
-    }, 90);
+      const target = clamped * ITEM_H;
+      if (Math.abs(listRef.current.scrollTop - target) > 0.5) {
+        listRef.current.scrollTo({ top: target, behavior: "smooth" });
+      }
+    }, 140);
   };
 
   const handleConfirm = () => {
-    const it = items[activeIdx];
+    const it = items[activeIdxRef.current];
     if (it) onSelect(it.value);
   };
 
   const containerH = ITEM_H * VISIBLE;
   const padding = (containerH - ITEM_H) / 2;
-
-  // Track fractional scroll position for smooth 3D rotation
-  const [scrollPos, setScrollPos] = useState(initialIdx);
-  useEffect(() => {
-    setScrollPos(initialIdx);
-  }, [initialIdx]);
-  const onScrollRaw = () => {
-    handleScroll();
-    if (listRef.current) {
-      setScrollPos(listRef.current.scrollTop / ITEM_H);
-    }
-  };
 
   return (
     <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
@@ -1125,8 +1152,8 @@ function ScrollPickerSheet<T extends number>({
             style={{
               height: containerH * 0.9,
               background:
-                "radial-gradient(60% 70% at 50% 50%, color-mix(in oklab, var(--brand-pink) 14%, transparent), transparent 70%)",
-              filter: "blur(8px)",
+                "radial-gradient(60% 70% at 50% 50%, color-mix(in oklab, var(--brand-pink) 12%, transparent), transparent 70%)",
+              filter: "blur(10px)",
             }}
           />
 
@@ -1140,18 +1167,18 @@ function ScrollPickerSheet<T extends number>({
               className="absolute inset-x-0 top-0 h-px"
               style={{
                 background:
-                  "linear-gradient(90deg, transparent, color-mix(in oklab, var(--brand-pink) 80%, transparent) 20%, color-mix(in oklab, var(--brand-purple) 80%, transparent) 80%, transparent)",
+                  "linear-gradient(90deg, transparent, color-mix(in oklab, var(--brand-pink) 70%, transparent) 25%, color-mix(in oklab, var(--brand-purple) 70%, transparent) 75%, transparent)",
                 boxShadow:
-                  "0 0 10px color-mix(in oklab, var(--brand-pink) 50%, transparent)",
+                  "0 0 8px color-mix(in oklab, var(--brand-pink) 35%, transparent)",
               }}
             />
             <div
               className="absolute inset-x-0 bottom-0 h-px"
               style={{
                 background:
-                  "linear-gradient(90deg, transparent, color-mix(in oklab, var(--brand-purple) 80%, transparent) 20%, color-mix(in oklab, var(--brand-pink) 80%, transparent) 80%, transparent)",
+                  "linear-gradient(90deg, transparent, color-mix(in oklab, var(--brand-purple) 70%, transparent) 25%, color-mix(in oklab, var(--brand-pink) 70%, transparent) 75%, transparent)",
                 boxShadow:
-                  "0 0 10px color-mix(in oklab, var(--brand-purple) 50%, transparent)",
+                  "0 0 8px color-mix(in oklab, var(--brand-purple) 35%, transparent)",
               }}
             />
           </div>
@@ -1167,12 +1194,12 @@ function ScrollPickerSheet<T extends number>({
               scrollbarWidth: "none",
               msOverflowStyle: "none",
               WebkitOverflowScrolling: "touch",
-              perspective: `${RADIUS * 2.2}px`,
+              perspective: `${RADIUS * 2.4}px`,
               perspectiveOrigin: "50% 50%",
               maskImage:
-                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 14%, #000 36%, #000 64%, rgba(0,0,0,0.4) 86%, transparent 100%)",
+                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 14%, #000 38%, #000 62%, rgba(0,0,0,0.35) 86%, transparent 100%)",
               WebkitMaskImage:
-                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 14%, #000 36%, #000 64%, rgba(0,0,0,0.4) 86%, transparent 100%)",
+                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 14%, #000 38%, #000 62%, rgba(0,0,0,0.35) 86%, transparent 100%)",
             }}
           >
             <div
@@ -1183,16 +1210,11 @@ function ScrollPickerSheet<T extends number>({
               }}
             >
               {items.map((it, i) => {
-                const offset = i - scrollPos; // fractional distance from center
-                const absOff = Math.abs(offset);
-                // Each item rotates around X axis on a virtual cylinder
-                const angle = offset * (360 / VISIBLE / 2); // half-turn per visible slot
-                const clampedAngle = Math.max(-90, Math.min(90, angle));
-                const opacity = Math.max(0.15, 1 - absOff * 0.32);
-                const active = absOff < 0.5;
+                const active = i === activeIdx;
                 return (
                   <button
                     key={it.value}
+                    ref={(el) => { itemRefs.current[i] = el; }}
                     type="button"
                     onClick={() => {
                       if (listRef.current)
@@ -1202,21 +1224,21 @@ function ScrollPickerSheet<T extends number>({
                     style={{
                       height: ITEM_H,
                       scrollSnapAlign: "center",
-                      opacity,
-                      transform: `rotateX(${-clampedAngle}deg) translateZ(${RADIUS}px)`,
                       transformOrigin: "center center",
                       backfaceVisibility: "hidden",
-                      color: active ? "var(--foreground)" : "color-mix(in oklab, var(--foreground) 70%, transparent)",
+                      color: active
+                        ? "var(--foreground)"
+                        : "color-mix(in oklab, var(--foreground) 65%, transparent)",
                       fontWeight: active ? 600 : 500,
-                      fontSize: active ? "1.5rem" : "1.25rem",
+                      fontSize: active ? "1.5rem" : "1.2rem",
                       letterSpacing: active ? "-0.015em" : "-0.005em",
                       fontFamily:
                         '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif',
                       textShadow: active
-                        ? "0 0 24px color-mix(in oklab, var(--brand-pink) 40%, transparent)"
+                        ? "0 0 22px color-mix(in oklab, var(--brand-pink) 38%, transparent)"
                         : "none",
                       transition:
-                        "color 160ms ease, font-size 160ms ease, text-shadow 200ms ease",
+                        "color 200ms cubic-bezier(0.22,1,0.36,1), font-size 200ms cubic-bezier(0.22,1,0.36,1), text-shadow 220ms ease",
                     }}
                   >
                     {it.label}
