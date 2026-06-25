@@ -1,0 +1,258 @@
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { ArrowLeft, Crown, Check, Sparkles, Calendar, AlertCircle } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { useSubscription } from "@/hooks/useSubscription";
+import { useProfile } from "@/hooks/useProfile";
+import { getPlanCards } from "@/lib/plans";
+import { useCountry } from "@/lib/country/context";
+import { cancelMyMembership } from "@/lib/membership.functions";
+import { PaywallFlow } from "@/components/paywall/PaywallFlow";
+import { hapticTap } from "@/hooks/useNativePlatform";
+
+function formatDate(d: Date | null): string {
+  if (!d) return "—";
+  return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" });
+}
+
+export function ManageMembership() {
+  const navigate = useNavigate();
+  const { subscription } = useSubscription();
+  const { reload } = useProfile();
+  const { country } = useCountry();
+  const cancel = useServerFn(cancelMyMembership);
+
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+
+  const tier = subscription.membershipTier;
+  const status = subscription.membershipStatus;
+  const expiresAt = subscription.expiresAt;
+  const isCancelled = status === "cancelled";
+
+  const planCards = getPlanCards(country);
+  const currentPlan = planCards.find((p) => p.tier === tier);
+  const accent = currentPlan?.accent ?? "#F0468C";
+  const label = currentPlan?.label ?? "Premium";
+
+  async function handleCancel() {
+    setCancelling(true);
+    try {
+      await cancel();
+      await reload();
+      toast.success("Subscrição cancelada. Manténs acesso até " + formatDate(expiresAt));
+      setConfirmCancel(false);
+    } catch (e) {
+      toast.error("Não foi possível cancelar. Tenta novamente.");
+    } finally {
+      setCancelling(false);
+    }
+  }
+
+  return (
+    <div className="min-h-[100dvh] bg-background text-foreground">
+      {/* Header */}
+      <header className="sticky top-0 z-20 flex items-center gap-3 bg-background/80 px-4 pb-3 pt-[max(env(safe-area-inset-top),16px)] backdrop-blur-xl">
+        <button
+          onClick={() => {
+            hapticTap();
+            navigate({ to: "/profile" });
+          }}
+          aria-label="Voltar"
+          className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.06] active:scale-95"
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <h1 className="text-lg font-black">Gerir Membership</h1>
+      </header>
+
+      <div className="px-5 pb-[max(env(safe-area-inset-bottom),120px)] pt-2">
+        {/* Current plan card */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+          className="relative overflow-hidden rounded-3xl border border-white/10 p-5"
+          style={{
+            background: `linear-gradient(160deg, ${accent}26, rgba(20,20,30,0.6))`,
+          }}
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-40 blur-3xl"
+            style={{ background: accent }}
+          />
+          <div className="relative">
+            <div className="flex items-center gap-2">
+              <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white/80">
+                Plano actual
+              </span>
+              {isCancelled && (
+                <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-300">
+                  Cancelado
+                </span>
+              )}
+            </div>
+
+            <div className="mt-3 flex items-center gap-2">
+              <h2
+                className="text-3xl uppercase text-white"
+                style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900, letterSpacing: "-0.02em" }}
+              >
+                HUNIE
+              </h2>
+              <span
+                className="rounded-full px-2.5 py-0.5 text-xs uppercase"
+                style={{
+                  fontFamily: "'Montserrat', sans-serif",
+                  fontWeight: 900,
+                  letterSpacing: "0.06em",
+                  backgroundColor: accent,
+                  color: "#0a0a0a",
+                }}
+              >
+                {label}
+              </span>
+              {tier === "elite" && <Crown size={20} className="text-amber-300" />}
+            </div>
+
+            <div className="mt-4 flex items-center gap-2 text-sm text-white/70">
+              <Calendar size={14} />
+              <span>
+                {isCancelled ? "Acesso até" : "Renova a"} <strong className="text-white">{formatDate(expiresAt)}</strong>
+              </span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Benefits */}
+        {currentPlan && (
+          <section className="mt-6">
+            <h3 className="mb-3 text-sm font-extrabold uppercase tracking-wider text-white/50">
+              O que tens incluído
+            </h3>
+            <ul className="space-y-2.5 rounded-2xl border border-white/8 bg-white/[0.03] p-4">
+              {currentPlan.highlights.map((h) => (
+                <li key={h.label} className="flex items-start gap-3 text-sm">
+                  <div
+                    className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full"
+                    style={{ background: `${accent}30` }}
+                  >
+                    <Check size={12} style={{ color: accent }} strokeWidth={3} />
+                  </div>
+                  <span className={h.bold ? "font-semibold text-white" : "text-white/80"}>
+                    {h.label}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* Actions */}
+        <section className="mt-6 space-y-2.5">
+          {tier !== "elite" && (
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                hapticTap();
+                setShowUpgrade(true);
+              }}
+              className="flex w-full items-center justify-between rounded-2xl bg-gradient-to-r from-fuchsia-500 via-pink-500 to-rose-500 px-5 py-4 text-left text-white shadow-[0_12px_40px_-12px_rgba(240,70,140,0.6)]"
+            >
+              <div>
+                <div className="flex items-center gap-2 text-base font-extrabold">
+                  <Sparkles size={16} /> Fazer upgrade
+                </div>
+                <p className="mt-0.5 text-xs text-white/80">Desbloqueia mais benefícios</p>
+              </div>
+              <span className="text-xl">→</span>
+            </motion.button>
+          )}
+
+          {isCancelled ? (
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                hapticTap();
+                setShowUpgrade(true);
+              }}
+              className="w-full rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-5 py-4 text-left"
+            >
+              <div className="text-base font-extrabold text-emerald-300">Reactivar subscrição</div>
+              <p className="mt-0.5 text-xs text-emerald-200/70">Volta a ter renovação automática</p>
+            </motion.button>
+          ) : (
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                hapticTap();
+                setConfirmCancel(true);
+              }}
+              className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-left text-white/70 active:bg-white/[0.06]"
+            >
+              <div className="text-base font-semibold">Cancelar subscrição</div>
+              <p className="mt-0.5 text-xs text-white/50">
+                Manténs acesso até ao fim do período actual
+              </p>
+            </motion.button>
+          )}
+        </section>
+
+        <p className="mt-6 text-center text-[11px] text-white/40">
+          Precisas de ajuda? Contacta suporte@hunie.app
+        </p>
+      </div>
+
+      {/* Upgrade flow */}
+      {showUpgrade && (
+        <PaywallFlow
+          open={showUpgrade}
+          onClose={() => setShowUpgrade(false)}
+          onSuccess={() => setShowUpgrade(false)}
+        />
+      )}
+
+      {/* Cancel confirmation */}
+      {confirmCancel && (
+        <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/70 backdrop-blur-md sm:items-center">
+          <motion.div
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
+            className="w-full max-w-md rounded-t-3xl border-t border-white/10 bg-background p-6 sm:rounded-3xl sm:border"
+          >
+            <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-full bg-amber-500/15">
+              <AlertCircle size={22} className="text-amber-400" />
+            </div>
+            <h3 className="text-center text-xl font-black">Cancelar subscrição?</h3>
+            <p className="mt-2 text-center text-sm text-white/70">
+              Vais perder os benefícios {label} a {formatDate(expiresAt)}. Sem mais
+              renovações automáticas.
+            </p>
+
+            <div className="mt-6 space-y-2">
+              <button
+                onClick={handleCancel}
+                disabled={cancelling}
+                className="w-full rounded-2xl bg-white/10 px-5 py-3.5 text-sm font-bold text-white/90 active:scale-[0.98] disabled:opacity-60"
+              >
+                {cancelling ? "A cancelar..." : "Sim, cancelar"}
+              </button>
+              <button
+                onClick={() => setConfirmCancel(false)}
+                disabled={cancelling}
+                className="w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 to-pink-500 px-5 py-3.5 text-sm font-bold text-white shadow-lg active:scale-[0.98]"
+              >
+                Manter membership
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </div>
+  );
+}
