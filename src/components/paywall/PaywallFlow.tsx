@@ -267,23 +267,6 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
             </div>
 
 
-            {/* Guarantee strip */}
-            <div className="mx-4 mt-6 rounded-2xl border border-white/[0.06] bg-white/[0.025] p-4">
-              <div className="flex items-start gap-3">
-                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-emerald-400/15">
-                  <ShieldCheck size={16} className="text-emerald-400" />
-                </div>
-                <div>
-                  <p className="text-[13px] font-semibold text-white">
-                    Sem match em 7 dias? Devolvemos o teu dinheiro.
-                  </p>
-                  <p className="mt-0.5 text-[11.5px] leading-snug text-white/50">
-                    Cancela com 1 toque. Sem perguntas. Sem letras pequenas.
-                  </p>
-                </div>
-              </div>
-            </div>
-
             {/* Trust row */}
             <div className="mt-5 flex items-center justify-center gap-4 px-6 text-[11px] text-white/45">
               <span className="inline-flex items-center gap-1.5">
