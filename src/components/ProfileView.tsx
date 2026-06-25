@@ -304,7 +304,7 @@ export function ProfileView({
               <ChevronRight size={18} className="text-muted-foreground opacity-50 shrink-0 group-active:translate-x-0.5 transition-transform" />
             </button>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {/* QUICK ACTIONS */}
