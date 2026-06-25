@@ -475,7 +475,7 @@ function ChatRoom() {
         fallbackName={peer.name}
         fallbackPhoto={peer.photo}
       />
-    </div>
+    </motion.div>
   );
 }
 
