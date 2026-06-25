@@ -23,6 +23,7 @@ import type { DiscoveryProfile, SwipeDirection } from "@/components/discovery/ty
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 import { useForceDarkTheme } from "@/lib/theme";
+import { maybeRequestReview, recordMatch } from "@/lib/native/inAppReview";
 
 export const Route = createFileRoute("/discover")({
   ssr: false,
