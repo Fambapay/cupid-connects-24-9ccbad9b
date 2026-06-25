@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Check, ArrowRight, Sparkles, ShieldCheck, Heart, Flame, Eye } from "lucide-react";
+import { X, Check, ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { getPlanCards, formatPrice, type PlanCardConfig } from "@/lib/plans";
-import type { BillingPeriod } from "@/lib/pricing";
 import { useCountry } from "@/lib/country/context";
 import { paymentLabel, type PaymentMethodCode } from "@/lib/country/config";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 import { invalidateOnboardingCache } from "@/lib/authGuard";
 import { toast } from "sonner";
+
 
 type Stage = "fomo" | "plans";
 
@@ -24,9 +24,9 @@ export interface PaywallFlowProps {
 
 export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowProps) {
   const [stage, setStage] = useState<Stage>("fomo");
-  const [period, setPeriod] = useState<BillingPeriod>("monthly");
   const [selected, setSelected] = useState<PlanCardConfig | null>(null);
   const [selectedTier, setSelectedTier] = useState<PlanCardConfig["tier"]>("plus");
+
   const { user } = useAuth();
   const { profile, reload } = useProfile();
   const { country, config } = useCountry();
@@ -252,53 +252,12 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
               </p>
             </div>
 
-            {/* Personal-relevance ticker — only real facts about THIS user */}
-            <PersonalTicker
-              className="mt-5"
-              pendingLikes={fomoData.count}
-              city={profile?.city ?? null}
-            />
-
-
-
-            {/* Billing toggle */}
-            <div className="mt-7 px-6">
-              <div className="relative mx-auto flex w-full max-w-[280px] items-center rounded-full border border-white/[0.06] bg-white/[0.04] p-1 backdrop-blur-md">
-                <motion.div
-                  layout
-                  transition={{ type: "spring", stiffness: 500, damping: 38 }}
-                  className="absolute inset-y-1 w-[calc(50%-4px)] rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.25)]"
-                  style={{ left: period === "monthly" ? "4px" : "calc(50% + 0px)" }}
-                />
-                <button
-                  onClick={() => setPeriod("monthly")}
-                  className={`relative z-10 flex-1 rounded-full py-2 text-[13px] font-semibold transition-colors ${
-                    period === "monthly" ? "text-black" : "text-white/60"
-                  }`}
-                >
-                  Mensal
-                </button>
-                <button
-                  onClick={() => setPeriod("annual")}
-                  className={`relative z-10 flex-1 rounded-full py-2 text-[13px] font-semibold transition-colors ${
-                    period === "annual" ? "text-black" : "text-white/60"
-                  }`}
-                >
-                  Anual
-                  <span className="ml-1 rounded-full bg-emerald-400/90 px-1.5 py-px text-[9px] font-bold text-black">
-                    -33%
-                  </span>
-                </button>
-              </div>
-            </div>
-
             {/* Plan rows (Apple-style vertical selectable list) */}
-            <div className="mt-6 flex flex-col gap-2.5 px-4">
+            <div className="mt-7 flex flex-col gap-2.5 px-4">
               {planCards.map((plan, i) => (
                 <PlanRow
                   key={plan.tier}
                   plan={plan}
-                  period={period}
                   country={country}
                   selected={selectedTier === plan.tier}
                   onSelect={() => setSelectedTier(plan.tier)}
@@ -306,6 +265,7 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
                 />
               ))}
             </div>
+
 
             {/* Guarantee strip */}
             <div className="mx-4 mt-6 rounded-2xl border border-white/[0.06] bg-white/[0.025] p-4">
@@ -343,12 +303,12 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
             <div className="pointer-events-auto bg-[#0a0a0c] px-5 pb-[max(env(safe-area-inset-bottom),20px)] pt-2">
               {fomoData.count > 0 && (
                 <p className="mb-2 flex items-center justify-center gap-1.5 text-[11.5px] font-medium text-pink-300/90">
-                  <Flame size={12} className="text-pink-400" />
                   {fomoData.count === 1
                     ? "1 pessoa já te deu like — vê quem é"
                     : `${fomoData.count} pessoas já te deram like — vê quem são`}
                 </p>
               )}
+
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setSelected(activePlan)}
@@ -375,10 +335,9 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
                 </span>
               </motion.button>
               <p className="mt-2 text-center text-[11px] text-white/45">
-                {period === "annual"
-                  ? `${formatPrice(activePlan.annualPriceMzn, country)}/ano · equivale a ${formatPrice(Math.round(activePlan.annualPriceMzn / 12), country)}/mês`
-                  : `${formatPrice(activePlan.priceMzn, country)} hoje · menos que um jantar a dois`}
+                {`${formatPrice(activePlan.priceMzn, country)} hoje · menos que um jantar a dois`}
               </p>
+
             </div>
           </div>
 
@@ -391,14 +350,11 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
           open={!!selected}
           onClose={() => setSelected(null)}
           title={`Hunie ${selected.label}`}
-          subtitle={
-            period === "annual"
-              ? `Subscrição anual — ${formatPrice(selected.annualPriceMzn, country)}`
-              : `Subscrição mensal — ${formatPrice(selected.priceMzn, country)}`
-          }
-          amountMzn={period === "annual" ? selected.annualPriceMzn : selected.priceMzn}
+          subtitle={`Subscrição mensal — ${formatPrice(selected.priceMzn, country)}`}
+          amountMzn={selected.priceMzn}
           planTier={selected.tier}
-          billingPeriod={period}
+          billingPeriod="monthly"
+
           onSuccess={async () => {
             invalidateOnboardingCache();
             await reload();
@@ -415,14 +371,12 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
 
 function PlanRow({
   plan,
-  period,
   country,
   selected,
   onSelect,
   index,
 }: {
   plan: PlanCardConfig;
-  period: BillingPeriod;
   country: import("@/lib/country/config").CountryCode;
   selected: boolean;
   onSelect: () => void;
@@ -430,11 +384,7 @@ function PlanRow({
 }) {
   const isPopular = plan.badge === "Mais popular";
   const isElite = plan.tier === "elite";
-  const price = period === "annual" ? plan.annualPriceMzn : plan.priceMzn;
-  const monthlyEquivalent =
-    period === "annual" ? Math.round(plan.annualPriceMzn / 12) : plan.priceMzn;
-  const fullPrice = plan.priceMzn * 12;
-  const savings = fullPrice - plan.annualPriceMzn;
+  const price = plan.priceMzn;
 
   return (
     <motion.button
@@ -470,9 +420,7 @@ function PlanRow({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
-            <span
-              className="text-[15px] font-bold tracking-tight text-white"
-            >
+            <span className="text-[15px] font-bold tracking-tight text-white">
               Hunie {plan.label}
             </span>
             {isElite && (
@@ -486,19 +434,13 @@ function PlanRow({
           </p>
         </div>
 
-        {/* Radio indicator */}
         <div
           className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border transition-all ${
-            selected
-              ? "border-transparent"
-              : "border-white/25 bg-transparent"
+            selected ? "border-transparent" : "border-white/25 bg-transparent"
           }`}
           style={
             selected
-              ? {
-                  background:
-                    "linear-gradient(135deg, #FF4FA3, #B13CFF)",
-                }
+              ? { background: "linear-gradient(135deg, #FF4FA3, #B13CFF)" }
               : undefined
           }
         >
@@ -506,27 +448,13 @@ function PlanRow({
         </div>
       </div>
 
-      {/* Price */}
       <div className="mt-3 flex items-baseline gap-1.5">
         <span className="text-[26px] font-black tracking-tight text-white">
           {formatPrice(price, country)}
         </span>
-        <span className="text-[12px] text-white/45">
-          /{period === "annual" ? "ano" : "mês"}
-        </span>
-        {period === "annual" && (
-          <span className="ml-auto text-[11px] font-semibold text-emerald-400">
-            poupa {formatPrice(savings, country)}
-          </span>
-        )}
+        <span className="text-[12px] text-white/45">/mês</span>
       </div>
-      {period === "annual" && (
-        <p className="mt-0.5 text-[11px] text-white/40">
-          equivale a {formatPrice(monthlyEquivalent, country)}/mês
-        </p>
-      )}
 
-      {/* Highlights — show always so user can compare without tapping */}
       <ul className="mt-3 grid grid-cols-1 gap-1.5">
         {plan.highlights.slice(0, selected ? plan.highlights.length : 4).map((h) => (
           <li key={h.label} className="flex items-start gap-2 text-[12.5px]">
@@ -551,88 +479,6 @@ function PlanRow({
   );
 }
 
-const TICKER_ITEMS: { icon: typeof Heart; build: (ctx: { pendingLikes: number; city: string | null }) => string | null }[] = [
-  {
-    icon: Heart,
-    build: ({ pendingLikes }) =>
-      pendingLikes > 0
-        ? pendingLikes === 1
-          ? "1 pessoa já te deu like — bloqueado"
-          : `${pendingLikes} pessoas já te deram like — bloqueado`
-        : null,
-  },
-  {
-    icon: Eye,
-    build: () => "O teu perfil aparece menos sem Plus",
-  },
-  {
-    icon: Flame,
-    build: ({ city }) =>
-      city ? `Perfis com Plus em ${city} têm 3x mais matches` : "Plus tem 3x mais matches",
-  },
-  {
-    icon: Heart,
-    build: ({ pendingLikes }) =>
-      pendingLikes > 0 ? "Vê quem é antes que desistam de ti" : null,
-  },
-  {
-    icon: Eye,
-    build: () => "Sem Plus, não sabes quem leu as tuas mensagens",
-  },
-  {
-    icon: Flame,
-    build: () => "Cada swipe sem Super Like é uma hipótese perdida",
-  },
-];
-
-function PersonalTicker({
-  className = "",
-  pendingLikes,
-  city,
-}: {
-  className?: string;
-  pendingLikes: number;
-  city: string | null;
-}) {
-  const events = useMemo(
-    () =>
-      TICKER_ITEMS.map((t) => ({ icon: t.icon, text: t.build({ pendingLikes, city }) }))
-        .filter((e): e is { icon: typeof Heart; text: string } => !!e.text),
-    [pendingLikes, city],
-  );
-  const [idx, setIdx] = useState(0);
-  useEffect(() => {
-    if (events.length <= 1) return;
-    const t = setInterval(() => setIdx((i) => (i + 1) % events.length), 3200);
-    return () => clearInterval(t);
-  }, [events.length]);
-  if (events.length === 0) return null;
-  const Event = events[idx % events.length];
-  const Icon = Event.icon;
-  return (
-    <div className={`mx-auto flex h-9 max-w-[340px] items-center justify-center overflow-hidden px-6 ${className}`}>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={idx}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.04] px-3 py-1.5 backdrop-blur-md"
-        >
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inset-0 animate-ping rounded-full bg-pink-400/70" />
-            <span className="relative h-1.5 w-1.5 rounded-full bg-pink-400" />
-          </span>
-          <Icon size={11} className="text-pink-300" />
-          <span className="truncate text-[11.5px] font-medium text-white/75">
-            {Event.text}
-          </span>
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-}
 
 
 
