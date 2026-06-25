@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useDragControls } from 'framer-motion';
 import { Check, Lock, X, BadgeCheck, Circle, FileText, Camera, Sparkles } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { hapticTap } from '@/hooks/useNativePlatform';
@@ -61,6 +61,7 @@ const EDUCATION = ['Secundário', 'Licenciatura', 'Mestrado', 'Doutoramento'];
 
 export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false, onUpgrade }: Props) => {
   const [local, setLocal] = useState<DiscoveryFilters>(value);
+  const dragControls = useDragControls();
 
   useEffect(() => { if (open) setLocal(value); }, [open, value]);
 
@@ -99,9 +100,20 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+            drag="y"
+            dragListener={false}
+            dragControls={dragControls}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.5 }}
+            onDragEnd={(_, info) => {
+              if (info.offset.y > 140 || info.velocity.y > 600) onClose();
+            }}
           >
             {/* Grabber */}
-            <div className="flex justify-center pt-2.5 pb-1">
+            <div
+              className="flex justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing touch-none"
+              onPointerDown={(e) => dragControls.start(e)}
+            >
               <div className="h-[5px] w-10 rounded-full bg-white/20" />
             </div>
 
