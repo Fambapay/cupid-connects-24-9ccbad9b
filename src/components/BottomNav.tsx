@@ -471,7 +471,7 @@ function NativeBottomNav({
   useEffect(() => {
     NativeTabs.setBadge({
       index: TAB_ORDER.indexOf("chat"),
-      value: formatBadge(unreadChats),
+      value: unreadChats > 0 ? "•" : "",
     }).catch(() => {});
   }, [unreadChats]);
 
