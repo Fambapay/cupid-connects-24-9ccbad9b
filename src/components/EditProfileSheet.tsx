@@ -114,21 +114,6 @@ export function EditProfileSheet({
             transition={{ type: 'spring', stiffness: 320, damping: 36, mass: 0.9 }}
           >
 
-            {/* Handle */}
-            <div
-              className="relative shrink-0 flex flex-col items-center pb-1 pt-3"
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-            >
-              <div
-                className="h-1 w-10 rounded-full"
-                style={{
-                  background:
-                    'linear-gradient(90deg, var(--brand-pink), var(--brand-purple))',
-                  opacity: 0.7,
-                }}
-              />
-            </div>
-
             {/* Header */}
             <div className="relative shrink-0 grid grid-cols-[auto_1fr_auto] items-center px-5 pb-3 pt-2">
               <button
