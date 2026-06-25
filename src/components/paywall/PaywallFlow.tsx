@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Check, ArrowRight } from "lucide-react";
+import { X, Check, ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
@@ -26,10 +26,20 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
   const [stage, setStage] = useState<Stage>("fomo");
   const [period, setPeriod] = useState<BillingPeriod>("monthly");
   const [selected, setSelected] = useState<PlanCardConfig | null>(null);
+  const [selectedTier, setSelectedTier] = useState<PlanCardConfig["tier"]>("plus");
   const { user } = useAuth();
   const { profile, reload } = useProfile();
   const { country, config } = useCountry();
-  const planCards = useMemo(() => getPlanCards(country), [country]);
+  // Ascending order: Select → Plus → Elite (Apple-style ladder)
+  const planCards = useMemo(() => {
+    const cards = getPlanCards(country);
+    const order: Record<string, number> = { select: 0, plus: 1, elite: 2 };
+    return [...cards].sort((a, b) => order[a.tier] - order[b.tier]);
+  }, [country]);
+  const activePlan = useMemo(
+    () => planCards.find((p) => p.tier === selectedTier) ?? planCards[1],
+    [planCards, selectedTier],
+  );
   const paymentSummary = useMemo(
     () => config.payments.slice(0, 3).map((p) => paymentLabel(p as PaymentMethodCode)).join(" e "),
     [config.payments],
@@ -189,89 +199,144 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
           animate={{ y: 0 }}
           exit={{ y: "100%" }}
           transition={{ type: "spring", stiffness: 360, damping: 36 }}
-          className="fixed inset-x-0 bottom-0 top-[6%] z-[61] flex flex-col overflow-hidden rounded-t-3xl border-t border-white/10 bg-background text-foreground shadow-2xl"
+          className="fixed inset-x-0 bottom-0 top-[4%] z-[61] flex flex-col overflow-hidden rounded-t-[28px] border-t border-white/10 bg-[#0a0a0c] text-white shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.6)]"
         >
+          {/* Ambient glow */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-32 left-1/2 h-[420px] w-[520px] -translate-x-1/2 rounded-full opacity-50 blur-[120px]"
+            style={{
+              background:
+                "radial-gradient(closest-side, rgba(240,70,140,0.55), rgba(177,60,255,0.15) 60%, transparent)",
+            }}
+          />
+
           <div className="mx-auto mt-3 h-1 w-10 rounded-full bg-white/15" />
-          <div className="flex items-start justify-between px-5 pt-3">
-            <div>
-              <h2 className="text-xl font-black">Escolhe o teu plano</h2>
-              <p className="mt-0.5 text-sm text-muted-foreground">
-                Começa hoje — cancela quando quiseres
+
+          {!required && (
+            <button
+              onClick={onClose}
+              aria-label="Fechar"
+              className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full bg-white/[0.08] backdrop-blur-md transition-colors hover:bg-white/[0.14]"
+            >
+              <X size={16} />
+            </button>
+          )}
+
+          <div className="relative flex-1 overflow-y-auto pb-[max(env(safe-area-inset-bottom),200px)]">
+            {/* Hero */}
+            <div className="px-6 pt-8 text-center">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.05, duration: 0.4 }}
+                className="mx-auto mb-5 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/70 backdrop-blur-md"
+              >
+                <Sparkles size={11} className="text-pink-400" />
+                Hunie Membership
+              </motion.div>
+              <h2
+                className="text-[34px] font-black leading-[1.05] tracking-[-0.03em]"
+                style={{ fontFamily: "'Instrument Serif', 'Cormorant', serif", fontWeight: 400 }}
+              >
+                Conhece quem
+                <br />
+                <span className="bg-gradient-to-r from-pink-400 via-fuchsia-400 to-violet-400 bg-clip-text italic text-transparent">
+                  está à tua espera.
+                </span>
+              </h2>
+              <p className="mx-auto mt-3 max-w-[280px] text-[14px] leading-snug text-white/55">
+                Desbloqueia tudo o que torna o Hunie uma experiência diferente.
               </p>
             </div>
-            {!required && (
-              <button
-                onClick={onClose}
-                aria-label="Fechar"
-                className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.06]"
-              >
-                <X size={16} />
-              </button>
-            )}
-          </div>
 
-          {/* Billing toggle */}
-          <div className="mt-4 px-5">
-            <div className="relative mx-auto flex w-full max-w-xs items-center rounded-full bg-white/[0.06] p-1">
-              <button
-                onClick={() => setPeriod("monthly")}
-                className={`relative z-10 flex-1 rounded-full py-2 text-sm font-bold transition-colors ${
-                  period === "monthly" ? "text-white" : "text-white/55"
-                }`}
-              >
-                Mensal
-              </button>
-              <button
-                onClick={() => setPeriod("annual")}
-                className={`relative z-10 flex-1 rounded-full py-2 text-sm font-bold transition-colors ${
-                  period === "annual" ? "text-white" : "text-white/55"
-                }`}
-              >
-                Anual
-              </button>
-              <motion.div
-                layout
-                transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                className="absolute inset-y-1 w-1/2 rounded-full bg-gradient-to-r from-fuchsia-500 to-pink-500"
-                style={{ left: period === "monthly" ? "4px" : "50%" }}
-              />
-            </div>
-            <AnimatePresence>
-              {period === "annual" && (
+            {/* Billing toggle */}
+            <div className="mt-7 px-6">
+              <div className="relative mx-auto flex w-full max-w-[280px] items-center rounded-full border border-white/[0.06] bg-white/[0.04] p-1 backdrop-blur-md">
                 <motion.div
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="mt-2 text-center text-xs font-semibold text-emerald-400"
+                  layout
+                  transition={{ type: "spring", stiffness: 500, damping: 38 }}
+                  className="absolute inset-y-1 w-[calc(50%-4px)] rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.25)]"
+                  style={{ left: period === "monthly" ? "4px" : "calc(50% + 0px)" }}
+                />
+                <button
+                  onClick={() => setPeriod("monthly")}
+                  className={`relative z-10 flex-1 rounded-full py-2 text-[13px] font-semibold transition-colors ${
+                    period === "monthly" ? "text-black" : "text-white/60"
+                  }`}
                 >
-                  💚 Poupa até 33%
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                  Mensal
+                </button>
+                <button
+                  onClick={() => setPeriod("annual")}
+                  className={`relative z-10 flex-1 rounded-full py-2 text-[13px] font-semibold transition-colors ${
+                    period === "annual" ? "text-black" : "text-white/60"
+                  }`}
+                >
+                  Anual
+                  <span className="ml-1 rounded-full bg-emerald-400/90 px-1.5 py-px text-[9px] font-bold text-black">
+                    -33%
+                  </span>
+                </button>
+              </div>
+            </div>
 
-          {/* Plans scroll */}
-          <div className="flex-1 overflow-y-auto px-3 pb-[max(env(safe-area-inset-bottom),120px)] pt-5">
-            <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
-              {planCards.map((plan) => (
-                <PlanCardView
+            {/* Plan rows (Apple-style vertical selectable list) */}
+            <div className="mt-6 flex flex-col gap-2.5 px-4">
+              {planCards.map((plan, i) => (
+                <PlanRow
                   key={plan.tier}
                   plan={plan}
                   period={period}
                   country={country}
-                  onSelect={() => setSelected(plan)}
+                  selected={selectedTier === plan.tier}
+                  onSelect={() => setSelectedTier(plan.tier)}
+                  index={i}
                 />
               ))}
             </div>
-            <p className="mt-6 px-2 text-center text-xs text-muted-foreground">
-              🔒 Pagamento seguro via {paymentSummary}
+
+            {/* Trust row */}
+            <div className="mt-6 flex items-center justify-center gap-4 px-6 text-[11px] text-white/45">
+              <span className="inline-flex items-center gap-1.5">
+                <ShieldCheck size={12} /> Pagamento seguro
+              </span>
+              <span className="h-3 w-px bg-white/15" />
+              <span>Cancela quando quiseres</span>
+            </div>
+            <p className="mt-2 px-6 text-center text-[10.5px] text-white/30">
+              via {paymentSummary} · Renovação automática
             </p>
-            <p className="mt-1 text-center text-[11px] text-muted-foreground/80">
-              Cancela a qualquer momento · Renovação automática
-            </p>
+          </div>
+
+          {/* Sticky CTA */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
+            <div className="h-16 bg-gradient-to-t from-[#0a0a0c] via-[#0a0a0c]/95 to-transparent" />
+            <div className="pointer-events-auto bg-[#0a0a0c] px-5 pb-[max(env(safe-area-inset-bottom),20px)] pt-2">
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setSelected(activePlan)}
+                className="relative flex h-14 w-full items-center justify-center overflow-hidden rounded-full text-[15px] font-bold text-white shadow-[0_12px_40px_-8px_rgba(240,70,140,0.55)]"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #FF4FA3 0%, #E935A0 45%, #B13CFF 100%)",
+                }}
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  Continuar com {activePlan.label}
+                  <ArrowRight size={16} />
+                </span>
+              </motion.button>
+              <p className="mt-2 text-center text-[11px] text-white/45">
+                {period === "annual"
+                  ? `${formatPrice(activePlan.annualPriceMzn, country)} por ano — cobrado hoje`
+                  : `${formatPrice(activePlan.priceMzn, country)} por mês — cobrado hoje`}
+              </p>
+            </div>
           </div>
         </motion.div>
       )}
+
 
       {selected && (
         <DebitoCheckoutSheet
@@ -300,107 +365,141 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
   );
 }
 
-function PlanCardView({
+function PlanRow({
   plan,
   period,
   country,
+  selected,
   onSelect,
+  index,
 }: {
   plan: PlanCardConfig;
   period: BillingPeriod;
   country: import("@/lib/country/config").CountryCode;
+  selected: boolean;
   onSelect: () => void;
+  index: number;
 }) {
   const isPopular = plan.badge === "Mais popular";
   const isElite = plan.tier === "elite";
   const price = period === "annual" ? plan.annualPriceMzn : plan.priceMzn;
+  const monthlyEquivalent =
+    period === "annual" ? Math.round(plan.annualPriceMzn / 12) : plan.priceMzn;
   const fullPrice = plan.priceMzn * 12;
   const savings = fullPrice - plan.annualPriceMzn;
 
   return (
-    <motion.div
-      whileTap={{ scale: 0.99 }}
-      className={`relative flex w-[78vw] max-w-[300px] shrink-0 snap-center flex-col rounded-3xl border-2 p-4 ${
-        isPopular
-          ? "border-pink-500/70 bg-gradient-to-b from-pink-500/10 to-fuchsia-500/5 shadow-[0_20px_60px_-15px_rgba(240,70,140,0.5)]"
-          : isElite
-          ? "border-amber-400/30 bg-gradient-to-b from-amber-400/8 to-black/40"
-          : "border-white/10 bg-white/[0.03]"
+    <motion.button
+      type="button"
+      onClick={onSelect}
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.08 + index * 0.06, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      whileTap={{ scale: 0.985 }}
+      className={`group relative flex w-full flex-col rounded-[22px] border p-4 text-left transition-all ${
+        selected
+          ? "border-white/30 bg-white/[0.06] shadow-[0_8px_30px_-6px_rgba(240,70,140,0.35)]"
+          : "border-white/[0.08] bg-white/[0.025]"
       }`}
+      style={
+        selected && isPopular
+          ? {
+              borderColor: "transparent",
+              backgroundImage:
+                "linear-gradient(#141417, #141417), linear-gradient(135deg, #FF4FA3, #B13CFF)",
+              backgroundOrigin: "border-box",
+              backgroundClip: "padding-box, border-box",
+            }
+          : undefined
+      }
     >
       {isPopular && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-fuchsia-500 to-pink-500 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-lg">
-          ⭐ Mais popular
-        </div>
-      )}
-      {isElite && (
-        <div className="absolute right-3 top-3 rounded-full bg-amber-400/20 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-300">
-          VIP
+        <div className="absolute -top-2.5 left-4 rounded-full bg-gradient-to-r from-pink-500 to-fuchsia-500 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-white shadow-lg">
+          Recomendado
         </div>
       )}
 
-      <div className="mt-1 flex items-center gap-2">
-        <h3
-          className="text-2xl uppercase text-white"
-          style={{
-            fontFamily: "'Montserrat', sans-serif",
-            fontWeight: 900,
-            letterSpacing: "-0.02em",
-          }}
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5">
+            <span
+              className="text-[15px] font-bold tracking-tight text-white"
+            >
+              Hunie {plan.label}
+            </span>
+            {isElite && (
+              <span className="rounded-full bg-amber-400/20 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-amber-300">
+                VIP
+              </span>
+            )}
+          </div>
+          <p className="mt-0.5 text-[12.5px] leading-snug text-white/55">
+            {plan.tagline}
+          </p>
+        </div>
+
+        {/* Radio indicator */}
+        <div
+          className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border transition-all ${
+            selected
+              ? "border-transparent"
+              : "border-white/25 bg-transparent"
+          }`}
+          style={
+            selected
+              ? {
+                  background:
+                    "linear-gradient(135deg, #FF4FA3, #B13CFF)",
+                }
+              : undefined
+          }
         >
-          HUNIE
-        </h3>
-        <span
-          className="rounded-full px-2 py-0.5 text-[10px] uppercase"
-          style={{
-            fontFamily: "'Montserrat', sans-serif",
-            fontWeight: 900,
-            letterSpacing: "0.06em",
-            backgroundColor: plan.accent,
-            color: "#0a0a0a",
-          }}
-        >
-          {plan.label}
-        </span>
+          {selected && <Check size={12} strokeWidth={3} className="text-white" />}
+        </div>
       </div>
 
-
-      <div className="mt-3 flex items-baseline gap-1">
-        <span className="text-3xl font-black">{formatPrice(price, country)}</span>
-        <span className="text-xs text-white/50">/{period === "annual" ? "ano" : "mês"}</span>
+      {/* Price */}
+      <div className="mt-3 flex items-baseline gap-1.5">
+        <span className="text-[26px] font-black tracking-tight text-white">
+          {formatPrice(price, country)}
+        </span>
+        <span className="text-[12px] text-white/45">
+          /{period === "annual" ? "ano" : "mês"}
+        </span>
+        {period === "annual" && (
+          <span className="ml-auto text-[11px] font-semibold text-emerald-400">
+            poupa {formatPrice(savings, country)}
+          </span>
+        )}
       </div>
       {period === "annual" && (
-        <div className="mt-1 flex items-center gap-2 text-xs">
-          <span className="text-white/40 line-through">{formatPrice(fullPrice, country)}</span>
-          <span className="font-semibold text-emerald-400">Poupa {formatPrice(savings, country)}</span>
-        </div>
+        <p className="mt-0.5 text-[11px] text-white/40">
+          equivale a {formatPrice(monthlyEquivalent, country)}/mês
+        </p>
       )}
 
-      <p className="mt-3 text-sm text-white/70">{plan.tagline}</p>
-
-      <ul className="mt-4 flex-1 space-y-2">
-        {plan.highlights.map((h) => (
-          <li key={h.label} className="flex items-start gap-2 text-sm">
-            <Check size={14} className="mt-1 shrink-0" style={{ color: plan.accent }} />
-            <span className={h.bold ? "font-semibold" : "text-white/80"}>{h.label}</span>
+      {/* Highlights — show always so user can compare without tapping */}
+      <ul className="mt-3 grid grid-cols-1 gap-1.5">
+        {plan.highlights.slice(0, selected ? plan.highlights.length : 4).map((h) => (
+          <li key={h.label} className="flex items-start gap-2 text-[12.5px]">
+            <Check
+              size={12}
+              strokeWidth={3}
+              className="mt-[3px] shrink-0"
+              style={{ color: plan.accent }}
+            />
+            <span className={h.bold ? "font-semibold text-white" : "text-white/70"}>
+              {h.label}
+            </span>
           </li>
         ))}
+        {!selected && plan.highlights.length > 4 && (
+          <li className="ml-5 text-[11px] text-white/35">
+            + {plan.highlights.length - 4} benefícios
+          </li>
+        )}
       </ul>
-
-      <motion.button
-        whileTap={{ scale: 0.96 }}
-        onClick={onSelect}
-        className={`mt-5 h-12 w-full rounded-2xl text-sm font-bold text-white shadow-lg ${
-          isPopular ? "bg-gradient-to-r from-fuchsia-500 to-pink-500" : ""
-        }`}
-        style={
-          !isPopular
-            ? { background: `linear-gradient(135deg, ${plan.accent}, ${plan.accent}cc)` }
-            : undefined
-        }
-      >
-        {isPopular ? `Escolher ${plan.label}` : "Escolher"}
-      </motion.button>
-    </motion.div>
+    </motion.button>
   );
 }
+
