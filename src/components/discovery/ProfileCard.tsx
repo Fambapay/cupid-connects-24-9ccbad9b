@@ -264,9 +264,12 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     useEffect(
       () => () => {
         if (flyCommitTimerRef.current) clearTimeout(flyCommitTimerRef.current);
+        animXRef.current?.stop();
+        animYRef.current?.stop();
       },
       [],
     );
+
 
     const animateTo = useCallback(
       (tx: number, ty: number, isFly = false, onDone?: () => void, velocity?: { x: number; y: number }) => {
@@ -310,9 +313,16 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       animateTo(tx, ty, true, undefined, velocity);
       flyCommitTimerRef.current = setTimeout(() => {
         flyCommitTimerRef.current = null;
+        // Stop the in-flight spring so the next card (which shares x/y)
+        // doesn't inherit the off-screen values and render frozen.
+        animXRef.current?.stop();
+        animYRef.current?.stop();
+        animXRef.current = null;
+        animYRef.current = null;
         onSwipe(dir);
       }, 300);
     };
+
 
     useImperativeHandle(ref, () => ({
       flyLeft: () => flyOut("left"),
