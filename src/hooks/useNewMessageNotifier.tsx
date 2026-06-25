@@ -5,6 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { signPhoto } from "@/lib/photos";
 import { AppleToast } from "@/components/notifications/AppleToast";
+import {
+  scheduleLocalNotification,
+  isAppInBackground,
+  requestLocalNotificationPermission,
+} from "@/lib/native/localNotifications";
 
 type PeerInfo = { name: string; photo: string };
 
@@ -146,6 +151,14 @@ export function useNewMessageNotifier() {
 
           const body =
             m.content.length > 120 ? `${m.content.slice(0, 120)}…` : m.content;
+
+          void scheduleLocalNotification({
+            id: m.id.split('-').map(s => parseInt(s, 16)).reduce((a, b) => a + b, 0) % 2147483647,
+            title: peer.name,
+            body,
+            extra: { type: 'message', matchId: m.match_id },
+          });
+
           toast.custom(
             (t) => (
               <AppleToast
@@ -183,6 +196,14 @@ export function useNewMessageNotifier() {
           const cached = peerCache.current.get(row.id);
           const peerPromise = cached ? Promise.resolve(cached) : resolvePeer(row.id);
           const bodyTemplate = (name: string) => `Tu e ${name} deram like. Manda já uma mensagem!`;
+
+          const notifId = row.id.split('-').map(s => parseInt(s, 16)).reduce((a, b) => a + b, 0) % 2147483647;
+          void scheduleLocalNotification({
+            id: notifId,
+            title: 'Novo match 💘',
+            body: cached ? bodyTemplate(cached.name) : 'Deram like um no outro. Manda já uma mensagem!',
+            extra: { type: 'match', matchId: row.id },
+          });
 
           toast.custom(
             (t) => (
@@ -255,6 +276,14 @@ export function useNewMessageNotifier() {
           }
 
           const isSuper = s.direction === "super";
+
+          void scheduleLocalNotification({
+            id: s.id.split('-').map(s => parseInt(s, 16)).reduce((a, b) => a + b, 0) % 2147483647,
+            title: isSuper ? "Super Like ⭐" : "Novo like 👀",
+            body: `${revealName} mostrou interesse no teu perfil.`,
+            extra: { type: 'like', swiperId: s.swiper_id },
+          });
+
           toast.custom(
             (t) => (
               <AppleToast
