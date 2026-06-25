@@ -239,7 +239,7 @@ export function ProfileView({
 
 
       {/* PROGRESS */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={itemVariants} className="relative px-5 pb-5">
         <div className="rounded-2xl border border-border bg-card p-4">
           <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-2">
@@ -272,7 +272,7 @@ export function ProfileView({
             </p>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* SUGGESTIONS */}
       {suggestions.length > 0 && (
