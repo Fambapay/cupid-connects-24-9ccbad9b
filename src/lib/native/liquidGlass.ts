@@ -48,7 +48,12 @@ const native = registerPlugin<LiquidGlassPlugin>('LiquidGlass', {
 
 export const isLiquidGlassSupported = (): boolean => {
   try {
-    return Capacitor.isNativePlatform() && getPlatform() === 'ios' && Capacitor.isPluginAvailable('LiquidGlass')
+    // `isPluginAvailable` can be false during the first WebView paint on a
+    // freshly booted native app even though the plugin is registered a few
+    // milliseconds later. Treat native iOS as eligible and let the bridge call
+    // decide readiness, otherwise the BottomNav switches to a transparent CSS
+    // shell and the outer pill appears to vanish in the simulator.
+    return Capacitor.isNativePlatform() && getPlatform() === 'ios'
   } catch {
     return false
   }
