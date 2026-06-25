@@ -8,6 +8,10 @@ import { signPhoto } from "@/lib/photos";
 const ROSE = "#FF5C8A";
 const PLUM = "#9B5BFF";
 
+// Module-level cache so the user's own photo is fetched once per session
+// and is instantly available when a match overlay opens.
+const myPhotoCache = new Map<string, string>();
+
 interface Props {
   open: boolean;
   targetName: string;
@@ -29,10 +33,18 @@ export function MatchOverlay({
   onSendMessage,
 }: Props) {
   const { user } = useAuth();
-  const [myPhoto, setMyPhoto] = useState<string | null>(null);
+  const [myPhoto, setMyPhoto] = useState<string | null>(() =>
+    user ? myPhotoCache.get(user.id) ?? null : null,
+  );
 
+  // Prefetch on mount (not just when open) so the photo is ready instantly when a match happens.
   useEffect(() => {
-    if (!open || !user) return;
+    if (!user) return;
+    const cached = myPhotoCache.get(user.id);
+    if (cached) {
+      setMyPhoto(cached);
+      return;
+    }
     let cancel = false;
     (async () => {
       const { data } = await supabase
@@ -43,17 +55,27 @@ export function MatchOverlay({
         .limit(1)
         .maybeSingle();
       const path = (data as { storage_path?: string } | null)?.storage_path;
-      if (!path) {
-        if (!cancel) setMyPhoto(null);
-        return;
-      }
+      if (!path) return;
       const url = await signPhoto(path, 3600, { width: 360, height: 440, resize: "cover", quality: 80 });
-      if (!cancel) setMyPhoto(url || null);
+      if (!cancel && url) {
+        myPhotoCache.set(user.id, url);
+        // Warm the browser image cache.
+        const img = new Image();
+        img.src = url;
+        setMyPhoto(url);
+      }
     })();
     return () => {
       cancel = true;
     };
-  }, [open, user]);
+  }, [user]);
+
+  // Warm target photo as soon as we know it (before overlay opens).
+  useEffect(() => {
+    if (!targetPhoto) return;
+    const img = new Image();
+    img.src = targetPhoto;
+  }, [targetPhoto]);
 
   return (
     <AnimatePresence>
