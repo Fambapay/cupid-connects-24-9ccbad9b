@@ -2,6 +2,8 @@ import { useState } from "react";
 import { MoreVertical, Flag, Ban, HeartCrack } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { showActionSheet } from "@/lib/native/actionSheet";
+import { isNative } from "@/lib/native/platform";
 import {
   DropdownMenu,
   DropdownMenuContent,
