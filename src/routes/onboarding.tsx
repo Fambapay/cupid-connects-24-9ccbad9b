@@ -171,6 +171,7 @@ const initialDraft: DraftState = {
 
 
 function OnboardingPage() {
+  useForceDarkTheme();
   const { user } = useAuth();
   const { profile, reload } = useProfile();
   const navigate = useNavigate();
