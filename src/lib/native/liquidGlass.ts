@@ -46,6 +46,15 @@ const native = registerPlugin<LiquidGlassPlugin>('LiquidGlass', {
   android: () => noop,
 })
 
+const waitForNativePlugin = async (): Promise<boolean> => {
+  if (!Capacitor.isNativePlatform() || getPlatform() !== 'ios') return false
+  for (let i = 0; i < 10; i += 1) {
+    if (Capacitor.isPluginAvailable('LiquidGlass')) return true
+    await new Promise((resolve) => window.setTimeout(resolve, 80))
+  }
+  return Capacitor.isPluginAvailable('LiquidGlass')
+}
+
 export const isLiquidGlassSupported = (): boolean => {
   try {
     // `isPluginAvailable` can be false during the first WebView paint on a
@@ -79,14 +88,15 @@ const setReady = (v: boolean) => {
 export const LiquidGlass: LiquidGlassPlugin = {
   async show(rect) {
     const supported = isLiquidGlassSupported()
+    const pluginAvailable = supported ? await waitForNativePlugin() : false
     console.log('[LiquidGlass] show()', {
       supported,
       platform: getPlatform(),
       isNative: Capacitor.isNativePlatform(),
-      pluginAvailable: Capacitor.isPluginAvailable('LiquidGlass'),
+      pluginAvailable,
       rect,
     })
-    if (!supported) return
+    if (!supported || !pluginAvailable) return
     try {
       await native.show(rect)
       activeSurfaces.add(rect.id ?? 'default')
