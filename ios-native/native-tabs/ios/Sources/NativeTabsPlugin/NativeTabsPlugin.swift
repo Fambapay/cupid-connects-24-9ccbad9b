@@ -96,16 +96,23 @@ public class NativeTabsPlugin: CAPPlugin, CAPBridgedPlugin {
         let bar = UITabBar()
         bar.translatesAutoresizingMaskIntoConstraints = false
 
-        // iOS 26+: UITabBar usa Liquid Glass por defeito. Garantimos
-        // background transparente para não tapar o material do sistema.
-        if #available(iOS 13.0, *) {
+        // iOS 26+: UITabBar aplica Liquid Glass automaticamente quando a
+        // appearance NÃO é customizada. Se chamarmos configureWithDefaultBackground()
+        // ou configureWithOpaqueBackground(), o sistema desliga o Liquid Glass.
+        // Em iOS < 26 mantemos o material translúcido padrão (também nativo).
+        if #available(iOS 26.0, *) {
+            // Não tocar em appearance — deixa o sistema aplicar UIGlassEffect.
+        } else if #available(iOS 15.0, *) {
             let appearance = UITabBarAppearance()
             appearance.configureWithDefaultBackground()
             bar.standardAppearance = appearance
-            if #available(iOS 15.0, *) {
-                bar.scrollEdgeAppearance = appearance
-            }
+            bar.scrollEdgeAppearance = appearance
         }
+
+        // Para o Liquid Glass refractar conteúdo, a WebView e o body precisam
+        // de ter algo visível por trás da barra. Tornamos o fundo da janela
+        // visível por baixo da tab bar (a WebView já é transparente).
+        bar.isTranslucent = true
 
         // Constrói os itens.
         var tabItems: [UITabBarItem] = []
