@@ -249,12 +249,24 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
 
     const animXRef = useRef<ReturnType<typeof animate> | null>(null);
     const animYRef = useRef<ReturnType<typeof animate> | null>(null);
+    const flyCommitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const cancelAnim = () => {
+      if (flyCommitTimerRef.current) {
+        clearTimeout(flyCommitTimerRef.current);
+        flyCommitTimerRef.current = null;
+      }
       animXRef.current?.stop();
       animYRef.current?.stop();
       animXRef.current = null;
       animYRef.current = null;
     };
+
+    useEffect(
+      () => () => {
+        if (flyCommitTimerRef.current) clearTimeout(flyCommitTimerRef.current);
+      },
+      [],
+    );
 
     const animateTo = useCallback(
       (tx: number, ty: number, isFly = false, onDone?: () => void, velocity?: { x: number; y: number }) => {
@@ -295,7 +307,11 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       const h = getVH();
       const tx = dir === "left" ? -w * 1.65 : dir === "right" ? w * 1.65 : 0;
       const ty = dir === "up" ? -h * 1.4 : 0;
-      animateTo(tx, ty, true, () => onSwipe(dir), velocity);
+      animateTo(tx, ty, true, undefined, velocity);
+      flyCommitTimerRef.current = setTimeout(() => {
+        flyCommitTimerRef.current = null;
+        onSwipe(dir);
+      }, 190);
     };
 
     useImperativeHandle(ref, () => ({
