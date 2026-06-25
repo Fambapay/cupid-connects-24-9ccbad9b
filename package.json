@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@block65/webcrypto-web-push": "^1.0.2",
+    "@capacitor-community/in-app-review": "^8.0.0",
     "@capacitor-community/safe-area": "^8.0.1",
     "@capacitor/action-sheet": "^8.1.1",
     "@capacitor/android": "^8.4.1",
