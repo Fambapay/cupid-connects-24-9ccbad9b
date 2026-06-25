@@ -5,6 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { signPhoto } from "@/lib/photos";
 import { AppleToast } from "@/components/notifications/AppleToast";
+import {
+  scheduleLocalNotification,
+  isAppInBackground,
+  requestLocalNotificationPermission,
+} from "@/lib/native/localNotifications";
 
 type PeerInfo = { name: string; photo: string };
 
