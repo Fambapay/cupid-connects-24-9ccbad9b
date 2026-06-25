@@ -370,20 +370,25 @@ function NativeBottomNav({
   likesCount,
   unreadChats,
   onTabChange,
+  onNativeUnavailable,
 }: {
   activeTab: TabId;
   likesCount: number;
   unreadChats: number;
   onTabChange: (t: TabId) => void;
+  onNativeUnavailable: () => void;
 }) {
   const onTabChangeRef = useRef(onTabChange);
   onTabChangeRef.current = onTabChange;
+  const onNativeUnavailableRef = useRef(onNativeUnavailable);
+  onNativeUnavailableRef.current = onNativeUnavailable;
 
   // Mount: cria a barra uma vez.
   useEffect(() => {
     let cancelled = false;
     let selectListener: { remove: () => void } | undefined;
     let heightListener: { remove: () => void } | undefined;
+    let nativeOk = false;
 
     (async () => {
       try {
@@ -402,6 +407,7 @@ function NativeBottomNav({
           })),
         });
         if (cancelled) return;
+        nativeOk = true;
 
         selectListener = await NativeTabs.addListener("tabSelected", ({ index }) => {
           const next = TAB_ORDER[index];
@@ -418,7 +424,8 @@ function NativeBottomNav({
           );
         });
       } catch (err) {
-        console.warn("[NativeTabs] show failed", err);
+        console.warn("[NativeTabs] show failed — falling back to HTML bar", err);
+        if (!cancelled) onNativeUnavailableRef.current();
       }
     })();
 
@@ -426,7 +433,7 @@ function NativeBottomNav({
       cancelled = true;
       selectListener?.remove();
       heightListener?.remove();
-      NativeTabs.hide().catch(() => {});
+      if (nativeOk) NativeTabs.hide().catch(() => {});
       document.documentElement.style.removeProperty("--native-tabs-height");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
