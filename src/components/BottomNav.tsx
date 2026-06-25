@@ -416,7 +416,7 @@ function NativeBottomNav({
               id === "likes"
                 ? formatBadge(likesCount)
                 : id === "chat"
-                  ? formatBadge(unreadChats)
+                  ? (unreadChats > 0 ? "•" : "")
                   : "",
             selected: id === activeTab,
           })),
