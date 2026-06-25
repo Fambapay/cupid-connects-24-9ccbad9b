@@ -228,8 +228,11 @@ function ChatRoom() {
 
   if (loading || !peer) {
     return (
-      <div
-        className="fixed inset-0 flex flex-col"
+      <motion.div
+        initial={{ opacity: 0, x: 24 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+        className="fixed inset-0 z-50 flex flex-col"
         style={{ background: "var(--chat-bg)", color: "var(--chat-fg)" }}
         aria-busy="true"
         aria-label="A carregar conversa"
@@ -247,7 +250,7 @@ function ChatRoom() {
           <div className="h-10 w-1/2 rounded-2xl bg-foreground/5 animate-pulse self-end" />
           <div className="h-10 w-3/5 rounded-2xl bg-foreground/5 animate-pulse" />
         </div>
-      </div>
+      </motion.div>
     );
   }
 
