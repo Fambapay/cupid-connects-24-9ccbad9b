@@ -96,7 +96,11 @@ export const LiquidGlass: LiquidGlassPlugin = {
       pluginAvailable,
       rect,
     })
-    if (!supported || !pluginAvailable) return
+    if (!supported) return
+    if (!pluginAvailable) {
+      setReady(false)
+      throw new Error('LiquidGlass native plugin is not available')
+    }
     try {
       await native.show(rect)
       activeSurfaces.add(rect.id ?? 'default')
