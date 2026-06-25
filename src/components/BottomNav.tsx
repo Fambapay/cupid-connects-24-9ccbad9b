@@ -132,6 +132,9 @@ export const BottomNavBase = ({
       const r = el.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
       const round = (v: number) => Math.round(v * dpr) / dpr;
+      // Apple-style approach: native glass renders BEHIND a transparent
+      // WebView. Icons & labels live in the web layer above the glass and
+      // stay crisp automatically — no exclusion masking required.
       const rect = {
         id: "bottom-nav-outer",
         x: round(r.left),
@@ -140,26 +143,23 @@ export const BottomNavBase = ({
         height: round(r.height),
         cornerRadius: round(r.height / 2),
         intensity: 1,
-        placement: "above" as const,
-        exclusionRects: Array.from(el.querySelectorAll<HTMLElement>("[data-glass-protected]")).map((protectedEl) => {
-          const pr = protectedEl.getBoundingClientRect();
-          return {
-            x: round(pr.left),
-            y: round(pr.top),
-            width: round(pr.width),
-            height: round(pr.height),
-            cornerRadius: round(Math.min(pr.width, pr.height) / 2),
-          };
-        }),
+        placement: "behind" as const,
       };
-      const key = `${rect.x}|${rect.y}|${rect.width}|${rect.height}|${rect.exclusionRects.map((protectedRect) => `${protectedRect.x},${protectedRect.y},${protectedRect.width},${protectedRect.height}`).join(";")}`;
+      const key = `${rect.x}|${rect.y}|${rect.width}|${rect.height}`;
       if (key === lastKey) return;
       lastKey = key;
       if (!started) {
         started = true;
+        console.log("[BottomNav] LiquidGlass.show", rect);
         LiquidGlass.show(rect)
-          .then(() => setNativeGlassActive(true))
-          .catch(() => setNativeGlassActive(false));
+          .then(() => {
+            console.log("[BottomNav] LiquidGlass.show OK → native active");
+            setNativeGlassActive(true);
+          })
+          .catch((err) => {
+            console.error("[BottomNav] LiquidGlass.show FAILED", err);
+            setNativeGlassActive(false);
+          });
       } else {
         LiquidGlass.update(rect);
       }
