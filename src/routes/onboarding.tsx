@@ -1049,33 +1049,35 @@ function ScrollPickerSheet<T extends number>({
   selected: T | null;
   onSelect: (v: T) => void;
 }) {
-  const ITEM_H = 44;
-  const VISIBLE = 5;
+  // 3D cylindrical "slot-machine" picker
+  const ITEM_H = 46;
+  const VISIBLE = 7; // odd number so there's a clear center
+  const RADIUS = (ITEM_H * VISIBLE) / 2 / Math.tan(Math.PI / VISIBLE);
   const listRef = useRef<HTMLDivElement>(null);
-  const [activeIdx, setActiveIdx] = useState<number>(() => {
+  const initialIdx = useMemo(() => {
     const i = items.findIndex((it) => it.value === selected);
     return i >= 0 ? i : Math.floor(items.length / 2);
-  });
+  }, [items, selected]);
+  const [activeIdx, setActiveIdx] = useState<number>(initialIdx);
   const scrollRaf = useRef<number | null>(null);
   const snapTimer = useRef<number | null>(null);
 
   useEffect(() => {
     if (!open) return;
-    const i = items.findIndex((it) => it.value === selected);
-    const idx = i >= 0 ? i : Math.floor(items.length / 2);
-    setActiveIdx(idx);
+    setActiveIdx(initialIdx);
     const id = requestAnimationFrame(() => {
-      if (listRef.current) listRef.current.scrollTop = idx * ITEM_H;
+      if (listRef.current) listRef.current.scrollTop = initialIdx * ITEM_H;
     });
     return () => cancelAnimationFrame(id);
-  }, [open, items, selected]);
+  }, [open, initialIdx]);
 
   const handleScroll = () => {
     if (scrollRaf.current) cancelAnimationFrame(scrollRaf.current);
     scrollRaf.current = requestAnimationFrame(() => {
       if (!listRef.current) return;
-      const idx = Math.round(listRef.current.scrollTop / ITEM_H);
-      setActiveIdx(Math.max(0, Math.min(items.length - 1, idx)));
+      const raw = listRef.current.scrollTop / ITEM_H;
+      const idx = Math.max(0, Math.min(items.length - 1, Math.round(raw)));
+      setActiveIdx(idx);
     });
     if (snapTimer.current) window.clearTimeout(snapTimer.current);
     snapTimer.current = window.setTimeout(() => {
@@ -1083,7 +1085,7 @@ function ScrollPickerSheet<T extends number>({
       const idx = Math.round(listRef.current.scrollTop / ITEM_H);
       const clamped = Math.max(0, Math.min(items.length - 1, idx));
       listRef.current.scrollTo({ top: clamped * ITEM_H, behavior: "smooth" });
-    }, 120);
+    }, 90);
   };
 
   const handleConfirm = () => {
@@ -1094,59 +1096,100 @@ function ScrollPickerSheet<T extends number>({
   const containerH = ITEM_H * VISIBLE;
   const padding = (containerH - ITEM_H) / 2;
 
+  // Track fractional scroll position for smooth 3D rotation
+  const [scrollPos, setScrollPos] = useState(initialIdx);
+  useEffect(() => {
+    setScrollPos(initialIdx);
+  }, [initialIdx]);
+  const onScrollRaw = () => {
+    handleScroll();
+    if (listRef.current) {
+      setScrollPos(listRef.current.scrollTop / ITEM_H);
+    }
+  };
+
   return (
     <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
       <DrawerContent className="border-t border-white/10 bg-card">
         <DrawerHeader className="pb-1 pt-3">
-          <DrawerTitle className="text-center text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          <DrawerTitle className="text-center text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
             {title}
           </DrawerTitle>
         </DrawerHeader>
 
-        <div className="relative px-6 pb-2 pt-1">
+        <div className="relative px-6 pb-3 pt-2">
+          {/* Ambient brand glow behind the wheel */}
           <div
             aria-hidden
-            className="pointer-events-none absolute left-6 right-6 top-1/2 -translate-y-1/2 rounded-2xl border border-white/10"
+            className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2"
             style={{
-              height: ITEM_H,
+              height: containerH * 0.9,
               background:
-                "linear-gradient(180deg, color-mix(in oklab, var(--brand-pink) 10%, transparent), color-mix(in oklab, var(--brand-purple) 10%, transparent))",
-              boxShadow:
-                "inset 0 1px 0 color-mix(in oklab, white 6%, transparent), 0 0 24px -8px color-mix(in oklab, var(--brand-pink) 40%, transparent)",
+                "radial-gradient(60% 70% at 50% 50%, color-mix(in oklab, var(--brand-pink) 14%, transparent), transparent 70%)",
+              filter: "blur(8px)",
             }}
           />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute left-7 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full"
-            style={{ background: "var(--brand-pink)" }}
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute right-7 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full"
-            style={{ background: "var(--brand-purple)" }}
-          />
 
+          {/* Selection rail — sleek hairline bars top & bottom of center slot */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute left-6 right-6 top-1/2 -translate-y-1/2"
+            style={{ height: ITEM_H }}
+          >
+            <div
+              className="absolute inset-x-0 top-0 h-px"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent, color-mix(in oklab, var(--brand-pink) 80%, transparent) 20%, color-mix(in oklab, var(--brand-purple) 80%, transparent) 80%, transparent)",
+                boxShadow:
+                  "0 0 10px color-mix(in oklab, var(--brand-pink) 50%, transparent)",
+              }}
+            />
+            <div
+              className="absolute inset-x-0 bottom-0 h-px"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent, color-mix(in oklab, var(--brand-purple) 80%, transparent) 20%, color-mix(in oklab, var(--brand-pink) 80%, transparent) 80%, transparent)",
+                boxShadow:
+                  "0 0 10px color-mix(in oklab, var(--brand-purple) 50%, transparent)",
+              }}
+            />
+          </div>
+
+          {/* 3D cylinder container */}
           <div
             ref={listRef}
-            onScroll={handleScroll}
+            onScroll={onScrollRaw}
             className="relative overflow-y-auto [&::-webkit-scrollbar]:hidden"
             style={{
               height: containerH,
               scrollSnapType: "y mandatory",
               scrollbarWidth: "none",
               msOverflowStyle: "none",
+              WebkitOverflowScrolling: "touch",
+              perspective: `${RADIUS * 2.2}px`,
+              perspectiveOrigin: "50% 50%",
               maskImage:
-                "linear-gradient(to bottom, transparent 0, #000 30%, #000 70%, transparent 100%)",
+                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 14%, #000 36%, #000 64%, rgba(0,0,0,0.4) 86%, transparent 100%)",
               WebkitMaskImage:
-                "linear-gradient(to bottom, transparent 0, #000 30%, #000 70%, transparent 100%)",
+                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 14%, #000 36%, #000 64%, rgba(0,0,0,0.4) 86%, transparent 100%)",
             }}
           >
-            <div style={{ paddingTop: padding, paddingBottom: padding }}>
+            <div
+              style={{
+                paddingTop: padding,
+                paddingBottom: padding,
+                transformStyle: "preserve-3d",
+              }}
+            >
               {items.map((it, i) => {
-                const dist = Math.abs(i - activeIdx);
-                const active = dist === 0;
-                const opacity = active ? 1 : Math.max(0.25, 1 - dist * 0.28);
-                const scale = active ? 1 : Math.max(0.82, 1 - dist * 0.06);
+                const offset = i - scrollPos; // fractional distance from center
+                const absOff = Math.abs(offset);
+                // Each item rotates around X axis on a virtual cylinder
+                const angle = offset * (360 / VISIBLE / 2); // half-turn per visible slot
+                const clampedAngle = Math.max(-90, Math.min(90, angle));
+                const opacity = Math.max(0.15, 1 - absOff * 0.32);
+                const active = absOff < 0.5;
                 return (
                   <button
                     key={it.value}
@@ -1155,16 +1198,25 @@ function ScrollPickerSheet<T extends number>({
                       if (listRef.current)
                         listRef.current.scrollTo({ top: i * ITEM_H, behavior: "smooth" });
                     }}
-                    className="flex w-full items-center justify-center text-center transition-[transform,opacity,color] duration-150 will-change-transform"
+                    className="flex w-full items-center justify-center text-center will-change-transform"
                     style={{
                       height: ITEM_H,
                       scrollSnapAlign: "center",
                       opacity,
-                      transform: `scale(${scale})`,
-                      color: active ? "var(--foreground)" : "var(--muted-foreground)",
-                      fontWeight: active ? 600 : 400,
-                      fontSize: active ? "1.375rem" : "1.125rem",
-                      letterSpacing: active ? "-0.01em" : "0",
+                      transform: `rotateX(${-clampedAngle}deg) translateZ(${RADIUS}px)`,
+                      transformOrigin: "center center",
+                      backfaceVisibility: "hidden",
+                      color: active ? "var(--foreground)" : "color-mix(in oklab, var(--foreground) 70%, transparent)",
+                      fontWeight: active ? 600 : 500,
+                      fontSize: active ? "1.5rem" : "1.25rem",
+                      letterSpacing: active ? "-0.015em" : "-0.005em",
+                      fontFamily:
+                        '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif',
+                      textShadow: active
+                        ? "0 0 24px color-mix(in oklab, var(--brand-pink) 40%, transparent)"
+                        : "none",
+                      transition:
+                        "color 160ms ease, font-size 160ms ease, text-shadow 200ms ease",
                     }}
                   >
                     {it.label}
