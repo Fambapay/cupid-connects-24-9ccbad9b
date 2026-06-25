@@ -203,13 +203,14 @@ export const BottomNavBase = ({
     let radius = 0;
 
     const measureBase = () => {
-      const r = el.getBoundingClientRect();
-      // El's translateX === pillX.get(), so subtract it to get the "0" anchor.
-      const tx = pillX.get();
-      baseLeft = r.left - tx;
-      baseTop = r.top;
-      height = r.height;
-      radius = r.height / 2;
+      // Anchor to the container — it is stable and does not depend on the
+      // current motion transform. The inner pill at translateX=0 aligns with
+      // the container's left edge (left:0, full width = tabWidth).
+      const cr = container.getBoundingClientRect();
+      baseLeft = cr.left;
+      baseTop = cr.top;
+      height = cr.height;
+      radius = cr.height / 2;
     };
     measureBase();
 
