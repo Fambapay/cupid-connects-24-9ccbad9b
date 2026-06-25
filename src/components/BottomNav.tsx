@@ -113,9 +113,9 @@ export const BottomNavBase = ({
   }, [activeIndex, tabWidth, isDragging, pillX]);
 
   // Native Apple Liquid Glass — outer tab bar surface.
-  // On iOS this is rendered ABOVE the WebView so it is the real Apple material,
-  // not a transparent CSS cutout. We punch transparent holes over every icon +
-  // label so text remains crisp per our liquid-glass rule.
+  // Renders ABOVE the WebView (so it is visible regardless of page background)
+  // with transparent exclusionRects punched over every icon + label, keeping
+  // text/icons crisp per our liquid-glass rule.
   useEffect(() => {
     if (!useNativeGlass) {
       setNativeGlassActive(false);
@@ -128,13 +128,46 @@ export const BottomNavBase = ({
     let lastKey = "";
     let started = false;
 
+    const collectExclusions = (pillRect: DOMRect, dpr: number) => {
+      const round = (v: number) => Math.round(v * dpr) / dpr;
+      const out: Array<{ x: number; y: number; width: number; height: number; cornerRadius: number }> = [];
+
+      // 1. Inner active pill — must show through, otherwise the native glass
+      //    covers our sliding selector.
+      const inner = innerPillRef.current?.getBoundingClientRect();
+      if (inner && inner.width > 1 && inner.height > 1) {
+        out.push({
+          x: round(inner.left),
+          y: round(inner.top),
+          width: round(inner.width),
+          height: round(inner.height),
+          cornerRadius: inner.height / 2,
+        });
+      }
+
+      // 2. Icons + labels — crisp text rule.
+      const nodes = el.querySelectorAll<HTMLElement>("[data-glass-protected]");
+      nodes.forEach((n) => {
+        const r = n.getBoundingClientRect();
+        if (r.width < 1 || r.height < 1) return;
+        out.push({
+          x: round(r.left),
+          y: round(r.top),
+          width: round(r.width),
+          height: round(r.height),
+          cornerRadius: Math.min(r.width, r.height) / 2,
+        });
+      });
+      void pillRect;
+      return out;
+    };
+
+
     const syncNow = () => {
       const r = el.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
       const round = (v: number) => Math.round(v * dpr) / dpr;
-      // Apple-style approach: native glass renders BEHIND a transparent
-      // WebView. Icons & labels live in the web layer above the glass and
-      // stay crisp automatically — no exclusion masking required.
+      const exclusionRects = collectExclusions(r, dpr);
       const rect = {
         id: "bottom-nav-outer",
         x: round(r.left),
@@ -143,9 +176,12 @@ export const BottomNavBase = ({
         height: round(r.height),
         cornerRadius: round(r.height / 2),
         intensity: 1,
-        placement: "behind" as const,
+        placement: "above" as const,
+        exclusionRects,
       };
-      const key = `${rect.x}|${rect.y}|${rect.width}|${rect.height}`;
+      const key = `${rect.x}|${rect.y}|${rect.width}|${rect.height}|${exclusionRects
+        .map((e) => `${e.x},${e.y},${e.width},${e.height}`)
+        .join(";")}`;
       if (key === lastKey) return;
       lastKey = key;
       if (!started) {
@@ -171,8 +207,18 @@ export const BottomNavBase = ({
     };
 
     schedule();
+    // Re-measure after fonts load (label widths change → exclusion rects shift).
+    const fonts = (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts;
+    fonts?.ready.then(schedule).catch(() => {});
+    // Re-sync on every frame while the inner pill animates, so exclusion rects
+    // track tab switches (active label can grow/shrink slightly).
+    const interval = window.setInterval(schedule, 400);
+    const unsubPillX = pillX.on("change", schedule);
+
+
     const ro = new ResizeObserver(schedule);
     ro.observe(el);
+    el.querySelectorAll("[data-glass-protected]").forEach((n) => ro.observe(n));
     window.addEventListener("resize", schedule);
     window.addEventListener("orientationchange", schedule);
     const vv = window.visualViewport;
@@ -181,6 +227,9 @@ export const BottomNavBase = ({
 
     return () => {
       cancelAnimationFrame(raf);
+      clearInterval(interval);
+      unsubPillX();
+
       ro.disconnect();
       window.removeEventListener("resize", schedule);
       window.removeEventListener("orientationchange", schedule);
@@ -190,6 +239,7 @@ export const BottomNavBase = ({
       LiquidGlass.hide({ id: "bottom-nav-outer" });
     };
   }, [useNativeGlass]);
+
 
 
 
