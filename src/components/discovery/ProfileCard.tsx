@@ -251,9 +251,9 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       if (enterAnim) return; // rewind handles its own entry
       const controls = animate(entry, 0, {
         type: "spring",
-        stiffness: 260,
-        damping: 28,
-        mass: 0.9,
+        stiffness: 170,
+        damping: 20,
+        mass: 1.15,
         restDelta: 0.001,
       });
       return () => controls.stop();
@@ -261,8 +261,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     }, []);
 
 
-    const snapSpring = { type: "spring" as const, stiffness: 520, damping: 36, mass: 0.7, restDelta: 0.5 };
-    const flySpring = { type: "spring" as const, stiffness: 220, damping: 26, mass: 0.9 };
+    const snapSpring = { type: "spring" as const, stiffness: 280, damping: 30, mass: 0.85, restDelta: 0.5 };
+    const flySpring = { type: "spring" as const, stiffness: 150, damping: 20, mass: 1.15 };
 
     const animXRef = useRef<ReturnType<typeof animate> | null>(null);
     const animYRef = useRef<ReturnType<typeof animate> | null>(null);
@@ -414,6 +414,12 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
 
 
     return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
+      >
       <div className="absolute inset-0 overflow-hidden" style={{ background: "#000", perspective: 1200 }}>
         {isTop && nextProfiles[1] && (
           <StackCard profile={nextProfiles[1]} topX={x} topY={y} stackIndex={2} />
@@ -1026,6 +1032,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
         )}
 
       </div>
+      </motion.div>
     );
   },
 );
