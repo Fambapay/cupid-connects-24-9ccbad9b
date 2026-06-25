@@ -38,6 +38,24 @@ function ChatList() {
   const newMatches = matches.filter((m) => !m.hasMessages);
   const conversations = matches.filter((m) => m.hasMessages);
 
+  // Delay skeleton reveal so fast loads don't flash skeleton → empty state.
+  const [showSkeleton, setShowSkeleton] = useState(false);
+  useEffect(() => {
+    if (!loading) {
+      setShowSkeleton(false);
+      return;
+    }
+    const t = window.setTimeout(() => setShowSkeleton(true), 250);
+    return () => window.clearTimeout(t);
+  }, [loading]);
+
+  const state: "skeleton" | "empty" | "list" =
+    loading && matches.length === 0
+      ? "skeleton"
+      : conversations.length === 0 && newMatches.length === 0
+      ? "empty"
+      : "list";
+
   return (
     <AppShell className="bg-[var(--profile-bg)]">
       <header className="sticky top-0 z-30 flex items-center justify-between bg-[var(--profile-bg)] px-5 py-4">
