@@ -249,20 +249,19 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     // of the animation — no visible jump.
     useEffect(() => {
       if (enterAnim) return; // rewind handles its own entry
+      // Tween entry — no bounce, iOS-style ease-out.
       const controls = animate(entry, 0, {
-        type: "spring",
-        stiffness: 170,
-        damping: 20,
-        mass: 1.15,
-        restDelta: 0.001,
+        duration: 0.42,
+        ease: [0.22, 1, 0.36, 1],
       });
       return () => controls.stop();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
 
-    const snapSpring = { type: "spring" as const, stiffness: 280, damping: 30, mass: 0.85, restDelta: 0.5 };
-    const flySpring = { type: "spring" as const, stiffness: 150, damping: 20, mass: 1.15 };
+    const snapSpring = { type: "spring" as const, stiffness: 320, damping: 34, mass: 0.7, restDelta: 0.5 };
+    // Fly-out as a tween so the card exits cleanly without lingering spring settle.
+    const flyTween = { type: "tween" as const, duration: 0.36, ease: [0.32, 0.72, 0, 1] as [number, number, number, number] };
 
     const animXRef = useRef<ReturnType<typeof animate> | null>(null);
     const animYRef = useRef<ReturnType<typeof animate> | null>(null);
@@ -276,7 +275,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     const animateTo = useCallback(
       (tx: number, ty: number, isFly = false, onDone?: () => void, velocity?: { x: number; y: number }) => {
         cancelAnim();
-        const spring = isFly ? flySpring : snapSpring;
+        const spring = isFly ? flyTween : snapSpring;
         // Attach onComplete to whichever axis travels farther so a vertical
         // fly-out (super like) doesn't fire onDone instantly via an X spring
         // that has no movement.
@@ -284,8 +283,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
         const dy = Math.abs(ty - y.get());
         const onX = dx >= dy ? onDone : undefined;
         const onY = dx >= dy ? undefined : onDone;
-        animXRef.current = animate(x, tx, { ...spring, velocity: velocity?.x, onComplete: onX });
-        animYRef.current = animate(y, ty, { ...spring, velocity: velocity?.y, onComplete: onY });
+        animXRef.current = animate(x, tx, { ...spring, velocity: isFly ? undefined : velocity?.x, onComplete: onX });
+        animYRef.current = animate(y, ty, { ...spring, velocity: isFly ? undefined : velocity?.y, onComplete: onY });
       },
       [x, y],
     );
