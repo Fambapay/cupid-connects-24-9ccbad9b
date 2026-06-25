@@ -253,7 +253,11 @@ export const BottomNavBase = ({
                 animate={{ scale: isPressed || isDragging ? 1.08 : 1 }}
                 transition={{ type: "spring", stiffness: 560, damping: 34, mass: 0.5 }}
               >
-                <div className="w-full h-full nav-active-pill" style={{ borderRadius: "9999px" }} />
+                <div
+                  ref={innerPillRef}
+                  className="w-full h-full nav-active-pill"
+                  style={{ borderRadius: "9999px" }}
+                />
               </motion.div>
 
               {/* Transparent drag handle — on top of active tab, captures gestures */}
@@ -268,7 +272,7 @@ export const BottomNavBase = ({
                 }}
                 drag="x"
                 dragConstraints={{ left: 0, right: (tabs.length - 1) * tabWidth }}
-                dragElastic={0.08}
+                dragElastic={0.06}
                 dragMomentum={false}
                 onPointerDown={() => {
                   setIsPressed(true);
@@ -276,25 +280,30 @@ export const BottomNavBase = ({
                 }}
                 onPointerUp={() => setIsPressed(false)}
                 onPointerCancel={() => setIsPressed(false)}
-                onDragStart={() => setIsDragging(true)}
-                onDrag={(_, info) => {
-                  // live snap preview: highlight nearest tab
+                onDragStart={() => {
+                  setIsDragging(true);
+                  setDragHoverIndex(activeIndex);
+                }}
+                onDrag={() => {
+                  // Haptic feedback when crossing into a new tab cell —
+                  // do NOT navigate yet, only commit on release.
                   const idx = Math.round((pillX.get() ?? 0) / tabWidth);
                   const clamped = Math.max(0, Math.min(tabs.length - 1, idx));
-                  if (tabs[clamped].id !== activeTab) {
-                    onTabChange(tabs[clamped].id);
-                  }
+                  setDragHoverIndex((prev) => {
+                    if (prev !== clamped) hapticTap();
+                    return clamped;
+                  });
                 }}
                 onDragEnd={() => {
                   const idx = Math.round((pillX.get() ?? 0) / tabWidth);
                   const clamped = Math.max(0, Math.min(tabs.length - 1, idx));
                   setIsDragging(false);
                   setIsPressed(false);
+                  setDragHoverIndex(null);
                   hapticTap();
                   if (tabs[clamped].id !== activeTab) {
                     onTabChange(tabs[clamped].id);
                   } else {
-                    // snap back
                     animate(pillX, clamped * tabWidth, {
                       type: "spring",
                       stiffness: 380,
@@ -308,6 +317,7 @@ export const BottomNavBase = ({
 
           {tabs.map((tab, index) => {
             const isActive = activeTab === tab.id;
+            const isHover = dragHoverIndex === index && dragHoverIndex !== activeIndex;
             const shouldAnimate = false;
 
             return (
@@ -318,7 +328,7 @@ export const BottomNavBase = ({
                 label={tab.label}
                 badge={tab.badge}
                 shouldAnimate={shouldAnimate}
-                isActive={isActive}
+                isActive={isActive || isHover}
                 index={index}
                 tabWidth={tabWidth}
                 pillX={pillX}
@@ -328,6 +338,7 @@ export const BottomNavBase = ({
               />
             );
           })}
+
         </div>
       </div>
     </nav>
