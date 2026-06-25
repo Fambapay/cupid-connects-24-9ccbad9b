@@ -130,13 +130,26 @@ export const BottomNavBase = ({
 
     const collectExclusions = (pillRect: DOMRect, dpr: number) => {
       const round = (v: number) => Math.round(v * dpr) / dpr;
-      const nodes = el.querySelectorAll<HTMLElement>("[data-glass-protected]");
       const out: Array<{ x: number; y: number; width: number; height: number; cornerRadius: number }> = [];
+
+      // 1. Inner active pill — must show through, otherwise the native glass
+      //    covers our sliding selector.
+      const inner = innerPillRef.current?.getBoundingClientRect();
+      if (inner && inner.width > 1 && inner.height > 1) {
+        out.push({
+          x: round(inner.left),
+          y: round(inner.top),
+          width: round(inner.width),
+          height: round(inner.height),
+          cornerRadius: inner.height / 2,
+        });
+      }
+
+      // 2. Icons + labels — crisp text rule.
+      const nodes = el.querySelectorAll<HTMLElement>("[data-glass-protected]");
       nodes.forEach((n) => {
         const r = n.getBoundingClientRect();
         if (r.width < 1 || r.height < 1) return;
-        // Convert to pill-local coordinates (Swift expects coords relative to
-        // the same origin used for the surface frame — webview-local CSS px).
         out.push({
           x: round(r.left),
           y: round(r.top),
@@ -148,6 +161,7 @@ export const BottomNavBase = ({
       void pillRect;
       return out;
     };
+
 
     const syncNow = () => {
       const r = el.getBoundingClientRect();
