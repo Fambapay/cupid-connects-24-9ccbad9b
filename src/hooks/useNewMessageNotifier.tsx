@@ -197,6 +197,14 @@ export function useNewMessageNotifier() {
           const peerPromise = cached ? Promise.resolve(cached) : resolvePeer(row.id);
           const bodyTemplate = (name: string) => `Tu e ${name} deram like. Manda já uma mensagem!`;
 
+          const notifId = row.id.split('-').map(s => parseInt(s, 16)).reduce((a, b) => a + b, 0) % 2147483647;
+          void scheduleLocalNotification({
+            id: notifId,
+            title: 'Novo match 💘',
+            body: cached ? bodyTemplate(cached.name) : 'Deram like um no outro. Manda já uma mensagem!',
+            extra: { type: 'match', matchId: row.id },
+          });
+
           toast.custom(
             (t) => (
               <AppleToast
