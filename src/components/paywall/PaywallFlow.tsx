@@ -233,22 +233,28 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
                 className="mx-auto mb-5 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/70 backdrop-blur-md"
               >
                 <Sparkles size={11} className="text-pink-400" />
-                Hunie Membership
+                {fomoData.count > 0
+                  ? `${fomoData.count} ${fomoData.count === 1 ? "pessoa à tua espera" : "pessoas à tua espera"}`
+                  : "Hunie Membership"}
               </motion.div>
               <h2
                 className="text-[34px] font-black leading-[1.05] tracking-[-0.03em]"
                 style={{ fontFamily: "'Instrument Serif', 'Cormorant', serif", fontWeight: 400 }}
               >
-                Conhece quem
+                A pessoa certa
                 <br />
                 <span className="bg-gradient-to-r from-pink-400 via-fuchsia-400 to-violet-400 bg-clip-text italic text-transparent">
-                  está à tua espera.
+                  não espera para sempre.
                 </span>
               </h2>
-              <p className="mx-auto mt-3 max-w-[280px] text-[14px] leading-snug text-white/55">
-                Desbloqueia tudo o que torna o Hunie uma experiência diferente.
+              <p className="mx-auto mt-3 max-w-[290px] text-[14px] leading-snug text-white/55">
+                Cada dia sem Hunie são conversas que não acontecem e matches que passam ao lado.
               </p>
             </div>
+
+            {/* Social proof live ticker */}
+            <SocialProofTicker className="mt-5" />
+
 
             {/* Billing toggle */}
             <div className="mt-7 px-6">
