@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from "react";
-import { motion, useMotionValue } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue } from "framer-motion";
 import { ProfileCard, type ProfileCardHandle } from "./ProfileCard";
 import { SwipeActions } from "./SwipeActions";
 import { DiscoverTopBar } from "./DiscoverTopBar";
@@ -187,43 +187,52 @@ export const DiscoveryPage = ({
     >
       {current ? (
         <>
-          <motion.div variants={itemVariants} className="h-full w-full">
-            <ProfileCard
-              ref={cardRef}
-              key={`${current.id}:${enterAnim ?? "n"}:${animNonce}`}
-              profile={current}
-              nextProfiles={[next1, next2].filter(Boolean) as DiscoveryProfile[]}
-              onSwipe={handle}
-              sharedX={x}
-              sharedY={y}
-              enterAnim={enterAnim}
-              actions={
-                <SwipeActions
-                  onSwipe={(d) => {
-                    if (d === "left") cardRef.current?.flyLeft();
-                    else if (d === "right") cardRef.current?.flyRight();
-                    else cardRef.current?.flyUp();
-                  }}
-                  onFirstImpression={() => onFirstImpression?.(current)}
-                  onRewind={handleRewind}
-                  canRewind={canRewind}
-                  dragX={x}
-                  dragY={y}
+          <motion.div variants={itemVariants} className="h-full w-full relative">
+            <AnimatePresence initial={false}>
+              <motion.div
+                key={`${current.id}:${enterAnim ?? "n"}:${animNonce}`}
+                className="absolute inset-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.42, ease: [0.22, 0.61, 0.36, 1] }}
+              >
+                <ProfileCard
+                  ref={cardRef}
+                  profile={current}
+                  nextProfiles={[next1, next2].filter(Boolean) as DiscoveryProfile[]}
+                  onSwipe={handle}
+                  sharedX={x}
+                  sharedY={y}
+                  enterAnim={enterAnim}
+                  actions={
+                    <SwipeActions
+                      onSwipe={(d) => {
+                        if (d === "left") cardRef.current?.flyLeft();
+                        else if (d === "right") cardRef.current?.flyRight();
+                        else cardRef.current?.flyUp();
+                      }}
+                      onFirstImpression={() => onFirstImpression?.(current)}
+                      onRewind={handleRewind}
+                      canRewind={canRewind}
+                      dragX={x}
+                      dragY={y}
+                    />
+                  }
+                  panelActions={
+                    <SwipeActions
+                      onSwipe={(d) => {
+                        if (d === "left") cardRef.current?.flyLeft();
+                        else if (d === "right") cardRef.current?.flyRight();
+                        else cardRef.current?.flyUp();
+                      }}
+                      onFirstImpression={() => onFirstImpression?.(current)}
+                      onRewind={handleRewind}
+                      canRewind={canRewind}
+                    />
+                  }
                 />
-              }
-              panelActions={
-                <SwipeActions
-                  onSwipe={(d) => {
-                    if (d === "left") cardRef.current?.flyLeft();
-                    else if (d === "right") cardRef.current?.flyRight();
-                    else cardRef.current?.flyUp();
-                  }}
-                  onFirstImpression={() => onFirstImpression?.(current)}
-                  onRewind={handleRewind}
-                  canRewind={canRewind}
-                />
-              }
-            />
+              </motion.div>
+            </AnimatePresence>
           </motion.div>
           {showTopBar && (
             <motion.div variants={itemVariants}>
