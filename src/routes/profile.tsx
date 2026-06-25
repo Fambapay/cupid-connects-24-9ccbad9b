@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { AppleToast } from '@/components/notifications/AppleToast';
 import { ProfileView, type ProfileViewData } from '@/components/ProfileView';
