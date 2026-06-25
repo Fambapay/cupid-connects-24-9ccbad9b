@@ -90,15 +90,35 @@ export function ProfileView({
     } finally { setBusy(false); }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.06, delayChildren: 0.05 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 14 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.35, ease: [0.32, 0.72, 0, 1] },
+    },
+  };
+
   return (
-    <div
+    <motion.div
       className="relative min-h-full pb-32"
       style={{
         background: 'var(--profile-bg)',
       }}
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
     >
       {/* Soft gradient backdrop */}
-      <div
+      <motion.div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[280px]"
         style={{
@@ -106,6 +126,7 @@ export function ProfileView({
           background:
             'radial-gradient(70% 60% at 50% 0%, rgba(255,79,163,0.22) 0%, rgba(255,79,163,0) 70%)',
         }}
+        variants={itemVariants}
       />
 
 
