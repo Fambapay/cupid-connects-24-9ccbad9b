@@ -6,6 +6,7 @@
       "name": "tanstack_start_ts",
       "dependencies": {
         "@block65/webcrypto-web-push": "^1.0.2",
+        "@capacitor-community/safe-area": "^8.0.1",
         "@capacitor/android": "^8.4.1",
         "@capacitor/app": "^8.1.0",
         "@capacitor/camera": "^8.2.0",
@@ -154,6 +155,8 @@
     "@block65/custom-error": ["@block65/custom-error@12.2.0", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@block65/custom-error/-/custom-error-12.2.0.tgz", { "dependencies": { "serialize-error": "^11.0.3" } }, "sha512-OH3qt4aY9W2kfpI5BY075Mc/M5HNJHjtYkxwUV62OZhKrKQeSUcIXHZkB6H+9YQ5a7D0po3JCouV3egeQDS2pA=="],
 
     "@block65/webcrypto-web-push": ["@block65/webcrypto-web-push@1.0.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@block65/webcrypto-web-push/-/webcrypto-web-push-1.0.2.tgz", { "dependencies": { "@block65/custom-error": "^12.2.0", "base64-arraybuffer": "^1.0.2", "type-fest": "^4.20.0" } }, "sha512-KYFCz4tgnquZ+Mu4EFrB5IfwM0gWJdEKAN4Gj5ZbTRO+ZYcNLs2th36v0toGa+1XOL4qD7G20LnU6yH7zn5siQ=="],
+
+    "@capacitor-community/safe-area": ["@capacitor-community/safe-area@8.0.1", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor-community/safe-area/-/safe-area-8.0.1.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-zVVQ7k94DbOff1mHP8qrZGTJZWyhGZnKHD2eXdcobIoOBFW9CeVphLNZYDCop/DBsHXfv6r8k0/Ac8xMIlwT+A=="],
 
     "@capacitor/android": ["@capacitor/android@8.4.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/android/-/android-8.4.1.tgz", { "peerDependencies": { "@capacitor/core": "^8.4.0" } }, "sha512-igtDCJ7QQn0P2qHFD9p4KXaa6V1b2PRNt+MxjVwtjTm/BJvqmiazOJq6rPjwFSZnfHm6iFoZk8TfzHd44pyBGw=="],
 
