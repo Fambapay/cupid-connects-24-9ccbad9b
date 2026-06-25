@@ -68,6 +68,12 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
 
   useEffect(() => { if (open) setLocal(value); }, [open, value]);
 
+  useEffect(() => {
+    if (!open) return;
+    document.body.classList.add('sheet-open');
+    return () => document.body.classList.remove('sheet-open');
+  }, [open]);
+
   const update = <K extends keyof DiscoveryFilters>(k: K, v: DiscoveryFilters[K]) => {
     hapticTap();
     setLocal((p) => ({ ...p, [k]: v }));

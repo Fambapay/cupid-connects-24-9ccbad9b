@@ -143,7 +143,11 @@
   filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.08));
 }
 
-/* Esconder enquanto sheet aberto */
+/* Esconder enquanto sheet aberto e travar scroll da página atrás */
+body.sheet-open {
+  overflow: hidden;
+  touch-action: none;
+}
 body.sheet-open .tab-bar {
   transform: translateY(140%);
   pointer-events: none;
