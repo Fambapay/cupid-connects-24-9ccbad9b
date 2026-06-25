@@ -3,8 +3,9 @@ import Capacitor
 import UIKit
 
 /**
- * LiquidGlass — renders a native Apple glass surface beneath the WebView
- * region of the bottom nav pill.
+ * LiquidGlass — renders one or more native Apple glass surfaces beneath the
+ * WebView. Each surface is keyed by an `id` so multiple pills can be tracked
+ * independently (e.g. outer tab-bar pill + inner sliding active pill).
  *
  *   iOS 26+ → UIGlassEffect (real Liquid Glass).
  *   iOS 17–25 → UIVisualEffectView with .systemUltraThinMaterial (fallback).
@@ -22,8 +23,7 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "hide",   returnType: CAPPluginReturnPromise),
     ]
 
-
-    private var glassView: UIView?
+    private var glassViews: [String: UIView] = [:]
     private var didMakeWebViewTransparent = false
 
     // MARK: - JS API
@@ -31,18 +31,29 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func show(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             self.ensureWebViewTransparent()
+            let id = call.getString("id") ?? "default"
             let frame = self.frame(from: call)
             let radius = CGFloat(call.getDouble("cornerRadius") ?? 28.0)
+            let intensity = CGFloat(call.getDouble("intensity") ?? 1.0)
 
-            if self.glassView == nil {
-                self.glassView = self.makeGlassView(frame: frame, cornerRadius: radius)
-                if let gv = self.glassView, let webView = self.bridge?.webView, let parent = webView.superview {
-                    // Insert BEHIND the WebView so HTML icons render on top.
-                    parent.insertSubview(gv, belowSubview: webView)
-                }
+            if let existing = self.glassViews[id] {
+                existing.frame = frame
+                existing.layer.cornerRadius = radius
+                existing.layer.cornerCurve = .continuous
+                existing.alpha = max(0, min(1, intensity))
             } else {
-                self.glassView?.frame = frame
-                self.applyCornerRadius(radius)
+                let view = self.makeGlassView(frame: frame, cornerRadius: radius)
+                view.alpha = max(0, min(1, intensity))
+                self.glassViews[id] = view
+                if let webView = self.bridge?.webView, let parent = webView.superview {
+                    // Inner pill renders ABOVE the WebView so it visually slides
+                    // on top of the HTML chrome; outer pill renders BEHIND.
+                    if id == "inner" {
+                        parent.insertSubview(view, aboveSubview: webView)
+                    } else {
+                        parent.insertSubview(view, belowSubview: webView)
+                    }
+                }
             }
             call.resolve()
         }
@@ -50,17 +61,17 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func update(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
-            guard let gv = self.glassView else { call.resolve(); return }
+            let id = call.getString("id") ?? "default"
+            guard let gv = self.glassViews[id] else { call.resolve(); return }
             let frame = self.frame(from: call)
             let radius = CGFloat(call.getDouble("cornerRadius") ?? Double(gv.layer.cornerRadius))
-            // Pixel-perfect tracking: disable implicit Core Animation so the
-            // glass jumps to the exact frame the JS rAF computed this tick.
-            // The JS side already drives smooth 60/120fps updates.
+            let intensity = call.getDouble("intensity").map { CGFloat($0) }
             CATransaction.begin()
             CATransaction.setDisableActions(true)
             gv.frame = frame
             gv.layer.cornerRadius = radius
             gv.layer.cornerCurve = .continuous
+            if let i = intensity { gv.alpha = max(0, min(1, i)) }
             CATransaction.commit()
             call.resolve()
         }
@@ -68,8 +79,9 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func hide(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
-            self.glassView?.removeFromSuperview()
-            self.glassView = nil
+            let id = call.getString("id") ?? "default"
+            self.glassViews[id]?.removeFromSuperview()
+            self.glassViews.removeValue(forKey: id)
             call.resolve()
         }
     }
@@ -77,8 +89,6 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
     // MARK: - Helpers
 
     private func frame(from call: CAPPluginCall) -> CGRect {
-        // JS sends CSS pixels; UIKit uses points. On iOS they're 1:1 for the
-        // WebView's coordinate space (WKWebView already accounts for scale).
         let x = CGFloat(call.getDouble("x") ?? 0)
         let y = CGFloat(call.getDouble("y") ?? 0)
         let w = CGFloat(call.getDouble("width") ?? 0)
@@ -86,16 +96,12 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
         guard let webView = self.bridge?.webView else {
             return CGRect(x: x, y: y, width: w, height: h)
         }
-        // Translate from WebView-local coords to its superview's coords.
         let local = CGRect(x: x, y: y, width: w, height: h)
         return webView.convert(local, to: webView.superview)
     }
 
     private func makeGlassView(frame: CGRect, cornerRadius: CGFloat) -> UIView {
-        // iOS 26+ Liquid Glass
         if #available(iOS 26.0, *) {
-            // UIGlassEffect ships as a UIVisualEffect subclass in iOS 26.
-            // We use it via UIVisualEffectView so the rest of the code is identical.
             if let glassEffectClass = NSClassFromString("UIGlassEffect") as? UIVisualEffect.Type {
                 let effect = glassEffectClass.init()
                 let view = UIVisualEffectView(effect: effect)
@@ -106,27 +112,17 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
                 return view
             }
         }
-        // Fallback: classic system material (Control Center-style)
         let blur = UIBlurEffect(style: .systemUltraThinMaterial)
         let view = UIVisualEffectView(effect: blur)
         view.frame = frame
         view.layer.cornerRadius = cornerRadius
         view.layer.cornerCurve = .continuous
         view.clipsToBounds = true
-        // Subtle hairline to match Apple's pill chrome
         view.layer.borderWidth = 1.0 / UIScreen.main.scale
-        view.layer.borderColor = UIColor(white: 1.0, alpha: 0.12).cgColor
+        view.layer.borderColor = UIColor(white: 1.0, alpha: 0.18).cgColor
         return view
     }
 
-    private func applyCornerRadius(_ radius: CGFloat) {
-        guard let gv = self.glassView else { return }
-        gv.layer.cornerRadius = radius
-        gv.layer.cornerCurve = .continuous
-    }
-
-    /// Make the WKWebView and its scroll view transparent so the native
-    /// glass surface behind it is visible. Called lazily on first show().
     private func ensureWebViewTransparent() {
         guard !didMakeWebViewTransparent, let webView = self.bridge?.webView else { return }
         webView.isOpaque = false
