@@ -327,9 +327,7 @@
   }
 }
 
-/* Bottom-nav reserved zone (tab bar height + safe-area + breathing room).
-   Content stays fully opaque under the native UITabBar so its Liquid Glass
-   material has something to refract. */
+/* Bottom-nav reserved zone (tab bar height + safe-area + breathing room). */
 :root {
   --nav-zone: calc(56px + env(safe-area-inset-bottom, 0px) + 24px);
 }

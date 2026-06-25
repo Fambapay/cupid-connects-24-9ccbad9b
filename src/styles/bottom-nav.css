@@ -1,5 +1,5 @@
 /* ============================================================
-   HUNIE — Bottom Nav (Liquid Glass)
+   HUNIE — Bottom Nav
    ============================================================ */
 
 .tab-bar, .tab-bar-pill {
@@ -27,7 +27,7 @@
   transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* ── Liquid Glass Pill (Apple-style native) ───────────────── */
+/* ── Floating pill ─────────────────────────────────────────── */
 .tab-bar-pill {
   pointer-events: auto;
   width: 100%;
@@ -46,7 +46,7 @@
   contain: layout paint style;
   -webkit-font-smoothing: antialiased;
 
-  /* Dark neutral glass — true Apple-style */
+  /* Dark neutral surface */
   background:
     linear-gradient(180deg,
       rgba(36, 36, 42, 0.62) 0%,
@@ -65,40 +65,6 @@
     0 10px 28px rgba(0, 0, 0, 0.42),
     0 2px 8px rgba(0, 0, 0, 0.22);
 }
-
-/* ── Native mode: real UIGlassEffect renders ABOVE the WebView.
-   Keep a polished web base underneath it so the outer pill never vanishes
-   if the native surface is delayed, too subtle, or clipped by the simulator. */
-.tab-bar-pill--native {
-  background:
-    linear-gradient(180deg,
-      rgba(255, 255, 255, 0.15) 0%,
-      rgba(255, 255, 255, 0.075) 42%,
-      rgba(255, 255, 255, 0.055) 100%
-    ) !important;
-  -webkit-backdrop-filter: blur(34px) saturate(210%) brightness(1.08) !important;
-  backdrop-filter: blur(34px) saturate(210%) brightness(1.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.26),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
-    0 10px 30px rgba(0, 0, 0, 0.34),
-    0 2px 10px rgba(0, 0, 0, 0.22) !important;
-  transition:
-    background 220ms cubic-bezier(0.32, 0.72, 0, 1),
-    box-shadow 220ms cubic-bezier(0.32, 0.72, 0, 1) !important;
-}
-.tab-bar-pill--native[data-interacting="true"] {
-  transform: translate3d(0, 0, 0);
-}
-/* Keep a very thin specular edge in native mode — it matches Apple's pill
-   affordance while the real native layer handles refraction above it. */
-.tab-bar-pill.tab-bar-pill--native::before,
-.tab-bar-pill.tab-bar-pill--native::after {
-  display: block !important;
-  opacity: 0.55;
-}
-
 
 /* Top specular sheen — thin glossy band */
 .tab-bar-pill::before {
@@ -151,27 +117,7 @@
   contain: paint;
 }
 
-/* Native: clean neutral inner pill — no heavy gradient, lets the native
-   refraction from neighboring tabs feel the transition. Text/icons stay
-   crisp on top (regra liquid glass). */
-.tab-bar-pill--native .nav-active-pill {
-  background:
-    linear-gradient(180deg,
-      rgba(255, 255, 255, 0.18) 0%,
-      rgba(255, 255, 255, 0.10) 100%
-    );
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
-    0 4px 12px rgba(0, 0, 0, 0.28);
-}
-.tab-bar-pill--native .nav-active-pill::before {
-  display: none;
-}
-
-
-/* ── Tab states — brighter for visibility on liquid glass ─── */
+/* ── Tab states ───────────────────────────────────────────── */
 .tab-bar-item {
   color: rgba(255, 255, 255, 0.62);
   transition:
@@ -190,30 +136,6 @@
 .tab-bar-item[data-active="true"] .tab-bar-icon {
   color: #ffffff;
   filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.45)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
-}
-
-/* Native: ensure icons sit crisply ABOVE the native UIGlassEffect "inner"
-   surface — bump brightness/contrast and tighten shadows so the glass
-   refraction never washes them out. */
-.tab-bar-pill--native .tab-bar-item {
-  color: rgba(255, 255, 255, 0.78);
-}
-.tab-bar-pill--native .tab-bar-item .tab-bar-icon {
-  filter:
-    drop-shadow(0 1px 1px rgba(0, 0, 0, 0.65))
-    drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
-}
-.tab-bar-pill--native .tab-bar-item[data-active="true"] {
-  color: #ffffff;
-}
-.tab-bar-pill--native .tab-bar-item[data-active="true"] .tab-bar-icon {
-  color: #ffffff;
-  filter:
-    drop-shadow(0 0 4px rgba(255, 255, 255, 0.55))
-    drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
-}
-.tab-bar-pill--native .tab-bar-item span {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 /* ── Light mode overrides ─────────────────────────────────── */

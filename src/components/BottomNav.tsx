@@ -12,12 +12,6 @@ import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { hapticTap } from "@/hooks/useNativePlatform";
 import { useLikesCount } from "@/hooks/useLikesCount";
 import { useUnreadChats } from "@/hooks/useUnreadChats";
-import { LiquidGlass, isLiquidGlassSupported } from "@/lib/native/liquidGlass";
-import {
-  NativeTabBar,
-  isNativeTabBarSupported,
-  onTabSelected,
-} from "@/lib/native/nativeTabBar";
 
 type Tab = "discover" | "likes" | "chat" | "profile";
 
@@ -53,11 +47,9 @@ export const BottomNavBase = ({
   const [isPressed, setIsPressed] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragHoverIndex, setDragHoverIndex] = useState<number | null>(null);
-  const [nativeGlassActive, setNativeGlassActive] = useState(false);
   const [visualTab, setVisualTab] = useState<Tab>(activeTab);
   const dragHoverIndexRef = useRef<number | null>(null);
   const pillX = useMotionValue(0);
-  const useNativeGlass = isLiquidGlassSupported();
 
   const handleTabChange = (tab: Tab) => {
     setVisualTab(tab);
@@ -112,140 +104,6 @@ export const BottomNavBase = ({
     return () => controls.stop();
   }, [activeIndex, tabWidth, isDragging, pillX]);
 
-  // Native Apple Liquid Glass — outer tab bar surface.
-  // Renders ABOVE the WebView (so it is visible regardless of page background)
-  // with transparent exclusionRects punched over every icon + label, keeping
-  // text/icons crisp per our liquid-glass rule.
-  useEffect(() => {
-    if (!useNativeGlass) {
-      setNativeGlassActive(false);
-      return;
-    }
-    const el = pillRef.current;
-    if (!el) return;
-
-    let raf = 0;
-    let lastKey = "";
-    let started = false;
-
-    const collectExclusions = (pillRect: DOMRect, dpr: number) => {
-      const round = (v: number) => Math.round(v * dpr) / dpr;
-      const out: Array<{ x: number; y: number; width: number; height: number; cornerRadius: number }> = [];
-
-      // 1. Inner active pill — must show through, otherwise the native glass
-      //    covers our sliding selector.
-      const inner = innerPillRef.current?.getBoundingClientRect();
-      if (inner && inner.width > 1 && inner.height > 1) {
-        out.push({
-          x: round(inner.left),
-          y: round(inner.top),
-          width: round(inner.width),
-          height: round(inner.height),
-          cornerRadius: inner.height / 2,
-        });
-      }
-
-      // 2. Icons + labels — crisp text rule.
-      const nodes = el.querySelectorAll<HTMLElement>("[data-glass-protected]");
-      nodes.forEach((n) => {
-        const r = n.getBoundingClientRect();
-        if (r.width < 1 || r.height < 1) return;
-        out.push({
-          x: round(r.left),
-          y: round(r.top),
-          width: round(r.width),
-          height: round(r.height),
-          cornerRadius: Math.min(r.width, r.height) / 2,
-        });
-      });
-      void pillRect;
-      return out;
-    };
-
-
-    const syncNow = () => {
-      const r = el.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      const round = (v: number) => Math.round(v * dpr) / dpr;
-      const exclusionRects = collectExclusions(r, dpr);
-      const rect = {
-        id: "bottom-nav-outer",
-        x: round(r.left),
-        y: round(r.top),
-        width: round(r.width),
-        height: round(r.height),
-        cornerRadius: round(r.height / 2),
-        intensity: 1,
-        placement: "above" as const,
-        exclusionRects,
-      };
-      const key = `${rect.x}|${rect.y}|${rect.width}|${rect.height}|${exclusionRects
-        .map((e) => `${e.x},${e.y},${e.width},${e.height}`)
-        .join(";")}`;
-      if (key === lastKey) return;
-      lastKey = key;
-      if (!started) {
-        started = true;
-        console.log("[BottomNav] LiquidGlass.show", rect);
-        LiquidGlass.show(rect)
-          .then(() => {
-            console.log("[BottomNav] LiquidGlass.show OK → native active");
-            setNativeGlassActive(true);
-          })
-          .catch((err) => {
-            console.error("[BottomNav] LiquidGlass.show FAILED", err);
-            setNativeGlassActive(false);
-          });
-      } else {
-        LiquidGlass.update(rect);
-      }
-    };
-
-    const schedule = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(syncNow);
-    };
-
-    schedule();
-    // Re-measure after fonts load (label widths change → exclusion rects shift).
-    const fonts = (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts;
-    fonts?.ready.then(schedule).catch(() => {});
-    // Re-sync on every frame while the inner pill animates, so exclusion rects
-    // track tab switches (active label can grow/shrink slightly).
-    const interval = window.setInterval(schedule, 400);
-    const unsubPillX = pillX.on("change", schedule);
-
-
-    const ro = new ResizeObserver(schedule);
-    ro.observe(el);
-    el.querySelectorAll("[data-glass-protected]").forEach((n) => ro.observe(n));
-    window.addEventListener("resize", schedule);
-    window.addEventListener("orientationchange", schedule);
-    const vv = window.visualViewport;
-    vv?.addEventListener("resize", schedule);
-    vv?.addEventListener("scroll", schedule);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      clearInterval(interval);
-      unsubPillX();
-
-      ro.disconnect();
-      window.removeEventListener("resize", schedule);
-      window.removeEventListener("orientationchange", schedule);
-      vv?.removeEventListener("resize", schedule);
-      vv?.removeEventListener("scroll", schedule);
-      setNativeGlassActive(false);
-      LiquidGlass.hide({ id: "bottom-nav-outer" });
-    };
-  }, [useNativeGlass]);
-
-
-
-
-
-
-
   const bottomStyle = dockToBottom
     ? { bottom: "0px" }
     : bottomOffsetPx
@@ -256,7 +114,7 @@ export const BottomNavBase = ({
     <nav ref={navRef} className="tab-bar" style={bottomStyle}>
       <div
         ref={pillRef}
-        className={`tab-bar-pill${nativeGlassActive ? " tab-bar-pill--native" : ""}`}
+        className="tab-bar-pill"
         data-interacting={isPressed || isDragging}
         data-dragging={isDragging}
       >
@@ -378,7 +236,7 @@ export const BottomNavBase = ({
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// TabButton — proximity-driven liquid-glass reflection as the pill drags over
+// TabButton
 // ─────────────────────────────────────────────────────────────────────────────
 interface TabButtonProps {
   tabId: Tab;
@@ -431,7 +289,7 @@ const TabButton = ({
       style={{ background: "none", border: "none" }}
       aria-label={label}
     >
-      <div data-glass-protected="true" className="relative flex items-center z-10">
+      <div className="relative flex items-center z-10">
         <Icon
           className={`tab-bar-icon w-[22px] h-[22px] ${shouldAnimate ? "animate-notification-bounce" : ""}`}
           style={{ fill: "none" }}
@@ -456,7 +314,6 @@ const TabButton = ({
         </AnimatePresence>
       </div>
       <span
-        data-glass-protected="true"
         className="relative text-[10px] leading-none z-10 tracking-wide"
         style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900, opacity: isActive ? 0.95 : 0.6 }}
       >
@@ -502,14 +359,6 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
     });
   }, [router]);
 
-  // NOTE: We intentionally do NOT render the system UITabBar on iOS — the
-  // custom BottomNavBase already uses the native Liquid Glass plugin for
-  // refraction and keeps page transitions in sync with the rest of the app.
-  // Mixing UITabBar (instant) with framer-motion page transitions produced
-  // a "broken / not fluid" feel on the simulator.
-  void NativeBottomNav;
-  void isNativeTabBarSupported;
-
   return (
     <BottomNavBase
       likesCount={likesCount}
@@ -524,61 +373,5 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
       }}
     />
   );
-}
-
-// ─── Native iOS UITabBar wrapper ────────────────────────────────────────────
-
-function NativeBottomNav({
-  activeTab,
-  likesCount,
-  unreadChats,
-}: {
-  activeTab: TabId;
-  likesCount: number;
-  unreadChats: number;
-}) {
-  const navigate = useNavigate();
-
-  // Configure tabs once on mount + wire the tabSelected listener.
-  useEffect(() => {
-    NativeTabBar.configure({
-      tabs: [
-        { id: "discover", title: "Descobrir", sfSymbol: "sparkles" },
-        { id: "likes", title: "Likes", sfSymbol: "heart.fill", badge: likesCount || undefined },
-        { id: "chat", title: "Chat", sfSymbol: "message.fill", badge: unreadChats || undefined },
-        { id: "profile", title: "Perfil", sfSymbol: "person.fill" },
-      ],
-      activeId: activeTab,
-    });
-    NativeTabBar.show();
-
-    const unsubscribe = onTabSelected((id) => {
-      hapticTap();
-      const path = TAB_TO_PATH[id as TabId];
-      if (path) navigate({ to: path });
-    });
-
-    return () => {
-      unsubscribe();
-      NativeTabBar.hide();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Sync active tab when the route changes.
-  useEffect(() => {
-    NativeTabBar.setActiveTab({ id: activeTab });
-  }, [activeTab]);
-
-  // Sync badges.
-  useEffect(() => {
-    NativeTabBar.setBadge({ id: "likes", value: likesCount > 0 ? likesCount : null });
-  }, [likesCount]);
-
-  useEffect(() => {
-    NativeTabBar.setBadge({ id: "chat", value: unreadChats > 0 ? unreadChats : null });
-  }, [unreadChats]);
-
-  return null;
 }
 
