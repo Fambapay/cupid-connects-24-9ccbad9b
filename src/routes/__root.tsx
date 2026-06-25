@@ -33,9 +33,13 @@ function ThemeSync() {
 }
 
 function NativeBoot() {
+  const router = useRouter();
   useEffect(() => {
+    setLocalNotificationNavigator((path) => {
+      try { router.navigate({ to: path }); } catch { /* ignore */ }
+    });
     void initNative();
-  }, []);
+  }, [router]);
   return null;
 }
 
