@@ -334,12 +334,125 @@ const TAB_TO_PATH = {
 } as const;
 
 type TabId = keyof typeof TAB_TO_PATH;
+const TAB_ORDER: TabId[] = ["discover", "likes", "chat", "profile"];
+
+// SF Symbols nativos — em iOS 26 a UITabBar aplica Liquid Glass real.
+const TAB_SYMBOLS: Record<TabId, string> = {
+  discover: "safari",
+  likes: "heart.fill",
+  chat: "message.fill",
+  profile: "person.fill",
+};
+
+const TAB_LABELS: Record<TabId, string> = {
+  discover: "Descobrir",
+  likes: "Likes",
+  chat: "Chat",
+  profile: "Perfil",
+};
 
 function pathToTab(pathname: string): TabId | null {
   if (pathname.startsWith("/discover") || pathname.startsWith("/explore")) return "discover";
   if (pathname.startsWith("/matches")) return "likes";
   if (pathname.startsWith("/chat")) return "chat";
   if (pathname.startsWith("/profile") || pathname.startsWith("/settings")) return "profile";
+  return null;
+}
+
+function formatBadge(n: number): string {
+  if (!n || n <= 0) return "";
+  return n > 99 ? "99+" : String(n);
+}
+
+/** Versão nativa: monta UITabBar via plugin, esconde HTML. */
+function NativeBottomNav({
+  activeTab,
+  likesCount,
+  unreadChats,
+  onTabChange,
+}: {
+  activeTab: TabId;
+  likesCount: number;
+  unreadChats: number;
+  onTabChange: (t: TabId) => void;
+}) {
+  const onTabChangeRef = useRef(onTabChange);
+  onTabChangeRef.current = onTabChange;
+
+  // Mount: cria a barra uma vez.
+  useEffect(() => {
+    let cancelled = false;
+    let selectListener: { remove: () => void } | undefined;
+    let heightListener: { remove: () => void } | undefined;
+
+    (async () => {
+      try {
+        await NativeTabs.show({
+          items: TAB_ORDER.map((id) => ({
+            id,
+            title: TAB_LABELS[id],
+            symbol: TAB_SYMBOLS[id],
+            badge:
+              id === "likes"
+                ? formatBadge(likesCount)
+                : id === "chat"
+                  ? formatBadge(unreadChats)
+                  : "",
+            selected: id === activeTab,
+          })),
+        });
+        if (cancelled) return;
+
+        selectListener = await NativeTabs.addListener("tabSelected", ({ index }) => {
+          const next = TAB_ORDER[index];
+          if (next) {
+            hapticTap();
+            onTabChangeRef.current(next);
+          }
+        });
+
+        heightListener = await NativeTabs.addListener("heightChanged", ({ height }) => {
+          document.documentElement.style.setProperty(
+            "--native-tabs-height",
+            `${Math.round(height)}px`,
+          );
+        });
+      } catch (err) {
+        console.warn("[NativeTabs] show failed", err);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      selectListener?.remove();
+      heightListener?.remove();
+      NativeTabs.hide().catch(() => {});
+      document.documentElement.style.removeProperty("--native-tabs-height");
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Sincroniza seleção quando o pathname muda.
+  useEffect(() => {
+    const index = TAB_ORDER.indexOf(activeTab);
+    if (index >= 0) NativeTabs.setSelected({ index }).catch(() => {});
+  }, [activeTab]);
+
+  // Sincroniza badges.
+  useEffect(() => {
+    NativeTabs.setBadge({
+      index: TAB_ORDER.indexOf("likes"),
+      value: formatBadge(likesCount),
+    }).catch(() => {});
+  }, [likesCount]);
+
+  useEffect(() => {
+    NativeTabs.setBadge({
+      index: TAB_ORDER.indexOf("chat"),
+      value: formatBadge(unreadChats),
+    }).catch(() => {});
+  }, [unreadChats]);
+
   return null;
 }
 
@@ -351,14 +464,29 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
   const likesCount = useLikesCount();
   const unreadChats = useUnreadChats();
 
-  // Warm all main tab routes (code chunks + loader data) on mount so tab
-  // switches feel instantaneous instead of waiting on network/JS chunks.
+  // Warm all main tab routes so switches feel instant.
   useEffect(() => {
     const paths = ["/discover", "/matches", "/chat", "/profile"] as const;
     paths.forEach((to) => {
       router.preloadRoute({ to }).catch(() => {});
     });
   }, [router]);
+
+  const handleTabChange = (t: TabId) => {
+    navigate({ to: TAB_TO_PATH[t] });
+  };
+
+  // iOS nativo → UITabBar com Liquid Glass real. Web/Android → HTML pill.
+  if (nativeTabsAvailable()) {
+    return (
+      <NativeBottomNav
+        activeTab={activeTab}
+        likesCount={likesCount}
+        unreadChats={unreadChats}
+        onTabChange={handleTabChange}
+      />
+    );
+  }
 
   return (
     <BottomNavBase
@@ -369,10 +497,9 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
       onTabHover={(t) => {
         router.preloadRoute({ to: TAB_TO_PATH[t] }).catch(() => {});
       }}
-      onTabChange={(t) => {
-        navigate({ to: TAB_TO_PATH[t] });
-      }}
+      onTabChange={handleTabChange}
     />
   );
 }
+
 
