@@ -440,7 +440,7 @@ export function ProfileView({
       <style>{`
         @keyframes shine { 0% { transform: translateX(0%);} 100% { transform: translateX(450%);} }
       `}</style>
-    </div>
+    </motion.div>
   );
 }
 
