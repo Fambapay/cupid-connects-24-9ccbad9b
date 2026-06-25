@@ -211,7 +211,7 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
             }}
           />
 
-          <div className="mx-auto mt-3 h-1 w-10 rounded-full bg-white/15" />
+          
 
           {!required && (
             <button

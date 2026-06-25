@@ -110,16 +110,6 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 36, stiffness: 320, mass: 0.9 }}
           >
-            {/* Grabber */}
-            <div
-              className="flex justify-center pt-2.5 pb-1"
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-            >
-              <div
-                className="h-[5px] w-10 rounded-full bg-white/25"
-              />
-            </div>
-
             {/* Header */}
             <div className="grid grid-cols-3 items-center px-5 pb-3 pt-1">
               <button
