@@ -244,8 +244,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     useMotionValueEvent(entry, "change", schedule);
 
     const snapSpring = { type: "spring" as const, stiffness: 320, damping: 34, mass: 0.7, restDelta: 0.5 };
-    // Overdamped fly-out keeps release velocity, so it does not pause when the finger leaves.
-    const flySpring = { type: "spring" as const, stiffness: 115, damping: 26, mass: 0.9, restDelta: 4, restSpeed: 60 };
+    // Fluid exit: carries finger velocity and advances before the invisible spring settle.
+    const flySpring = { type: "spring" as const, stiffness: 120, damping: 18, mass: 0.72, restDelta: 8, restSpeed: 90 };
 
     const animXRef = useRef<ReturnType<typeof animate> | null>(null);
     const animYRef = useRef<ReturnType<typeof animate> | null>(null);
@@ -305,13 +305,13 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     const flyOut = (dir: SwipeDirection, velocity?: { x: number; y: number }) => {
       const w = getVW();
       const h = getVH();
-      const tx = dir === "left" ? -w * 1.65 : dir === "right" ? w * 1.65 : 0;
+      const tx = dir === "left" ? -w * 1.9 : dir === "right" ? w * 1.9 : 0;
       const ty = dir === "up" ? -h * 1.4 : 0;
       animateTo(tx, ty, true, undefined, velocity);
       flyCommitTimerRef.current = setTimeout(() => {
         flyCommitTimerRef.current = null;
         onSwipe(dir);
-      }, 190);
+      }, 300);
     };
 
     useImperativeHandle(ref, () => ({
