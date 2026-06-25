@@ -275,7 +275,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     const animateTo = useCallback(
       (tx: number, ty: number, isFly = false, onDone?: () => void, velocity?: { x: number; y: number }) => {
         cancelAnim();
-        const spring = isFly ? flySpring : snapSpring;
+        const spring = isFly ? flyTween : snapSpring;
         // Attach onComplete to whichever axis travels farther so a vertical
         // fly-out (super like) doesn't fire onDone instantly via an X spring
         // that has no movement.
@@ -283,8 +283,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
         const dy = Math.abs(ty - y.get());
         const onX = dx >= dy ? onDone : undefined;
         const onY = dx >= dy ? undefined : onDone;
-        animXRef.current = animate(x, tx, { ...spring, velocity: velocity?.x, onComplete: onX });
-        animYRef.current = animate(y, ty, { ...spring, velocity: velocity?.y, onComplete: onY });
+        animXRef.current = animate(x, tx, { ...spring, velocity: isFly ? undefined : velocity?.x, onComplete: onX });
+        animYRef.current = animate(y, ty, { ...spring, velocity: isFly ? undefined : velocity?.y, onComplete: onY });
       },
       [x, y],
     );
