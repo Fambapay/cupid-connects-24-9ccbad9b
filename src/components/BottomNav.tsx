@@ -118,10 +118,7 @@ export const BottomNavBase = ({
     return () => controls.stop();
   }, [activeIndex, tabWidth, isDragging, pillX]);
 
-  // Native Apple Liquid Glass — iOS only. Tracks the pill's bounding rect
-  // and forwards it to the native plugin so UIGlassEffect renders BEHIND
-  // the WebView at the right position. The transparency on top is handled
-  // by a gradient mask on each .screen-scroll container (see styles.css).
+  // Native Apple Liquid Glass — outer tab bar surface (id: "default", behind WebView).
   useEffect(() => {
     if (!useNativeGlass) return;
     const el = pillRef.current;
@@ -158,15 +155,11 @@ export const BottomNavBase = ({
       raf = requestAnimationFrame(syncNow);
     };
 
-    // Initial sync after layout settles.
     schedule();
-
     const ro = new ResizeObserver(schedule);
     ro.observe(el);
-
     window.addEventListener("resize", schedule);
     window.addEventListener("orientationchange", schedule);
-
     const vv = window.visualViewport;
     vv?.addEventListener("resize", schedule);
     vv?.addEventListener("scroll", schedule);
@@ -181,6 +174,54 @@ export const BottomNavBase = ({
       LiquidGlass.hide();
     };
   }, [useNativeGlass]);
+
+  // Native Apple Liquid Glass — INNER sliding pill (id: "inner", above WebView).
+  // Subscribes to pillX so the native glass droplet refracts in real time as
+  // the user drags between tabs.
+  useEffect(() => {
+    if (!useNativeGlass) return;
+    const el = innerPillRef.current;
+    if (!el || tabWidth === 0) return;
+
+    let started = false;
+    let lastKey = "";
+
+    const sync = () => {
+      const r = el.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const round = (v: number) => Math.round(v * dpr) / dpr;
+      const rect = {
+        id: "inner" as const,
+        x: round(r.left),
+        y: round(r.top),
+        width: round(r.width),
+        height: round(r.height),
+        cornerRadius: round(r.height / 2),
+        intensity: isPressed || isDragging ? 1 : 0.92,
+      };
+      const key = `${rect.x}|${rect.y}|${rect.width}|${rect.height}|${rect.intensity}`;
+      if (key === lastKey) return;
+      lastKey = key;
+      if (!started) {
+        started = true;
+        LiquidGlass.show(rect);
+      } else {
+        LiquidGlass.update(rect);
+      }
+    };
+
+    // rAF loop tied to pillX motion value for buttery 60/120fps refraction
+    let raf = 0;
+    const loop = () => { sync(); raf = requestAnimationFrame(loop); };
+    raf = requestAnimationFrame(loop);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      LiquidGlass.hide({ id: "inner" });
+    };
+  }, [useNativeGlass, tabWidth, isPressed, isDragging]);
+
+
 
 
   const bottomStyle = dockToBottom
