@@ -24,7 +24,7 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "hide",   returnType: CAPPluginReturnPromise),
     ]
 
-    private var glassViews: [String: UIView] = [:]
+    private var glassViews: [String: GlassSurfaceView] = [:]
     private var didMakeWebViewTransparent = false
 
     // MARK: - JS API
@@ -39,14 +39,11 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
             let exclusions = self.exclusionFrames(from: call)
 
             if let existing = self.glassViews[id] {
-                existing.frame = frame
-                existing.layer.cornerRadius = radius
-                existing.layer.cornerCurve = .continuous
-                existing.alpha = max(0, min(1, intensity))
+                existing.configure(frame: frame, cornerRadius: radius, alpha: max(0, min(1, intensity)))
                 self.applyMask(to: existing, frame: frame, cornerRadius: radius, exclusionFrames: exclusions)
             } else {
                 let view = self.makeGlassView(frame: frame, cornerRadius: radius)
-                view.alpha = max(0, min(1, intensity))
+                view.configure(frame: frame, cornerRadius: radius, alpha: max(0, min(1, intensity)))
                 view.isUserInteractionEnabled = false
                 self.applyMask(to: view, frame: frame, cornerRadius: radius, exclusionFrames: exclusions)
                 self.glassViews[id] = view
@@ -73,10 +70,7 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
             let exclusions = self.exclusionFrames(from: call)
             CATransaction.begin()
             CATransaction.setDisableActions(true)
-            gv.frame = frame
-            gv.layer.cornerRadius = radius
-            gv.layer.cornerCurve = .continuous
-            if let i = intensity { gv.alpha = max(0, min(1, i)) }
+            gv.configure(frame: frame, cornerRadius: radius, alpha: intensity.map { max(0, min(1, $0)) })
             self.applyMask(to: gv, frame: frame, cornerRadius: radius, exclusionFrames: exclusions)
             CATransaction.commit()
             call.resolve()
@@ -147,26 +141,19 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
         view.layer.mask = mask
     }
 
-    private func makeGlassView(frame: CGRect, cornerRadius: CGFloat) -> UIView {
+    private func makeGlassView(frame: CGRect, cornerRadius: CGFloat) -> GlassSurfaceView {
+        let view = GlassSurfaceView(frame: frame)
         if #available(iOS 26.0, *) {
             if let glassEffectClass = NSClassFromString("UIGlassEffect") as? UIVisualEffect.Type {
                 let effect = glassEffectClass.init()
-                let view = UIVisualEffectView(effect: effect)
-                view.frame = frame
-                view.layer.cornerRadius = cornerRadius
-                view.layer.cornerCurve = .continuous
-                view.clipsToBounds = true
+                view.effectView.effect = effect
+                view.configure(frame: frame, cornerRadius: cornerRadius, alpha: nil)
                 return view
             }
         }
         let blur = UIBlurEffect(style: .systemUltraThinMaterial)
-        let view = UIVisualEffectView(effect: blur)
-        view.frame = frame
-        view.layer.cornerRadius = cornerRadius
-        view.layer.cornerCurve = .continuous
-        view.clipsToBounds = true
-        view.layer.borderWidth = 1.0 / UIScreen.main.scale
-        view.layer.borderColor = UIColor(white: 1.0, alpha: 0.18).cgColor
+        view.effectView.effect = blur
+        view.configure(frame: frame, cornerRadius: cornerRadius, alpha: nil)
         return view
     }
 
@@ -176,5 +163,68 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
         didMakeWebViewTransparent = true
+    }
+}
+
+private final class GlassSurfaceView: UIView {
+    let effectView = UIVisualEffectView(effect: nil)
+    private let tintView = UIView()
+    private let strokeLayer = CAShapeLayer()
+    private let topHighlightLayer = CAGradientLayer()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        isOpaque = false
+        backgroundColor = .clear
+        clipsToBounds = true
+
+        effectView.frame = bounds
+        effectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        addSubview(effectView)
+
+        tintView.frame = bounds
+        tintView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        tintView.backgroundColor = UIColor(white: 1.0, alpha: 0.10)
+        tintView.isUserInteractionEnabled = false
+        addSubview(tintView)
+
+        topHighlightLayer.colors = [
+            UIColor(white: 1.0, alpha: 0.30).cgColor,
+            UIColor(white: 1.0, alpha: 0.06).cgColor,
+            UIColor(white: 1.0, alpha: 0.00).cgColor,
+        ]
+        topHighlightLayer.locations = [0.0, 0.34, 1.0]
+        layer.addSublayer(topHighlightLayer)
+
+        strokeLayer.fillColor = UIColor.clear.cgColor
+        strokeLayer.strokeColor = UIColor(white: 1.0, alpha: 0.24).cgColor
+        strokeLayer.lineWidth = 1.0 / UIScreen.main.scale
+        layer.addSublayer(strokeLayer)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func configure(frame: CGRect, cornerRadius: CGFloat, alpha: CGFloat?) {
+        self.frame = frame
+        if let alpha { self.alpha = alpha }
+        layer.cornerRadius = cornerRadius
+        layer.cornerCurve = .continuous
+        effectView.layer.cornerRadius = cornerRadius
+        effectView.layer.cornerCurve = .continuous
+        effectView.clipsToBounds = true
+        tintView.layer.cornerRadius = cornerRadius
+        tintView.layer.cornerCurve = .continuous
+        setNeedsLayout()
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        effectView.frame = bounds
+        tintView.frame = bounds
+        topHighlightLayer.frame = CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height * 0.58)
+        let strokeRect = bounds.insetBy(dx: strokeLayer.lineWidth / 2, dy: strokeLayer.lineWidth / 2)
+        strokeLayer.path = UIBezierPath(roundedRect: strokeRect, cornerRadius: max(0, layer.cornerRadius - strokeLayer.lineWidth / 2)).cgPath
     }
 }
