@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet, useMatchRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { MessageCircle, Sparkles, Compass } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useMatches } from "@/hooks/useMatches";
@@ -20,11 +20,15 @@ export const Route = createFileRoute("/chat")({
 });
 
 function ChatLayout() {
-  const matchRoute = useMatchRoute();
-  const onDetail = matchRoute({ to: "/chat/$matchId" });
-  if (onDetail) return <Outlet />;
-
-  return <ChatList />;
+  // Keep the list mounted always; the detail route uses `fixed inset-0 z-50`
+  // to overlay it. This avoids an unmount/remount flash when navigating
+  // between list and conversation.
+  return (
+    <>
+      <ChatList />
+      <Outlet />
+    </>
+  );
 }
 
 function ChatList() {
