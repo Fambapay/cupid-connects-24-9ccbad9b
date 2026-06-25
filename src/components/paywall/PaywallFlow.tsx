@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Check, ArrowRight, Sparkles, ShieldCheck, Heart, Flame, Eye } from "lucide-react";
+import { X, Check, ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { getPlanCards, formatPrice, type PlanCardConfig } from "@/lib/plans";
-import type { BillingPeriod } from "@/lib/pricing";
 import { useCountry } from "@/lib/country/context";
 import { paymentLabel, type PaymentMethodCode } from "@/lib/country/config";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 import { invalidateOnboardingCache } from "@/lib/authGuard";
 import { toast } from "sonner";
+
 
 type Stage = "fomo" | "plans";
 
