@@ -112,10 +112,21 @@ export function EditProfileSheet({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', stiffness: 380, damping: 38 }}
+            drag="y"
+            dragListener={false}
+            dragControls={dragControls}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.5 }}
+            onDragEnd={(_, info) => {
+              if (info.offset.y > 140 || info.velocity.y > 600) onClose();
+            }}
           >
 
             {/* Handle */}
-            <div className="relative shrink-0 flex flex-col items-center pb-1 pt-3">
+            <div
+              className="relative shrink-0 flex flex-col items-center pb-1 pt-3 cursor-grab active:cursor-grabbing touch-none"
+              onPointerDown={(e) => dragControls.start(e)}
+            >
               <div
                 className="h-1 w-10 rounded-full"
                 style={{
