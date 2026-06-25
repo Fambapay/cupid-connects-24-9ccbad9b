@@ -63,33 +63,18 @@
     0 2px 8px rgba(0, 0, 0, 0.22);
 }
 
-/* ── Native mode: keep a subtle tint + hairline edge on top of the
-   native UIGlassEffect (which renders behind the WebView). This keeps
-   the OUTER pill always visually defined — even on dark pages — while
-   still letting the real liquid glass refraction show through. ────── */
+/* ── Native mode: OUTER pill is 100% native UIGlassEffect.
+   Remove every CSS tint, hairline, shadow and sheen so the real
+   Apple Liquid Glass surface (rendered behind the WebView) is the
+   only thing the user sees. ──────────────────────────────────── */
 .tab-bar-pill--native {
-  background:
-    linear-gradient(180deg,
-      rgba(255, 255, 255, 0.06) 0%,
-      rgba(255, 255, 255, 0.02) 100%
-    ) !important;
+  background: transparent !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
-  border: 1px solid rgba(255, 255, 255, 0.10) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.10),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
-    0 8px 22px rgba(0, 0, 0, 0.32) !important;
+  border: none !important;
+  box-shadow: none !important;
 }
-/* Keep the specular sheen on native — it sells the glass volume */
-.tab-bar-pill--native::before {
-  background:
-    linear-gradient(180deg,
-      rgba(255, 255, 255, 0.10) 0%,
-      rgba(255, 255, 255, 0.02) 30%,
-      transparent 55%
-    ) !important;
-}
+.tab-bar-pill--native::before,
 .tab-bar-pill--native::after {
   display: none !important;
 }
