@@ -326,7 +326,10 @@ function Discover() {
         targetName={matched?.name ?? ""}
         targetPhoto={matched?.photo}
         sending={openingChat}
-        onClose={() => setMatched(null)}
+        onClose={async () => {
+          setMatched(null);
+          await maybeRequestReview();
+        }}
         onSendMessage={async () => {
           if (!matched || !user) return;
           setOpeningChat(true);
