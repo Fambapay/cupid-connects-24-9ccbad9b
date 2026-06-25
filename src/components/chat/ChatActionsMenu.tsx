@@ -220,57 +220,80 @@ export function ChatActionsMenu({
       </AlertDialog>
 
       <Dialog open={reportOpen} onOpenChange={setReportOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Denunciar {otherName}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div className="space-y-2">
-              <Label>Motivo</Label>
-              <div className="grid gap-1.5">
-                {REASONS.map((r) => (
-                  <label
-                    key={r.value}
-                    className={`flex cursor-pointer items-center gap-2 rounded-lg border p-2.5 text-sm transition ${
-                      reason === r.value ? "border-flame bg-flame/10" : "border-border"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="reason"
-                      value={r.value}
-                      checked={reason === r.value}
-                      onChange={() => setReason(r.value)}
-                      className="sr-only"
-                    />
-                    <span>{r.label}</span>
-                  </label>
-                ))}
+        <DialogContent
+          className="left-1/2 top-auto bottom-0 grid max-h-[92dvh] w-full max-w-[480px] -translate-x-1/2 translate-y-0 gap-0 overflow-hidden rounded-t-[28px] rounded-b-none border border-white/10 border-b-0 bg-[hsl(0_0%_6%/0.92)] p-0 shadow-[0_-20px_60px_-10px_rgba(0,0,0,0.6)] backdrop-blur-2xl data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom sm:rounded-t-[28px]"
+        >
+          <div className="flex flex-col max-h-[92dvh]">
+            <DialogHeader className="relative px-6 pt-5 pb-3 text-center">
+              <DialogTitle className="text-center text-[19px] font-semibold tracking-tight text-white">
+                Denunciar {otherName}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 overflow-y-auto px-6 pb-2 space-y-5">
+              <div className="space-y-2.5">
+                <Label className="text-[13px] font-medium uppercase tracking-wider text-white/50">Motivo</Label>
+                <div className="grid gap-2">
+                  {REASONS.map((r) => {
+                    const selected = reason === r.value;
+                    return (
+                      <label
+                        key={r.value}
+                        className={`relative flex cursor-pointer items-center gap-3 rounded-full border px-5 py-3.5 text-[15px] font-medium transition-all duration-200 active:scale-[0.98] ${
+                          selected
+                            ? "border-[#FF4FA3] bg-gradient-to-r from-[#FF4FA3]/15 via-[#E935A0]/10 to-[#B13CFF]/15 text-white shadow-[0_0_0_3px_rgba(255,79,163,0.12)]"
+                            : "border-white/10 bg-white/[0.03] text-white/85 hover:bg-white/[0.06]"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="reason"
+                          value={r.value}
+                          checked={selected}
+                          onChange={() => setReason(r.value)}
+                          className="sr-only"
+                        />
+                        <span>{r.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
+              <div className="space-y-2.5">
+                <Label htmlFor="details" className="text-[13px] font-medium uppercase tracking-wider text-white/50">
+                  Detalhes (opcional)
+                </Label>
+                <Textarea
+                  id="details"
+                  value={details}
+                  onChange={(e) => setDetails(e.target.value)}
+                  placeholder="Conta-nos mais, se quiseres"
+                  maxLength={1000}
+                  rows={3}
+                  className="rounded-2xl border-white/10 bg-white/[0.03] px-4 py-3 text-[15px] text-white placeholder:text-white/35 focus-visible:border-[#FF4FA3]/40 focus-visible:ring-2 focus-visible:ring-[#FF4FA3]/20"
+                />
+              </div>
+              <p className="text-center text-[12px] text-white/45">
+                Após a denúncia, este utilizador será também bloqueado.
+              </p>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="details">Detalhes (opcional)</Label>
-              <Textarea
-                id="details"
-                value={details}
-                onChange={(e) => setDetails(e.target.value)}
-                placeholder="Conta-nos mais, se quiseres"
-                maxLength={1000}
-                rows={3}
-              />
+            <div className="flex flex-col gap-1 px-6 pt-3 pb-[calc(env(safe-area-inset-bottom)+16px)]">
+              <Button
+                onClick={handleReport}
+                disabled={busy}
+                className="h-12 w-full rounded-full bg-gradient-to-r from-[#FF4FA3] via-[#E935A0] to-[#B13CFF] text-[15px] font-semibold text-white shadow-[0_8px_24px_-8px_rgba(255,79,163,0.6)] transition-all hover:opacity-95 active:scale-[0.98]"
+              >
+                Enviar denúncia
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setReportOpen(false)}
+                disabled={busy}
+                className="h-11 w-full rounded-full text-[15px] font-medium text-white/70 hover:bg-white/[0.04] hover:text-white"
+              >
+                Cancelar
+              </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Após a denúncia, este utilizador será também bloqueado.
-            </p>
           </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setReportOpen(false)} disabled={busy}>
-              Cancelar
-            </Button>
-            <Button onClick={handleReport} disabled={busy}>
-              Enviar denúncia
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
