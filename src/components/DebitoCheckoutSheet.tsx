@@ -251,7 +251,7 @@ export function DebitoCheckoutSheet({
             className="fixed inset-x-0 bottom-0 max-h-[92dvh] overflow-y-auto overscroll-contain rounded-t-3xl border-t border-[var(--surface-border)] bg-[image:var(--checkout-sheet-bg)] p-5 pb-[max(env(safe-area-inset-bottom),24px)] text-foreground shadow-[0_-20px_60px_-10px_rgba(240,70,140,0.3)]"
             style={{ zIndex: 10011 }}
           >
-            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-[var(--surface-strong)]" />
+            
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="mb-1 inline-flex items-center gap-1 rounded-full bg-fuchsia-500/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-fuchsia-300">

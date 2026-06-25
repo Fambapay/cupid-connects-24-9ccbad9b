@@ -129,10 +129,6 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
             className="fixed inset-x-0 bottom-0 top-[4%] flex flex-col overflow-hidden rounded-t-[32px] border-t border-white/[0.06] bg-[#0b0b0d] text-foreground"
             style={{ zIndex: 10001, boxShadow: "0 -20px 60px rgba(0,0,0,0.6)" }}
           >
-            <div className="relative flex justify-center pt-2.5 pb-1 shrink-0">
-              <div className="h-[5px] w-9 rounded-full bg-white/15" />
-            </div>
-
             <button
               onClick={onClose}
               aria-label="Fechar"
