@@ -365,107 +365,141 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
   );
 }
 
-function PlanCardView({
+function PlanRow({
   plan,
   period,
   country,
+  selected,
   onSelect,
+  index,
 }: {
   plan: PlanCardConfig;
   period: BillingPeriod;
   country: import("@/lib/country/config").CountryCode;
+  selected: boolean;
   onSelect: () => void;
+  index: number;
 }) {
   const isPopular = plan.badge === "Mais popular";
   const isElite = plan.tier === "elite";
   const price = period === "annual" ? plan.annualPriceMzn : plan.priceMzn;
+  const monthlyEquivalent =
+    period === "annual" ? Math.round(plan.annualPriceMzn / 12) : plan.priceMzn;
   const fullPrice = plan.priceMzn * 12;
   const savings = fullPrice - plan.annualPriceMzn;
 
   return (
-    <motion.div
-      whileTap={{ scale: 0.99 }}
-      className={`relative flex w-[78vw] max-w-[300px] shrink-0 snap-center flex-col rounded-3xl border-2 p-4 ${
-        isPopular
-          ? "border-pink-500/70 bg-gradient-to-b from-pink-500/10 to-fuchsia-500/5 shadow-[0_20px_60px_-15px_rgba(240,70,140,0.5)]"
-          : isElite
-          ? "border-amber-400/30 bg-gradient-to-b from-amber-400/8 to-black/40"
-          : "border-white/10 bg-white/[0.03]"
+    <motion.button
+      type="button"
+      onClick={onSelect}
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.08 + index * 0.06, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      whileTap={{ scale: 0.985 }}
+      className={`group relative flex w-full flex-col rounded-[22px] border p-4 text-left transition-all ${
+        selected
+          ? "border-white/30 bg-white/[0.06] shadow-[0_8px_30px_-6px_rgba(240,70,140,0.35)]"
+          : "border-white/[0.08] bg-white/[0.025]"
       }`}
+      style={
+        selected && isPopular
+          ? {
+              borderColor: "transparent",
+              backgroundImage:
+                "linear-gradient(#141417, #141417), linear-gradient(135deg, #FF4FA3, #B13CFF)",
+              backgroundOrigin: "border-box",
+              backgroundClip: "padding-box, border-box",
+            }
+          : undefined
+      }
     >
       {isPopular && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-fuchsia-500 to-pink-500 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-lg">
-          ⭐ Mais popular
-        </div>
-      )}
-      {isElite && (
-        <div className="absolute right-3 top-3 rounded-full bg-amber-400/20 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-300">
-          VIP
+        <div className="absolute -top-2.5 left-4 rounded-full bg-gradient-to-r from-pink-500 to-fuchsia-500 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-white shadow-lg">
+          Recomendado
         </div>
       )}
 
-      <div className="mt-1 flex items-center gap-2">
-        <h3
-          className="text-2xl uppercase text-white"
-          style={{
-            fontFamily: "'Montserrat', sans-serif",
-            fontWeight: 900,
-            letterSpacing: "-0.02em",
-          }}
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5">
+            <span
+              className="text-[15px] font-bold tracking-tight text-white"
+            >
+              Hunie {plan.label}
+            </span>
+            {isElite && (
+              <span className="rounded-full bg-amber-400/20 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-amber-300">
+                VIP
+              </span>
+            )}
+          </div>
+          <p className="mt-0.5 text-[12.5px] leading-snug text-white/55">
+            {plan.tagline}
+          </p>
+        </div>
+
+        {/* Radio indicator */}
+        <div
+          className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border transition-all ${
+            selected
+              ? "border-transparent"
+              : "border-white/25 bg-transparent"
+          }`}
+          style={
+            selected
+              ? {
+                  background:
+                    "linear-gradient(135deg, #FF4FA3, #B13CFF)",
+                }
+              : undefined
+          }
         >
-          HUNIE
-        </h3>
-        <span
-          className="rounded-full px-2 py-0.5 text-[10px] uppercase"
-          style={{
-            fontFamily: "'Montserrat', sans-serif",
-            fontWeight: 900,
-            letterSpacing: "0.06em",
-            backgroundColor: plan.accent,
-            color: "#0a0a0a",
-          }}
-        >
-          {plan.label}
-        </span>
+          {selected && <Check size={12} strokeWidth={3} className="text-white" />}
+        </div>
       </div>
 
-
-      <div className="mt-3 flex items-baseline gap-1">
-        <span className="text-3xl font-black">{formatPrice(price, country)}</span>
-        <span className="text-xs text-white/50">/{period === "annual" ? "ano" : "mês"}</span>
+      {/* Price */}
+      <div className="mt-3 flex items-baseline gap-1.5">
+        <span className="text-[26px] font-black tracking-tight text-white">
+          {formatPrice(price, country)}
+        </span>
+        <span className="text-[12px] text-white/45">
+          /{period === "annual" ? "ano" : "mês"}
+        </span>
+        {period === "annual" && (
+          <span className="ml-auto text-[11px] font-semibold text-emerald-400">
+            poupa {formatPrice(savings, country)}
+          </span>
+        )}
       </div>
       {period === "annual" && (
-        <div className="mt-1 flex items-center gap-2 text-xs">
-          <span className="text-white/40 line-through">{formatPrice(fullPrice, country)}</span>
-          <span className="font-semibold text-emerald-400">Poupa {formatPrice(savings, country)}</span>
-        </div>
+        <p className="mt-0.5 text-[11px] text-white/40">
+          equivale a {formatPrice(monthlyEquivalent, country)}/mês
+        </p>
       )}
 
-      <p className="mt-3 text-sm text-white/70">{plan.tagline}</p>
-
-      <ul className="mt-4 flex-1 space-y-2">
-        {plan.highlights.map((h) => (
-          <li key={h.label} className="flex items-start gap-2 text-sm">
-            <Check size={14} className="mt-1 shrink-0" style={{ color: plan.accent }} />
-            <span className={h.bold ? "font-semibold" : "text-white/80"}>{h.label}</span>
+      {/* Highlights — show always so user can compare without tapping */}
+      <ul className="mt-3 grid grid-cols-1 gap-1.5">
+        {plan.highlights.slice(0, selected ? plan.highlights.length : 4).map((h) => (
+          <li key={h.label} className="flex items-start gap-2 text-[12.5px]">
+            <Check
+              size={12}
+              strokeWidth={3}
+              className="mt-[3px] shrink-0"
+              style={{ color: plan.accent }}
+            />
+            <span className={h.bold ? "font-semibold text-white" : "text-white/70"}>
+              {h.label}
+            </span>
           </li>
         ))}
+        {!selected && plan.highlights.length > 4 && (
+          <li className="ml-5 text-[11px] text-white/35">
+            + {plan.highlights.length - 4} benefícios
+          </li>
+        )}
       </ul>
-
-      <motion.button
-        whileTap={{ scale: 0.96 }}
-        onClick={onSelect}
-        className={`mt-5 h-12 w-full rounded-2xl text-sm font-bold text-white shadow-lg ${
-          isPopular ? "bg-gradient-to-r from-fuchsia-500 to-pink-500" : ""
-        }`}
-        style={
-          !isPopular
-            ? { background: `linear-gradient(135deg, ${plan.accent}, ${plan.accent}cc)` }
-            : undefined
-        }
-      >
-        {isPopular ? `Escolher ${plan.label}` : "Escolher"}
-      </motion.button>
-    </motion.div>
+    </motion.button>
   );
 }
+
