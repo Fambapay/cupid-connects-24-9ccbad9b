@@ -1,4 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
+import {
+  getCurrentPosition,
+  checkLocationPermission,
+  requestLocationPermission,
+  type GeoPosition,
+} from "@/lib/native/geolocation";
 
 export type PermissionState = "granted" | "denied" | "prompt" | "unknown";
 
@@ -8,31 +14,28 @@ export function useGeolocation(autoRequest: boolean = false) {
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   const queryPermission = useCallback(async () => {
-    if (typeof navigator === "undefined" || !navigator.permissions) return;
     try {
-      const status = await navigator.permissions.query({ name: "geolocation" as PermissionName });
-      setPermissionState(status.state as PermissionState);
-      status.onchange = () => setPermissionState(status.state as PermissionState);
+      const state = await checkLocationPermission();
+      setPermissionState(state as PermissionState);
     } catch { /* noop */ }
   }, []);
 
   useEffect(() => { queryPermission(); }, [queryPermission]);
 
-  const requestPermission = useCallback(() => {
-    if (typeof navigator === "undefined" || !navigator.geolocation) return;
+  const requestPermission = useCallback(async () => {
     setLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setPermissionState("granted");
-        setLoading(false);
-      },
-      () => {
-        setPermissionState("denied");
-        setLoading(false);
-      },
-      { enableHighAccuracy: false, timeout: 10000 },
-    );
+    try {
+      const state = await requestLocationPermission();
+      setPermissionState(state as PermissionState);
+      if (state === "granted") {
+        const pos = await getCurrentPosition({ enableHighAccuracy: true, timeout: 10000 });
+        setCoords({ lat: pos.latitude, lng: pos.longitude });
+      }
+    } catch {
+      setPermissionState("denied");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
