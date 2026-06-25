@@ -152,13 +152,16 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
         let view = GlassSurfaceView(frame: frame)
         #if compiler(>=6.0)
         if #available(iOS 26.0, *) {
-            // Real Apple Liquid Glass — only compiles when built with the
-            // iOS 26 SDK (Xcode 26+). Falls through to the material blur on
-            // older SDKs / OS versions.
+            // Real Apple Liquid Glass — uses UIGlassEffect from the iOS 26 SDK.
+            // The effect already renders refraction + specular highlights, so
+            // we strip the fallback tint / gradient / stroke overlays that
+            // would otherwise sit on top and flatten it back into a blur.
             let effect = UIGlassEffect()
+            effect.isInteractive = true
             view.effectView.effect = effect
+            view.stripFallbackOverlays()
             view.configure(frame: frame, cornerRadius: cornerRadius, alpha: nil)
-            NSLog("[LiquidGlass] using native UIGlassEffect (iOS 26)")
+            NSLog("[LiquidGlass] using native UIGlassEffect (iOS 26) — overlays stripped")
             return view
         }
         #endif
@@ -168,6 +171,7 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
         NSLog("[LiquidGlass] fallback UIBlurEffect .systemUltraThinMaterial")
         return view
     }
+
 
     private func ensureWebViewTransparent() {
         guard !didMakeWebViewTransparent, let webView = self.bridge?.webView else { return }
@@ -213,6 +217,16 @@ private final class GlassSurfaceView: UIView {
         strokeLayer.lineWidth = 1.0 / UIScreen.main.scale
         layer.addSublayer(strokeLayer)
     }
+
+    /// Remove tint / top highlight / stroke when the real UIGlassEffect is
+    /// active — the effect renders its own specular + edge and any overlay
+    /// flattens it back into a plain blur.
+    func stripFallbackOverlays() {
+        tintView.removeFromSuperview()
+        topHighlightLayer.removeFromSuperlayer()
+        strokeLayer.removeFromSuperlayer()
+    }
+
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
