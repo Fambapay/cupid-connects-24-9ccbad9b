@@ -31,6 +31,7 @@ export function EditProfileSheet({
 }: Props) {
   const [draft, setDraft] = useState(profile);
   const fileRef = useRef<HTMLInputElement>(null);
+  const dragControls = useDragControls();
 
   useEffect(() => { if (open) setDraft(profile); }, [open, profile]);
 
