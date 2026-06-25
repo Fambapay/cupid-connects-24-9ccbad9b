@@ -46,13 +46,10 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
                 view.alpha = max(0, min(1, intensity))
                 self.glassViews[id] = view
                 if let webView = self.bridge?.webView, let parent = webView.superview {
-                    // Inner pill renders ABOVE the WebView so it visually slides
-                    // on top of the HTML chrome; outer pill renders BEHIND.
-                    if id == "inner" {
-                        parent.insertSubview(view, aboveSubview: webView)
-                    } else {
-                        parent.insertSubview(view, belowSubview: webView)
-                    }
+                    // All glass surfaces render BEHIND the WebView so HTML
+                    // icons/labels stay perfectly crisp on top of the native
+                    // refraction (the WebView is transparent over the nav).
+                    parent.insertSubview(view, belowSubview: webView)
                 }
             }
             call.resolve()
