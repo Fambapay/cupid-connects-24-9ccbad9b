@@ -240,9 +240,14 @@ function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 bg-background pt-12">
+      <motion.div
+        className="flex-1 bg-background pt-12"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+      >
         <SettingsListSkeleton count={8} />
-      </div>
+      </motion.div>
     );
   }
 
