@@ -486,7 +486,12 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
 
   const [nativeFailed, setNativeFailed] = useState(false);
 
-  // iOS nativo → UITabBar com Liquid Glass real. Web/Android/failure → HTML pill.
+  // Preferir o novo plugin NativeTabBar (id-based) quando disponível.
+  if (isNativeTabBarSupported()) {
+    return <NativeTabBarBottomNav activeTab={activeTab} likesCount={likesCount} unreadChats={unreadChats} />;
+  }
+
+  // iOS nativo (legacy NativeTabs) → UITabBar com Liquid Glass real. Web/Android/failure → HTML pill.
   if (nativeTabsAvailable() && !nativeFailed) {
     return (
       <NativeBottomNav
