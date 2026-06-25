@@ -1049,43 +1049,21 @@ function ScrollPickerSheet<T extends number>({
   selected: T | null;
   onSelect: (v: T) => void;
 }) {
-  // 3D cylindrical "slot-machine" picker — refs-only updates, zero per-frame re-renders
-  const ITEM_H = 46;
-  const VISIBLE = 7; // odd number so there's a clear center
-  const RADIUS = (ITEM_H * VISIBLE) / 2 / Math.tan(Math.PI / VISIBLE);
-  const STEP_ANGLE = 360 / VISIBLE / 2; // half-turn per visible slot
+  // Clean iOS-style flat picker — scroll-snap, no 3D, no glow.
+  const ITEM_H = 44;
+  const VISIBLE = 7;
+  const containerH = ITEM_H * VISIBLE;
+  const padding = (containerH - ITEM_H) / 2;
+
   const listRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const initialIdx = useMemo(() => {
     const i = items.findIndex((it) => it.value === selected);
     return i >= 0 ? i : Math.floor(items.length / 2);
   }, [items, selected]);
   const activeIdxRef = useRef<number>(initialIdx);
   const [activeIdx, setActiveIdx] = useState<number>(initialIdx);
-  const scrollRaf = useRef<number | null>(null);
   const snapTimer = useRef<number | null>(null);
-
-  const applyTransforms = (pos: number) => {
-    const els = itemRefs.current;
-    for (let i = 0; i < els.length; i++) {
-      const el = els[i];
-      if (!el) continue;
-      const offset = i - pos;
-      const absOff = Math.abs(offset);
-      const angle = offset * STEP_ANGLE;
-      // Hide items past the back of the cylinder
-      if (absOff > VISIBLE / 2 + 0.5) {
-        el.style.opacity = "0";
-        el.style.visibility = "hidden";
-        continue;
-      }
-      const clampedAngle = Math.max(-90, Math.min(90, angle));
-      const opacity = Math.max(0.18, 1 - absOff * 0.3);
-      el.style.visibility = "visible";
-      el.style.opacity = String(opacity);
-      el.style.transform = `rotateX(${-clampedAngle}deg) translateZ(${RADIUS}px)`;
-    }
-  };
+  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -1093,26 +1071,21 @@ function ScrollPickerSheet<T extends number>({
     setActiveIdx(initialIdx);
     const id = requestAnimationFrame(() => {
       if (listRef.current) listRef.current.scrollTop = initialIdx * ITEM_H;
-      applyTransforms(initialIdx);
     });
     return () => cancelAnimationFrame(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialIdx]);
 
-  const onScrollRaw = () => {
-    if (scrollRaf.current) cancelAnimationFrame(scrollRaf.current);
-    scrollRaf.current = requestAnimationFrame(() => {
+  const onScroll = () => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
       if (!listRef.current) return;
-      const raw = listRef.current.scrollTop / ITEM_H;
-      applyTransforms(raw);
-      const idx = Math.max(0, Math.min(items.length - 1, Math.round(raw)));
+      const idx = Math.max(
+        0,
+        Math.min(items.length - 1, Math.round(listRef.current.scrollTop / ITEM_H)),
+      );
       if (idx !== activeIdxRef.current) {
         activeIdxRef.current = idx;
         setActiveIdx(idx);
-        // soft haptic tick on slot change
-        if (typeof navigator !== "undefined" && navigator.vibrate) {
-          try { navigator.vibrate(4); } catch { /* noop */ }
-        }
       }
     });
     if (snapTimer.current) window.clearTimeout(snapTimer.current);
@@ -1124,16 +1097,13 @@ function ScrollPickerSheet<T extends number>({
       if (Math.abs(listRef.current.scrollTop - target) > 0.5) {
         listRef.current.scrollTo({ top: target, behavior: "smooth" });
       }
-    }, 140);
+    }, 120);
   };
 
   const handleConfirm = () => {
     const it = items[activeIdxRef.current];
     if (it) onSelect(it.value);
   };
-
-  const containerH = ITEM_H * VISIBLE;
-  const padding = (containerH - ITEM_H) / 2;
 
   return (
     <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
@@ -1145,48 +1115,16 @@ function ScrollPickerSheet<T extends number>({
         </DrawerHeader>
 
         <div className="relative px-6 pb-3 pt-2">
-          {/* Ambient brand glow behind the wheel */}
+          {/* Selection band — single soft pill behind the centered item */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2"
-            style={{
-              height: containerH * 0.9,
-              background:
-                "radial-gradient(60% 70% at 50% 50%, color-mix(in oklab, var(--brand-pink) 12%, transparent), transparent 70%)",
-              filter: "blur(10px)",
-            }}
+            className="pointer-events-none absolute left-4 right-4 top-1/2 -translate-y-1/2 rounded-xl bg-white/[0.05]"
+            style={{ height: ITEM_H }}
           />
 
-          {/* Selection rail — sleek hairline bars top & bottom of center slot */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute left-6 right-6 top-1/2 -translate-y-1/2"
-            style={{ height: ITEM_H }}
-          >
-            <div
-              className="absolute inset-x-0 top-0 h-px"
-              style={{
-                background:
-                  "linear-gradient(90deg, transparent, color-mix(in oklab, var(--brand-pink) 70%, transparent) 25%, color-mix(in oklab, var(--brand-purple) 70%, transparent) 75%, transparent)",
-                boxShadow:
-                  "0 0 8px color-mix(in oklab, var(--brand-pink) 35%, transparent)",
-              }}
-            />
-            <div
-              className="absolute inset-x-0 bottom-0 h-px"
-              style={{
-                background:
-                  "linear-gradient(90deg, transparent, color-mix(in oklab, var(--brand-purple) 70%, transparent) 25%, color-mix(in oklab, var(--brand-pink) 70%, transparent) 75%, transparent)",
-                boxShadow:
-                  "0 0 8px color-mix(in oklab, var(--brand-purple) 35%, transparent)",
-              }}
-            />
-          </div>
-
-          {/* 3D cylinder container */}
           <div
             ref={listRef}
-            onScroll={onScrollRaw}
+            onScroll={onScroll}
             className="relative overflow-y-auto [&::-webkit-scrollbar]:hidden"
             style={{
               height: containerH,
@@ -1194,51 +1132,37 @@ function ScrollPickerSheet<T extends number>({
               scrollbarWidth: "none",
               msOverflowStyle: "none",
               WebkitOverflowScrolling: "touch",
-              perspective: `${RADIUS * 2.4}px`,
-              perspectiveOrigin: "50% 50%",
               maskImage:
-                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 14%, #000 38%, #000 62%, rgba(0,0,0,0.35) 86%, transparent 100%)",
+                "linear-gradient(to bottom, transparent 0%, #000 28%, #000 72%, transparent 100%)",
               WebkitMaskImage:
-                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 14%, #000 38%, #000 62%, rgba(0,0,0,0.35) 86%, transparent 100%)",
+                "linear-gradient(to bottom, transparent 0%, #000 28%, #000 72%, transparent 100%)",
             }}
           >
-            <div
-              style={{
-                paddingTop: padding,
-                paddingBottom: padding,
-                transformStyle: "preserve-3d",
-              }}
-            >
+            <div style={{ paddingTop: padding, paddingBottom: padding }}>
               {items.map((it, i) => {
-                const active = i === activeIdx;
+                const dist = Math.abs(i - activeIdx);
+                const active = dist === 0;
                 return (
                   <button
                     key={it.value}
-                    ref={(el) => { itemRefs.current[i] = el; }}
                     type="button"
                     onClick={() => {
                       if (listRef.current)
                         listRef.current.scrollTo({ top: i * ITEM_H, behavior: "smooth" });
                     }}
-                    className="flex w-full items-center justify-center text-center will-change-transform"
+                    className="flex w-full items-center justify-center text-center"
                     style={{
                       height: ITEM_H,
                       scrollSnapAlign: "center",
-                      transformOrigin: "center center",
-                      backfaceVisibility: "hidden",
                       color: active
                         ? "var(--foreground)"
-                        : "color-mix(in oklab, var(--foreground) 65%, transparent)",
-                      fontWeight: active ? 600 : 500,
-                      fontSize: active ? "1.5rem" : "1.2rem",
-                      letterSpacing: active ? "-0.015em" : "-0.005em",
+                        : `color-mix(in oklab, var(--foreground) ${Math.max(28, 70 - dist * 14)}%, transparent)`,
+                      fontWeight: active ? 600 : 400,
+                      fontSize: "1.0625rem",
+                      letterSpacing: "-0.01em",
                       fontFamily:
                         '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif',
-                      textShadow: active
-                        ? "0 0 22px color-mix(in oklab, var(--brand-pink) 38%, transparent)"
-                        : "none",
-                      transition:
-                        "color 200ms cubic-bezier(0.22,1,0.36,1), font-size 200ms cubic-bezier(0.22,1,0.36,1), text-shadow 220ms ease",
+                      transition: "color 180ms ease, font-weight 180ms ease",
                     }}
                   >
                     {it.label}
