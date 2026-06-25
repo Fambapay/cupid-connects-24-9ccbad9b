@@ -171,7 +171,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     const y = sharedY ?? localY;
     // Start in the stacked pose on first paint so the spring-in is smooth
     // (avoids a 1-frame jump from settled -> stacked before the animation starts).
-    const entry = useMotionValue(enterAnim ? 0 : 1); // 0 = settled, 1 = stacked pose
+    const entry = useMotionValue(0); // 0 = settled, 1 = stacked pose
     const cardRef = useRef<HTMLDivElement>(null);
     const photoWrapRef = useRef<HTMLDivElement>(null);
     const infoWrapRef = useRef<HTMLDivElement>(null);
@@ -243,39 +243,35 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     useMotionValueEvent(y, "change", schedule);
     useMotionValueEvent(entry, "change", schedule);
 
-
-    // Spring the card up from the stacked pose into place on mount.
-    // `entry` is already initialised to 1 so the first paint matches the start
-    // of the animation — no visible jump.
-    useEffect(() => {
-      if (enterAnim) return; // rewind handles its own entry
-      // Tween entry — no bounce, iOS-style ease-out.
-      const controls = animate(entry, 0, {
-        duration: 0.42,
-        ease: [0.22, 1, 0.36, 1],
-      });
-      return () => controls.stop();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-
     const snapSpring = { type: "spring" as const, stiffness: 320, damping: 34, mass: 0.7, restDelta: 0.5 };
-    // Fly-out as a tween so the card exits cleanly without lingering spring settle.
-    const flyTween = { type: "tween" as const, duration: 0.36, ease: [0.32, 0.72, 0, 1] as [number, number, number, number] };
+    // Fluid exit: carries finger velocity and advances before the invisible spring settle.
+    const flySpring = { type: "spring" as const, stiffness: 120, damping: 18, mass: 0.72, restDelta: 8, restSpeed: 90 };
 
     const animXRef = useRef<ReturnType<typeof animate> | null>(null);
     const animYRef = useRef<ReturnType<typeof animate> | null>(null);
+    const flyCommitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const cancelAnim = () => {
+      if (flyCommitTimerRef.current) {
+        clearTimeout(flyCommitTimerRef.current);
+        flyCommitTimerRef.current = null;
+      }
       animXRef.current?.stop();
       animYRef.current?.stop();
       animXRef.current = null;
       animYRef.current = null;
     };
 
+    useEffect(
+      () => () => {
+        if (flyCommitTimerRef.current) clearTimeout(flyCommitTimerRef.current);
+      },
+      [],
+    );
+
     const animateTo = useCallback(
       (tx: number, ty: number, isFly = false, onDone?: () => void, velocity?: { x: number; y: number }) => {
         cancelAnim();
-        const spring = isFly ? flyTween : snapSpring;
+        const spring = isFly ? flySpring : snapSpring;
         // Attach onComplete to whichever axis travels farther so a vertical
         // fly-out (super like) doesn't fire onDone instantly via an X spring
         // that has no movement.
@@ -283,8 +279,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
         const dy = Math.abs(ty - y.get());
         const onX = dx >= dy ? onDone : undefined;
         const onY = dx >= dy ? undefined : onDone;
-        animXRef.current = animate(x, tx, { ...spring, velocity: isFly ? undefined : velocity?.x, onComplete: onX });
-        animYRef.current = animate(y, ty, { ...spring, velocity: isFly ? undefined : velocity?.y, onComplete: onY });
+        animXRef.current = animate(x, tx, { ...spring, velocity: velocity?.x, onComplete: onX });
+        animYRef.current = animate(y, ty, { ...spring, velocity: velocity?.y, onComplete: onY });
       },
       [x, y],
     );
@@ -309,9 +305,13 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     const flyOut = (dir: SwipeDirection, velocity?: { x: number; y: number }) => {
       const w = getVW();
       const h = getVH();
-      const tx = dir === "left" ? -w * 1.4 : dir === "right" ? w * 1.4 : 0;
+      const tx = dir === "left" ? -w * 1.9 : dir === "right" ? w * 1.9 : 0;
       const ty = dir === "up" ? -h * 1.4 : 0;
-      animateTo(tx, ty, true, () => onSwipe(dir), velocity);
+      animateTo(tx, ty, true, undefined, velocity);
+      flyCommitTimerRef.current = setTimeout(() => {
+        flyCommitTimerRef.current = null;
+        onSwipe(dir);
+      }, 300);
     };
 
     useImperativeHandle(ref, () => ({
@@ -413,12 +413,6 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
 
 
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-      >
       <div className="absolute inset-0 overflow-hidden" style={{ background: "#000", perspective: 1200 }}>
         {isTop && nextProfiles[1] && (
           <StackCard profile={nextProfiles[1]} topX={x} topY={y} stackIndex={2} />
@@ -1031,7 +1025,6 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
         )}
 
       </div>
-      </motion.div>
     );
   },
 );
