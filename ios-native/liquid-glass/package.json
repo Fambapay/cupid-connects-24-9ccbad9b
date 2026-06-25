@@ -3,8 +3,9 @@
   "version": "0.0.1",
   "description": "Native Apple Liquid Glass for the Hunie bottom nav pill (iOS only).",
   "files": [
-    "ios/Plugin",
-    "LiquidGlassPlugin.podspec"
+    "ios/Sources",
+    "LiquidGlassPlugin.podspec",
+    "Package.swift"
   ],
   "scripts": {},
   "author": "Hunie",

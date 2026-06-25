@@ -13,7 +13,15 @@ import UIKit
  * visible behind the HTML content (icons/labels stay in React).
  */
 @objc(LiquidGlassPlugin)
-public class LiquidGlassPlugin: CAPPlugin {
+public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "LiquidGlassPlugin"
+    public let jsName = "LiquidGlass"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "show",   returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "update", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "hide",   returnType: CAPPluginReturnPromise),
+    ]
+
 
     private var glassView: UIView?
     private var didMakeWebViewTransparent = false
