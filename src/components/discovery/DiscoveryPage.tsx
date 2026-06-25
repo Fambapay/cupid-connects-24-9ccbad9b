@@ -159,61 +159,88 @@ export const DiscoveryPage = ({
 
   const canRewind = !!onRewind && !rewinding && !rewindUsed && history.length > 0 && index > 0;
 
+  const pageVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.07, delayChildren: 0.05 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 18, scale: 0.98 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.4, ease: [0.32, 0.72, 0, 1] as const },
+    },
+  };
+
   return (
-    <div
+    <motion.div
       className="relative h-full w-full overflow-hidden"
       style={{ background: "#000", color: "#fff" }}
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
     >
       {current ? (
         <>
-          <ProfileCard
-            ref={cardRef}
-            key={`${current.id}:${enterAnim ?? "n"}:${animNonce}`}
-            profile={current}
-            nextProfiles={[next1, next2].filter(Boolean) as DiscoveryProfile[]}
-            onSwipe={handle}
-            sharedX={x}
-            sharedY={y}
-            enterAnim={enterAnim}
-            actions={
-              <SwipeActions
-                onSwipe={(d) => {
-                  if (d === "left") cardRef.current?.flyLeft();
-                  else if (d === "right") cardRef.current?.flyRight();
-                  else cardRef.current?.flyUp();
-                }}
-                onFirstImpression={() => onFirstImpression?.(current)}
-                onRewind={handleRewind}
-                canRewind={canRewind}
-                dragX={x}
-                dragY={y}
-              />
-            }
-            panelActions={
-              <SwipeActions
-                onSwipe={(d) => {
-                  if (d === "left") cardRef.current?.flyLeft();
-                  else if (d === "right") cardRef.current?.flyRight();
-                  else cardRef.current?.flyUp();
-                }}
-                onFirstImpression={() => onFirstImpression?.(current)}
-                onRewind={handleRewind}
-                canRewind={canRewind}
-              />
-            }
-          />
-          {showTopBar && (
-            <DiscoverTopBar
-              onOpenFilters={onOpenFilters}
-              onBoost={onBoost}
-              boostActive={boostActive}
-              boostMultiplier={boostMultiplier}
+          <motion.div variants={itemVariants} className="h-full w-full">
+            <ProfileCard
+              ref={cardRef}
+              key={`${current.id}:${enterAnim ?? "n"}:${animNonce}`}
+              profile={current}
+              nextProfiles={[next1, next2].filter(Boolean) as DiscoveryProfile[]}
+              onSwipe={handle}
+              sharedX={x}
+              sharedY={y}
+              enterAnim={enterAnim}
+              actions={
+                <SwipeActions
+                  onSwipe={(d) => {
+                    if (d === "left") cardRef.current?.flyLeft();
+                    else if (d === "right") cardRef.current?.flyRight();
+                    else cardRef.current?.flyUp();
+                  }}
+                  onFirstImpression={() => onFirstImpression?.(current)}
+                  onRewind={handleRewind}
+                  canRewind={canRewind}
+                  dragX={x}
+                  dragY={y}
+                />
+              }
+              panelActions={
+                <SwipeActions
+                  onSwipe={(d) => {
+                    if (d === "left") cardRef.current?.flyLeft();
+                    else if (d === "right") cardRef.current?.flyRight();
+                    else cardRef.current?.flyUp();
+                  }}
+                  onFirstImpression={() => onFirstImpression?.(current)}
+                  onRewind={handleRewind}
+                  canRewind={canRewind}
+                />
+              }
             />
+          </motion.div>
+          {showTopBar && (
+            <motion.div variants={itemVariants}>
+              <DiscoverTopBar
+                onOpenFilters={onOpenFilters}
+                onBoost={onBoost}
+                boostActive={boostActive}
+                boostMultiplier={boostMultiplier}
+              />
+            </motion.div>
           )}
         </>
       ) : (
-        <EmptyDiscovery onRefresh={onEnd} />
+        <motion.div variants={itemVariants} className="h-full w-full">
+          <EmptyDiscovery onRefresh={onEnd} />
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };
