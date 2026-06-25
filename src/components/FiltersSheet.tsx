@@ -62,6 +62,9 @@ const EDUCATION = ['Secundário', 'Licenciatura', 'Mestrado', 'Doutoramento'];
 export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false, onUpgrade }: Props) => {
   const [local, setLocal] = useState<DiscoveryFilters>(value);
   const dragControls = useDragControls();
+  const y = useMotionValue(0);
+  const backdropOpacity = useTransform(y, [0, 400], [1, 0.35], { clamp: true });
+  const handleScale = useTransform(y, [0, 200], [1, 0.6], { clamp: true });
 
   useEffect(() => { if (open) setLocal(value); }, [open, value]);
 
@@ -79,42 +82,58 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
         <>
           <motion.div
             className="fixed inset-0 z-[60] bg-black/60"
-            style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
+            style={{
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              opacity: backdropOpacity,
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
             onClick={onClose}
           />
           <motion.div
-            className="fixed inset-x-0 bottom-0 z-[61] flex flex-col overflow-hidden rounded-t-[28px] text-white"
+            className="fixed inset-x-0 bottom-0 z-[61] flex flex-col overflow-hidden rounded-t-[28px] text-white will-change-transform"
             style={{
               maxHeight: '92vh',
               background: 'rgba(18,16,22,0.985)',
               backdropFilter: 'blur(40px) saturate(180%)',
               WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-              boxShadow: '0 -20px 60px -10px rgba(0,0,0,0.55)',
+              boxShadow: '0 -24px 70px -12px rgba(0,0,0,0.6)',
               border: '1px solid rgba(255,255,255,0.06)',
               borderBottom: 'none',
+              y,
             }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+            transition={{ type: 'spring', damping: 36, stiffness: 320, mass: 0.9 }}
             drag="y"
             dragListener={false}
             dragControls={dragControls}
             dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0, bottom: 0.5 }}
+            dragElastic={{ top: 0, bottom: 0.6 }}
+            dragMomentum={false}
             onDragEnd={(_, info) => {
-              if (info.offset.y > 140 || info.velocity.y > 600) onClose();
+              const shouldClose = info.offset.y > 120 || info.velocity.y > 500;
+              if (shouldClose) {
+                onClose();
+              } else {
+                animateMV(y, 0, { type: 'spring', stiffness: 420, damping: 40, mass: 0.8 });
+              }
             }}
           >
             {/* Grabber */}
             <div
               className="flex justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing touch-none"
               onPointerDown={(e) => dragControls.start(e)}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              <div className="h-[5px] w-10 rounded-full bg-white/20" />
+              <motion.div
+                className="h-[5px] w-10 rounded-full bg-white/25"
+                style={{ scaleX: handleScale }}
+              />
             </div>
 
             {/* Header */}
