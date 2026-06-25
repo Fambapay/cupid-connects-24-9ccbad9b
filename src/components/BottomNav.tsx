@@ -228,6 +228,8 @@ export const BottomNavBase = ({
     return () => {
       cancelAnimationFrame(raf);
       clearInterval(interval);
+      unsubPillX();
+
       ro.disconnect();
       window.removeEventListener("resize", schedule);
       window.removeEventListener("orientationchange", schedule);
