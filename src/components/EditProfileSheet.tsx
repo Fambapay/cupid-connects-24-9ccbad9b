@@ -92,8 +92,6 @@ export function EditProfileSheet({
         <>
           <motion.div
             className="fixed inset-0 z-[9998]"
-          <motion.div
-            className="fixed inset-0 z-[9998]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
