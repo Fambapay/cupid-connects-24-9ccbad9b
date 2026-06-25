@@ -48,31 +48,21 @@ export const BottomNavBase = ({
   const pointerStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const navRef = useRef<HTMLElement | null>(null);
   const pillRef = useRef<HTMLDivElement | null>(null);
+  const innerPillRef = useRef<HTMLDivElement | null>(null);
   const pillContainerRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [isPressed, setIsPressed] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [dragHoverIndex, setDragHoverIndex] = useState<number | null>(null);
   const pillX = useMotionValue(0);
   const useNativeGlass = isLiquidGlassSupported();
   const [nativeGlassReady, setNativeGlassReady] = useState(false);
   useEffect(() => {
-    // Diagnostics — confirms WebView platform detection at mount time.
-    import('@capacitor/core').then(({ Capacitor }) => {
-      console.log('[BottomNav] platform diagnostics', {
-        'Capacitor.getPlatform()': Capacitor.getPlatform(),
-        'Capacitor.isNativePlatform()': Capacitor.isNativePlatform(),
-        useNativeGlass,
-        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'n/a',
-        href: typeof location !== 'undefined' ? location.href : 'n/a',
-      });
-    });
     return onLiquidGlassReady((ready) => {
-      console.log('[BottomNav] LiquidGlass ready ->', ready);
       setNativeGlassReady(ready);
-      // The actual transparent hole is punched via the SVG mask attached
-      // to #hunie-app-root (see the native-glass effect below).
     });
   }, [useNativeGlass]);
+
 
   const handleTabChange = (tab: Tab) => {
     hapticTap();
@@ -128,10 +118,7 @@ export const BottomNavBase = ({
     return () => controls.stop();
   }, [activeIndex, tabWidth, isDragging, pillX]);
 
-  // Native Apple Liquid Glass — iOS only. Tracks the pill's bounding rect
-  // and forwards it to the native plugin so UIGlassEffect renders BEHIND
-  // the WebView at the right position. The transparency on top is handled
-  // by a gradient mask on each .screen-scroll container (see styles.css).
+  // Native Apple Liquid Glass — outer tab bar surface (id: "default", behind WebView).
   useEffect(() => {
     if (!useNativeGlass) return;
     const el = pillRef.current;
@@ -168,15 +155,11 @@ export const BottomNavBase = ({
       raf = requestAnimationFrame(syncNow);
     };
 
-    // Initial sync after layout settles.
     schedule();
-
     const ro = new ResizeObserver(schedule);
     ro.observe(el);
-
     window.addEventListener("resize", schedule);
     window.addEventListener("orientationchange", schedule);
-
     const vv = window.visualViewport;
     vv?.addEventListener("resize", schedule);
     vv?.addEventListener("scroll", schedule);
@@ -191,6 +174,54 @@ export const BottomNavBase = ({
       LiquidGlass.hide();
     };
   }, [useNativeGlass]);
+
+  // Native Apple Liquid Glass — INNER sliding pill (id: "inner", above WebView).
+  // Subscribes to pillX so the native glass droplet refracts in real time as
+  // the user drags between tabs.
+  useEffect(() => {
+    if (!useNativeGlass) return;
+    const el = innerPillRef.current;
+    if (!el || tabWidth === 0) return;
+
+    let started = false;
+    let lastKey = "";
+
+    const sync = () => {
+      const r = el.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const round = (v: number) => Math.round(v * dpr) / dpr;
+      const rect = {
+        id: "inner" as const,
+        x: round(r.left),
+        y: round(r.top),
+        width: round(r.width),
+        height: round(r.height),
+        cornerRadius: round(r.height / 2),
+        intensity: isPressed || isDragging ? 1 : 0.92,
+      };
+      const key = `${rect.x}|${rect.y}|${rect.width}|${rect.height}|${rect.intensity}`;
+      if (key === lastKey) return;
+      lastKey = key;
+      if (!started) {
+        started = true;
+        LiquidGlass.show(rect);
+      } else {
+        LiquidGlass.update(rect);
+      }
+    };
+
+    // rAF loop tied to pillX motion value for buttery 60/120fps refraction
+    let raf = 0;
+    const loop = () => { sync(); raf = requestAnimationFrame(loop); };
+    raf = requestAnimationFrame(loop);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      LiquidGlass.hide({ id: "inner" });
+    };
+  }, [useNativeGlass, tabWidth, isPressed, isDragging]);
+
+
 
 
   const bottomStyle = dockToBottom
@@ -222,7 +253,11 @@ export const BottomNavBase = ({
                 animate={{ scale: isPressed || isDragging ? 1.08 : 1 }}
                 transition={{ type: "spring", stiffness: 560, damping: 34, mass: 0.5 }}
               >
-                <div className="w-full h-full nav-active-pill" style={{ borderRadius: "9999px" }} />
+                <div
+                  ref={innerPillRef}
+                  className="w-full h-full nav-active-pill"
+                  style={{ borderRadius: "9999px" }}
+                />
               </motion.div>
 
               {/* Transparent drag handle — on top of active tab, captures gestures */}
@@ -237,7 +272,7 @@ export const BottomNavBase = ({
                 }}
                 drag="x"
                 dragConstraints={{ left: 0, right: (tabs.length - 1) * tabWidth }}
-                dragElastic={0.08}
+                dragElastic={0.06}
                 dragMomentum={false}
                 onPointerDown={() => {
                   setIsPressed(true);
@@ -245,25 +280,30 @@ export const BottomNavBase = ({
                 }}
                 onPointerUp={() => setIsPressed(false)}
                 onPointerCancel={() => setIsPressed(false)}
-                onDragStart={() => setIsDragging(true)}
-                onDrag={(_, info) => {
-                  // live snap preview: highlight nearest tab
+                onDragStart={() => {
+                  setIsDragging(true);
+                  setDragHoverIndex(activeIndex);
+                }}
+                onDrag={() => {
+                  // Haptic feedback when crossing into a new tab cell —
+                  // do NOT navigate yet, only commit on release.
                   const idx = Math.round((pillX.get() ?? 0) / tabWidth);
                   const clamped = Math.max(0, Math.min(tabs.length - 1, idx));
-                  if (tabs[clamped].id !== activeTab) {
-                    onTabChange(tabs[clamped].id);
-                  }
+                  setDragHoverIndex((prev) => {
+                    if (prev !== clamped) hapticTap();
+                    return clamped;
+                  });
                 }}
                 onDragEnd={() => {
                   const idx = Math.round((pillX.get() ?? 0) / tabWidth);
                   const clamped = Math.max(0, Math.min(tabs.length - 1, idx));
                   setIsDragging(false);
                   setIsPressed(false);
+                  setDragHoverIndex(null);
                   hapticTap();
                   if (tabs[clamped].id !== activeTab) {
                     onTabChange(tabs[clamped].id);
                   } else {
-                    // snap back
                     animate(pillX, clamped * tabWidth, {
                       type: "spring",
                       stiffness: 380,
@@ -277,6 +317,7 @@ export const BottomNavBase = ({
 
           {tabs.map((tab, index) => {
             const isActive = activeTab === tab.id;
+            const isHover = dragHoverIndex === index && dragHoverIndex !== activeIndex;
             const shouldAnimate = false;
 
             return (
@@ -287,7 +328,7 @@ export const BottomNavBase = ({
                 label={tab.label}
                 badge={tab.badge}
                 shouldAnimate={shouldAnimate}
-                isActive={isActive}
+                isActive={isActive || isHover}
                 index={index}
                 tabWidth={tabWidth}
                 pillX={pillX}
@@ -297,6 +338,7 @@ export const BottomNavBase = ({
               />
             );
           })}
+
         </div>
       </div>
     </nav>

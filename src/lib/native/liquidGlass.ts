@@ -9,17 +9,20 @@ import { getPlatform } from './platform'
  * Coordinates are CSS pixels in WebView-local space (i.e. getBoundingClientRect).
  */
 export interface LiquidGlassRect {
+  id?: string
   x: number
   y: number
   width: number
   height: number
   cornerRadius?: number
+  /** 0-1 alpha multiplier on the native glass surface (default 1). */
+  intensity?: number
 }
 
 interface LiquidGlassPlugin {
   show(rect: LiquidGlassRect): Promise<void>
   update(rect: LiquidGlassRect): Promise<void>
-  hide(): Promise<void>
+  hide(opts?: { id?: string }): Promise<void>
 }
 
 const noop: LiquidGlassPlugin = {
@@ -35,9 +38,6 @@ const native = registerPlugin<LiquidGlassPlugin>('LiquidGlass', {
 
 export const isLiquidGlassSupported = (): boolean => getPlatform() === 'ios'
 
-/** Becomes true only after the native plugin successfully responds once.
- *  Use this to decide whether to drop the CSS glass fallback — if the
- *  native pod isn't installed yet, we keep the CSS so the pill stays visible. */
 let nativeReady = false
 export const isLiquidGlassReady = (): boolean => nativeReady
 
@@ -54,47 +54,30 @@ const setReady = (v: boolean) => {
   listeners.forEach((l) => l(v))
 }
 
-let showCallCount = 0
-let updateCallCount = 0
-
 export const LiquidGlass: LiquidGlassPlugin = {
   async show(rect) {
-    showCallCount += 1
-    console.log(`[LiquidGlass] show() call #${showCallCount}`, {
-      platform: getPlatform(),
-      supported: isLiquidGlassSupported(),
-      rect,
-    })
-    if (!isLiquidGlassSupported()) {
-      console.warn('[LiquidGlass] show() SKIPPED — platform is not iOS:', getPlatform())
-      return
-    }
+    if (!isLiquidGlassSupported()) return
     try {
       await native.show(rect)
-      console.log('[LiquidGlass] native.show() ✅ resolved OK — bridge reachable')
       setReady(true)
     } catch (err) {
-      console.error('[LiquidGlass] native.show() ❌ FAILED', err)
+      console.error('[LiquidGlass] show failed', err)
       setReady(false)
     }
   },
   async update(rect) {
-    updateCallCount += 1
-    if (updateCallCount <= 3 || updateCallCount % 60 === 0) {
-      console.log(`[LiquidGlass] update() call #${updateCallCount}`, { platform: getPlatform(), rect })
-    }
     if (!isLiquidGlassSupported()) return
-    try {
-      await native.update(rect)
-    } catch (err) {
-      console.error('[LiquidGlass] native.update() ❌ FAILED', err)
-      setReady(false)
+    try { await native.update(rect) } catch (err) {
+      console.error('[LiquidGlass] update failed', err)
     }
   },
-  async hide() {
-    console.log('[LiquidGlass] hide() called', { platform: getPlatform() })
+  async hide(opts) {
     if (!isLiquidGlassSupported()) return
-    try { await native.hide() } catch (err) { console.error('[LiquidGlass] native.hide() ❌ FAILED', err) }
-    setReady(false)
+    try { await native.hide(opts) } catch (err) {
+      console.error('[LiquidGlass] hide failed', err)
+    }
+    // only fully unready when the default surface is gone
+    if (!opts?.id || opts.id === 'default') setReady(false)
   },
 }
+
