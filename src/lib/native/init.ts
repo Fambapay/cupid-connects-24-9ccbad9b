@@ -1,7 +1,9 @@
-import { isNative } from './platform'
+import { isNative, getPlatform } from './platform'
 import { setupStatusBar } from './statusBar'
 import { setupKeyboard } from './keyboard'
 import { setupDeepLinks } from './deepLinks'
+import { setupSafeArea } from './safeArea'
+import { setupBackButton } from './backButton'
 import { hideSplash } from './splash'
 
 let initialized = false
@@ -16,9 +18,18 @@ export async function initNative() {
   initialized = true
   if (!isNative()) return
 
-  document.documentElement.classList.add('native', 'native-android')
+  const platform = getPlatform()
+  document.documentElement.classList.add('native', `native-${platform}`)
 
-  await Promise.all([setupStatusBar(), setupKeyboard(), setupDeepLinks()])
+  // Safe area must run before status bar so insets are wired before the
+  // WebView is told to overlay.
+  await setupSafeArea()
+  await Promise.all([
+    setupStatusBar(),
+    setupKeyboard(),
+    setupDeepLinks(),
+    setupBackButton(),
+  ])
 
   // Hide splash a tick after the first paint
   setTimeout(() => {
