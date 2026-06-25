@@ -252,8 +252,13 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
               </p>
             </div>
 
-            {/* Social proof live ticker */}
-            <SocialProofTicker className="mt-5" />
+            {/* Personal-relevance ticker — only real facts about THIS user */}
+            <PersonalTicker
+              className="mt-5"
+              pendingLikes={fomoData.count}
+              city={profile?.city ?? null}
+            />
+
 
 
             {/* Billing toggle */}
