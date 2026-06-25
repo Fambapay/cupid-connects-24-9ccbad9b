@@ -551,26 +551,66 @@ function PlanRow({
   );
 }
 
-const TICKER_EVENTS = [
-  { icon: Heart, text: "Joana, 24 · acabou de dar match em Maputo" },
-  { icon: Flame, text: "23 pessoas começaram Hunie Plus hoje" },
-  { icon: Eye, text: "Tiago, 28 · viu quem lhe deu like" },
-  { icon: Heart, text: "Carla, 26 · primeiro encontro marcado esta semana" },
-  { icon: Flame, text: "Hunie Elite esgotou em Lisboa ontem" },
-  { icon: Heart, text: "Ana & Miguel · matched há 2 minutos" },
-  { icon: Eye, text: "8 pessoas viram o teu perfil na última hora" },
+const TICKER_ITEMS: { icon: typeof Heart; build: (ctx: { pendingLikes: number; city: string | null }) => string | null }[] = [
+  {
+    icon: Heart,
+    build: ({ pendingLikes }) =>
+      pendingLikes > 0
+        ? pendingLikes === 1
+          ? "1 pessoa já te deu like — bloqueado"
+          : `${pendingLikes} pessoas já te deram like — bloqueado`
+        : null,
+  },
+  {
+    icon: Eye,
+    build: () => "O teu perfil aparece menos sem Plus",
+  },
+  {
+    icon: Flame,
+    build: ({ city }) =>
+      city ? `Perfis com Plus em ${city} têm 3x mais matches` : "Plus tem 3x mais matches",
+  },
+  {
+    icon: Heart,
+    build: ({ pendingLikes }) =>
+      pendingLikes > 0 ? "Vê quem é antes que desistam de ti" : null,
+  },
+  {
+    icon: Eye,
+    build: () => "Sem Plus, não sabes quem leu as tuas mensagens",
+  },
+  {
+    icon: Flame,
+    build: () => "Cada swipe sem Super Like é uma hipótese perdida",
+  },
 ];
 
-function SocialProofTicker({ className = "" }: { className?: string }) {
+function PersonalTicker({
+  className = "",
+  pendingLikes,
+  city,
+}: {
+  className?: string;
+  pendingLikes: number;
+  city: string | null;
+}) {
+  const events = useMemo(
+    () =>
+      TICKER_ITEMS.map((t) => ({ icon: t.icon, text: t.build({ pendingLikes, city }) }))
+        .filter((e): e is { icon: typeof Heart; text: string } => !!e.text),
+    [pendingLikes, city],
+  );
   const [idx, setIdx] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setIdx((i) => (i + 1) % TICKER_EVENTS.length), 2800);
+    if (events.length <= 1) return;
+    const t = setInterval(() => setIdx((i) => (i + 1) % events.length), 3200);
     return () => clearInterval(t);
-  }, []);
-  const Event = TICKER_EVENTS[idx];
+  }, [events.length]);
+  if (events.length === 0) return null;
+  const Event = events[idx % events.length];
   const Icon = Event.icon;
   return (
-    <div className={`mx-auto flex h-9 max-w-[320px] items-center justify-center overflow-hidden px-6 ${className}`}>
+    <div className={`mx-auto flex h-9 max-w-[340px] items-center justify-center overflow-hidden px-6 ${className}`}>
       <AnimatePresence mode="wait">
         <motion.div
           key={idx}
@@ -581,11 +621,11 @@ function SocialProofTicker({ className = "" }: { className?: string }) {
           className="flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.04] px-3 py-1.5 backdrop-blur-md"
         >
           <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/70" />
-            <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            <span className="absolute inset-0 animate-ping rounded-full bg-pink-400/70" />
+            <span className="relative h-1.5 w-1.5 rounded-full bg-pink-400" />
           </span>
           <Icon size={11} className="text-pink-300" />
-          <span className="truncate text-[11.5px] font-medium text-white/70">
+          <span className="truncate text-[11.5px] font-medium text-white/75">
             {Event.text}
           </span>
         </motion.div>
@@ -593,5 +633,6 @@ function SocialProofTicker({ className = "" }: { className?: string }) {
     </div>
   );
 }
+
 
 
