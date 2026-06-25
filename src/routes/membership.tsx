@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 import { PaywallFlow } from "@/components/paywall/PaywallFlow";
+import { useForceDarkTheme } from "@/lib/theme";
 
 export const Route = createFileRoute("/membership")({
   ssr: false,
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/membership")({
 });
 
 function MembershipPage() {
+  useForceDarkTheme();
   const navigate = useNavigate();
   const { required } = Route.useSearch();
   return (
