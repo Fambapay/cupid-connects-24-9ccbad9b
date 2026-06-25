@@ -1,4 +1,4 @@
-import { registerPlugin } from '@capacitor/core'
+import { Capacitor, registerPlugin } from '@capacitor/core'
 import { getPlatform } from './platform'
 
 /**
@@ -46,7 +46,13 @@ const native = registerPlugin<LiquidGlassPlugin>('LiquidGlass', {
   android: () => noop,
 })
 
-export const isLiquidGlassSupported = (): boolean => getPlatform() === 'ios'
+export const isLiquidGlassSupported = (): boolean => {
+  try {
+    return Capacitor.isNativePlatform() && getPlatform() === 'ios' && Capacitor.isPluginAvailable('LiquidGlass')
+  } catch {
+    return false
+  }
+}
 
 let nativeReady = false
 const activeSurfaces = new Set<string>()
