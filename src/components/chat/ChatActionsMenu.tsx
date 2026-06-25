@@ -2,6 +2,8 @@ import { useState } from "react";
 import { MoreVertical, Flag, Ban, HeartCrack } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { showActionSheet } from "@/lib/native/actionSheet";
+import { isNative } from "@/lib/native/platform";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -117,52 +119,78 @@ export function ChatActionsMenu({
     }
   };
 
+  const openNativeSheet = async () => {
+    const idx = await showActionSheet({
+      title: otherName,
+      options: [
+        { title: "Denunciar", style: "destructive" },
+        { title: "Bloquear", style: "destructive" },
+        { title: "Desfazer match" },
+        { title: "Cancelar", style: "cancel" },
+      ],
+    });
+    if (idx === 0) setReportOpen(true);
+    else if (idx === 1) setConfirmKind("block");
+    else if (idx === 2) setConfirmKind("unmatch");
+  };
+
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button
-            aria-label="Mais opções"
-            className="grid h-10 w-10 place-items-center rounded-full text-foreground/80 hover:bg-muted active:scale-95"
-          >
-            <MoreVertical className="h-5 w-5" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          sideOffset={8}
-          className="w-60 overflow-hidden rounded-2xl border border-border/60 bg-popover/95 p-1.5 shadow-2xl backdrop-blur-xl"
+      {isNative() ? (
+        <button
+          aria-label="Mais opções"
+          onClick={() => void openNativeSheet()}
+          className="grid h-10 w-10 place-items-center rounded-full text-foreground/80 hover:bg-muted active:scale-95"
         >
-          <DropdownMenuItem
-            onClick={() => setReportOpen(true)}
-            className="gap-3 rounded-xl px-3 py-2.5 text-sm font-medium"
+          <MoreVertical className="h-5 w-5" />
+        </button>
+      ) : (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              aria-label="Mais opções"
+              className="grid h-10 w-10 place-items-center rounded-full text-foreground/80 hover:bg-muted active:scale-95"
+            >
+              <MoreVertical className="h-5 w-5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            sideOffset={8}
+            className="w-60 overflow-hidden rounded-2xl border border-border/60 bg-popover/95 p-1.5 shadow-2xl backdrop-blur-xl"
           >
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-amber-500/15 text-amber-500">
-              <Flag className="h-4 w-4" />
-            </span>
-            Denunciar
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => setConfirmKind("block")}
-            className="gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-destructive focus:text-destructive"
-          >
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-destructive/15 text-destructive">
-              <Ban className="h-4 w-4" />
-            </span>
-            Bloquear
-          </DropdownMenuItem>
-          <DropdownMenuSeparator className="my-1 bg-border/60" />
-          <DropdownMenuItem
-            onClick={() => setConfirmKind("unmatch")}
-            className="gap-3 rounded-xl px-3 py-2.5 text-sm font-medium"
-          >
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-muted text-foreground/70">
-              <HeartCrack className="h-4 w-4" />
-            </span>
-            Desfazer match
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+            <DropdownMenuItem
+              onClick={() => setReportOpen(true)}
+              className="gap-3 rounded-xl px-3 py-2.5 text-sm font-medium"
+            >
+              <span className="grid h-8 w-8 place-items-center rounded-lg bg-amber-500/15 text-amber-500">
+                <Flag className="h-4 w-4" />
+              </span>
+              Denunciar
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setConfirmKind("block")}
+              className="gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-destructive focus:text-destructive"
+            >
+              <span className="grid h-8 w-8 place-items-center rounded-lg bg-destructive/15 text-destructive">
+                <Ban className="h-4 w-4" />
+              </span>
+              Bloquear
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="my-1 bg-border/60" />
+            <DropdownMenuItem
+              onClick={() => setConfirmKind("unmatch")}
+              className="gap-3 rounded-xl px-3 py-2.5 text-sm font-medium"
+            >
+              <span className="grid h-8 w-8 place-items-center rounded-lg bg-muted text-foreground/70">
+                <HeartCrack className="h-4 w-4" />
+              </span>
+              Desfazer match
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+
 
       <AlertDialog open={confirmKind !== null} onOpenChange={(o) => !o && setConfirmKind(null)}>
         <AlertDialogContent>
