@@ -1,4 +1,6 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { MessageCircle, Sparkles, Compass } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useMatches } from "@/hooks/useMatches";
