@@ -218,6 +218,16 @@ private final class GlassSurfaceView: UIView {
         layer.addSublayer(strokeLayer)
     }
 
+    /// Remove tint / top highlight / stroke when the real UIGlassEffect is
+    /// active — the effect renders its own specular + edge and any overlay
+    /// flattens it back into a plain blur.
+    func stripFallbackOverlays() {
+        tintView.removeFromSuperview()
+        topHighlightLayer.removeFromSuperlayer()
+        strokeLayer.removeFromSuperlayer()
+    }
+
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
