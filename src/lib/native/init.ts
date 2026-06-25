@@ -31,6 +31,7 @@ export async function initNative() {
     setupDeepLinks(),
     setupBackButton(),
     initAppStateTracking(),
+    initLocalNotificationHandlers(),
   ])
 
   // Hide splash a tick after the first paint
