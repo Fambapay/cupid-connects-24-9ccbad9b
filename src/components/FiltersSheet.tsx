@@ -61,10 +61,6 @@ const EDUCATION = ['Secundário', 'Licenciatura', 'Mestrado', 'Doutoramento'];
 
 export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false, onUpgrade }: Props) => {
   const [local, setLocal] = useState<DiscoveryFilters>(value);
-  const dragControls = useDragControls();
-  const y = useMotionValue(0);
-  const backdropOpacity = useTransform(y, [0, 400], [1, 0.35], { clamp: true });
-  const handleScale = useTransform(y, [0, 200], [1, 0.6], { clamp: true });
 
   useEffect(() => { if (open) setLocal(value); }, [open, value]);
 

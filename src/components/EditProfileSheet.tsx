@@ -31,10 +31,6 @@ export function EditProfileSheet({
 }: Props) {
   const [draft, setDraft] = useState(profile);
   const fileRef = useRef<HTMLInputElement>(null);
-  const dragControls = useDragControls();
-  const y = useMotionValue(0);
-  const backdropOpacity = useTransform(y, [0, 400], [1, 0.35], { clamp: true });
-  const handleScale = useTransform(y, [0, 200], [1, 0.6], { clamp: true });
 
   useEffect(() => { if (open) setDraft(profile); }, [open, profile]);
 
