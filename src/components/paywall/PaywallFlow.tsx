@@ -252,53 +252,12 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
               </p>
             </div>
 
-            {/* Personal-relevance ticker — only real facts about THIS user */}
-            <PersonalTicker
-              className="mt-5"
-              pendingLikes={fomoData.count}
-              city={profile?.city ?? null}
-            />
-
-
-
-            {/* Billing toggle */}
-            <div className="mt-7 px-6">
-              <div className="relative mx-auto flex w-full max-w-[280px] items-center rounded-full border border-white/[0.06] bg-white/[0.04] p-1 backdrop-blur-md">
-                <motion.div
-                  layout
-                  transition={{ type: "spring", stiffness: 500, damping: 38 }}
-                  className="absolute inset-y-1 w-[calc(50%-4px)] rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.25)]"
-                  style={{ left: period === "monthly" ? "4px" : "calc(50% + 0px)" }}
-                />
-                <button
-                  onClick={() => setPeriod("monthly")}
-                  className={`relative z-10 flex-1 rounded-full py-2 text-[13px] font-semibold transition-colors ${
-                    period === "monthly" ? "text-black" : "text-white/60"
-                  }`}
-                >
-                  Mensal
-                </button>
-                <button
-                  onClick={() => setPeriod("annual")}
-                  className={`relative z-10 flex-1 rounded-full py-2 text-[13px] font-semibold transition-colors ${
-                    period === "annual" ? "text-black" : "text-white/60"
-                  }`}
-                >
-                  Anual
-                  <span className="ml-1 rounded-full bg-emerald-400/90 px-1.5 py-px text-[9px] font-bold text-black">
-                    -33%
-                  </span>
-                </button>
-              </div>
-            </div>
-
             {/* Plan rows (Apple-style vertical selectable list) */}
-            <div className="mt-6 flex flex-col gap-2.5 px-4">
+            <div className="mt-7 flex flex-col gap-2.5 px-4">
               {planCards.map((plan, i) => (
                 <PlanRow
                   key={plan.tier}
                   plan={plan}
-                  period={period}
                   country={country}
                   selected={selectedTier === plan.tier}
                   onSelect={() => setSelectedTier(plan.tier)}
@@ -306,6 +265,7 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
                 />
               ))}
             </div>
+
 
             {/* Guarantee strip */}
             <div className="mx-4 mt-6 rounded-2xl border border-white/[0.06] bg-white/[0.025] p-4">
