@@ -269,7 +269,10 @@ function ChatRoom() {
   };
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, x: 24 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
       className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none"
       style={{
         height: "var(--chat-vh, 100dvh)",
