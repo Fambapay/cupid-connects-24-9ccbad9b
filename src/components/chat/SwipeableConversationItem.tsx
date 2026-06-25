@@ -47,6 +47,7 @@ interface Props {
   lastMessage: string | null;
   lastMessageAt: string;
   unread?: number;
+  yourTurn?: boolean;
   onActionTaken?: () => void;
 }
 
@@ -58,6 +59,7 @@ export function SwipeableConversationItem({
   lastMessage,
   lastMessageAt,
   unread = 0,
+  yourTurn = false,
   onActionTaken,
 }: Props) {
   const x = useMotionValue(0);
