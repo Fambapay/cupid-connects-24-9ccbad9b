@@ -1,5 +1,5 @@
 import { isNative, getPlatform } from './platform'
-import { initAppStateTracking } from './localNotifications'
+import { initAppStateTracking, initLocalNotificationHandlers } from './localNotifications'
 import { setupStatusBar } from './statusBar'
 import { setupKeyboard } from './keyboard'
 import { setupDeepLinks } from './deepLinks'
