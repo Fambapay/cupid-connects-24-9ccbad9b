@@ -12,6 +12,7 @@ export interface MatchSummary {
   lastMessageAt: string;
   unread: number;
   hasMessages: boolean;
+  lastFromMe: boolean;
 }
 
 interface RawSummary {
@@ -23,6 +24,7 @@ interface RawSummary {
   last_message_at: string;
   unread: number;
   has_messages: boolean;
+  last_from_me: boolean;
 }
 
 export function useMatches() {
