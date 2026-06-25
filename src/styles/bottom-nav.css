@@ -63,18 +63,44 @@
     0 2px 8px rgba(0, 0, 0, 0.22);
 }
 
-/* ── Native mode: OUTER pill is 100% native UIGlassEffect.
-   Remove every CSS tint, hairline, shadow and sheen so the real
-   Apple Liquid Glass surface (rendered behind the WebView) is the
-   only thing the user sees. ──────────────────────────────────── */
+/* ── Native mode: OUTER pill sits ON TOP of the real UIGlassEffect
+   surface (rendered behind the transparent WebView). We DO NOT add
+   any backdrop-filter here — that would double-blur — but we DO add
+   a subtle whitish tint + hairline edge + specular sheen so the pill
+   reads like the iOS 26 "App Library" search bar (visible glass body
+   with a bright top edge), instead of disappearing. ─────────────── */
 .tab-bar-pill--native {
-  background: transparent !important;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 255, 255, 0.08) 55%,
+      rgba(255, 255, 255, 0.12) 100%
+    ) !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
-  border: none !important;
-  box-shadow: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.18),
+    0 10px 30px rgba(0, 0, 0, 0.28) !important;
 }
-.tab-bar-pill--native::before,
+/* Top specular sheen — bright glossy band like App Library */
+.tab-bar-pill--native::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.35) 0%,
+      rgba(255, 255, 255, 0.08) 25%,
+      transparent 55%
+    );
+  z-index: 1;
+  display: block !important;
+}
 .tab-bar-pill--native::after {
   display: none !important;
 }
