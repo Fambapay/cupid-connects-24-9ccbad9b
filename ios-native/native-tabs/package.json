@@ -1,0 +1,18 @@
+{
+  "name": "native-tabs",
+  "version": "0.0.1",
+  "description": "Native UITabBar with iOS 26 Liquid Glass",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "capacitor": {
+    "ios": {
+      "src": "ios"
+    }
+  },
+  "files": [
+    "ios/",
+    "Package.swift",
+    "dist/"
+  ]
+}
