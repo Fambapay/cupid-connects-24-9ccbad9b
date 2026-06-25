@@ -151,6 +151,14 @@ export function useNewMessageNotifier() {
 
           const body =
             m.content.length > 120 ? `${m.content.slice(0, 120)}…` : m.content;
+
+          void scheduleLocalNotification({
+            id: m.id.split('-').map(s => parseInt(s, 16)).reduce((a, b) => a + b, 0) % 2147483647,
+            title: peer.name,
+            body,
+            extra: { type: 'message', matchId: m.match_id },
+          });
+
           toast.custom(
             (t) => (
               <AppleToast
