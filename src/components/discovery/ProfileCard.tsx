@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import {
+  motion,
   useMotionValue,
   useMotionValueEvent,
   animate,
