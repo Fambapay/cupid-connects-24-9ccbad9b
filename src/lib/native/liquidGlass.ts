@@ -86,6 +86,7 @@ export const LiquidGlass: LiquidGlassPlugin = {
     } catch (err) {
       console.error('[LiquidGlass] show failed', err)
       setReady(false)
+      throw err
     }
   },
   async update(rect) {
