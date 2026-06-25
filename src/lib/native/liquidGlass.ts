@@ -78,13 +78,22 @@ const setReady = (v: boolean) => {
 
 export const LiquidGlass: LiquidGlassPlugin = {
   async show(rect) {
-    if (!isLiquidGlassSupported()) return
+    const supported = isLiquidGlassSupported()
+    console.log('[LiquidGlass] show()', {
+      supported,
+      platform: getPlatform(),
+      isNative: Capacitor.isNativePlatform(),
+      pluginAvailable: Capacitor.isPluginAvailable('LiquidGlass'),
+      rect,
+    })
+    if (!supported) return
     try {
       await native.show(rect)
       activeSurfaces.add(rect.id ?? 'default')
       setReady(activeSurfaces.size > 0)
+      console.log('[LiquidGlass] show() resolved →', rect.id)
     } catch (err) {
-      console.error('[LiquidGlass] show failed', err)
+      console.error('[LiquidGlass] show() FAILED', err)
       setReady(false)
       throw err
     }
@@ -92,13 +101,14 @@ export const LiquidGlass: LiquidGlassPlugin = {
   async update(rect) {
     if (!isLiquidGlassSupported()) return
     try { await native.update(rect) } catch (err) {
-      console.error('[LiquidGlass] update failed', err)
+      console.error('[LiquidGlass] update() failed', err)
     }
   },
   async hide(opts) {
     if (!isLiquidGlassSupported()) return
+    console.log('[LiquidGlass] hide()', opts)
     try { await native.hide(opts) } catch (err) {
-      console.error('[LiquidGlass] hide failed', err)
+      console.error('[LiquidGlass] hide() failed', err)
     }
     activeSurfaces.delete(opts?.id ?? 'default')
     setReady(activeSurfaces.size > 0)

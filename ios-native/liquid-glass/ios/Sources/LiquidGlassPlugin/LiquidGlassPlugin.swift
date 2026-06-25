@@ -38,7 +38,10 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
             let placement = call.getString("placement") ?? "behind"
             let exclusions = self.exclusionFrames(from: call)
 
+            NSLog("[LiquidGlass] show id=\(id) frame=\(frame) radius=\(radius) placement=\(placement) hasWebView=\(self.bridge?.webView != nil)")
+
             if let existing = self.glassViews[id] {
+                NSLog("[LiquidGlass] reusing existing surface for \(id)")
                 existing.configure(frame: frame, cornerRadius: radius, alpha: max(0, min(1, intensity)))
                 self.applyMask(to: existing, frame: frame, cornerRadius: radius, exclusionFrames: exclusions)
             } else {
@@ -50,10 +53,14 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
                 if let webView = self.bridge?.webView, let parent = webView.superview {
                     if placement == "above" {
                         parent.insertSubview(view, aboveSubview: webView)
+                        NSLog("[LiquidGlass] inserted ABOVE webView, parent=\(type(of: parent)) parentBounds=\(parent.bounds)")
                     } else {
                         self.ensureWebViewTransparent()
                         parent.insertSubview(view, belowSubview: webView)
+                        NSLog("[LiquidGlass] inserted BEHIND webView (transparent), parent=\(type(of: parent)) parentBounds=\(parent.bounds)")
                     }
+                } else {
+                    NSLog("[LiquidGlass] ERROR — no webView/parent available")
                 }
             }
             call.resolve()
