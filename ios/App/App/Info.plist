@@ -45,7 +45,13 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<true/>
+    <key>UIViewControllerBasedStatusBarAppearance</key>
+    <true/>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Hunie precisa da tua localização para mostrar perfis perto de ti.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Hunie precisa da tua localização para mostrar perfis perto de ti, mesmo em segundo plano.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Hunie precisa da tua localização para mostrar perfis perto de ti, mesmo em segundo plano.</string>
 </dict>
 </plist>
