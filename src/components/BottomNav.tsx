@@ -482,8 +482,9 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
   const handleTabChange = (t: TabId) => {
     navigate({ to: TAB_TO_PATH[t] });
   };
+  const [nativeFailed, setNativeFailed] = useState(false);
 
-  // iOS nativo → UITabBar com Liquid Glass real (iOS 26 UIGlassEffect).
+
   // Web/Android/failure → HTML pill fallback.
   if (nativeTabsAvailable() && !nativeFailed) {
     return (
