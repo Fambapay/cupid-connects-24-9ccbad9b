@@ -28,6 +28,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { useAuth } from "@/hooks/useAuth";
+import { useForceDarkTheme } from "@/lib/theme";
 import { useProfile } from "@/hooks/useProfile";
 import { usePhotoUpload, type PhotoRow } from "@/hooks/usePhotoUpload";
 import { useToast } from "@/hooks/use-toast";
@@ -170,6 +171,7 @@ const initialDraft: DraftState = {
 
 
 function OnboardingPage() {
+  useForceDarkTheme();
   const { user } = useAuth();
   const { profile, reload } = useProfile();
   const navigate = useNavigate();
