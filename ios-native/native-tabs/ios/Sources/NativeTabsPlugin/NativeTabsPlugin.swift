@@ -93,6 +93,22 @@ public class NativeTabsPlugin: CAPPlugin, CAPBridgedPlugin {
         // Remove a barra anterior, se existir.
         tabBar?.removeFromSuperview()
 
+        // ── Transparência da WKWebView ──────────────────────────────────────
+        // Para o UITabBar (iOS 26 Liquid Glass) refractar o conteúdo da página
+        // por baixo, a WKWebView e o seu scrollView NÃO podem ser opacos.
+        // O fundo visível passa a ser o do parent / window — pintamos a cor
+        // escura da app aí para manter o look quando a página tem áreas
+        // transparentes.
+        webView.isOpaque = false
+        webView.backgroundColor = .clear
+        webView.scrollView.backgroundColor = .clear
+        parent.backgroundColor = UIColor(red: 0x07/255.0, green: 0x06/255.0, blue: 0x0a/255.0, alpha: 1.0)
+        if let window = parent.window {
+            window.backgroundColor = parent.backgroundColor
+        }
+
+
+
         let bar = UITabBar()
         bar.translatesAutoresizingMaskIntoConstraints = false
 
