@@ -276,7 +276,7 @@ export function ProfileView({
 
       {/* SUGGESTIONS */}
       {suggestions.length > 0 && (
-        <div className="relative px-5 flex flex-col gap-2">
+        <motion.div variants={itemVariants} className="relative px-5 flex flex-col gap-2">
           {suggestions.map((s) => (
             <button
               key={s.key}
