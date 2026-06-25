@@ -276,6 +276,14 @@ export function useNewMessageNotifier() {
           }
 
           const isSuper = s.direction === "super";
+
+          void scheduleLocalNotification({
+            id: s.id.split('-').map(s => parseInt(s, 16)).reduce((a, b) => a + b, 0) % 2147483647,
+            title: isSuper ? "Super Like ⭐" : "Novo like 👀",
+            body: `${revealName} mostrou interesse no teu perfil.`,
+            extra: { type: 'like', swiperId: s.swiper_id },
+          });
+
           toast.custom(
             (t) => (
               <AppleToast
