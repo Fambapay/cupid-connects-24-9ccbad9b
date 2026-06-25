@@ -252,9 +252,12 @@ function SettingsPage() {
   }
 
   return (
-    <div
+    <motion.div
       className="h-[100dvh] overflow-y-auto overflow-x-hidden overscroll-y-contain"
       style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y', background: 'var(--profile-bg)' }}
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
     >
       {/* Header */}
       <div
