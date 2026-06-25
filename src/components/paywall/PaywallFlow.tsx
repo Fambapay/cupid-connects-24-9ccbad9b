@@ -26,10 +26,20 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
   const [stage, setStage] = useState<Stage>("fomo");
   const [period, setPeriod] = useState<BillingPeriod>("monthly");
   const [selected, setSelected] = useState<PlanCardConfig | null>(null);
+  const [selectedTier, setSelectedTier] = useState<PlanCardConfig["tier"]>("plus");
   const { user } = useAuth();
   const { profile, reload } = useProfile();
   const { country, config } = useCountry();
-  const planCards = useMemo(() => getPlanCards(country), [country]);
+  // Ascending order: Select → Plus → Elite (Apple-style ladder)
+  const planCards = useMemo(() => {
+    const cards = getPlanCards(country);
+    const order: Record<string, number> = { select: 0, plus: 1, elite: 2 };
+    return [...cards].sort((a, b) => order[a.tier] - order[b.tier]);
+  }, [country]);
+  const activePlan = useMemo(
+    () => planCards.find((p) => p.tier === selectedTier) ?? planCards[1],
+    [planCards, selectedTier],
+  );
   const paymentSummary = useMemo(
     () => config.payments.slice(0, 3).map((p) => paymentLabel(p as PaymentMethodCode)).join(" e "),
     [config.payments],
