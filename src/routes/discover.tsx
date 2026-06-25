@@ -128,6 +128,7 @@ function Discover() {
     }
     if (result.matched) {
       setMatched({ id: target.id, name: target.name, photo: target.photo ?? null });
+      recordMatch().catch(() => {});
     }
     return result;
   };
