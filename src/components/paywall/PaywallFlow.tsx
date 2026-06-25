@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Check, ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
+import { X, Check, ArrowRight, Sparkles, ShieldCheck, Heart, Flame, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
@@ -233,22 +233,28 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
                 className="mx-auto mb-5 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/70 backdrop-blur-md"
               >
                 <Sparkles size={11} className="text-pink-400" />
-                Hunie Membership
+                {fomoData.count > 0
+                  ? `${fomoData.count} ${fomoData.count === 1 ? "pessoa à tua espera" : "pessoas à tua espera"}`
+                  : "Hunie Membership"}
               </motion.div>
               <h2
                 className="text-[34px] font-black leading-[1.05] tracking-[-0.03em]"
                 style={{ fontFamily: "'Instrument Serif', 'Cormorant', serif", fontWeight: 400 }}
               >
-                Conhece quem
+                A pessoa certa
                 <br />
                 <span className="bg-gradient-to-r from-pink-400 via-fuchsia-400 to-violet-400 bg-clip-text italic text-transparent">
-                  está à tua espera.
+                  não espera para sempre.
                 </span>
               </h2>
-              <p className="mx-auto mt-3 max-w-[280px] text-[14px] leading-snug text-white/55">
-                Desbloqueia tudo o que torna o Hunie uma experiência diferente.
+              <p className="mx-auto mt-3 max-w-[290px] text-[14px] leading-snug text-white/55">
+                Cada dia sem Hunie são conversas que não acontecem e matches que passam ao lado.
               </p>
             </div>
+
+            {/* Social proof live ticker */}
+            <SocialProofTicker className="mt-5" />
+
 
             {/* Billing toggle */}
             <div className="mt-7 px-6">
@@ -296,8 +302,25 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
               ))}
             </div>
 
+            {/* Guarantee strip */}
+            <div className="mx-4 mt-6 rounded-2xl border border-white/[0.06] bg-white/[0.025] p-4">
+              <div className="flex items-start gap-3">
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-emerald-400/15">
+                  <ShieldCheck size={16} className="text-emerald-400" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-semibold text-white">
+                    Sem match em 7 dias? Devolvemos o teu dinheiro.
+                  </p>
+                  <p className="mt-0.5 text-[11.5px] leading-snug text-white/50">
+                    Cancela com 1 toque. Sem perguntas. Sem letras pequenas.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Trust row */}
-            <div className="mt-6 flex items-center justify-center gap-4 px-6 text-[11px] text-white/45">
+            <div className="mt-5 flex items-center justify-center gap-4 px-6 text-[11px] text-white/45">
               <span className="inline-flex items-center gap-1.5">
                 <ShieldCheck size={12} /> Pagamento seguro
               </span>
@@ -313,6 +336,14 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
             <div className="h-16 bg-gradient-to-t from-[#0a0a0c] via-[#0a0a0c]/95 to-transparent" />
             <div className="pointer-events-auto bg-[#0a0a0c] px-5 pb-[max(env(safe-area-inset-bottom),20px)] pt-2">
+              {fomoData.count > 0 && (
+                <p className="mb-2 flex items-center justify-center gap-1.5 text-[11.5px] font-medium text-pink-300/90">
+                  <Flame size={12} className="text-pink-400" />
+                  {fomoData.count === 1
+                    ? "1 pessoa já te deu like — vê quem é"
+                    : `${fomoData.count} pessoas já te deram like — vê quem são`}
+                </p>
+              )}
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setSelected(activePlan)}
@@ -322,18 +353,30 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
                     "linear-gradient(135deg, #FF4FA3 0%, #E935A0 45%, #B13CFF 100%)",
                 }}
               >
+                {/* Shimmer sweep */}
+                <motion.span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-y-0 w-1/3"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)",
+                  }}
+                  animate={{ x: ["-120%", "320%"] }}
+                  transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.6 }}
+                />
                 <span className="relative z-10 flex items-center gap-2">
-                  Continuar com {activePlan.label}
+                  Começar agora — {activePlan.label}
                   <ArrowRight size={16} />
                 </span>
               </motion.button>
               <p className="mt-2 text-center text-[11px] text-white/45">
                 {period === "annual"
-                  ? `${formatPrice(activePlan.annualPriceMzn, country)} por ano — cobrado hoje`
-                  : `${formatPrice(activePlan.priceMzn, country)} por mês — cobrado hoje`}
+                  ? `${formatPrice(activePlan.annualPriceMzn, country)}/ano · equivale a ${formatPrice(Math.round(activePlan.annualPriceMzn / 12), country)}/mês`
+                  : `${formatPrice(activePlan.priceMzn, country)} hoje · menos que um jantar a dois`}
               </p>
             </div>
           </div>
+
         </motion.div>
       )}
 
@@ -502,4 +545,48 @@ function PlanRow({
     </motion.button>
   );
 }
+
+const TICKER_EVENTS = [
+  { icon: Heart, text: "Joana, 24 · acabou de dar match em Maputo" },
+  { icon: Flame, text: "23 pessoas começaram Hunie Plus hoje" },
+  { icon: Eye, text: "Tiago, 28 · viu quem lhe deu like" },
+  { icon: Heart, text: "Carla, 26 · primeiro encontro marcado esta semana" },
+  { icon: Flame, text: "Hunie Elite esgotou em Lisboa ontem" },
+  { icon: Heart, text: "Ana & Miguel · matched há 2 minutos" },
+  { icon: Eye, text: "8 pessoas viram o teu perfil na última hora" },
+];
+
+function SocialProofTicker({ className = "" }: { className?: string }) {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setIdx((i) => (i + 1) % TICKER_EVENTS.length), 2800);
+    return () => clearInterval(t);
+  }, []);
+  const Event = TICKER_EVENTS[idx];
+  const Icon = Event.icon;
+  return (
+    <div className={`mx-auto flex h-9 max-w-[320px] items-center justify-center overflow-hidden px-6 ${className}`}>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={idx}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.04] px-3 py-1.5 backdrop-blur-md"
+        >
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/70" />
+            <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          </span>
+          <Icon size={11} className="text-pink-300" />
+          <span className="truncate text-[11.5px] font-medium text-white/70">
+            {Event.text}
+          </span>
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
 
