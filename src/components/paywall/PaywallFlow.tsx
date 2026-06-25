@@ -546,3 +546,47 @@ function PlanRow({
   );
 }
 
+const TICKER_EVENTS = [
+  { icon: Heart, text: "Joana, 24 · acabou de dar match em Maputo" },
+  { icon: Flame, text: "23 pessoas começaram Hunie Plus hoje" },
+  { icon: Eye, text: "Tiago, 28 · viu quem lhe deu like" },
+  { icon: Heart, text: "Carla, 26 · primeiro encontro marcado esta semana" },
+  { icon: Flame, text: "Hunie Elite esgotou em Lisboa ontem" },
+  { icon: Heart, text: "Ana & Miguel · matched há 2 minutos" },
+  { icon: Eye, text: "8 pessoas viram o teu perfil na última hora" },
+];
+
+function SocialProofTicker({ className = "" }: { className?: string }) {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setIdx((i) => (i + 1) % TICKER_EVENTS.length), 2800);
+    return () => clearInterval(t);
+  }, []);
+  const Event = TICKER_EVENTS[idx];
+  const Icon = Event.icon;
+  return (
+    <div className={`mx-auto flex h-9 max-w-[320px] items-center justify-center overflow-hidden px-6 ${className}`}>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={idx}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.04] px-3 py-1.5 backdrop-blur-md"
+        >
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/70" />
+            <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          </span>
+          <Icon size={11} className="text-pink-300" />
+          <span className="truncate text-[11.5px] font-medium text-white/70">
+            {Event.text}
+          </span>
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
+
