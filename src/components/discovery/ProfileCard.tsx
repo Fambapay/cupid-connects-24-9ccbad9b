@@ -787,28 +787,6 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               touchAction: "pan-y",
             }}
           >
-            {/* Drag handle */}
-            <div
-              style={{
-                position: "sticky",
-                top: 0,
-                zIndex: 5,
-                display: "flex",
-                justifyContent: "center",
-                paddingTop: 8,
-                pointerEvents: "none",
-              }}
-            >
-              <div
-                style={{
-                  width: 44,
-                  height: 5,
-                  borderRadius: 999,
-                  background: "rgba(255,255,255,0.4)",
-                }}
-              />
-            </div>
-
             {/* Photo carousel */}
             <div
               onClick={(e) => {
