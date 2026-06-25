@@ -487,6 +487,8 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
   };
   const [nativeFailed, setNativeFailed] = useState(false);
 
+  // Hide entirely inside a conversation (chat detail overlays the list).
+  if (inConversation) return null;
 
   // Web/Android/failure → HTML pill fallback.
   if (nativeTabsAvailable() && !nativeFailed) {
@@ -500,6 +502,7 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
       />
     );
   }
+
 
   return (
     <BottomNavBase
