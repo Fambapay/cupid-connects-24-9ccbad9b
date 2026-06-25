@@ -187,7 +187,9 @@ function ChatList() {
                   lastMessage={m.lastMessage}
                   lastMessageAt={formatTime(m.lastMessageAt)}
                   unread={m.unread}
+                  yourTurn={m.hasMessages && !m.lastFromMe && m.unread === 0}
                 />
+
               ))}
             </motion.ul>
           )}

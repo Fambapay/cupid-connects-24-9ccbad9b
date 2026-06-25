@@ -47,6 +47,7 @@ interface Props {
   lastMessage: string | null;
   lastMessageAt: string;
   unread?: number;
+  yourTurn?: boolean;
   onActionTaken?: () => void;
 }
 
@@ -58,6 +59,7 @@ export function SwipeableConversationItem({
   lastMessage,
   lastMessageAt,
   unread = 0,
+  yourTurn = false,
   onActionTaken,
 }: Props) {
   const x = useMotionValue(0);
@@ -221,11 +223,18 @@ export function SwipeableConversationItem({
                 )}
               </span>
             </div>
-            <p
-              className={`mt-1 truncate text-[14px] ${unread > 0 ? "font-medium text-foreground/90" : "text-muted-foreground"}`}
-            >
-              {lastMessage ?? "Diz olá 👋"}
-            </p>
+            <div className="mt-1 flex items-center gap-2">
+              <p
+                className={`min-w-0 flex-1 truncate text-[14px] ${unread > 0 ? "font-medium text-foreground/90" : "text-muted-foreground"}`}
+              >
+                {lastMessage ?? "Diz olá 👋"}
+              </p>
+              {yourTurn && (
+                <span className="shrink-0 rounded-full bg-flame/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-flame">
+                  Tua vez
+                </span>
+              )}
+            </div>
           </div>
         </Link>
 
