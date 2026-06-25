@@ -180,11 +180,12 @@ export const BottomNavBase = ({
   // base rect (no per-frame layout reads), coalesce bursts into one rAF, and
   // skip sub-pixel deltas. Intensity is pushed via a ref so press/drag state
   // changes don't tear down the subscription.
-  // Keep the native inner glass subtle so icons stay crisp — boost during
-  // drag/press for premium refraction feedback while sliding between tabs.
-  const intensityRef = useRef(0.55);
+  // Inner glass now renders BEHIND the WebView (see native plugin), so icons
+  // stay perfectly crisp on top of it — we can keep full intensity at all
+  // times without blurring the icon glyphs.
+  const intensityRef = useRef(1.0);
   useEffect(() => {
-    intensityRef.current = isPressed || isDragging ? 0.95 : 0.55;
+    intensityRef.current = 1.0;
   }, [isPressed, isDragging]);
 
   useEffect(() => {
