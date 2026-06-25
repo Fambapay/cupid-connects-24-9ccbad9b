@@ -150,17 +150,22 @@ public class LiquidGlassPlugin: CAPPlugin, CAPBridgedPlugin {
 
     private func makeGlassView(frame: CGRect, cornerRadius: CGFloat) -> GlassSurfaceView {
         let view = GlassSurfaceView(frame: frame)
+        #if compiler(>=6.0)
         if #available(iOS 26.0, *) {
-            if let glassEffectClass = NSClassFromString("UIGlassEffect") as? UIVisualEffect.Type {
-                let effect = glassEffectClass.init()
-                view.effectView.effect = effect
-                view.configure(frame: frame, cornerRadius: cornerRadius, alpha: nil)
-                return view
-            }
+            // Real Apple Liquid Glass — only compiles when built with the
+            // iOS 26 SDK (Xcode 26+). Falls through to the material blur on
+            // older SDKs / OS versions.
+            let effect = UIGlassEffect()
+            view.effectView.effect = effect
+            view.configure(frame: frame, cornerRadius: cornerRadius, alpha: nil)
+            NSLog("[LiquidGlass] using native UIGlassEffect (iOS 26)")
+            return view
         }
+        #endif
         let blur = UIBlurEffect(style: .systemUltraThinMaterial)
         view.effectView.effect = blur
         view.configure(frame: frame, cornerRadius: cornerRadius, alpha: nil)
+        NSLog("[LiquidGlass] fallback UIBlurEffect .systemUltraThinMaterial")
         return view
     }
 
