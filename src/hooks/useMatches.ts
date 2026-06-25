@@ -101,6 +101,11 @@ export function useMatches() {
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () =>
         load(),
       )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "match_reads", filter: `user_id=eq.${user.id}` },
+        () => load(),
+      )
       .subscribe();
     return () => {
       supabase.removeChannel(ch);

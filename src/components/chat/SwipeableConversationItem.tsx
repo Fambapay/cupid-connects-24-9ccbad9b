@@ -199,19 +199,30 @@ export function SwipeableConversationItem({
             <div className="flex items-center justify-between gap-2">
               <span
                 className="truncate text-[19px] leading-none tracking-tight text-foreground"
-                style={{ fontFamily: "-apple-system, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif", fontWeight: 600 }}
+                style={{
+                  fontFamily:
+                    "-apple-system, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif",
+                  fontWeight: unread > 0 ? 700 : 600,
+                }}
               >
                 {name}
               </span>
-              {unread > 0 && (
+              <span className="ml-2 flex shrink-0 items-center gap-2">
                 <span
-                  aria-label={`${unread} novas mensagens`}
-                  className="ml-2 h-2.5 w-2.5 shrink-0 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.55)]"
-                />
-              )}
+                  className={`text-[12px] ${unread > 0 ? "font-semibold text-foreground" : "text-muted-foreground"}`}
+                >
+                  {lastMessageAt}
+                </span>
+                {unread > 0 && (
+                  <span
+                    aria-label={`${unread} novas mensagens`}
+                    className="h-2.5 w-2.5 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.55)]"
+                  />
+                )}
+              </span>
             </div>
             <p
-              className={`mt-0.5 truncate text-[14px] ${unread > 0 ? "text-foreground/90" : "text-muted-foreground"}`}
+              className={`mt-1 truncate text-[14px] ${unread > 0 ? "font-medium text-foreground/90" : "text-muted-foreground"}`}
             >
               {lastMessage ?? "Diz olá 👋"}
             </p>

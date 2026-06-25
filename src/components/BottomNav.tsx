@@ -298,19 +298,34 @@ const TabButton = ({
         />
         <AnimatePresence mode="wait">
           {badge !== undefined && badge > 0 && (
-            <motion.span
-              key={`badge-${badge}`}
-              className={`absolute -top-1.5 -right-2 min-w-[16px] h-[16px] text-[9px] rounded-full flex items-center justify-center font-bold px-1 ${
-                tabId === "likes" ? "bg-[#C89B0C] text-black" : "bg-red-500 text-white"
-              }`}
-              style={{ boxShadow: "0 0 0 1.5px hsl(var(--background))" }}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 500, damping: 25 }}
-            >
-              {badge > 99 ? "99+" : badge}
-            </motion.span>
+            tabId === "chat" ? (
+              <motion.span
+                key="chat-dot"
+                aria-label="Novas mensagens"
+                className="absolute -top-1 -right-1.5 h-[10px] w-[10px] rounded-full bg-red-500"
+                style={{
+                  boxShadow: "0 0 0 2px hsl(var(--background)), 0 0 10px rgba(239,68,68,0.55)",
+                }}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 500, damping: 25 }}
+              />
+            ) : (
+              <motion.span
+                key={`badge-${badge}`}
+                className={`absolute -top-1.5 -right-2 min-w-[16px] h-[16px] text-[9px] rounded-full flex items-center justify-center font-bold px-1 ${
+                  tabId === "likes" ? "bg-[#C89B0C] text-black" : "bg-red-500 text-white"
+                }`}
+                style={{ boxShadow: "0 0 0 1.5px hsl(var(--background))" }}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 500, damping: 25 }}
+              >
+                {badge > 99 ? "99+" : badge}
+              </motion.span>
+            )
           )}
         </AnimatePresence>
       </div>
@@ -401,7 +416,7 @@ function NativeBottomNav({
               id === "likes"
                 ? formatBadge(likesCount)
                 : id === "chat"
-                  ? formatBadge(unreadChats)
+                  ? (unreadChats > 0 ? "•" : "")
                   : "",
             selected: id === activeTab,
           })),
@@ -456,7 +471,7 @@ function NativeBottomNav({
   useEffect(() => {
     NativeTabs.setBadge({
       index: TAB_ORDER.indexOf("chat"),
-      value: formatBadge(unreadChats),
+      value: unreadChats > 0 ? "•" : "",
     }).catch(() => {});
   }, [unreadChats]);
 
