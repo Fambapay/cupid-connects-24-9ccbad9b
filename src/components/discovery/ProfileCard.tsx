@@ -251,9 +251,9 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       if (enterAnim) return; // rewind handles its own entry
       const controls = animate(entry, 0, {
         type: "spring",
-        stiffness: 260,
-        damping: 28,
-        mass: 0.9,
+        stiffness: 170,
+        damping: 20,
+        mass: 1.15,
         restDelta: 0.001,
       });
       return () => controls.stop();
@@ -261,8 +261,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
     }, []);
 
 
-    const snapSpring = { type: "spring" as const, stiffness: 520, damping: 36, mass: 0.7, restDelta: 0.5 };
-    const flySpring = { type: "spring" as const, stiffness: 220, damping: 26, mass: 0.9 };
+    const snapSpring = { type: "spring" as const, stiffness: 280, damping: 30, mass: 0.85, restDelta: 0.5 };
+    const flySpring = { type: "spring" as const, stiffness: 150, damping: 20, mass: 1.15 };
 
     const animXRef = useRef<ReturnType<typeof animate> | null>(null);
     const animYRef = useRef<ReturnType<typeof animate> | null>(null);
