@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence, useDragControls, useMotionValue, useTransform, animate as animateMV } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Trash2, Camera, Star } from 'lucide-react';
 import type { ProfileViewData } from './ProfileView';
 
