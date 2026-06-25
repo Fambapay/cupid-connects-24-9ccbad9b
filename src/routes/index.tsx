@@ -172,7 +172,7 @@ function Splash() {
 }
 
 /* ============================================================
-   New Landing — Apple liquid glass, dark, brand pink↔purple.
+   New Landing — dark, brand pink↔purple.
    Fully country-driven via useCountry / getCountryCopy.
    ============================================================ */
 
