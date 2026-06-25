@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Link } from '@tanstack/react-router';
 import {
   Settings, Pencil, BadgeCheck, Camera, FileText, Tag, ShieldCheck,
@@ -89,15 +90,35 @@ export function ProfileView({
     } finally { setBusy(false); }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.06, delayChildren: 0.05 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 14 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.35, ease: [0.32, 0.72, 0, 1] as const },
+    },
+  };
+
   return (
-    <div
+    <motion.div
       className="relative min-h-full pb-32"
       style={{
         background: 'var(--profile-bg)',
       }}
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
     >
       {/* Soft gradient backdrop */}
-      <div
+      <motion.div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[280px]"
         style={{
@@ -105,6 +126,7 @@ export function ProfileView({
           background:
             'radial-gradient(70% 60% at 50% 0%, rgba(255,79,163,0.22) 0%, rgba(255,79,163,0) 70%)',
         }}
+        variants={itemVariants}
       />
 
 
@@ -119,7 +141,7 @@ export function ProfileView({
       />
 
       {/* HEADER */}
-      <div className="relative flex items-center justify-between px-5 pt-4 pb-5">
+      <motion.div variants={itemVariants} className="relative flex items-center justify-between px-5 pt-4 pb-5">
         <div className="flex items-center gap-3.5 min-w-0">
           <button
             onClick={() => fileRef.current?.click()}
@@ -213,11 +235,11 @@ export function ProfileView({
             <Settings size={18} className="text-muted-foreground" />
           </button>
         </div>
-      </div>
+      </motion.div>
 
 
       {/* PROGRESS */}
-      <div className="relative px-5 pb-5">
+      <motion.div variants={itemVariants} className="relative px-5 pb-5">
         <div className="rounded-2xl border border-border bg-card p-4">
           <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-2">
@@ -250,11 +272,11 @@ export function ProfileView({
             </p>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* SUGGESTIONS */}
       {suggestions.length > 0 && (
-        <div className="relative px-5 flex flex-col gap-2">
+        <motion.div variants={itemVariants} className="relative px-5 flex flex-col gap-2">
           {suggestions.map((s) => (
             <button
               key={s.key}
@@ -282,7 +304,7 @@ export function ProfileView({
               <ChevronRight size={18} className="text-muted-foreground opacity-50 shrink-0 group-active:translate-x-0.5 transition-transform" />
             </button>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {/* QUICK ACTIONS */}
@@ -418,7 +440,7 @@ export function ProfileView({
       <style>{`
         @keyframes shine { 0% { transform: translateX(0%);} 100% { transform: translateX(450%);} }
       `}</style>
-    </div>
+    </motion.div>
   );
 }
 
