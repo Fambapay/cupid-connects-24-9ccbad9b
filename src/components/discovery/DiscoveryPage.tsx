@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from "react";
-import { motion, useMotionValue } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue } from "framer-motion";
 import { ProfileCard, type ProfileCardHandle } from "./ProfileCard";
 import { SwipeActions } from "./SwipeActions";
 import { DiscoverTopBar } from "./DiscoverTopBar";
