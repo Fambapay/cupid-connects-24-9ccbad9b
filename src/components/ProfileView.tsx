@@ -141,7 +141,7 @@ export function ProfileView({
       />
 
       {/* HEADER */}
-      <div className="relative flex items-center justify-between px-5 pt-4 pb-5">
+      <motion.div variants={itemVariants} className="relative flex items-center justify-between px-5 pt-4 pb-5">
         <div className="flex items-center gap-3.5 min-w-0">
           <button
             onClick={() => fileRef.current?.click()}
