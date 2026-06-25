@@ -115,6 +115,20 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           )
         }
 
+        // Anti-abuse: when the template does not pin a fixed recipient, the
+        // recipient MUST match the authenticated caller's own email. Without
+        // this check, any signed-in user could send branded transactional
+        // emails to arbitrary addresses (spam / phishing / sender reputation).
+        if (!template.to) {
+          const callerEmail = user.email?.toLowerCase()
+          if (!callerEmail || effectiveRecipient.toLowerCase() !== callerEmail) {
+            return Response.json(
+              { error: 'Forbidden: recipient must match authenticated user' },
+              { status: 403 }
+            )
+          }
+        }
+
         // 2. Check suppression list (fail-closed: if we can't verify, don't send)
         const { data: suppressed, error: suppressionError } = await supabase
           .from('suppressed_emails')

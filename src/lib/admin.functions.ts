@@ -6,20 +6,23 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const requireAdmin = createMiddleware({ type: "function" })
   .middleware([requireSupabaseAuth])
   .server(async ({ next, context }) => {
-    const email = (context.claims as { email?: string } | null)?.email?.toLowerCase();
-    if (!email) throw new Error("Forbidden: no email in token");
-
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data, error } = await supabaseAdmin
-      .from("admin_emails")
-      .select("email")
-      .eq("email", email)
-      .maybeSingle();
-    if (error) throw new Error(error.message);
-    if (!data) throw new Error("Forbidden: not an admin");
+
+    // Authoritative admin check: server-side uid lookup via SECURITY DEFINER
+    // function that joins auth.users → admin_emails. Never trust the JWT
+    // email claim (it can be stale after admin_emails changes or email rotation).
+    const { data: isAdmin, error: rpcError } = await supabaseAdmin.rpc("is_admin", {
+      _uid: context.userId,
+    });
+    if (rpcError) throw new Error(rpcError.message);
+    if (!isAdmin) throw new Error("Forbidden: not an admin");
+
+    // Resolve current email from auth.users for audit logging (not for authz).
+    const { data: userRes } = await supabaseAdmin.auth.admin.getUserById(context.userId);
+    const adminEmail = userRes?.user?.email?.toLowerCase() ?? "";
 
     return next({
-      context: { ...context, adminEmail: email, supabaseAdmin },
+      context: { ...context, adminEmail, supabaseAdmin },
     });
   });
 
