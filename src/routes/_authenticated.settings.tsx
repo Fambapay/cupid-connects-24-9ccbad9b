@@ -240,16 +240,24 @@ function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 bg-background pt-12">
+      <motion.div
+        className="flex-1 bg-background pt-12"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+      >
         <SettingsListSkeleton count={8} />
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div
+    <motion.div
       className="h-[100dvh] overflow-y-auto overflow-x-hidden overscroll-y-contain"
       style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y', background: 'var(--profile-bg)' }}
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
     >
       {/* Header */}
       <div
@@ -744,6 +752,6 @@ function SettingsPage() {
       </Sheet>
       <PaywallSheet open={paywallOpen} onClose={() => setPaywallOpen(false)} />
       <InstallModal open={installOpen} onClose={() => setInstallOpen(false)} deferredPrompt={pwa.deferredPrompt} />
-    </div>
+    </motion.div>
   );
 }
