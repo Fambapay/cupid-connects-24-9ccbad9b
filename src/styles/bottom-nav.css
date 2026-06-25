@@ -179,7 +179,31 @@
 
 .tab-bar-item[data-active="true"] .tab-bar-icon {
   color: #ffffff;
-  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.35)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.45)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
+}
+
+/* Native: ensure icons sit crisply ABOVE the native UIGlassEffect "inner"
+   surface — bump brightness/contrast and tighten shadows so the glass
+   refraction never washes them out. */
+.tab-bar-pill--native .tab-bar-item {
+  color: rgba(255, 255, 255, 0.78);
+}
+.tab-bar-pill--native .tab-bar-item .tab-bar-icon {
+  filter:
+    drop-shadow(0 1px 1px rgba(0, 0, 0, 0.65))
+    drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
+}
+.tab-bar-pill--native .tab-bar-item[data-active="true"] {
+  color: #ffffff;
+}
+.tab-bar-pill--native .tab-bar-item[data-active="true"] .tab-bar-icon {
+  color: #ffffff;
+  filter:
+    drop-shadow(0 0 4px rgba(255, 255, 255, 0.55))
+    drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
+}
+.tab-bar-pill--native .tab-bar-item span {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 /* ── Light mode overrides ─────────────────────────────────── */
