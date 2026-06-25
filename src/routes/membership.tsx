@@ -41,8 +41,8 @@ function MembershipPage() {
       <PaywallFlow
         open
         required={required === 1}
-        onClose={() => navigate({ to: "/discover" })}
-        onSuccess={() => navigate({ to: "/discover" })}
+        onClose={() => navigate({ to: "/profile" })}
+        onSuccess={() => navigate({ to: "/profile" })}
       />
     </div>
   );
