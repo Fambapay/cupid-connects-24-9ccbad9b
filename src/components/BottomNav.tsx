@@ -359,8 +359,8 @@ const TabButton = ({
         pointerStartRef.current = null;
         onTap();
       }}
-      whileTap={{ scale: 0.92 }}
-      transition={{ type: "spring", stiffness: 500, damping: 28 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ duration: 0.14, ease: [0.32, 0.72, 0, 1] }}
       className="tab-bar-item relative flex flex-col items-center justify-center gap-[3px] h-full flex-1 z-10"
       style={{ background: "none", border: "none" }}
       aria-label={label}
