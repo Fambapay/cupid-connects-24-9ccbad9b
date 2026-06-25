@@ -235,7 +235,7 @@ export function ProfileView({
             <Settings size={18} className="text-muted-foreground" />
           </button>
         </div>
-      </div>
+      </motion.div>
 
 
       {/* PROGRESS */}
