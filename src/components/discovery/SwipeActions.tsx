@@ -210,8 +210,12 @@ export const SwipeActions = ({
         ],
         { duration: 380, easing: "cubic-bezier(0.32,0.72,0,1)" },
       );
+      // Drop focus so the button doesn't render in its hover/active state
+      // after the card flies off.
+      el.blur();
       cb?.();
     };
+
 
   const Fill = (
     ref: React.RefObject<HTMLSpanElement | null>,
