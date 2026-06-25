@@ -50,6 +50,15 @@ const config: CapacitorConfig = {
       backgroundColor: '#07060a00',
       overlaysWebView: true,
     },
+    SafeArea: {
+      enabled: true,
+      customColorsForSystemBars: true,
+      statusBarColor: '#00000000',
+      statusBarContent: 'light',
+      navigationBarColor: '#00000000',
+      navigationBarContent: 'light',
+      offset: 0,
+    },
     Keyboard: {
       resize: 'native',
       resizeOnFullScreen: true,
