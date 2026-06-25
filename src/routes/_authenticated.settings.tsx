@@ -752,6 +752,6 @@ function SettingsPage() {
       </Sheet>
       <PaywallSheet open={paywallOpen} onClose={() => setPaywallOpen(false)} />
       <InstallModal open={installOpen} onClose={() => setInstallOpen(false)} deferredPrompt={pwa.deferredPrompt} />
-    </div>
+    </motion.div>
   );
 }
