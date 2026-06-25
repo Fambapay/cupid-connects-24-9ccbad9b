@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useDragControls, useMotionValue, useTransform, animate as animateMV } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Lock, X, BadgeCheck, Circle, FileText, Camera, Sparkles } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { hapticTap } from '@/hooks/useNativePlatform';
@@ -61,10 +61,6 @@ const EDUCATION = ['Secundário', 'Licenciatura', 'Mestrado', 'Doutoramento'];
 
 export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false, onUpgrade }: Props) => {
   const [local, setLocal] = useState<DiscoveryFilters>(value);
-  const dragControls = useDragControls();
-  const y = useMotionValue(0);
-  const backdropOpacity = useTransform(y, [0, 400], [1, 0.35], { clamp: true });
-  const handleScale = useTransform(y, [0, 200], [1, 0.6], { clamp: true });
 
   useEffect(() => { if (open) setLocal(value); }, [open, value]);
 
@@ -91,7 +87,6 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
             style={{
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
-              opacity: backdropOpacity,
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -109,36 +104,19 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
               boxShadow: '0 -24px 70px -12px rgba(0,0,0,0.6)',
               border: '1px solid rgba(255,255,255,0.06)',
               borderBottom: 'none',
-              y,
             }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 36, stiffness: 320, mass: 0.9 }}
-            drag="y"
-            dragListener={false}
-            dragControls={dragControls}
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0, bottom: 0.6 }}
-            dragMomentum={false}
-            onDragEnd={(_, info) => {
-              const shouldClose = info.offset.y > 120 || info.velocity.y > 500;
-              if (shouldClose) {
-                onClose();
-              } else {
-                animateMV(y, 0, { type: 'spring', stiffness: 420, damping: 40, mass: 0.8 });
-              }
-            }}
           >
             {/* Grabber */}
             <div
-              className="flex justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing touch-none"
-              onPointerDown={(e) => dragControls.start(e)}
+              className="flex justify-center pt-2.5 pb-1"
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              <motion.div
+              <div
                 className="h-[5px] w-10 rounded-full bg-white/25"
-                style={{ scaleX: handleScale }}
               />
             </div>
 
