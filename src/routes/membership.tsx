@@ -1,7 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 import { PaywallFlow } from "@/components/paywall/PaywallFlow";
+import { ManageMembership } from "@/components/membership/ManageMembership";
 import { useForceDarkTheme } from "@/lib/theme";
+import { useSubscription } from "@/hooks/useSubscription";
 
 export const Route = createFileRoute("/membership")({
   ssr: false,
@@ -26,6 +28,14 @@ function MembershipPage() {
   useForceDarkTheme();
   const navigate = useNavigate();
   const { required } = Route.useSearch();
+  const { isPremium } = useSubscription();
+
+  // Users with an active plan: management UI (upgrade, cancel, benefits).
+  // Users without a plan: paywall (plans list + benefits).
+  if (isPremium && !required) {
+    return <ManageMembership />;
+  }
+
   return (
     <div className="min-h-[100dvh] bg-background">
       <PaywallFlow
