@@ -302,8 +302,25 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
               ))}
             </div>
 
+            {/* Guarantee strip */}
+            <div className="mx-4 mt-6 rounded-2xl border border-white/[0.06] bg-white/[0.025] p-4">
+              <div className="flex items-start gap-3">
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-emerald-400/15">
+                  <ShieldCheck size={16} className="text-emerald-400" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-semibold text-white">
+                    Sem match em 7 dias? Devolvemos o teu dinheiro.
+                  </p>
+                  <p className="mt-0.5 text-[11.5px] leading-snug text-white/50">
+                    Cancela com 1 toque. Sem perguntas. Sem letras pequenas.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Trust row */}
-            <div className="mt-6 flex items-center justify-center gap-4 px-6 text-[11px] text-white/45">
+            <div className="mt-5 flex items-center justify-center gap-4 px-6 text-[11px] text-white/45">
               <span className="inline-flex items-center gap-1.5">
                 <ShieldCheck size={12} /> Pagamento seguro
               </span>
@@ -319,6 +336,14 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
             <div className="h-16 bg-gradient-to-t from-[#0a0a0c] via-[#0a0a0c]/95 to-transparent" />
             <div className="pointer-events-auto bg-[#0a0a0c] px-5 pb-[max(env(safe-area-inset-bottom),20px)] pt-2">
+              {fomoData.count > 0 && (
+                <p className="mb-2 flex items-center justify-center gap-1.5 text-[11.5px] font-medium text-pink-300/90">
+                  <Flame size={12} className="text-pink-400" />
+                  {fomoData.count === 1
+                    ? "1 pessoa já te deu like — vê quem é"
+                    : `${fomoData.count} pessoas já te deram like — vê quem são`}
+                </p>
+              )}
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setSelected(activePlan)}
@@ -328,18 +353,30 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
                     "linear-gradient(135deg, #FF4FA3 0%, #E935A0 45%, #B13CFF 100%)",
                 }}
               >
+                {/* Shimmer sweep */}
+                <motion.span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-y-0 w-1/3"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)",
+                  }}
+                  animate={{ x: ["-120%", "320%"] }}
+                  transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.6 }}
+                />
                 <span className="relative z-10 flex items-center gap-2">
-                  Continuar com {activePlan.label}
+                  Começar agora — {activePlan.label}
                   <ArrowRight size={16} />
                 </span>
               </motion.button>
               <p className="mt-2 text-center text-[11px] text-white/45">
                 {period === "annual"
-                  ? `${formatPrice(activePlan.annualPriceMzn, country)} por ano — cobrado hoje`
-                  : `${formatPrice(activePlan.priceMzn, country)} por mês — cobrado hoje`}
+                  ? `${formatPrice(activePlan.annualPriceMzn, country)}/ano · equivale a ${formatPrice(Math.round(activePlan.annualPriceMzn / 12), country)}/mês`
+                  : `${formatPrice(activePlan.priceMzn, country)} hoje · menos que um jantar a dois`}
               </p>
             </div>
           </div>
+
         </motion.div>
       )}
 
