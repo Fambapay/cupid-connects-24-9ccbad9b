@@ -116,17 +116,23 @@ function ProfilePage() {
 
   return (
     <AppShell className="bg-[var(--profile-bg)]">
-      <ProfileView
-        profile={view}
-        superLikeBalance={credits.super_like_balance}
-        boostBalance={credits.boost_balance}
-        onAddFiles={handleAddFiles}
-        onEditProfile={() => setEditing(true)}
-        onVerify={() => setVerifying(true)}
-        onOpenSettings={() => navigate({ to: '/settings' })}
-        isAdmin={isAdmin}
-        onOpenAdmin={() => navigate({ to: '/admin' })}
-      />
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] as const }}
+      >
+        <ProfileView
+          profile={view}
+          superLikeBalance={credits.super_like_balance}
+          boostBalance={credits.boost_balance}
+          onAddFiles={handleAddFiles}
+          onEditProfile={() => setEditing(true)}
+          onVerify={() => setVerifying(true)}
+          onOpenSettings={() => navigate({ to: '/settings' })}
+          isAdmin={isAdmin}
+          onOpenAdmin={() => navigate({ to: '/admin' })}
+        />
+      </motion.div>
       <EditProfileSheet
         open={editing}
         profile={view}
