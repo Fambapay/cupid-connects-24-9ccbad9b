@@ -46,56 +46,14 @@
   contain: layout paint style;
   -webkit-font-smoothing: antialiased;
 
-  /* Dark neutral surface */
-  background:
-    linear-gradient(180deg,
-      rgba(36, 36, 42, 0.62) 0%,
-      rgba(16, 16, 20, 0.72) 100%
-    );
-  -webkit-backdrop-filter: blur(28px) saturate(180%) brightness(1.04);
-  backdrop-filter: blur(28px) saturate(180%) brightness(1.04);
-
-  /* Hairline edge */
-  border: 1px solid rgba(255, 255, 255, 0.09);
-
-  /* Volumetric depth */
+  /* Solid dark surface — no fake glass */
+  background: #1a1a1f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
     0 10px 28px rgba(0, 0, 0, 0.42),
     0 2px 8px rgba(0, 0, 0, 0.22);
 }
 
-/* Top specular sheen — thin glossy band */
-.tab-bar-pill::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background:
-    linear-gradient(180deg,
-      rgba(255, 255, 255, 0.16) 0%,
-      rgba(255, 255, 255, 0.03) 22%,
-      transparent 45%
-    );
-  z-index: 1;
-}
-
-/* Bottom inner shadow */
-.tab-bar-pill::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background:
-    linear-gradient(0deg,
-      rgba(0, 0, 0, 0.22) 0%,
-      transparent 32%
-    );
-  z-index: 1;
-}
 
 /* ── Active inner pill (Dynamic Island style) ──────────────── */
 .tab-bar-pill .nav-active-pill {
