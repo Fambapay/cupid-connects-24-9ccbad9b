@@ -539,6 +539,69 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_transactions: {
+        Row: {
+          amount_minor: number
+          completed_at: string | null
+          created_at: string
+          currency: string
+          external_receipt: string | null
+          external_transaction_id: string | null
+          id: string
+          kind: string
+          pack_id: string | null
+          pack_kind: string | null
+          pack_quantity: number | null
+          plan_tier: string | null
+          provider: string
+          raw: Json | null
+          renewal_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_minor: number
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          external_receipt?: string | null
+          external_transaction_id?: string | null
+          id?: string
+          kind: string
+          pack_id?: string | null
+          pack_kind?: string | null
+          pack_quantity?: number | null
+          plan_tier?: string | null
+          provider: string
+          raw?: Json | null
+          renewal_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_minor?: number
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          external_receipt?: string | null
+          external_transaction_id?: string | null
+          id?: string
+          kind?: string
+          pack_id?: string | null
+          pack_kind?: string | null
+          pack_quantity?: number | null
+          plan_tier?: string | null
+          provider?: string
+          raw?: Json | null
+          renewal_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profile_contact: {
         Row: {
           phone: string | null
@@ -1018,6 +1081,7 @@ export type Database = {
           longitude: number
         }[]
       }
+      get_my_payment_history: { Args: { _limit?: number }; Returns: Json }
       get_my_phone: { Args: never; Returns: string }
       get_unread_chats_count: { Args: never; Returns: number }
       grant_credits: {
