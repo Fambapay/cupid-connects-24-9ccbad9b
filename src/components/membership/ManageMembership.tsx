@@ -13,6 +13,9 @@ import { cancelMyMembership } from "@/lib/membership.functions";
 import { getMyPaymentHistory, restoreMyPurchases, type PaymentHistoryEntry } from "@/lib/payments.functions";
 import { PaywallFlow } from "@/components/paywall/PaywallFlow";
 import { hapticTap } from "@/hooks/useNativePlatform";
+import { requiresExternalCheckout, getExternalCheckoutUrl, getBillingMode } from "@/lib/billing/platform";
+import { openInAppBrowser } from "@/lib/native/inAppBrowser";
+import { ExternalLink, Info } from "lucide-react";
 
 function formatDate(d: Date | null | string): string {
   if (!d) return "—";
