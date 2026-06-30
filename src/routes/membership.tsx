@@ -3,7 +3,7 @@ import { requireAuthAndOnboarding } from "@/lib/authGuard";
 import { PaywallFlow } from "@/components/paywall/PaywallFlow";
 import { ManageMembership } from "@/components/membership/ManageMembership";
 import { useForceDarkTheme } from "@/lib/theme";
-import { useSubscription } from "@/hooks/useSubscription";
+
 
 export const Route = createFileRoute("/membership")({
   ssr: false,
