@@ -31,6 +31,7 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
   const [stage, setStage] = useState<Stage>("fomo");
   const [selected, setSelected] = useState<PlanCardConfig | null>(null);
   const [selectedTier, setSelectedTier] = useState<PlanCardConfig["tier"]>("plus");
+  const verifyPlayPurchase = useServerFn(verifyGooglePlayPurchase);
 
   const { user } = useAuth();
   const { profile, reload } = useProfile();
