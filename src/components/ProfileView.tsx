@@ -314,7 +314,7 @@ export function ProfileView({
         {[
           { Icon: Star, color: '#5BB8FF', label: 'Super Likes', count: String(superLikeCount), sub: superLikeCount > 0 ? 'disponíveis' : 'comprar', to: '/shop', search: { tab: 'super_like' as const } },
           { Icon: Zap, color: '#B13CFF', label: 'Boosts', count: String(boostCount), sub: boostCount > 0 ? 'disponíveis' : 'comprar', to: '/shop', search: { tab: 'boost' as const } },
-          { Icon: Heart, color: PINK, label: 'Membership', count: isPremium ? '✓' : '–', sub: isPremium ? 'ativo' : 'gerir', to: '/membership' },
+          { Icon: Heart, color: PINK, label: 'Conta', count: isPremium ? '✓' : '–', sub: isPremium ? 'gerir' : 'upgrade', to: '/membership' },
         ].map((a, i) => (
           <Link
             key={i}
