@@ -77,6 +77,8 @@ export function ManageMembership() {
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const externalOnly = requiresExternalCheckout();
+  const billingMode = getBillingMode();
 
   const { data: history = [] } = useQuery({
     queryKey: ["payment-history"],
