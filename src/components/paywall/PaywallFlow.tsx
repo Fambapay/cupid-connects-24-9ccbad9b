@@ -10,6 +10,8 @@ import { paymentLabel, type PaymentMethodCode } from "@/lib/country/config";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 import { invalidateOnboardingCache } from "@/lib/authGuard";
 import { toast } from "sonner";
+import { requiresExternalCheckout, getExternalCheckoutUrl, getBillingMode } from "@/lib/billing/platform";
+import { openInAppBrowser } from "@/lib/native/inAppBrowser";
 
 
 type Stage = "fomo" | "plans";
@@ -294,7 +296,20 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
 
               <motion.button
                 whileTap={{ scale: 0.98 }}
-                onClick={() => setSelected(activePlan)}
+                onClick={async () => {
+                  if (requiresExternalCheckout()) {
+                    const mode = getBillingMode();
+                    const url = getExternalCheckoutUrl(`/membership?plan=${activePlan.tier}`);
+                    toast(
+                      mode === "ios-appstore"
+                        ? "Vais ser levado ao site para concluir o pagamento."
+                        : "Para pagar com M-Pesa ou e-Mola abrimos o site no browser.",
+                    );
+                    await openInAppBrowser(url);
+                    return;
+                  }
+                  setSelected(activePlan);
+                }}
                 className="relative flex h-14 w-full items-center justify-center overflow-hidden rounded-full text-[15px] font-bold text-white shadow-[0_12px_40px_-8px_rgba(240,70,140,0.55)]"
                 style={{
                   background:
@@ -313,12 +328,16 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
                   transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.6 }}
                 />
                 <span className="relative z-10 flex items-center gap-2">
-                  Começar agora — {activePlan.label}
+                  {requiresExternalCheckout()
+                    ? `Continuar em hunie.app — ${activePlan.label}`
+                    : `Começar agora — ${activePlan.label}`}
                   <ArrowRight size={16} />
                 </span>
               </motion.button>
               <p className="mt-2 text-center text-[11px] text-white/45">
-                {`${formatPrice(activePlan.priceMzn, country)} hoje · menos que um jantar a dois`}
+                {requiresExternalCheckout()
+                  ? `${formatPrice(activePlan.priceMzn, country)}/mês · pagamento concluído no browser`
+                  : `${formatPrice(activePlan.priceMzn, country)} hoje · menos que um jantar a dois`}
               </p>
 
             </div>
