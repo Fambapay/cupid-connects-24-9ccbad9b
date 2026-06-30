@@ -292,6 +292,7 @@ export const SwipeActions = ({
 
   return (
     <div
+      className="swipe-actions-row"
       style={{
         display: "flex",
         justifyContent: "space-between",

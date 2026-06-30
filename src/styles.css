@@ -641,3 +641,11 @@ textarea:-webkit-autofill:active {
   -webkit-text-fill-color: var(--color-foreground) !important;
   caret-color: var(--color-foreground) !important;
 }
+
+/* Browser (non-PWA) only: lift the swipe action row above the
+   bottom nav + browser URL bar. Standalone PWA keeps its tighter spacing. */
+@media not all and (display-mode: standalone) {
+  .swipe-actions-row {
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px) + 88px) !important;
+  }
+}
