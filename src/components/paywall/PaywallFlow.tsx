@@ -12,6 +12,9 @@ import { invalidateOnboardingCache } from "@/lib/authGuard";
 import { toast } from "sonner";
 import { requiresExternalCheckout, getExternalCheckoutUrl, getBillingMode } from "@/lib/billing/platform";
 import { openInAppBrowser } from "@/lib/native/inAppBrowser";
+import { isPlayBillingAvailable, buySubscription } from "@/lib/billing/googlePlay";
+import { verifyGooglePlayPurchase } from "@/lib/billing/google-play.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 
 type Stage = "fomo" | "plans";
@@ -297,6 +300,32 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 onClick={async () => {
+                  // 1) Native Google Play Billing if the plugin is installed.
+                  if (getBillingMode() === "android-play" && user) {
+                    const available = await isPlayBillingAvailable();
+                    if (available) {
+                      try {
+                        const result = await buySubscription(activePlan.tier, user.id);
+                        await verifyPlayPurchase({
+                          data: { productId: result.productId, purchaseToken: result.purchaseToken },
+                        });
+                        invalidateOnboardingCache();
+                        await reload();
+                        toast.success(`Bem-vindo ao Hunie ${activePlan.label}!`);
+                        onSuccess?.();
+                        onClose();
+                      } catch (e) {
+                        const msg = e instanceof Error ? e.message : String(e);
+                        if (msg !== "PLAY_BILLING_UNAVAILABLE") {
+                          toast.error("Pagamento Google Play falhou. Tenta novamente.");
+                          return;
+                        }
+                        // Plugin not installed → fall through to external browser.
+                      }
+                      return;
+                    }
+                  }
+                  // 2) External browser (iOS App Store / Android Play without plugin).
                   if (requiresExternalCheckout()) {
                     const mode = getBillingMode();
                     const url = getExternalCheckoutUrl(`/membership?plan=${activePlan.tier}`);
@@ -308,6 +337,7 @@ export function PaywallFlow({ open, onClose, required, onSuccess }: PaywallFlowP
                     await openInAppBrowser(url);
                     return;
                   }
+                  // 3) Web: in-app Débito sheet.
                   setSelected(activePlan);
                 }}
                 className="relative flex h-14 w-full items-center justify-center overflow-hidden rounded-full text-[15px] font-bold text-white shadow-[0_12px_40px_-8px_rgba(240,70,140,0.55)]"
