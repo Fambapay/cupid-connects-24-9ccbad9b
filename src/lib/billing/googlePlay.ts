@@ -29,10 +29,13 @@ type PurchaseResult = {
 
 async function loadPlugin(): Promise<unknown | null> {
   try {
-    // Lazy require so the bundle compiles even when the plugin isn't installed.
-    const mod = (await import(/* @vite-ignore */ "@capgo/capacitor-purchases").catch(
-      () => null,
-    )) as { Purchases?: unknown } | null;
+    // Plugin name resolved at runtime so TS/Vite don't require it at build time.
+    // Replace with a static `import { Purchases } from "@capgo/capacitor-purchases"`
+    // once the plugin is installed (`bun add @capgo/capacitor-purchases`).
+    const pkg = "@capgo/capacitor-purchases";
+    const mod = (await import(/* @vite-ignore */ pkg).catch(() => null)) as
+      | { Purchases?: unknown }
+      | null;
     return mod?.Purchases ?? null;
   } catch {
     return null;
