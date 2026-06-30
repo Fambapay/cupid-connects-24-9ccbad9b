@@ -4,10 +4,9 @@ import { getRequestHeader } from "@tanstack/react-start/server";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Plus, Sparkles, Crown, BadgeCheck, ArrowRight, Menu, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import "@fontsource/montserrat/400.css";
-import "@fontsource/montserrat/600.css";
-import "@fontsource/montserrat/800.css";
-import "@fontsource/montserrat/900.css";
+// PERF: Montserrat is loaded via Google Fonts in the route head below
+// (single woff2 request, font-display: swap). The @fontsource imports
+// were duplicates that bloated the main bundle.
 import "@/styles/liquid-landing.css";
 import { InstallModal } from "@/components/landing/InstallModal";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
@@ -58,7 +57,9 @@ function buildHead(country: keyof typeof COUNTRY_CONFIG): any {
       { rel: "alternate", hrefLang: "x-default", href: "https://hunie.app/" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" },
+      // PERF: Landing uses Montserrat 800/900 for display headlines (see liquid-landing.css).
+      // Instrument Serif comes from root. Inter was loaded but never referenced — dropped.
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap" },
     ],
     scripts: [
       {

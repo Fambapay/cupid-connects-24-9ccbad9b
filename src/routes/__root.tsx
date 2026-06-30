@@ -156,7 +156,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Montserrat:wght@800;900&family=Instrument+Serif:ital@0;1&display=swap" },
+      // PERF: Trimmed sitewide fonts to the two families actually used in styles.css
+      // (Sora display/body + Instrument Serif accents). Manrope/Playfair were unused;
+      // Montserrat is only on the landing route and loads there.
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" },
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", type: "image/png", sizes: "192x192", href: "/icon-192.png" },
