@@ -4,10 +4,9 @@ import { getRequestHeader } from "@tanstack/react-start/server";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Plus, Sparkles, Crown, BadgeCheck, ArrowRight, Menu, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import "@fontsource/montserrat/400.css";
-import "@fontsource/montserrat/600.css";
-import "@fontsource/montserrat/800.css";
-import "@fontsource/montserrat/900.css";
+// PERF: Montserrat is loaded via Google Fonts in the route head below
+// (single woff2 request, font-display: swap). The @fontsource imports
+// were duplicates that bloated the main bundle.
 import "@/styles/liquid-landing.css";
 import { InstallModal } from "@/components/landing/InstallModal";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
