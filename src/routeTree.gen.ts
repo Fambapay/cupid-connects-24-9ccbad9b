@@ -46,6 +46,7 @@ import { Route as ApiPublicReactivationCronRouteImport } from './routes/api/publ
 import { Route as ApiPublicNotifyRouteImport } from './routes/api/public/notify'
 import { Route as ApiPublicMembershipExpiryCronRouteImport } from './routes/api/public/membership-expiry-cron'
 import { Route as ApiPublicKambapayWebhookRouteImport } from './routes/api/public/kambapay-webhook'
+import { Route as ApiPublicGooglePlayWebhookRouteImport } from './routes/api/public/google-play-webhook'
 import { Route as ApiPublicDebitoWebhookRouteImport } from './routes/api/public/debito-webhook'
 import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated.settings.notifications'
@@ -242,6 +243,12 @@ const ApiPublicKambapayWebhookRoute =
     path: '/api/public/kambapay-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicGooglePlayWebhookRoute =
+  ApiPublicGooglePlayWebhookRouteImport.update({
+    id: '/api/public/google-play-webhook',
+    path: '/api/public/google-play-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicDebitoWebhookRoute = ApiPublicDebitoWebhookRouteImport.update({
   id: '/api/public/debito-webhook',
   path: '/api/public/debito-webhook',
@@ -321,6 +328,7 @@ export interface FileRoutesByFullPath {
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
+  '/api/public/google-play-webhook': typeof ApiPublicGooglePlayWebhookRoute
   '/api/public/kambapay-webhook': typeof ApiPublicKambapayWebhookRoute
   '/api/public/membership-expiry-cron': typeof ApiPublicMembershipExpiryCronRoute
   '/api/public/notify': typeof ApiPublicNotifyRoute
@@ -366,6 +374,7 @@ export interface FileRoutesByTo {
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
+  '/api/public/google-play-webhook': typeof ApiPublicGooglePlayWebhookRoute
   '/api/public/kambapay-webhook': typeof ApiPublicKambapayWebhookRoute
   '/api/public/membership-expiry-cron': typeof ApiPublicMembershipExpiryCronRoute
   '/api/public/notify': typeof ApiPublicNotifyRoute
@@ -414,6 +423,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/api/public/debito-webhook': typeof ApiPublicDebitoWebhookRoute
+  '/api/public/google-play-webhook': typeof ApiPublicGooglePlayWebhookRoute
   '/api/public/kambapay-webhook': typeof ApiPublicKambapayWebhookRoute
   '/api/public/membership-expiry-cron': typeof ApiPublicMembershipExpiryCronRoute
   '/api/public/notify': typeof ApiPublicNotifyRoute
@@ -462,6 +472,7 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
+    | '/api/public/google-play-webhook'
     | '/api/public/kambapay-webhook'
     | '/api/public/membership-expiry-cron'
     | '/api/public/notify'
@@ -507,6 +518,7 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
+    | '/api/public/google-play-webhook'
     | '/api/public/kambapay-webhook'
     | '/api/public/membership-expiry-cron'
     | '/api/public/notify'
@@ -554,6 +566,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/notifications'
     | '/admin/users/$id'
     | '/api/public/debito-webhook'
+    | '/api/public/google-play-webhook'
     | '/api/public/kambapay-webhook'
     | '/api/public/membership-expiry-cron'
     | '/api/public/notify'
@@ -587,6 +600,7 @@ export interface RootRouteChildren {
   LegalPrivacidadeRoute: typeof LegalPrivacidadeRoute
   LegalTermosRoute: typeof LegalTermosRoute
   ApiPublicDebitoWebhookRoute: typeof ApiPublicDebitoWebhookRoute
+  ApiPublicGooglePlayWebhookRoute: typeof ApiPublicGooglePlayWebhookRoute
   ApiPublicKambapayWebhookRoute: typeof ApiPublicKambapayWebhookRoute
   ApiPublicMembershipExpiryCronRoute: typeof ApiPublicMembershipExpiryCronRoute
   ApiPublicNotifyRoute: typeof ApiPublicNotifyRoute
@@ -861,6 +875,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicKambapayWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/google-play-webhook': {
+      id: '/api/public/google-play-webhook'
+      path: '/api/public/google-play-webhook'
+      fullPath: '/api/public/google-play-webhook'
+      preLoaderRoute: typeof ApiPublicGooglePlayWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/debito-webhook': {
       id: '/api/public/debito-webhook'
       path: '/api/public/debito-webhook'
@@ -1026,6 +1047,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalPrivacidadeRoute: LegalPrivacidadeRoute,
   LegalTermosRoute: LegalTermosRoute,
   ApiPublicDebitoWebhookRoute: ApiPublicDebitoWebhookRoute,
+  ApiPublicGooglePlayWebhookRoute: ApiPublicGooglePlayWebhookRoute,
   ApiPublicKambapayWebhookRoute: ApiPublicKambapayWebhookRoute,
   ApiPublicMembershipExpiryCronRoute: ApiPublicMembershipExpiryCronRoute,
   ApiPublicNotifyRoute: ApiPublicNotifyRoute,
