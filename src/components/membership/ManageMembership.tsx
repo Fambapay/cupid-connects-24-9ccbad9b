@@ -241,18 +241,34 @@ export function ManageMembership() {
 
         {/* Actions */}
         <section className="mt-6 space-y-2.5">
+          {externalOnly && (
+            <div className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-xs text-white/70 backdrop-blur-xl">
+              <Info size={14} className="mt-0.5 shrink-0 text-white/60" />
+              <p>
+                {billingMode === "ios-appstore"
+                  ? "A subscrição é gerida em hunie.app no browser. Para cancelar, abre Definições → Apple ID → Subscrições."
+                  : "Para pagar com M-Pesa, e-Mola ou mKesh, abrimos o site no teu browser. Cancelamentos: Play Store → Subscrições."}
+              </p>
+            </div>
+          )}
+
           {tier !== "elite" && (
             <motion.button
               whileTap={{ scale: 0.98 }}
-              onClick={() => {
+              onClick={async () => {
                 hapticTap();
+                if (externalOnly) {
+                  await openInAppBrowser(getExternalCheckoutUrl("/membership?required=1"));
+                  return;
+                }
                 setShowUpgrade(true);
               }}
               className="flex w-full items-center justify-between rounded-2xl bg-gradient-to-r from-fuchsia-500 via-pink-500 to-rose-500 px-5 py-4 text-left text-white shadow-[0_12px_40px_-12px_rgba(240,70,140,0.6)]"
             >
               <div>
                 <div className="flex items-center gap-2 text-base font-extrabold">
-                  <Sparkles size={16} /> Fazer upgrade
+                  <Sparkles size={16} /> {externalOnly ? "Fazer upgrade no browser" : "Fazer upgrade"}
+                  {externalOnly && <ExternalLink size={13} className="opacity-80" />}
                 </div>
                 <p className="mt-0.5 text-xs text-white/80">
                   {isActive ? "Desbloqueia mais benefícios" : "Activa Hunie Premium"}
@@ -265,13 +281,19 @@ export function ManageMembership() {
           {isCancelled && (
             <motion.button
               whileTap={{ scale: 0.98 }}
-              onClick={() => {
+              onClick={async () => {
                 hapticTap();
+                if (externalOnly) {
+                  await openInAppBrowser(getExternalCheckoutUrl("/membership"));
+                  return;
+                }
                 setShowUpgrade(true);
               }}
               className="w-full rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-5 py-4 text-left backdrop-blur-xl"
             >
-              <div className="text-base font-extrabold text-emerald-300">Reactivar subscrição</div>
+              <div className="text-base font-extrabold text-emerald-300">
+                Reactivar subscrição {externalOnly && <ExternalLink size={13} className="inline opacity-80" />}
+              </div>
               <p className="mt-0.5 text-xs text-emerald-200/70">Volta a ter renovação automática</p>
             </motion.button>
           )}
@@ -279,15 +301,30 @@ export function ManageMembership() {
           {isActive && !isCancelled && (
             <motion.button
               whileTap={{ scale: 0.98 }}
-              onClick={() => {
+              onClick={async () => {
                 hapticTap();
+                if (billingMode === "android-play") {
+                  await openInAppBrowser("https://play.google.com/store/account/subscriptions");
+                  return;
+                }
+                if (billingMode === "ios-appstore") {
+                  await openInAppBrowser(getExternalCheckoutUrl("/membership"));
+                  return;
+                }
                 setConfirmCancel(true);
               }}
               className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-left text-white/70 backdrop-blur-xl active:bg-white/[0.06]"
             >
-              <div className="text-base font-semibold">Cancelar subscrição</div>
+              <div className="flex items-center gap-2 text-base font-semibold">
+                Cancelar subscrição
+                {externalOnly && <ExternalLink size={13} className="opacity-70" />}
+              </div>
               <p className="mt-0.5 text-xs text-white/50">
-                Manténs acesso até ao fim do período actual
+                {billingMode === "android-play"
+                  ? "Geres na Play Store → Subscrições"
+                  : billingMode === "ios-appstore"
+                    ? "Geres em hunie.app no browser"
+                    : "Manténs acesso até ao fim do período actual"}
               </p>
             </motion.button>
           )}
