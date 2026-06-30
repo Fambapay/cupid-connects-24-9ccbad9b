@@ -58,7 +58,7 @@ export const verifyGooglePlayPurchase = createServerFn({ method: "POST" })
           external_transaction_id: sub.latestOrderId ?? purchaseToken,
           external_receipt: purchaseToken,
           renewal_at: expiryTime.toISOString(),
-          raw: sub as unknown as Record<string, unknown>,
+          raw: JSON.parse(JSON.stringify(sub)),
           completed_at: new Date().toISOString(),
         },
         { onConflict: "external_receipt" },
