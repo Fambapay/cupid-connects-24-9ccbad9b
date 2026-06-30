@@ -1,20 +1,64 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Crown, Check, Sparkles, Calendar, AlertCircle } from "lucide-react";
+import { ArrowLeft, Crown, Check, Sparkles, Calendar, AlertCircle, Receipt, RefreshCcw, CheckCircle2, Clock, XCircle } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useProfile } from "@/hooks/useProfile";
 import { getPlanCards } from "@/lib/plans";
 import { useCountry } from "@/lib/country/context";
 import { cancelMyMembership } from "@/lib/membership.functions";
+import { getMyPaymentHistory, restoreMyPurchases, type PaymentHistoryEntry } from "@/lib/payments.functions";
 import { PaywallFlow } from "@/components/paywall/PaywallFlow";
 import { hapticTap } from "@/hooks/useNativePlatform";
 
-function formatDate(d: Date | null): string {
+function formatDate(d: Date | null | string): string {
   if (!d) return "—";
-  return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" });
+  const date = typeof d === "string" ? new Date(d) : d;
+  return date.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" });
+}
+
+function formatAmount(minor: number, currency: string): string {
+  const value = minor / 100;
+  try {
+    return new Intl.NumberFormat("pt-PT", { style: "currency", currency }).format(value);
+  } catch {
+    return `${value.toFixed(2)} ${currency}`;
+  }
+}
+
+function providerLabel(provider: string): string {
+  if (provider.startsWith("debito_")) {
+    const m = provider.replace("debito_", "");
+    const map: Record<string, string> = {
+      mpesa: "M-Pesa", emola: "e-Mola", mkesh: "mKesh",
+      card: "Cartão", visa_mastercard: "Cartão", payfast: "PayFast",
+    };
+    return map[m] ?? m;
+  }
+  if (provider === "google_play") return "Google Play";
+  if (provider === "apple_iap") return "Apple";
+  return provider;
+}
+
+function describeEntry(e: PaymentHistoryEntry): string {
+  if (e.kind === "subscription" && e.plan_tier) {
+    const label = e.plan_tier === "elite" ? "Elite" : e.plan_tier === "plus" ? "Plus" : "Select";
+    return `Hunie ${label}`;
+  }
+  if (e.kind === "credit_pack") {
+    const k = e.pack_kind === "boost" ? "Boost" : e.pack_kind === "super_like" ? "Super Like" : "Pack";
+    return `${e.pack_quantity ?? ""}× ${k}`.trim();
+  }
+  return "Compra";
+}
+
+function StatusIcon({ status }: { status: PaymentHistoryEntry["status"] }) {
+  if (status === "paid") return <CheckCircle2 size={14} className="text-emerald-400" />;
+  if (status === "pending") return <Clock size={14} className="text-amber-400" />;
+  return <XCircle size={14} className="text-white/40" />;
 }
 
 export function ManageMembership() {
@@ -23,20 +67,30 @@ export function ManageMembership() {
   const { reload } = useProfile();
   const { country } = useCountry();
   const cancel = useServerFn(cancelMyMembership);
+  const fetchHistory = useServerFn(getMyPaymentHistory);
+  const restore = useServerFn(restoreMyPurchases);
 
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [restoring, setRestoring] = useState(false);
+
+  const { data: history = [] } = useQuery({
+    queryKey: ["payment-history"],
+    queryFn: () => fetchHistory(),
+    staleTime: 30_000,
+  });
 
   const tier = subscription.membershipTier;
   const status = subscription.membershipStatus;
   const expiresAt = subscription.expiresAt;
   const isCancelled = status === "cancelled";
+  const isActive = subscription.isActive;
 
   const planCards = getPlanCards(country);
   const currentPlan = planCards.find((p) => p.tier === tier);
   const accent = currentPlan?.accent ?? "#F0468C";
-  const label = currentPlan?.label ?? "Premium";
+  const label = currentPlan?.label ?? "Free";
 
   async function handleCancel() {
     setCancelling(true);
@@ -45,10 +99,27 @@ export function ManageMembership() {
       await reload();
       toast.success("Subscrição cancelada. Manténs acesso até " + formatDate(expiresAt));
       setConfirmCancel(false);
-    } catch (e) {
+    } catch {
       toast.error("Não foi possível cancelar. Tenta novamente.");
     } finally {
       setCancelling(false);
+    }
+  }
+
+  async function handleRestore() {
+    setRestoring(true);
+    try {
+      const r = await restore();
+      if (r.hasActiveMembership) {
+        await reload();
+        toast.success(r.message);
+      } else {
+        toast(r.message);
+      }
+    } catch {
+      toast.error("Não foi possível restaurar. Tenta novamente.");
+    } finally {
+      setRestoring(false);
     }
   }
 
@@ -66,7 +137,7 @@ export function ManageMembership() {
         >
           <ArrowLeft size={18} />
         </button>
-        <h1 className="text-lg font-black">Gerir Membership</h1>
+        <h1 className="text-lg font-black">Gerir conta</h1>
       </header>
 
       <div className="px-5 pb-[max(env(safe-area-inset-bottom),120px)] pt-2">
@@ -75,16 +146,20 @@ export function ManageMembership() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
-          className="relative overflow-hidden rounded-3xl border border-white/10 p-5"
+          className="relative overflow-hidden rounded-3xl border border-white/10 p-5 backdrop-blur-2xl"
           style={{
-            background: `linear-gradient(160deg, ${accent}26, rgba(20,20,30,0.6))`,
+            background: isActive
+              ? `linear-gradient(160deg, ${accent}26, rgba(20,20,30,0.6))`
+              : "linear-gradient(160deg, rgba(255,255,255,0.06), rgba(20,20,30,0.6))",
           }}
         >
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-40 blur-3xl"
-            style={{ background: accent }}
-          />
+          {isActive && (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-40 blur-3xl"
+              style={{ background: accent }}
+            />
+          )}
           <div className="relative">
             <div className="flex items-center gap-2">
               <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white/80">
@@ -93,6 +168,11 @@ export function ManageMembership() {
               {isCancelled && (
                 <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-300">
                   Cancelado
+                </span>
+              )}
+              {!isActive && (
+                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white/60">
+                  Sem subscrição
                 </span>
               )}
             </div>
@@ -110,31 +190,33 @@ export function ManageMembership() {
                   fontFamily: "'Montserrat', sans-serif",
                   fontWeight: 900,
                   letterSpacing: "0.06em",
-                  backgroundColor: accent,
-                  color: "#0a0a0a",
+                  backgroundColor: isActive ? accent : "rgba(255,255,255,0.12)",
+                  color: isActive ? "#0a0a0a" : "rgba(255,255,255,0.7)",
                 }}
               >
-                {label}
+                {isActive ? label : "Free"}
               </span>
-              {tier === "elite" && <Crown size={20} className="text-amber-300" />}
+              {tier === "elite" && isActive && <Crown size={20} className="text-amber-300" />}
             </div>
 
-            <div className="mt-4 flex items-center gap-2 text-sm text-white/70">
-              <Calendar size={14} />
-              <span>
-                {isCancelled ? "Acesso até" : "Renova a"} <strong className="text-white">{formatDate(expiresAt)}</strong>
-              </span>
-            </div>
+            {isActive && (
+              <div className="mt-4 flex items-center gap-2 text-sm text-white/70">
+                <Calendar size={14} />
+                <span>
+                  {isCancelled ? "Acesso até" : "Renova a"} <strong className="text-white">{formatDate(expiresAt)}</strong>
+                </span>
+              </div>
+            )}
           </div>
         </motion.div>
 
         {/* Benefits */}
-        {currentPlan && (
+        {currentPlan && isActive && (
           <section className="mt-6">
             <h3 className="mb-3 text-sm font-extrabold uppercase tracking-wider text-white/50">
               O que tens incluído
             </h3>
-            <ul className="space-y-2.5 rounded-2xl border border-white/8 bg-white/[0.03] p-4">
+            <ul className="space-y-2.5 rounded-2xl border border-white/8 bg-white/[0.03] p-4 backdrop-blur-xl">
               {currentPlan.highlights.map((h) => (
                 <li key={h.label} className="flex items-start gap-3 text-sm">
                   <div
@@ -167,38 +249,100 @@ export function ManageMembership() {
                 <div className="flex items-center gap-2 text-base font-extrabold">
                   <Sparkles size={16} /> Fazer upgrade
                 </div>
-                <p className="mt-0.5 text-xs text-white/80">Desbloqueia mais benefícios</p>
+                <p className="mt-0.5 text-xs text-white/80">
+                  {isActive ? "Desbloqueia mais benefícios" : "Activa Hunie Premium"}
+                </p>
               </div>
               <span className="text-xl">→</span>
             </motion.button>
           )}
 
-          {isCancelled ? (
+          {isCancelled && (
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={() => {
                 hapticTap();
                 setShowUpgrade(true);
               }}
-              className="w-full rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-5 py-4 text-left"
+              className="w-full rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-5 py-4 text-left backdrop-blur-xl"
             >
               <div className="text-base font-extrabold text-emerald-300">Reactivar subscrição</div>
               <p className="mt-0.5 text-xs text-emerald-200/70">Volta a ter renovação automática</p>
             </motion.button>
-          ) : (
+          )}
+
+          {isActive && !isCancelled && (
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={() => {
                 hapticTap();
                 setConfirmCancel(true);
               }}
-              className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-left text-white/70 active:bg-white/[0.06]"
+              className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-left text-white/70 backdrop-blur-xl active:bg-white/[0.06]"
             >
               <div className="text-base font-semibold">Cancelar subscrição</div>
               <p className="mt-0.5 text-xs text-white/50">
                 Manténs acesso até ao fim do período actual
               </p>
             </motion.button>
+          )}
+
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={() => {
+              hapticTap();
+              handleRestore();
+            }}
+            disabled={restoring}
+            className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-left text-white/80 backdrop-blur-xl active:bg-white/[0.06] disabled:opacity-60"
+          >
+            <div>
+              <div className="flex items-center gap-2 text-base font-semibold">
+                <RefreshCcw size={15} className={restoring ? "animate-spin" : ""} /> Restaurar compra
+              </div>
+              <p className="mt-0.5 text-xs text-white/50">
+                Recupera uma subscrição comprada noutro dispositivo
+              </p>
+            </div>
+          </motion.button>
+        </section>
+
+        {/* Payment history */}
+        <section className="mt-7">
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase tracking-wider text-white/50">
+            <Receipt size={14} /> Histórico de pagamentos
+          </h3>
+          {history.length === 0 ? (
+            <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 text-center text-sm text-white/50 backdrop-blur-xl">
+              Ainda não tens pagamentos.
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {history.map((e) => (
+                <li
+                  key={e.id}
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 backdrop-blur-xl"
+                >
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                      <StatusIcon status={e.status} />
+                      <span className="truncate">{describeEntry(e)}</span>
+                    </div>
+                    <p className="mt-0.5 text-[11px] text-white/50">
+                      {providerLabel(e.provider)} · {formatDate(e.created_at)}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <div className="text-sm font-bold tabular-nums text-white">
+                      {formatAmount(e.amount_minor, e.currency)}
+                    </div>
+                    <div className="text-[10px] uppercase tracking-wider text-white/40">
+                      {e.status === "paid" ? "Pago" : e.status === "pending" ? "Pendente" : e.status}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
         </section>
 
