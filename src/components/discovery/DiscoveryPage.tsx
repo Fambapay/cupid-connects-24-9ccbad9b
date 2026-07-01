@@ -38,6 +38,7 @@ export const DiscoveryPage = ({
 }: DiscoveryPageProps) => {
   const [index, setIndex] = useState(0);
   const [rewinding, setRewinding] = useState(false);
+  const detailOpen = useDiscoveryDetailOpen();
   // Local stack of past swipes so rewind can restore the previous card and
   // animate it back from the direction it flew off.
   const [history, setHistory] = useState<{ id: string; dir: SwipeDirection }[]>([]);
