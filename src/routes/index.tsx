@@ -21,6 +21,41 @@ import { faqData } from "@/components/landing/faqData";
 import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
 import { useForceDarkTheme } from "@/lib/theme";
 
+// Smooth anchor scroll with easeInOutCubic + brief highlight pulse on target.
+// Feels premium vs. the browser's default snap-jump.
+function smoothAnchorClick(e: React.MouseEvent<HTMLAnchorElement>) {
+  const href = e.currentTarget.getAttribute("href");
+  if (!href || !href.startsWith("#")) return;
+  const id = href.slice(1);
+  const target = document.getElementById(id);
+  if (!target) return;
+  e.preventDefault();
+
+  const navOffset = 96; // sticky nav + a little breathing room
+  const startY = window.scrollY;
+  const targetY = target.getBoundingClientRect().top + startY - navOffset;
+  const distance = targetY - startY;
+  if (Math.abs(distance) < 4) return;
+
+  const duration = Math.min(1100, Math.max(520, Math.abs(distance) * 0.55));
+  const startTime = performance.now();
+  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+  const step = (now: number) => {
+    const t = Math.min(1, (now - startTime) / duration);
+    window.scrollTo(0, startY + distance * ease(t));
+    if (t < 1) requestAnimationFrame(step);
+    else {
+      target.classList.add("ll-section-flash");
+      window.setTimeout(() => target.classList.remove("ll-section-flash"), 1100);
+      // Update hash without triggering a jump.
+      history.replaceState(null, "", `#${id}`);
+    }
+  };
+  requestAnimationFrame(step);
+}
+
+
 
 // SEO-01: Country-aware <head> resolved at SSR so crawlers (WhatsApp,
 // Twitter, Facebook, LinkedIn) get a real title/description/og:image when
