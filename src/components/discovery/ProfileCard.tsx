@@ -164,6 +164,10 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
   ) => {
     const [photoIdx, setPhotoIdx] = useState(0);
     const [detailOpen, setDetailOpen] = useState(false);
+    useEffect(() => {
+      setDiscoveryDetailOpen(detailOpen);
+      return () => setDiscoveryDetailOpen(false);
+    }, [detailOpen]);
     const photos = profile.photos.length ? profile.photos : [""];
 
     const localX = useMotionValue(0);
