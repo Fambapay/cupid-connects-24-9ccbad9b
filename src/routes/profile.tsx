@@ -119,12 +119,6 @@ function ProfilePage() {
     }
   };
 
-  const [isAdmin, setIsAdmin] = useState(false);
-  useEffect(() => {
-    supabase.from('admin_emails').select('email').maybeSingle().then(({ data }) => {
-      setIsAdmin(!!data);
-    });
-  }, []);
 
   const [isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
