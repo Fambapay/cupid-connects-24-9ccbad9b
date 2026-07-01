@@ -45,13 +45,13 @@ export const NO_TIER_ENTITLEMENTS: PlanEntitlements = {
   canSendFirstImpression: false,
 };
 
-const SELECT: PlanEntitlements = {
+export const SELECT: PlanEntitlements = {
   ...NO_TIER_ENTITLEMENTS,
   dailyLikes: -1,
   dailySuperLikes: 1,
 };
 
-const PLUS: PlanEntitlements = {
+export const PLUS: PlanEntitlements = {
   ...SELECT,
   dailySuperLikes: 5,
   weeklyBoosts: 1,
@@ -62,7 +62,7 @@ const PLUS: PlanEntitlements = {
   canReadReceipts: true,
 };
 
-const ELITE: PlanEntitlements = {
+export const ELITE: PlanEntitlements = {
   ...PLUS,
   dailySuperLikes: 10,
   weeklyBoosts: 0,

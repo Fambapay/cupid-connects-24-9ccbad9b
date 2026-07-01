@@ -488,6 +488,7 @@ function ChatRoom() {
         open={paywallOpen}
         onClose={() => setPaywallOpen(false)}
         defaultTier="plus"
+        origin="chat"
       />
     </motion.div>
   );

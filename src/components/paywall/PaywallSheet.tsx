@@ -18,12 +18,19 @@ import {
   TrendingUp,
   BarChart3,
   Headphones,
+  MessageCircle,
+  Heart,
+  Zap,
+  Lock,
+  Clock,
+  AlertCircle,
 } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
-import { getPlanCards, formatPrice } from "@/lib/plans";
+import { getPlanCards, formatPrice, NO_TIER_ENTITLEMENTS, PLUS } from "@/lib/plans";
 import { type PlanTier } from "@/lib/pricing";
 import { useCountry } from "@/lib/country/context";
 import { paymentLabel, type PaymentMethodCode } from "@/lib/country/config";
+import { useSubscription } from "@/hooks/useSubscription";
 import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
 import { invalidateOnboardingCache } from "@/lib/authGuard";
 import { toast } from "sonner";
@@ -33,22 +40,30 @@ export interface PaywallSheetProps {
   onClose: () => void;
   onSuccess?: () => void;
   defaultTier?: PlanTier;
+  /** Where the paywall was triggered from — drives copy & urgency */
+  origin?: "chat" | "discover" | "settings";
+  /** Optional: remaining likes today for the limit counter */
+  likesRemaining?: number;
+  /** Optional: total likes limit today */
+  likesLimit?: number;
 }
 
 type Benefit = {
   icon: React.ComponentType<{ size?: number; className?: string }>;
   label: string;
+  highlight?: boolean;
 };
 
 const BENEFITS_BY_TIER: Record<PlanTier, Benefit[]> = {
   select: [
-    { icon: InfinityIcon, label: "Likes ilimitados" },
+    { icon: InfinityIcon, label: "Likes ilimitados", highlight: true },
     { icon: Eye, label: "Vê quem já gostou de ti" },
     { icon: Star, label: "1 Super Like por dia" },
     { icon: Rocket, label: "1 Boost na ativação" },
   ],
   plus: [
-    { icon: InfinityIcon, label: "Likes ilimitados" },
+    { icon: MessageCircle, label: "Mensagens ilimitadas", highlight: true },
+    { icon: InfinityIcon, label: "Likes ilimitados", highlight: true },
     { icon: Eye, label: "Vê quem já gostou de ti" },
     { icon: Star, label: "5 Super Likes por dia" },
     { icon: Rocket, label: "1 Boost por semana" },
@@ -58,7 +73,7 @@ const BENEFITS_BY_TIER: Record<PlanTier, Benefit[]> = {
     { icon: Globe2, label: "Passport — outras cidades" },
   ],
   elite: [
-    { icon: TrendingUp, label: "Prioridade no topo do feed" },
+    { icon: Zap, label: "Prioridade absoluta no feed", highlight: true },
     { icon: Crown, label: "Badge Elite no teu perfil" },
     { icon: Star, label: "10 Super Likes por dia" },
     { icon: Rocket, label: "1 Boost por dia" },
@@ -70,11 +85,82 @@ const BENEFITS_BY_TIER: Record<PlanTier, Benefit[]> = {
   ],
 };
 
-export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }: PaywallSheetProps) {
+function usePaywallCopy(origin: PaywallSheetProps["origin"], subscription: ReturnType<typeof useSubscription>) {
+  const { isTrialing, trialDaysLeft, graceDaysLeft, isInGracePeriod, subscription: sub } = subscription;
+
+  // User seeing paywall has !hasPremiumAccess, but we still show relevant status
+  const hadTrial = sub.membershipTier === "elite" && sub.membershipStatus === "expired";
+  const hadPlus = sub.membershipTier === "plus" && sub.membershipStatus === "expired";
+
+  // Urgency banner copy
+  const urgency = useMemo(() => {
+    if (isTrialing && trialDaysLeft > 0) {
+      return {
+        icon: Clock,
+        text: `Faltam ${trialDaysLeft} dia${trialDaysLeft === 1 ? "" : "s"} no teu trial`,
+        tone: "trial" as const,
+      };
+    }
+    if (isInGracePeriod && graceDaysLeft > 0) {
+      return {
+        icon: AlertCircle,
+        text: `Faltam ${graceDaysLeft} dia${graceDaysLeft === 1 ? "" : "s"} antes de perderes tudo`,
+        tone: "warning" as const,
+      };
+    }
+    if (hadTrial || hadPlus) {
+      return {
+        icon: Lock,
+        text: "O teu acesso Premium expirou. Recupera agora.",
+        tone: "expired" as const,
+      };
+    }
+    return {
+      icon: Heart,
+      text: "Versão free — capacidade limitada",
+      tone: "free" as const,
+    };
+  }, [isTrialing, trialDaysLeft, isInGracePeriod, graceDaysLeft, hadTrial, hadPlus]);
+
+  // Contextual headline / subheadline
+  const headline = useMemo(() => {
+    switch (origin) {
+      case "chat":
+        return {
+          title: "Não deixes esta conversa perder-se",
+          subtitle: "Responde agora. O Premium desbloqueia mensagens ilimitadas, leitura de mensagens e prioridade no feed.",
+        };
+      case "discover":
+        return {
+          title: "Não pares de fazer matches",
+          subtitle: "O Premium dá-te likes ilimitados, Super Likes e Boosts para seres visto primeiro.",
+        };
+      default:
+        return {
+          title: "Conhece quem realmente quer",
+          subtitle: "Desbloqueia tudo o que precisas para fazer matches a sério.",
+        };
+    }
+  }, [origin]);
+
+  return { urgency, headline };
+}
+
+export function PaywallSheet({
+  open,
+  onClose,
+  onSuccess,
+  defaultTier = "plus",
+  origin,
+  likesRemaining,
+  likesLimit = 5,
+}: PaywallSheetProps) {
   const { reload } = useProfile();
   const { country, config } = useCountry();
+  const subscription = useSubscription();
   const [selectedTier, setSelectedTier] = useState<PlanTier>(defaultTier);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const { urgency, headline } = usePaywallCopy(origin, subscription);
 
   useEffect(() => {
     if (open) setSelectedTier(defaultTier);
@@ -100,6 +186,37 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
     const items = config.payments.slice(0, 3).map((p) => paymentLabel(p as PaymentMethodCode));
     return items.join(", ");
   }, [config.payments]);
+
+  const urgencyGradient =
+    urgency.tone === "trial"
+      ? "from-[#B13CFF]/20 to-[#FF4FA3]/20"
+      : urgency.tone === "warning"
+        ? "from-amber-500/15 to-orange-500/15"
+        : urgency.tone === "expired"
+          ? "from-[#FF4FA3]/15 to-[#E935A0]/15"
+          : "from-white/5 to-white/[0.02]";
+
+  const urgencyBorder =
+    urgency.tone === "trial"
+      ? "border-[#B13CFF]/30"
+      : urgency.tone === "warning"
+        ? "border-amber-500/25"
+        : urgency.tone === "expired"
+          ? "border-[#FF4FA3]/25"
+          : "border-white/8";
+
+  const urgencyText =
+    urgency.tone === "trial"
+      ? "text-[#E8A6FF]"
+      : urgency.tone === "warning"
+        ? "text-amber-300"
+        : urgency.tone === "expired"
+          ? "text-[#FF8ABF]"
+          : "text-white/50";
+
+  const showLimitCounter = origin === "discover" || origin === "chat";
+  const freeLikes = NO_TIER_ENTITLEMENTS.dailyLikes;
+  const premiumLikes = PLUS.dailyLikes; // -1 = unlimited
 
   return (
     <AnimatePresence>
@@ -138,18 +255,77 @@ export function PaywallSheet({ open, onClose, onSuccess, defaultTier = "plus" }:
             </button>
 
             <div className="relative flex-1 overflow-y-auto overscroll-contain px-6 pb-[max(env(safe-area-inset-bottom),132px)]">
-              <div className="pt-7 pb-7">
+              {/* ── Urgency status banner ── */}
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05, duration: 0.35 }}
+                className={`mt-6 flex items-center gap-3 rounded-2xl border ${urgencyBorder} bg-gradient-to-r ${urgencyGradient} px-4 py-3`}
+              >
+                <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/[0.06] ${urgencyText}`}>
+                  <urgency.icon size={15} />
+                </span>
+                <p className={`text-[13px] font-medium leading-snug ${urgencyText}`}>
+                  {urgency.text}
+                </p>
+              </motion.div>
+
+              {/* ── Limit counter (Free vs Premium) ── */}
+              {showLimitCounter && (
+                <motion.div
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.12, duration: 0.35 }}
+                  className="mt-4 rounded-2xl border border-white/[0.06] bg-white/[0.025] px-4 py-3.5"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <Heart size={15} className="text-white/40" />
+                      <span className="text-[13px] text-white/60">Likes hoje</span>
+                    </div>
+                    <span className="text-[13px] font-semibold tabular-nums text-white/80">
+                      {typeof likesRemaining === "number" ? likesRemaining : freeLikes}
+                      <span className="mx-1 text-white/30">/</span>
+                      {likesLimit}
+                    </span>
+                  </div>
+                  <div className="mt-2.5 flex items-center gap-2">
+                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.08]">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{
+                          width: `${Math.min(
+                            100,
+                            (((typeof likesRemaining === "number" ? likesRemaining : freeLikes) / Math.max(1, likesLimit)) * 100),
+                          )}%`,
+                        }}
+                        transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
+                        className="h-full rounded-full bg-gradient-to-r from-[#FF4FA3] to-[#B13CFF]"
+                      />
+                    </div>
+                  </div>
+                  <p className="mt-2 text-[11px] leading-relaxed text-white/40">
+                    No Premium, passas a ter{" "}
+                    <span className="font-medium text-white/70">
+                      {premiumLikes < 0 ? "likes ilimitados" : `${premiumLikes} likes`}
+                    </span>
+                    {" "}por dia.
+                  </p>
+                </motion.div>
+              )}
+
+              <div className="pt-6 pb-7">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/40">
                   Hunie Premium · {config.flag} {config.name}
                 </p>
                 <h2
-                  className="mt-3 text-[34px] font-semibold leading-[1.05] tracking-[-0.02em] text-white"
+                  className="mt-3 text-[30px] font-semibold leading-[1.08] tracking-[-0.02em] text-white"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
-                  Conhece quem<br />realmente quer.
+                  {headline.title}
                 </h2>
-                <p className="mt-3 max-w-[300px] text-[15px] leading-snug text-white/55">
-                  Desbloqueia tudo o que precisas para fazer matches a sério.
+                <p className="mt-3 max-w-[320px] text-[15px] leading-snug text-white/55">
+                  {headline.subtitle}
                 </p>
               </div>
 
