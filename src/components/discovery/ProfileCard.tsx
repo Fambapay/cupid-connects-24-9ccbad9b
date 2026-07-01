@@ -732,12 +732,12 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             style={{
               position: "absolute",
               right: 16,
-              bottom: 110,
-              width: 40,
-              height: 40,
+              bottom: 156,
+              width: 36,
+              height: 36,
               borderRadius: "50%",
-              border: "1px solid rgba(255,255,255,0.08)",
-              background: "rgba(40,40,46,0.72)",
+              border: "1px solid rgba(255,255,255,0.10)",
+              background: "rgba(30,30,34,0.78)",
               backdropFilter: "blur(14px)",
               WebkitBackdropFilter: "blur(14px)",
               color: "#fff",
@@ -746,10 +746,11 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
+              boxShadow: "0 4px 14px rgba(0,0,0,0.35)",
             }}
             aria-label="Ver detalhes"
           >
-            <ArrowUp size={20} strokeWidth={2.6} />
+            <ArrowUp size={18} strokeWidth={2.6} />
           </button>
         </div>
 
