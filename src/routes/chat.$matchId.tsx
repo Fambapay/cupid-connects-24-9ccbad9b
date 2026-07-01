@@ -263,11 +263,7 @@ function ChatRoom() {
     if (!value) return;
     // Hard paywall: block chat send without premium access.
     if (!hasPremiumAccess) {
-      const { toast } = await import("sonner");
-      toast.error("Precisas de subscrição para enviar mensagens", {
-        description: "Ativa o Hunie Premium para continuar.",
-        action: { label: "Ver planos", onClick: () => navigate({ to: "/membership" }) },
-      });
+      setPaywallOpen(true);
       return;
     }
     if (input) input.value = "";
