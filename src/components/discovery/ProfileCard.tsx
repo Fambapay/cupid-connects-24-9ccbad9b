@@ -787,7 +787,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               background: "#0a0a0a",
               color: "#fff",
               overflowY: "auto",
-              paddingBottom: 140,
+              paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 32px)",
               borderRadius: 0,
               touchAction: "pan-y",
             }}
@@ -800,7 +800,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 if (relX < rect.width / 2) goPrevPhoto();
                 else goNextPhoto();
               }}
-              style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: "#111", marginTop: -22, cursor: "pointer" }}
+              style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: "#111", marginTop: "env(safe-area-inset-top, 0px)", cursor: "pointer" }}
             >
               {photos.map((src, i) => (
                 <img
