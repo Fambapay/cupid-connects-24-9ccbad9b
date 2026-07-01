@@ -61,8 +61,8 @@ export function ProfileView({
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
-  const { name, age, city, bio, interests, photos, isVerified, isPremium, tier } = profile;
-  const isElite = tier === 'elite';
+  const { name, age, city, bio, interests, photos, isVerified, isPremium, tier, isTrialing } = profile;
+  const isElite = tier === 'elite' && !isTrialing;
 
   const completion = computeProfileCompletion({
     photosCount: photos.length, bio, interests, city, isVerified,
