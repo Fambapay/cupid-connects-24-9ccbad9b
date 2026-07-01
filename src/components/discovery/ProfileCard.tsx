@@ -14,7 +14,7 @@ import {
   animate,
   type MotionValue,
 } from "framer-motion";
-import { MapPin, ArrowUp, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { MapPin, ArrowUp, ChevronLeft } from "lucide-react";
 import type { DiscoveryProfile, SwipeDirection } from "./types";
 import { setDiscoveryDetailOpen } from "@/lib/discoveryDetail";
 
@@ -786,15 +786,16 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               position: "absolute",
               inset: 0,
               zIndex: 30,
-              background: "#0a0a0a",
+              background: "#000",
               color: "#fff",
               overflowY: "auto",
-              paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 32px)",
+              overflowX: "hidden",
+              paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 48px)",
               borderRadius: 0,
               touchAction: "pan-y",
             }}
           >
-            {/* Photo carousel */}
+            {/* Hero photo carousel — 3/4 editorial portrait */}
             <div
               onClick={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -802,13 +803,21 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 if (relX < rect.width / 2) goPrevPhoto();
                 else goNextPhoto();
               }}
-              style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: "#111", marginTop: "env(safe-area-inset-top, 0px)", cursor: "pointer" }}
+              style={{
+                position: "relative",
+                width: "100%",
+                aspectRatio: "3 / 4",
+                background: "#111",
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
             >
               {photos.map((src, i) => (
                 <img
                   key={i + src}
                   src={src}
                   alt=""
+                  draggable={false}
                   style={{
                     position: "absolute",
                     inset: 0,
@@ -816,193 +825,352 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                     height: "100%",
                     objectFit: "cover",
                     opacity: i === photoIdx ? 1 : 0,
-                    transition: "opacity 150ms linear",
+                    transition: "opacity 180ms linear",
                   }}
                 />
               ))}
+
+              {/* Progress bars — respect safe area */}
               {photos.length > 1 && (
-                <>
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 14,
-                      left: 10,
-                      right: 10,
-                      display: "flex",
-                      gap: 4,
-                      zIndex: 2,
-                    }}
-                  >
-                    {photos.map((_, i) => (
-                      <div
-                        key={i}
-                        style={{
-                          flex: 1,
-                          height: 3,
-                          borderRadius: 2,
-                          background: i === photoIdx ? "#fff" : "rgba(255,255,255,0.35)",
-                          transition: "background 120ms",
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <button
-                    onClick={goPrevPhoto}
-                    aria-label="Foto anterior"
-                    disabled={photoIdx === 0}
-                    style={{
-                      position: "absolute",
-                      left: 8,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      width: 40,
-                      height: 40,
-                      borderRadius: "50%",
-                      border: "none",
-                      background: "rgba(0,0,0,0.45)",
-                      color: "#fff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      opacity: photoIdx === 0 ? 0.3 : 1,
-                      cursor: "pointer",
-                    }}
-                  >
-                    <ChevronLeft size={22} />
-                  </button>
-                  <button
-                    onClick={goNextPhoto}
-                    aria-label="Próxima foto"
-                    disabled={photoIdx === photos.length - 1}
-                    style={{
-                      position: "absolute",
-                      right: 8,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      width: 40,
-                      height: 40,
-                      borderRadius: "50%",
-                      border: "none",
-                      background: "rgba(0,0,0,0.45)",
-                      color: "#fff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      opacity: photoIdx === photos.length - 1 ? 0.3 : 1,
-                      cursor: "pointer",
-                    }}
-                  >
-                    <ChevronRight size={22} />
-                  </button>
-                </>
-              )}
-            </div>
-
-            <button
-              onClick={() => setDetailOpen(false)}
-              style={{
-                position: "fixed",
-                top: "calc(env(safe-area-inset-top, 0px) + 12px)",
-                right: 16,
-                width: 42,
-                height: 42,
-                borderRadius: "50%",
-                border: "1px solid rgba(255,255,255,0.15)",
-                background: "rgba(0,0,0,0.65)",
-                backdropFilter: "blur(14px)",
-                WebkitBackdropFilter: "blur(14px)",
-                color: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                zIndex: 40,
-              }}
-              aria-label="Fechar"
-            >
-              <X size={22} />
-            </button>
-
-            <div style={{ padding: "20px 20px 0" }}>
-              <div
-                style={{ display: "flex", alignItems: "baseline", gap: 10 }}
-              >
-                <h2 style={{ fontSize: 30, fontWeight: 800, margin: 0 }}>
-                  {profile.name}
-                </h2>
-                <span style={{ fontSize: 24, opacity: 0.9 }}>{profile.age}</span>
-              </div>
-              {(profile.city || profile.distance) && (
                 <div
                   style={{
-                    marginTop: 6,
+                    position: "absolute",
+                    top: "calc(env(safe-area-inset-top, 0px) + 14px)",
+                    left: 16,
+                    right: 16,
                     display: "flex",
-                    alignItems: "center",
                     gap: 6,
-                    opacity: 0.8,
-                    fontSize: 14,
+                    zIndex: 20,
                   }}
                 >
-                  <MapPin size={14} /> {profile.city}
-                  {profile.city && profile.distance ? " • " : ""}
-                  {formatDistance(profile.distance)}
+                  {photos.map((_, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        flex: 1,
+                        height: 3,
+                        borderRadius: 2,
+                        background:
+                          i === photoIdx ? "#fff" : "rgba(255,255,255,0.28)",
+                        transition: "background 160ms",
+                      }}
+                    />
+                  ))}
                 </div>
               )}
-              {profile.bio && (
-                <p
+
+              {/* Drag handle */}
+              <div
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  top: "calc(env(safe-area-inset-top, 0px) + 6px)",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  width: 42,
+                  height: 4,
+                  borderRadius: 2,
+                  background: "rgba(255,255,255,0.28)",
+                  zIndex: 20,
+                }}
+              />
+
+              {/* Close button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDetailOpen(false);
+                }}
+                aria-label="Fechar"
+                style={{
+                  position: "absolute",
+                  top: "calc(env(safe-area-inset-top, 0px) + 28px)",
+                  right: 16,
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  background: "rgba(0,0,0,0.35)",
+                  backdropFilter: "blur(18px)",
+                  WebkitBackdropFilter: "blur(18px)",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  zIndex: 40,
+                }}
+              >
+                <ChevronLeft
+                  size={22}
+                  style={{ transform: "rotate(90deg)" }}
+                />
+              </button>
+
+              {/* Cinematic gradient */}
+              <div
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background:
+                    "linear-gradient(to top, #000 0%, rgba(0,0,0,0.35) 32%, rgba(0,0,0,0) 60%)",
+                  pointerEvents: "none",
+                }}
+              />
+
+              {/* Name plate */}
+              <div
+                style={{
+                  position: "absolute",
+                  left: 24,
+                  right: 24,
+                  bottom: 28,
+                  display: "flex",
+                  alignItems: "flex-end",
+                  justifyContent: "space-between",
+                  gap: 12,
+                  zIndex: 10,
+                  pointerEvents: "none",
+                }}
+              >
+                <h2
                   style={{
-                    marginTop: 16,
-                    fontSize: 15,
-                    lineHeight: 1.5,
-                    opacity: 0.92,
+                    fontFamily: '"Instrument Serif", Georgia, serif',
+                    fontStyle: "italic",
+                    fontSize: 52,
+                    lineHeight: 0.95,
+                    margin: 0,
+                    color: "#fff",
+                    letterSpacing: "-0.5px",
+                    textShadow: "0 2px 24px rgba(0,0,0,0.35)",
                   }}
                 >
-                  {profile.bio}
-                </p>
+                  {profile.name.split(" ")[0]}
+                  <span style={{ opacity: 0.85 }}>, {profile.age}</span>
+                </h2>
+                {profile.isOnline && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      paddingBottom: 8,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: "50%",
+                        background: "#19D27E",
+                        boxShadow: "0 0 10px rgba(25,210,126,0.65)",
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        letterSpacing: "0.18em",
+                        textTransform: "uppercase",
+                        color: "rgba(255,255,255,0.85)",
+                      }}
+                    >
+                      Online
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Detail content */}
+            <div
+              style={{
+                padding: "32px 24px 0",
+                display: "flex",
+                flexDirection: "column",
+                gap: 40,
+              }}
+            >
+              {/* Location + verified strip */}
+              {(profile.city || profile.distance || profile.isVerified) && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 16,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {(profile.city || profile.distance) && (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                      }}
+                    >
+                      <MapPin size={15} color="#FF4FA3" strokeWidth={2.2} />
+                      <span
+                        style={{
+                          fontSize: 13.5,
+                          color: "rgba(255,255,255,0.9)",
+                          fontWeight: 500,
+                        }}
+                      >
+                        {profile.city}
+                        {profile.city && profile.distance ? ", " : ""}
+                        {formatDistance(profile.distance)}
+                      </span>
+                    </div>
+                  )}
+                  {profile.isVerified && (
+                    <>
+                      <span
+                        aria-hidden
+                        style={{
+                          width: 1,
+                          height: 12,
+                          background: "rgba(255,255,255,0.18)",
+                        }}
+                      />
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <svg
+                          width="15"
+                          height="15"
+                          viewBox="0 0 24 24"
+                          fill="#B13CFF"
+                        >
+                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>
+                        <span
+                          style={{
+                            fontSize: 13.5,
+                            color: "rgba(255,255,255,0.9)",
+                            fontWeight: 500,
+                          }}
+                        >
+                          Verificada
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
               )}
-              {profile.interests && profile.interests.length > 0 && (
-                <>
+
+              {/* Bio */}
+              {profile.bio && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                   <h3
                     style={{
-                      marginTop: 24,
-                      fontSize: 13,
+                      margin: 0,
+                      fontSize: 10,
                       fontWeight: 700,
                       textTransform: "uppercase",
-                      letterSpacing: 1,
-                      opacity: 0.6,
+                      letterSpacing: "0.22em",
+                      color: "rgba(255,255,255,0.42)",
+                    }}
+                  >
+                    Sobre
+                  </h3>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontFamily: '"Instrument Serif", Georgia, serif',
+                      fontStyle: "italic",
+                      fontSize: 22,
+                      lineHeight: 1.4,
+                      color: "rgba(255,255,255,0.92)",
+                      fontWeight: 400,
+                    }}
+                  >
+                    {profile.bio}
+                  </p>
+                </div>
+              )}
+
+              {/* Interests */}
+              {profile.interests && profile.interests.length > 0 && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                  <h3
+                    style={{
+                      margin: 0,
+                      fontSize: 10,
+                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.22em",
+                      color: "rgba(255,255,255,0.42)",
                     }}
                   >
                     Interesses
                   </h3>
                   <div
                     style={{
-                      marginTop: 10,
                       display: "flex",
                       flexWrap: "wrap",
-                      gap: 8,
+                      gap: 10,
                     }}
                   >
                     {profile.interests.map((it) => (
                       <span
                         key={it}
                         style={{
-                          fontSize: 13,
-                          fontWeight: 600,
-                          padding: "8px 14px",
-                          borderRadius: 999,
-                          background: "#FF4458",
-                          color: "#fff",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 10,
+                          padding: "10px 16px",
+                          borderRadius: 18,
+                          border: "1px solid rgba(255,255,255,0.10)",
+                          background: "rgba(255,255,255,0.05)",
+                          backdropFilter: "blur(10px)",
+                          WebkitBackdropFilter: "blur(10px)",
+                          fontSize: 13.5,
+                          fontWeight: 500,
+                          color: "rgba(255,255,255,0.92)",
+                          lineHeight: 1,
                         }}
                       >
+                        <span
+                          aria-hidden
+                          style={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            background:
+                              "linear-gradient(135deg, #FF4FA3, #B13CFF)",
+                          }}
+                        />
                         {it}
                       </span>
                     ))}
                   </div>
-                </>
+                </div>
               )}
-            </div>
 
-            {/* panelActions intentionally not rendered — swipe actions hidden inside detail view */}
+              {/* Subtle end marker */}
+              <div
+                style={{
+                  padding: "8px 0 4px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <div
+                  style={{
+                    width: 4,
+                    height: 4,
+                    borderRadius: "50%",
+                    background: "rgba(255,255,255,0.22)",
+                  }}
+                />
+              </div>
+            </div>
           </motion.div>
         )}
 
