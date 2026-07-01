@@ -59,7 +59,6 @@ function Discover() {
   const [openingChat, setOpeningChat] = useState(false);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [creditShop, setCreditShop] = useState<PackKind | null>(null);
-  const [bannerVisible, setBannerVisible] = useState(false);
   const [firstImpression, setFirstImpression] = useState<DiscoveryProfile | null>(null);
   const [sendingFI, setSendingFI] = useState(false);
   const [pendingAction, setPendingAction] = useState<
