@@ -645,3 +645,11 @@ textarea:-webkit-autofill:active {
 /* Browser (non-PWA): keep the same tight PWA layout — the bottom nav is
    fixed and already accounts for the Safari URL bar via dvh/safe-area. */
 
+
+/* Browser (non-PWA): give swipe actions extra breathing room above the
+   Safari URL bar. PWA keeps the tighter default padding. */
+@media not all and (display-mode: standalone) {
+  .swipe-actions-row {
+    padding-bottom: 36px !important;
+  }
+}
