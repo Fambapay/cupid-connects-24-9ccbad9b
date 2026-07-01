@@ -592,6 +592,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
 
           <div
             ref={infoWrapRef}
+            className="discover-info-block"
             style={{
               position: "absolute",
               left: 0,
@@ -603,6 +604,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               pointerEvents: "none",
             }}
           >
+
             {/* Nearby pill */}
             <div
               style={{
