@@ -60,7 +60,7 @@ const BUNDLES: Bundle[] = [
 ];
 
 export function ProfileBundles() {
-  const [active, setActive] = useState<{ bundle: Bundle; price: number } | null>(null);
+  const navigate = useNavigate();
   const { country } = useCountry();
 
   // Resolve each bundle's price from the country catalog at render time.
