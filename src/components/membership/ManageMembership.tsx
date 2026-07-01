@@ -67,7 +67,7 @@ function StatusIcon({ status }: { status: PaymentHistoryEntry["status"] }) {
 
 export function ManageMembership() {
   const navigate = useNavigate();
-  const { subscription } = useSubscription();
+  const { subscription, isTrialing, isInGracePeriod, trialDaysLeft, graceDaysLeft, hasPremiumAccess } = useSubscription();
   const { reload } = useProfile();
   const { country } = useCountry();
   const cancel = useServerFn(cancelMyMembership);
