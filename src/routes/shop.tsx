@@ -450,14 +450,6 @@ function PackCard({ pack, index, country }: { pack: Pack; index: number; country
           </motion.button>
         </div>
       </div>
-      <DebitoCheckoutSheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        title={`${pack.quantity} ${pack.kind === "boost" ? "Boosts" : "Super Likes"}`}
-        subtitle="Crédito instantâneo após confirmação"
-        amountMzn={pack.price}
-        packId={pack.id}
-      />
     </motion.div>
   );
 }
