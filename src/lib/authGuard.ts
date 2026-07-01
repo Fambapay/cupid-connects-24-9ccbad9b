@@ -32,8 +32,10 @@ async function getProfileGate(userId: string): Promise<ProfileGate> {
     .maybeSingle();
   const status = (profile as { membership_status?: string } | null)?.membership_status ?? "inactive";
   const exp = (profile as { membership_expires_at?: string | null } | null)?.membership_expires_at;
+  const notExpired = !exp || new Date(exp).getTime() > Date.now();
+  // Trial and grace period grant full access (hard-paywall model).
   const membershipActive =
-    status === "active" && (!exp || new Date(exp).getTime() > Date.now());
+    (status === "active" || status === "trialing" || status === "grace_period") && notExpired;
   profileCache = {
     userId,
     completed: !!profile?.onboarding_completed,

@@ -143,42 +143,32 @@ function Discover() {
   ): Promise<void | "blocked"> => {
     const direction = dir === "right" ? "like" : dir === "up" ? "super" : "pass";
 
-    // Pass (dislike) is always free — never trigger paywall.
+    // Hard paywall: without premium access (trial/active/grace), block ALL swipes.
+    if (!isPremium) {
+      setPendingAction({ profileId: target.id, direction });
+      openPaywall();
+      return "blocked";
+    }
+
+    // Pass is free once inside premium access.
     if (direction === "pass") {
       setIndex((i) => i + 1);
       await performSwipe({ id: target.id, name: target.name, photo: target.photos?.[0] }, "pass");
       return;
     }
 
-    // Super Like requires active membership for non-premium users.
-    if (direction === "super" && !isPremium) {
-      setPendingAction({ profileId: target.id, direction });
-      openPaywall();
-      return "blocked";
-    }
-
-    // Like: free users get 5/day. On the 6th attempt, open paywall.
-    if (direction === "like" && !isPremium) {
-      if (dailyLimits.likesLimit >= 0 && dailyLimits.likesRemaining <= 0) {
-        setPendingAction({ profileId: target.id, direction });
-        openPaywall();
-        return "blocked";
-      }
-    }
-
-    // Premium daily-limit guard (likesLimit < 0 means unlimited).
-    if (dailyLimits.likesLimit >= 0 && dailyLimits.likesRemaining <= 0 && isPremium) {
-      toast.error("Atingiste o limite diário de likes.");
-      return "blocked";
-    }
     setIndex((i) => i + 1);
     const res = await performSwipe(
       { id: target.id, name: target.name, photo: target.photos?.[0] },
       direction,
     );
+    if (res?.reason === "paywall_required") {
+      setIndex((i) => Math.max(0, i - 1));
+      setPendingAction({ profileId: target.id, direction });
+      openPaywall();
+      return "blocked";
+    }
     if (direction === "super" && res?.reason === "insufficient_credits") {
-      // Credit shop was opened by performSwipe; bounce the card back so the
-      // profile returns to the stack (same UX as the out-of-likes case).
       setIndex((i) => Math.max(0, i - 1));
       return "blocked";
     }
