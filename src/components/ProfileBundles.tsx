@@ -109,7 +109,16 @@ export function ProfileBundles() {
                 transition={{ delay: i * 0.05, duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
                 onClick={() => {
                   hapticTap();
-                  setActive({ bundle: b, price });
+                  navigate({
+                    to: "/checkout",
+                    search: {
+                      title: `${b.title} · ${b.subtitle}`,
+                      subtitle: "Crédito instantâneo após confirmação",
+                      amount: price,
+                      packId: b.packId,
+                      returnTo: "/profile",
+                    },
+                  });
                 }}
                 className="bundle-card relative shrink-0 snap-start w-[260px] text-left rounded-[20px] overflow-hidden border border-white/10 active:scale-[0.98] transition-transform"
                 style={{ background: b.gradient }}
