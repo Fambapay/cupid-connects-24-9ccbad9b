@@ -139,7 +139,7 @@ function usePaywallCopy(origin: PaywallSheetProps["origin"], subscription: Retur
       default:
         return {
           title: "Encontra alguém que valha o teu tempo",
-          subtitle: "Desbloqueia tudo o que precisas para fazer matches a sério.",
+          subtitle: "Aqui não se anda a passar o dedo à toa. Abre tudo e conhece pessoas que também estão a sério.",
         };
     }
   }, [origin]);
