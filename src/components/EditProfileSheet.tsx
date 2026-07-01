@@ -427,3 +427,102 @@ function Field({
     </label>
   );
 }
+
+function OptionGrid({
+  value,
+  options,
+  onChange,
+}: {
+  value: string | null;
+  options: Record<string, string>;
+  onChange: (v: string | null) => void;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {Object.entries(options).map(([key, label]) => {
+        const active = value === key;
+        return (
+          <button
+            key={key}
+            type="button"
+            onClick={() => onChange(active ? null : key)}
+            className="rounded-2xl px-3 py-2.5 text-[13px] font-semibold tracking-tight transition-all active:scale-[0.97]"
+            style={
+              active
+                ? {
+                    backgroundImage:
+                      'linear-gradient(135deg, #FF4FA3 0%, #B13CFF 100%)',
+                    color: '#fff',
+                    border: '1px solid transparent',
+                    boxShadow:
+                      '0 8px 18px -8px color-mix(in oklab, var(--brand-pink) 70%, transparent), inset 0 1px 0 rgba(255,255,255,0.22)',
+                  }
+                : {
+                    background: 'var(--edit-sheet-btn-bg)',
+                    color: 'var(--edit-sheet-fg)',
+                    border: '1px solid var(--edit-sheet-btn-border)',
+                    opacity: 0.9,
+                  }
+            }
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function LifestyleRow({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string | null;
+  options: Record<string, string>;
+  onChange: (v: string | null) => void;
+}) {
+  return (
+    <div>
+      <div
+        className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em]"
+        style={{ color: 'var(--edit-sheet-fg-muted)', opacity: 0.75 }}
+      >
+        {label}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {Object.entries(options).map(([key, l]) => {
+          const active = value === key;
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onChange(active ? null : key)}
+              className="rounded-full px-3.5 py-1.5 text-[13px] font-semibold tracking-tight transition-all active:scale-[0.96]"
+              style={
+                active
+                  ? {
+                      backgroundImage:
+                        'linear-gradient(135deg, #FF4FA3 0%, #B13CFF 100%)',
+                      color: '#fff',
+                      border: '1px solid transparent',
+                    }
+                  : {
+                      background: 'var(--edit-sheet-btn-bg)',
+                      color: 'var(--edit-sheet-fg)',
+                      border: '1px solid var(--edit-sheet-btn-border)',
+                      opacity: 0.85,
+                    }
+              }
+            >
+              {l}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
