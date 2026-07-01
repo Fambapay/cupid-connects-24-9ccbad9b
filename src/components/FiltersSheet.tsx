@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, Lock, X, BadgeCheck, Circle, FileText } from 'lucide-react';
+import { Check, Lock, X, BadgeCheck, FileText } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { hapticTap } from '@/hooks/useNativePlatform';
 
