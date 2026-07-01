@@ -1228,3 +1228,123 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
   },
 );
 ProfileCard.displayName = "ProfileCard";
+
+function DetailSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <h3
+        style={{
+          margin: 0,
+          fontSize: 10,
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: "0.22em",
+          color: "rgba(255,255,255,0.42)",
+        }}
+      >
+        {title}
+      </h3>
+      {children}
+    </div>
+  );
+}
+
+function FactGrid({
+  items,
+}: {
+  items: { label: string; value: string }[];
+}) {
+  if (!items.length) return null;
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(2, minmax(0,1fr))",
+        gap: 10,
+      }}
+    >
+      {items.map((it) => (
+        <div
+          key={it.label}
+          style={{
+            padding: "12px 14px",
+            borderRadius: 16,
+            border: "1px solid rgba(255,255,255,0.08)",
+            background: "rgba(255,255,255,0.04)",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 9.5,
+              fontWeight: 700,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.42)",
+            }}
+          >
+            {it.label}
+          </span>
+          <span
+            style={{
+              fontSize: 15,
+              fontWeight: 600,
+              color: "rgba(255,255,255,0.94)",
+            }}
+          >
+            {it.value}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Pill({ label, accent = false }: { label: string; accent?: boolean }) {
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        alignSelf: "flex-start",
+        gap: 10,
+        padding: "10px 16px",
+        borderRadius: 18,
+        border: accent
+          ? "1px solid rgba(255,79,163,0.32)"
+          : "1px solid rgba(255,255,255,0.10)",
+        background: accent
+          ? "linear-gradient(135deg, rgba(255,79,163,0.16), rgba(177,60,255,0.14))"
+          : "rgba(255,255,255,0.05)",
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
+        fontSize: 13.5,
+        fontWeight: 600,
+        color: "rgba(255,255,255,0.94)",
+        lineHeight: 1,
+      }}
+    >
+      <span
+        aria-hidden
+        style={{
+          width: 8,
+          height: 8,
+          borderRadius: "50%",
+          background: "linear-gradient(135deg, #FF4FA3, #B13CFF)",
+        }}
+      />
+      {label}
+    </span>
+  );
+}
+
