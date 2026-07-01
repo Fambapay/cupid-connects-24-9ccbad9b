@@ -208,16 +208,6 @@ export function ProfileBundles() {
         </div>
       </div>
 
-      {active && (
-        <DebitoCheckoutSheet
-          open={!!active}
-          onClose={() => setActive(null)}
-          title={`${active.bundle.title} · ${active.bundle.subtitle}`}
-          subtitle="Crédito instantâneo após confirmação"
-          amountMzn={active.price}
-          packId={active.bundle.packId}
-        />
-      )}
 
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
