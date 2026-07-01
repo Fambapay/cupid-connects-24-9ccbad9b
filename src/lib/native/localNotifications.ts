@@ -93,6 +93,7 @@ export interface LocalNotifPayload {
 
 export async function scheduleLocalNotification(payload: LocalNotifPayload): Promise<void> {
   if (!isNative()) return
+  if (!appInBackground) return
   if (!permissionGranted) {
     const ok = await checkLocalNotificationPermission()
     if (!ok) return

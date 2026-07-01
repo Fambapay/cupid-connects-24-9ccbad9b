@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/integrations/supabase/client.server'
+import type { Json } from '@/integrations/supabase/types'
 import { sendWebPush, type PushPayload } from './send.server'
 
 type NotifyKind = 'new_match' | 'new_message' | 'new_like' | 'promo'
@@ -175,15 +176,20 @@ async function notifyOne(kind: NotifyKind, r: Recipient, ctx: NotifyContext) {
   const payload = buildPushContent(kind, r, ctx)
   if (!payload) return
 
+  const eventKey = deliveryEventKey(kind, r.user_id, ctx)
+  const reserved = await reserveDelivery(eventKey, kind, r.user_id, ctx, payload)
+  if (!reserved) return
+
   let pushSucceeded = false
 
   if (r.prefs.push_enabled) {
     const { data: subs } = await supabaseAdmin
       .from('push_subscriptions')
-      .select('id, endpoint, p256dh, auth')
+      .select('id, endpoint, p256dh, auth, client_id, device_key, user_agent, last_used_at')
       .eq('user_id', r.user_id)
+      .order('last_used_at', { ascending: false })
 
-    for (const sub of subs || []) {
+    for (const sub of uniqueWebSubscriptions(subs || [])) {
       if (!sub.p256dh || !sub.auth) continue // native FCM subs handled elsewhere
       const webSub = { id: sub.id, endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth }
       const res = await sendWebPush(webSub, payload)
@@ -204,7 +210,92 @@ async function notifyOne(kind: NotifyKind, r: Recipient, ctx: NotifyContext) {
   // Email fallback when push didn't reach the user
   if (!pushSucceeded && r.prefs.email_enabled) {
     await enqueueFallbackEmail(kind, r, ctx)
+    await markDelivery(eventKey, 'emailed')
+    return
   }
+
+  await markDelivery(eventKey, pushSucceeded ? 'sent' : 'skipped')
+}
+
+function deliveryEventKey(kind: NotifyKind, userId: string, ctx: NotifyContext): string {
+  const eventId =
+    kind === 'new_message' ? ctx.message_id
+    : kind === 'new_match' ? ctx.match_id
+    : kind === 'new_like' ? ctx.swipe_id
+    : ctx.url || `${ctx.title || 'promo'}:${ctx.body || ''}`
+
+  return `${kind}:${userId}:${eventId || crypto.randomUUID()}`
+}
+
+async function reserveDelivery(
+  eventKey: string,
+  kind: NotifyKind,
+  userId: string,
+  ctx: NotifyContext,
+  payload: PushPayload,
+): Promise<boolean> {
+  const eventId =
+    kind === 'new_message' ? ctx.message_id
+    : kind === 'new_match' ? ctx.match_id
+    : kind === 'new_like' ? ctx.swipe_id
+    : ctx.url || null
+
+  const auditPayload = JSON.parse(JSON.stringify({ ctx, push: payload })) as Json
+
+  const { error } = await supabaseAdmin.from('notification_deliveries').insert({
+    event_key: eventKey,
+    user_id: userId,
+    kind,
+    event_id: eventId,
+    status: 'reserved',
+    payload: auditPayload,
+  })
+
+  // 23505 = unique violation. It means this exact notification event was
+  // already accepted, so do not send another push/email for it.
+  if (!error) return true
+  if (error.code === '23505') return false
+  console.warn('notification delivery reservation failed', { eventKey, err: error.message })
+  return true
+}
+
+async function markDelivery(eventKey: string, status: 'sent' | 'emailed' | 'skipped' | 'failed') {
+  await supabaseAdmin
+    .from('notification_deliveries')
+    .update({ status, delivered_at: status === 'skipped' ? null : new Date().toISOString() })
+    .eq('event_key', eventKey)
+}
+
+type PushSubRow = {
+  id: string
+  endpoint: string
+  p256dh: string | null
+  auth: string | null
+  client_id?: string | null
+  device_key?: string | null
+  user_agent?: string | null
+  last_used_at?: string | null
+}
+
+function uniqueWebSubscriptions(subs: PushSubRow[]): PushSubRow[] {
+  const seen = new Set<string>()
+  const out: PushSubRow[] = []
+
+  for (const sub of subs) {
+    if (!sub.p256dh || !sub.auth) continue
+    const key =
+      sub.device_key
+      || sub.client_id
+      || (sub.endpoint.startsWith('https://web.push.apple.com/')
+        ? `legacy-apple:${sub.user_agent || 'unknown'}`
+        : sub.endpoint)
+
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push(sub)
+  }
+
+  return out
 }
 
 async function enqueueFallbackEmail(kind: NotifyKind, r: Recipient, ctx: NotifyContext) {

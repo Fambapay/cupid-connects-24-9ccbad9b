@@ -506,6 +506,48 @@ export type Database = {
           },
         ]
       }
+      notification_deliveries: {
+        Row: {
+          created_at: string
+          delivered_at: string | null
+          error_message: string | null
+          event_id: string | null
+          event_key: string
+          id: string
+          kind: string
+          payload: Json
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          event_id?: string | null
+          event_key: string
+          id?: string
+          kind: string
+          payload?: Json
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          event_id?: string | null
+          event_key?: string
+          id?: string
+          kind?: string
+          payload?: Json
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notification_preferences: {
         Row: {
           email_enabled: boolean
@@ -787,7 +829,9 @@ export type Database = {
       push_subscriptions: {
         Row: {
           auth: string | null
+          client_id: string | null
           created_at: string
+          device_key: string | null
           endpoint: string
           fcm_token: string | null
           id: string
@@ -799,7 +843,9 @@ export type Database = {
         }
         Insert: {
           auth?: string | null
+          client_id?: string | null
           created_at?: string
+          device_key?: string | null
           endpoint: string
           fcm_token?: string | null
           id?: string
@@ -811,7 +857,9 @@ export type Database = {
         }
         Update: {
           auth?: string | null
+          client_id?: string | null
           created_at?: string
+          device_key?: string | null
           endpoint?: string
           fcm_token?: string | null
           id?: string
