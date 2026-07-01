@@ -319,10 +319,10 @@ function Landing() {
               <img src={hunieMarkTransparent.url} alt="Logótipo Hunie" className="ll-logo-img" />
             </Link>
             <div className="ll-nav-links">
-              <a className="ll-nav-link" href="#como-funciona">Como funciona</a>
-              <a className="ll-nav-link" href="#planos">Planos</a>
-              <a className="ll-nav-link" href="#cidades">Cidades</a>
-              <a className="ll-nav-link" href="#faq">FAQ</a>
+              <a className="ll-nav-link" href="#como-funciona" onClick={smoothAnchorClick}>Como funciona</a>
+              <a className="ll-nav-link" href="#planos" onClick={smoothAnchorClick}>Planos</a>
+              <a className="ll-nav-link" href="#cidades" onClick={smoothAnchorClick}>Cidades</a>
+              <a className="ll-nav-link" href="#faq" onClick={smoothAnchorClick}>FAQ</a>
               <Link to="/auth/login" className="ll-nav-link">Entrar</Link>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -341,10 +341,10 @@ function Landing() {
           </div>
           {menuOpen && (
             <div className="ll-nav-menu">
-              <a className="ll-nav-menu-link" href="#como-funciona" onClick={() => setMenuOpen(false)}>Como funciona</a>
-              <a className="ll-nav-menu-link" href="#planos" onClick={() => setMenuOpen(false)}>Planos</a>
-              <a className="ll-nav-menu-link" href="#cidades" onClick={() => setMenuOpen(false)}>Cidades</a>
-              <a className="ll-nav-menu-link" href="#faq" onClick={() => setMenuOpen(false)}>FAQ</a>
+              <a className="ll-nav-menu-link" href="#como-funciona" onClick={(e) => { smoothAnchorClick(e); setMenuOpen(false); }}>Como funciona</a>
+              <a className="ll-nav-menu-link" href="#planos" onClick={(e) => { smoothAnchorClick(e); setMenuOpen(false); }}>Planos</a>
+              <a className="ll-nav-menu-link" href="#cidades" onClick={(e) => { smoothAnchorClick(e); setMenuOpen(false); }}>Cidades</a>
+              <a className="ll-nav-menu-link" href="#faq" onClick={(e) => { smoothAnchorClick(e); setMenuOpen(false); }}>FAQ</a>
               <Link to="/auth/login" className="ll-nav-menu-link" onClick={() => setMenuOpen(false)}>Entrar</Link>
               <Link to="/auth/register" className="ll-nav-menu-link ll-nav-menu-cta" onClick={() => setMenuOpen(false)}>Criar conta</Link>
             </div>
