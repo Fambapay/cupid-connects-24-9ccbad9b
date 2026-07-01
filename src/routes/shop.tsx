@@ -18,7 +18,7 @@ import { z } from "zod";
 
 import { useCredits } from "@/hooks/useCredits";
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
-import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
+
 import { getPacks, type Pack, type PackKind } from "@/lib/pricing";
 import { formatCountryPrice, type CountryCode } from "@/lib/country/config";
 import { useCountry } from "@/lib/country/context";
