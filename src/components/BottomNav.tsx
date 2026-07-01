@@ -489,6 +489,7 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
 
   // Hide nav inside a conversation (overlay screen). Matches /chat/<id>.
   const inConversation = /^\/chat\/[^/]+/.test(pathname);
+  const detailOpen = useDiscoveryDetailOpen();
 
   // Warm all main tab routes so switches feel instant.
   useEffect(() => {
