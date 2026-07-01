@@ -96,21 +96,21 @@ export function ProfileView({
     } finally { setBusy(false); }
   };
 
+  // Single lightweight container fade — no per-item stagger/translate.
+  // Per-child translateY on 5+ sections was thrashing layout on entry.
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.08, delayChildren: 0.08 },
+      transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const },
     },
   };
 
+  // Kept as an identity variant so existing `variants={itemVariants}` usages
+  // stay valid without triggering their own animations.
   const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] as const },
-    },
+    hidden: { opacity: 1, y: 0 },
+    visible: { opacity: 1, y: 0 },
   };
 
   return (
@@ -118,13 +118,14 @@ export function ProfileView({
       className="relative min-h-full pb-32"
       style={{
         background: 'var(--profile-bg)',
+        willChange: 'opacity',
       }}
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
       {/* Soft gradient backdrop — extends into the safe area (notch) */}
-      <motion.div
+      <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 -z-0"
         style={{
@@ -134,8 +135,8 @@ export function ProfileView({
           background:
             'radial-gradient(70% 60% at 50% 0%, rgba(255,79,163,0.28) 0%, rgba(255,79,163,0) 70%)',
         }}
-        variants={itemVariants}
       />
+
 
 
       <input
