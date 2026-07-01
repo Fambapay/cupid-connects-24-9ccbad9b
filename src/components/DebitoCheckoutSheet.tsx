@@ -314,26 +314,27 @@ export function DebitoCheckoutSheet({
                   </div>
                 )}
 
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  disabled={stage === "submitting" || !phoneOk}
-                  onClick={submit}
-                  className="relative mt-5 h-13 w-full overflow-hidden rounded-2xl bg-gradient-to-r from-fuchsia-500 via-pink-500 to-rose-500 py-3.5 text-sm font-bold text-white shadow-[0_10px_30px_-10px_rgba(240,70,140,0.7)] disabled:opacity-50"
-                >
-                  {stage === "submitting" ? (
-                    <span className="inline-flex items-center gap-2">
-                      <Loader2 size={16} className="animate-spin" /> A processar…
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-2">
-                      <Lock size={14} /> Pagar {amountFormatted}
-                    </span>
-                  )}
-                </motion.button>
-
-                <div className="mt-3 flex items-center justify-center gap-2 text-[11px] text-[color:var(--fg-dim)]">
-                  <ShieldCheck size={12} className="text-emerald-400" />
-                  Pagamento encriptado · {config.currency}
+                <div className="sticky bottom-0 -mx-5 mt-5 px-5 pt-3 pb-[max(env(safe-area-inset-bottom),12px)] bg-gradient-to-t from-[var(--surface-1)] via-[var(--surface-1)] to-transparent">
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    disabled={stage === "submitting" || !phoneOk}
+                    onClick={submit}
+                    className="relative h-13 w-full overflow-hidden rounded-2xl bg-gradient-to-r from-fuchsia-500 via-pink-500 to-rose-500 py-3.5 text-sm font-bold text-white shadow-[0_10px_30px_-10px_rgba(240,70,140,0.7)] disabled:opacity-50"
+                  >
+                    {stage === "submitting" ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Loader2 size={16} className="animate-spin" /> A processar…
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-2">
+                        <Lock size={14} /> Pagar {amountFormatted}
+                      </span>
+                    )}
+                  </motion.button>
+                  <div className="mt-2 flex items-center justify-center gap-2 text-[11px] text-[color:var(--fg-dim)]">
+                    <ShieldCheck size={12} className="text-emerald-400" />
+                    Pagamento encriptado · {config.currency}
+                  </div>
                 </div>
               </>
             )}
