@@ -65,6 +65,7 @@ function Discover() {
     | { profileId: string; direction: "like" | "super"; firstImpressionMessage?: string }
     | null
   >(null);
+  const detailOpen = useDiscoveryDetailOpen();
 
   useEffect(() => {
     setIndex(0);
