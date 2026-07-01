@@ -287,6 +287,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
           insufficient_super_like: "insufficient_credits",
           insufficient_first_impression: "insufficient_credits",
           daily_limit_reached: "daily_limit_reached",
+          paywall_required: "paywall_required",
         };
         return { matched: false, reason: reasonMap[res?.reason ?? ""] ?? res?.reason };
       }

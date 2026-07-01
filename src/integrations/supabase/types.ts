@@ -808,6 +808,57 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          bonus_granted_at: string | null
+          code: string
+          created_at: string
+          days_awarded: number
+          id: string
+          onboarding_completed_at: string | null
+          referred_id: string
+          referrer_id: string
+        }
+        Insert: {
+          bonus_granted_at?: string | null
+          code: string
+          created_at?: string
+          days_awarded?: number
+          id?: string
+          onboarding_completed_at?: string | null
+          referred_id: string
+          referrer_id: string
+        }
+        Update: {
+          bonus_granted_at?: string | null
+          code?: string
+          created_at?: string
+          days_awarded?: number
+          id?: string
+          onboarding_completed_at?: string | null
+          referred_id?: string
+          referrer_id?: string
+        }
+        Relationships: []
+      }
       reports: {
         Row: {
           created_at: string
@@ -1018,6 +1069,7 @@ export type Database = {
         Args: { _days: number; _plan_tier: string; _user_id: string }
         Returns: Json
       }
+      apply_referral_code: { Args: { _code: string }; Returns: Json }
       boost_entitlement_discrepancies: {
         Args: { _days?: number }
         Returns: {
@@ -1065,6 +1117,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      generate_referral_code: { Args: { _uid: string }; Returns: string }
       get_discovery_feed: {
         Args: {
           _filters?: Json
@@ -1084,11 +1137,15 @@ export type Database = {
       }
       get_my_payment_history: { Args: { _limit?: number }; Returns: Json }
       get_my_phone: { Args: never; Returns: string }
+      get_my_referral_summary: { Args: never; Returns: Json }
+      get_or_create_my_referral_code: { Args: never; Returns: string }
       get_unread_chats_count: { Args: never; Returns: number }
       grant_credits: {
         Args: { _pack_kind: string; _quantity: number; _user_id: string }
         Returns: Json
       }
+      grant_referral_bonus: { Args: { _referred_id: string }; Returns: Json }
+      has_premium_access: { Args: { _uid: string }; Returns: boolean }
       insert_swipe: {
         Args: {
           _direction: string
@@ -1102,6 +1159,7 @@ export type Database = {
         Args: { _match_id: string; _user_id: string }
         Returns: boolean
       }
+      mark_referral_onboarding_complete: { Args: never; Returns: undefined }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -1124,6 +1182,7 @@ export type Database = {
       refill_my_credits: { Args: never; Returns: Json }
       rewind_last_swipe: { Args: never; Returns: Json }
       touch_last_active: { Args: never; Returns: undefined }
+      transition_expired_memberships: { Args: never; Returns: Json }
     }
     Enums: {
       swipe_direction: "like" | "pass" | "super"

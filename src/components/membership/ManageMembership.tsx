@@ -12,6 +12,7 @@ import { useCountry } from "@/lib/country/context";
 import { cancelMyMembership } from "@/lib/membership.functions";
 import { getMyPaymentHistory, restoreMyPurchases, type PaymentHistoryEntry } from "@/lib/payments.functions";
 import { PaywallFlow } from "@/components/paywall/PaywallFlow";
+import { ReferralSection } from "./ReferralSection";
 import { hapticTap } from "@/hooks/useNativePlatform";
 import { requiresExternalCheckout, getExternalCheckoutUrl, getBillingMode } from "@/lib/billing/platform";
 import { openInAppBrowser } from "@/lib/native/inAppBrowser";
@@ -66,7 +67,7 @@ function StatusIcon({ status }: { status: PaymentHistoryEntry["status"] }) {
 
 export function ManageMembership() {
   const navigate = useNavigate();
-  const { subscription } = useSubscription();
+  const { subscription, isTrialing, isInGracePeriod, trialDaysLeft, graceDaysLeft, hasPremiumAccess } = useSubscription();
   const { reload } = useProfile();
   const { country } = useCountry();
   const cancel = useServerFn(cancelMyMembership);
@@ -175,7 +176,17 @@ export function ManageMembership() {
                   Cancelado
                 </span>
               )}
-              {!isActive && (
+              {isTrialing && (
+                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-300">
+                  Trial · {trialDaysLeft}d
+                </span>
+              )}
+              {isInGracePeriod && (
+                <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-300">
+                  Tolerância · {graceDaysLeft}d
+                </span>
+              )}
+              {!hasPremiumAccess && (
                 <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white/60">
                   Sem subscrição
                 </span>
@@ -195,20 +206,26 @@ export function ManageMembership() {
                   fontFamily: "'Montserrat', sans-serif",
                   fontWeight: 900,
                   letterSpacing: "0.06em",
-                  backgroundColor: isActive ? accent : "rgba(255,255,255,0.12)",
-                  color: isActive ? "#0a0a0a" : "rgba(255,255,255,0.7)",
+                  backgroundColor: hasPremiumAccess ? accent : "rgba(255,255,255,0.12)",
+                  color: hasPremiumAccess ? "#0a0a0a" : "rgba(255,255,255,0.7)",
                 }}
               >
-                {isActive ? label : "Free"}
+                {hasPremiumAccess ? label : "Free"}
               </span>
-              {tier === "elite" && isActive && <Crown size={20} className="text-amber-300" />}
+              {tier === "elite" && hasPremiumAccess && <Crown size={20} className="text-amber-300" />}
             </div>
 
-            {isActive && (
+            {hasPremiumAccess && (
               <div className="mt-4 flex items-center gap-2 text-sm text-white/70">
                 <Calendar size={14} />
                 <span>
-                  {isCancelled ? "Acesso até" : "Renova a"} <strong className="text-white">{formatDate(expiresAt)}</strong>
+                  {isTrialing
+                    ? <>Trial termina a <strong className="text-white">{formatDate(expiresAt)}</strong></>
+                    : isInGracePeriod
+                      ? <>Renova antes de <strong className="text-white">{formatDate(expiresAt)}</strong></>
+                      : isCancelled
+                        ? <>Acesso até <strong className="text-white">{formatDate(expiresAt)}</strong></>
+                        : <>Renova a <strong className="text-white">{formatDate(expiresAt)}</strong></>}
                 </span>
               </div>
             )}
@@ -216,7 +233,7 @@ export function ManageMembership() {
         </motion.div>
 
         {/* Benefits */}
-        {currentPlan && isActive && (
+        {currentPlan && hasPremiumAccess && (
           <section className="mt-6">
             <h3 className="mb-3 text-sm font-extrabold uppercase tracking-wider text-white/50">
               O que tens incluído
@@ -348,6 +365,9 @@ export function ManageMembership() {
             </div>
           </motion.button>
         </section>
+
+        {/* Referrals */}
+        <ReferralSection />
 
         {/* Payment history */}
         <section className="mt-7">

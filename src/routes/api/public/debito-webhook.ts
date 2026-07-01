@@ -110,6 +110,8 @@ export const Route = createFileRoute("/api/public/debito-webhook")({
               _plan_tier: row.plan_tier,
               _days: days,
             });
+            // Referral bonus (idempotent — first activation only)
+            await supabaseAdmin.rpc("grant_referral_bonus", { _referred_id: row.user_id });
           }
         }
 
