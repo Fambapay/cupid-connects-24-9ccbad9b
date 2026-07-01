@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-router";
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -25,7 +25,8 @@ export const Route = createFileRoute("/chat/$matchId")({
 function ChatRoom() {
   const { matchId } = useParams({ from: "/chat/$matchId" });
   const { user } = useAuth();
-  const { entitlements } = useSubscription();
+  const { entitlements, hasPremiumAccess } = useSubscription();
+  const navigate = useNavigate();
   const { messages, peer, loading, notFound, send } = useMessages(matchId);
   const [typing, setTyping] = useState(false);
   const [peerLastReadAt, setPeerLastReadAt] = useState<string | null>(null);
@@ -258,6 +259,15 @@ function ChatRoom() {
     const input = inputRef.current;
     const value = input?.value.trim() ?? "";
     if (!value) return;
+    // Hard paywall: block chat send without premium access.
+    if (!hasPremiumAccess) {
+      const { toast } = await import("sonner");
+      toast.error("Precisas de subscrição para enviar mensagens", {
+        description: "Ativa o Hunie Premium para continuar.",
+        action: { label: "Ver planos", onClick: () => navigate({ to: "/membership" }) },
+      });
+      return;
+    }
     if (input) input.value = "";
     inputHasTextRef.current = false;
     // Only keep focus if the input was already focused (keyboard open).
