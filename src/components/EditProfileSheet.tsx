@@ -315,6 +315,71 @@ export function EditProfileSheet({
                   })}
                 </div>
               </section>
+
+              {/* Altura */}
+              <section>
+                <SectionHeader title="Altura" hint={draft.heightCm ? `${draft.heightCm} cm` : 'Opcional'} />
+                <input
+                  type="range"
+                  min={140}
+                  max={210}
+                  step={1}
+                  value={draft.heightCm ?? 170}
+                  onChange={(e) =>
+                    setDraft((d) => ({ ...d, heightCm: Number(e.target.value) }))
+                  }
+                  className="w-full accent-[color:var(--brand-pink)]"
+                />
+                {draft.heightCm != null && (
+                  <button
+                    type="button"
+                    onClick={() => setDraft((d) => ({ ...d, heightCm: null }))}
+                    className="mt-2 text-[12px] font-medium"
+                    style={{ color: 'var(--edit-sheet-fg-dim)' }}
+                  >
+                    Não indicar
+                  </button>
+                )}
+              </section>
+
+              {/* À procura de */}
+              <section>
+                <SectionHeader title="À procura de" />
+                <OptionGrid
+                  value={draft.lookingFor ?? null}
+                  options={LOOKING_FOR_LABELS}
+                  onChange={(v) => setDraft((d) => ({ ...d, lookingFor: v }))}
+                />
+              </section>
+
+              {/* Estilo de vida */}
+              <section className="space-y-5">
+                <SectionHeader title="Estilo de vida" />
+                <LifestyleRow
+                  label="Animais"
+                  value={draft.pets ?? null}
+                  options={PETS_LABELS}
+                  onChange={(v) => setDraft((d) => ({ ...d, pets: v }))}
+                />
+                <LifestyleRow
+                  label="Fumo"
+                  value={draft.smoking ?? null}
+                  options={SMOKING_LABELS}
+                  onChange={(v) => setDraft((d) => ({ ...d, smoking: v }))}
+                />
+                <LifestyleRow
+                  label="Bebida"
+                  value={draft.drinking ?? null}
+                  options={DRINKING_LABELS}
+                  onChange={(v) => setDraft((d) => ({ ...d, drinking: v }))}
+                />
+                <LifestyleRow
+                  label="Treino"
+                  value={draft.workout ?? null}
+                  options={WORKOUT_LABELS}
+                  onChange={(v) => setDraft((d) => ({ ...d, workout: v }))}
+                />
+              </section>
             </div>
           </motion.section>
         </>
