@@ -274,11 +274,6 @@ function Discover() {
       </main>
 
 
-      {!isPremium && bannerVisible && items.length > 0 && !detailOpen && (
-        <div onClick={(e) => e.stopPropagation()}>
-          <BrowseBanner count={items.length} onActivate={openPaywall} />
-        </div>
-      )}
 
       <PaywallSheet
         open={paywallOpen}
