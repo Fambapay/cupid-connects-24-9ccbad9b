@@ -230,7 +230,7 @@ export const DiscoveryPage = ({
             </motion.div>
 
           </motion.div>
-          {showTopBar && (
+          {showTopBar && !detailOpen && (
             <motion.div variants={itemVariants}>
               <DiscoverTopBar
                 onOpenFilters={onOpenFilters}
