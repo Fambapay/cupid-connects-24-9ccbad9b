@@ -4,6 +4,7 @@ import { ProfileCard, type ProfileCardHandle } from "./ProfileCard";
 import { SwipeActions } from "./SwipeActions";
 import { DiscoverTopBar } from "./DiscoverTopBar";
 import { EmptyDiscovery } from "./EmptyDiscovery";
+import { useDiscoveryDetailOpen } from "@/lib/discoveryDetail";
 
 import type { DiscoveryProfile, SwipeDirection } from "./types";
 
