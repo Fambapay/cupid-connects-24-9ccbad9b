@@ -26,6 +26,7 @@ function ChatRoom() {
   const { matchId } = useParams({ from: "/chat/$matchId" });
   const { user } = useAuth();
   const { entitlements, hasPremiumAccess } = useSubscription();
+  const navigate = useNavigate();
   const { messages, peer, loading, notFound, send } = useMessages(matchId);
   const [typing, setTyping] = useState(false);
   const [peerLastReadAt, setPeerLastReadAt] = useState<string | null>(null);
