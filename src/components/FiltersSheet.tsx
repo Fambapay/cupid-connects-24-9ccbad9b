@@ -9,7 +9,6 @@ export interface DiscoveryFilters {
   ageMax: number;
   distance: number;
   verifiedOnly: boolean;
-  onlineNow: boolean;
   hasBio: boolean;
   withPhotos: boolean;
   heightMin: number;
@@ -30,7 +29,6 @@ export const DEFAULT_FILTERS: DiscoveryFilters = {
   ageMax: 55,
   distance: 50,
   verifiedOnly: false,
-  onlineNow: false,
   hasBio: false,
   withPhotos: true,
   heightMin: 150,
@@ -138,7 +136,6 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
                     { value: 'todos', label: 'Todos' },
                     { value: 'feminino', label: 'Mulheres' },
                     { value: 'masculino', label: 'Homens' },
-                    { value: 'nao_binario', label: 'Não-binário' },
                   ]}
                   value={local.gender}
                   onChange={(v) => update('gender', v as DiscoveryFilters['gender'])}
