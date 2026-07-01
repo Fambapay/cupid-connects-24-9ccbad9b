@@ -296,7 +296,7 @@ export function PaywallSheet({
                         animate={{
                           width: `${Math.min(
                             100,
-                            (((typeof likesRemaining === "number" ? likesRemaining : freeLikes) / Math.max(1, likesLimit)) * 100),
+                            (((typeof likesRemaining === "number" ? likesRemaining : 0) / Math.max(1, likesLimit)) * 100),
                           )}%`,
                         }}
                         transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
