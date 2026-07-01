@@ -14,7 +14,7 @@ import {
 import { getPacks, type Pack, type PackKind } from "@/lib/pricing";
 import { formatCountryPrice } from "@/lib/country/config";
 import { useCountry } from "@/lib/country/context";
-import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
+import { useNavigate } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
 
 const COPY: Record<
