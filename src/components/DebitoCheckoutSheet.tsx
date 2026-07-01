@@ -81,6 +81,7 @@ export function DebitoCheckoutSheet({
   const [errMsg, setErrMsg] = useState<string | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(TIMEOUT_MS / 1000);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [viewport, setViewport] = useState({ height: 0, bottomInset: 0 });
 
   useEffect(() => {
     // Re-seed method when country (or its payments list) changes.
@@ -106,6 +107,37 @@ export function DebitoCheckoutSheet({
       body.style.cssText = prev;
       body.classList.remove("sheet-open");
       window.scrollTo(0, scrollY);
+    };
+  }, [open]);
+
+  // iOS Safari keeps fixed sheets behind the bottom browser chrome unless we
+  // anchor them to the visual viewport. This also behaves correctly in PWA.
+  useEffect(() => {
+    if (!open) return;
+
+    const updateViewport = () => {
+      const vv = window.visualViewport;
+      if (!vv) {
+        setViewport({ height: window.innerHeight, bottomInset: 0 });
+        return;
+      }
+
+      const bottomInset = Math.max(
+        0,
+        Math.ceil(window.innerHeight - vv.height - vv.offsetTop),
+      );
+      setViewport({ height: Math.floor(vv.height), bottomInset });
+    };
+
+    updateViewport();
+    window.visualViewport?.addEventListener("resize", updateViewport);
+    window.visualViewport?.addEventListener("scroll", updateViewport);
+    window.addEventListener("resize", updateViewport);
+
+    return () => {
+      window.visualViewport?.removeEventListener("resize", updateViewport);
+      window.visualViewport?.removeEventListener("scroll", updateViewport);
+      window.removeEventListener("resize", updateViewport);
     };
   }, [open]);
 
@@ -248,11 +280,14 @@ export function DebitoCheckoutSheet({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 360, damping: 36 }}
-            className="checkout-sheet-panel fixed inset-x-0 max-h-[85dvh] overflow-y-auto overscroll-contain rounded-t-3xl border-t border-[var(--surface-border)] bg-[image:var(--checkout-sheet-bg)] p-5 text-foreground shadow-[0_-20px_60px_-10px_rgba(240,70,140,0.3)]"
+            className="checkout-sheet-panel fixed inset-x-0 overflow-y-auto overscroll-contain rounded-t-3xl border-t border-[var(--surface-border)] bg-[image:var(--checkout-sheet-bg)] p-5 text-foreground shadow-[0_-20px_60px_-10px_rgba(240,70,140,0.3)]"
             style={{
               zIndex: 10011,
-              bottom: "calc(100vh - 100dvh)",
-              paddingBottom: "max(env(safe-area-inset-bottom), 24px)",
+              bottom: `max(${viewport.bottomInset}px, env(safe-area-inset-bottom))`,
+              maxHeight: viewport.height
+                ? `${Math.max(360, viewport.height - 16)}px`
+                : "calc(100dvh - 16px)",
+              paddingBottom: "max(env(safe-area-inset-bottom), 16px)",
             }}
           >
             
