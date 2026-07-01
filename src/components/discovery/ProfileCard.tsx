@@ -774,14 +774,6 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 380, damping: 36 }}
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0, bottom: 0.6 }}
-            onDragEnd={(_, info) => {
-              if (info.offset.y > 120 || info.velocity.y > 600) {
-                setDetailOpen(false);
-              }
-            }}
             style={{
               position: "absolute",
               inset: 0,
@@ -790,6 +782,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               color: "#fff",
               overflowY: "auto",
               overflowX: "hidden",
+              WebkitOverflowScrolling: "touch",
+              overscrollBehavior: "contain",
               paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 48px)",
               borderRadius: 0,
               touchAction: "pan-y",
