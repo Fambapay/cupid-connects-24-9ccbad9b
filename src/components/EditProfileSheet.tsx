@@ -272,7 +272,7 @@ export function EditProfileSheet({
                   value={draft.bio}
                   onChange={(e) => setDraft(d => ({ ...d, bio: e.target.value.slice(0, 500) }))}
                   rows={4}
-                  placeholder="Conta algo sobre ti..."
+                  placeholder="Diz-nos quem és, em poucas linhas."
                   className="hunie-input w-full resize-none p-4 text-[14px] leading-relaxed outline-none"
                   style={{
                     color: 'var(--edit-sheet-fg)',
