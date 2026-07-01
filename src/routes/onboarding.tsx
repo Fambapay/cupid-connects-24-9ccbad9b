@@ -422,6 +422,8 @@ function OnboardingPage() {
     }
 
     try { localStorage.removeItem(storageKey(user.id)); } catch { /* noop */ }
+    // Mark referral onboarding-complete (no-op if no referral applied)
+    try { await supabase.rpc("mark_referral_onboarding_complete"); } catch { /* noop */ }
     const { invalidateOnboardingCache } = await import("@/lib/authGuard");
     invalidateOnboardingCache();
     await reload();
