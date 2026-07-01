@@ -483,6 +483,12 @@ function ChatRoom() {
         fallbackName={peer.name}
         fallbackPhoto={peer.photo}
       />
+
+      <PaywallSheet
+        open={paywallOpen}
+        onClose={() => setPaywallOpen(false)}
+        defaultTier="plus"
+      />
     </motion.div>
   );
 }
