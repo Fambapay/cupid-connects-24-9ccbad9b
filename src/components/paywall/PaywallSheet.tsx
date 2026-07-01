@@ -116,9 +116,9 @@ function usePaywallCopy(origin: PaywallSheetProps["origin"], subscription: Retur
       };
     }
     return {
-      icon: Heart,
-      text: "Versão free — capacidade limitada",
-      tone: "free" as const,
+      icon: Lock,
+      text: "Subscreve para continuar a usar o Hunie",
+      tone: "expired" as const,
     };
   }, [isTrialing, trialDaysLeft, isInGracePeriod, graceDaysLeft, hadTrial, hadPlus]);
 
