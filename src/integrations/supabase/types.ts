@@ -1203,6 +1203,7 @@ export type Database = {
       get_my_referral_summary: { Args: never; Returns: Json }
       get_or_create_my_referral_code: { Args: never; Returns: string }
       get_unread_chats_count: { Args: never; Returns: number }
+      get_who_liked_me: { Args: never; Returns: Json }
       grant_credits: {
         Args: { _pack_kind: string; _quantity: number; _user_id: string }
         Returns: Json
