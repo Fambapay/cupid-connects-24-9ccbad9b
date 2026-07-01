@@ -145,7 +145,9 @@ function Discover() {
 
     // Hard paywall: without premium access (trial/active/grace), block ALL swipes.
     if (!isPremium) {
-      setPendingAction({ profileId: target.id, direction });
+      if (direction !== "pass") {
+        setPendingAction({ profileId: target.id, direction });
+      }
       openPaywall();
       return "blocked";
     }
