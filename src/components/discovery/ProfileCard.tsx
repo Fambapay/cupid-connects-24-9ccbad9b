@@ -16,6 +16,7 @@ import {
 } from "framer-motion";
 import { MapPin, ArrowUp, X, ChevronLeft, ChevronRight } from "lucide-react";
 import type { DiscoveryProfile, SwipeDirection } from "./types";
+import { setDiscoveryDetailOpen } from "@/lib/discoveryDetail";
 
 interface ProfileCardProps {
   profile: DiscoveryProfile;
@@ -163,6 +164,10 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
   ) => {
     const [photoIdx, setPhotoIdx] = useState(0);
     const [detailOpen, setDetailOpen] = useState(false);
+    useEffect(() => {
+      setDiscoveryDetailOpen(detailOpen);
+      return () => setDiscoveryDetailOpen(false);
+    }, [detailOpen]);
     const photos = profile.photos.length ? profile.photos : [""];
 
     const localX = useMotionValue(0);
@@ -782,7 +787,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               background: "#0a0a0a",
               color: "#fff",
               overflowY: "auto",
-              paddingBottom: 140,
+              paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 32px)",
               borderRadius: 0,
               touchAction: "pan-y",
             }}
@@ -795,7 +800,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 if (relX < rect.width / 2) goPrevPhoto();
                 else goNextPhoto();
               }}
-              style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: "#111", marginTop: -22, cursor: "pointer" }}
+              style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", background: "#111", marginTop: "env(safe-area-inset-top, 0px)", cursor: "pointer" }}
             >
               {photos.map((src, i) => (
                 <img
@@ -895,7 +900,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               onClick={() => setDetailOpen(false)}
               style={{
                 position: "fixed",
-                top: 14,
+                top: "calc(env(safe-area-inset-top, 0px) + 12px)",
                 right: 16,
                 width: 42,
                 height: 42,
@@ -995,20 +1000,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               )}
             </div>
 
-            {panelActions && (
-              <div
-                style={{
-                  position: "sticky",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  background:
-                    "linear-gradient(to top, #0a0a0a 70%, rgba(10,10,10,0))",
-                }}
-              >
-                {panelActions}
-              </div>
-            )}
+            {/* panelActions intentionally not rendered — swipe actions hidden inside detail view */}
           </motion.div>
         )}
 

@@ -13,6 +13,7 @@ import { hapticTap } from "@/hooks/useNativePlatform";
 import { useLikesCount } from "@/hooks/useLikesCount";
 import { useUnreadChats } from "@/hooks/useUnreadChats";
 import NativeTabs, { nativeTabsAvailable } from "@/lib/native/nativeTabs";
+import { useDiscoveryDetailOpen } from "@/lib/discoveryDetail";
 
 type Tab = "discover" | "likes" | "chat" | "profile";
 
@@ -488,6 +489,7 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
 
   // Hide nav inside a conversation (overlay screen). Matches /chat/<id>.
   const inConversation = /^\/chat\/[^/]+/.test(pathname);
+  const detailOpen = useDiscoveryDetailOpen();
 
   // Warm all main tab routes so switches feel instant.
   useEffect(() => {
@@ -503,7 +505,7 @@ export function BottomNav(props: Omit<BottomNavProps, "activeTab" | "onTabChange
   const [nativeFailed, setNativeFailed] = useState(false);
 
   // Hide entirely inside a conversation (chat detail overlays the list).
-  if (inConversation) return null;
+  if (inConversation || detailOpen) return null;
 
   // Web/Android/failure → HTML pill fallback.
   if (nativeTabsAvailable() && !nativeFailed) {
