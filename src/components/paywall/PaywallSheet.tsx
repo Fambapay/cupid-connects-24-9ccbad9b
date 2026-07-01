@@ -96,8 +96,8 @@ function usePaywallCopy(origin: PaywallSheetProps["origin"], subscription: Retur
       return {
         icon: Clock,
         text: trialDaysLeft === 1
-          ? "Último dia de acesso completo"
-          : `Faltam ${trialDaysLeft} dias — aproveita antes que feche`,
+          ? "Hoje é o teu último dia para descobrir mais. Depois, um mundo de possibilidades espera por ti."
+          : `Ainda tens ${trialDaysLeft} dias para descobrir mais. Depois, um mundo de possibilidades espera por ti.`,
         tone: "trial" as const,
       };
     }
@@ -105,21 +105,21 @@ function usePaywallCopy(origin: PaywallSheetProps["origin"], subscription: Retur
       return {
         icon: AlertCircle,
         text: graceDaysLeft === 1
-          ? "Último dia antes de perderes os teus matches"
-          : `${graceDaysLeft} dias para não perderes o que já construíste`,
+          ? "Ainda tens hoje para não perderes o que já construíste. Um novo começo espera por ti."
+          : `Ainda tens ${graceDaysLeft} dias para não perderes o que já construíste. Um novo começo espera por ti.`,
         tone: "warning" as const,
       };
     }
     if (hadTrial || hadPlus) {
       return {
         icon: Lock,
-        text: "Os teus matches estão à espera. Volta agora.",
+        text: "Os teus matches estão à espera. Um mundo de possibilidades espera por ti.",
         tone: "expired" as const,
       };
     }
     return {
       icon: Lock,
-      text: "Só falta um passo para continuares",
+      text: "Só falta um passo para continuares. Um mundo de possibilidades espera por ti.",
       tone: "expired" as const,
     };
   }, [isTrialing, trialDaysLeft, isInGracePeriod, graceDaysLeft, hadTrial, hadPlus]);
