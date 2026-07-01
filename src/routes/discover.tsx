@@ -13,6 +13,7 @@ import type { PackKind } from "@/lib/pricing";
 import { FirstImpressionSheet } from "@/components/discovery/FirstImpressionSheet";
 import { FirstImpressionToast } from "@/components/discovery/FirstImpressionToast";
 import { BrowseBanner } from "@/components/discovery/BrowseBanner";
+import { useDiscoveryDetailOpen } from "@/lib/discoveryDetail";
 import { useDiscovery } from "@/hooks/useDiscovery";
 import { useCredits } from "@/hooks/useCredits";
 import { useBoost } from "@/hooks/useBoost";
