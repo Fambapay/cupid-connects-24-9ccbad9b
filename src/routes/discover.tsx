@@ -12,7 +12,8 @@ import { CreditShopSheet } from "@/components/paywall/CreditShopSheet";
 import type { PackKind } from "@/lib/pricing";
 import { FirstImpressionSheet } from "@/components/discovery/FirstImpressionSheet";
 import { FirstImpressionToast } from "@/components/discovery/FirstImpressionToast";
-import { BrowseBanner } from "@/components/discovery/BrowseBanner";
+
+
 import { useDiscoveryDetailOpen } from "@/lib/discoveryDetail";
 import { useDiscovery } from "@/hooks/useDiscovery";
 import { useCredits } from "@/hooks/useCredits";
@@ -58,7 +59,6 @@ function Discover() {
   const [openingChat, setOpeningChat] = useState(false);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [creditShop, setCreditShop] = useState<PackKind | null>(null);
-  const [bannerVisible, setBannerVisible] = useState(false);
   const [firstImpression, setFirstImpression] = useState<DiscoveryProfile | null>(null);
   const [sendingFI, setSendingFI] = useState(false);
   const [pendingAction, setPendingAction] = useState<
@@ -71,18 +71,8 @@ function Discover() {
     setIndex(0);
   }, [items.length]);
 
-  // Show banner after 3s if not premium
-  useEffect(() => {
-    if (isPremium) {
-      setBannerVisible(false);
-      return;
-    }
-    const t = setTimeout(() => setBannerVisible(true), 3000);
-    return () => clearTimeout(t);
-  }, [isPremium]);
 
   const openPaywall = () => {
-    setBannerVisible(false);
     setPaywallOpen(true);
   };
 
@@ -283,11 +273,6 @@ function Discover() {
       </main>
 
 
-      {!isPremium && bannerVisible && items.length > 0 && !detailOpen && (
-        <div onClick={(e) => e.stopPropagation()}>
-          <BrowseBanner count={items.length} onActivate={openPaywall} />
-        </div>
-      )}
 
       <PaywallSheet
         open={paywallOpen}
