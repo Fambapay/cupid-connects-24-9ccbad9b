@@ -14,7 +14,7 @@ import {
 import { getPacks, type Pack, type PackKind } from "@/lib/pricing";
 import { formatCountryPrice } from "@/lib/country/config";
 import { useCountry } from "@/lib/country/context";
-import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
+import { useNavigate } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
 
 const COPY: Record<
@@ -63,10 +63,10 @@ function unitPrice(p: Pack) {
 }
 
 export function CreditShopSheet({ open, kind, onClose, onSuccess }: CreditShopSheetProps) {
-  const { credits, reload } = useCredits();
+  const { credits, reload: _reload } = useCredits();
+  const navigate = useNavigate();
   const { country, config } = useCountry();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   const packs = useMemo(
     () =>
@@ -296,7 +296,20 @@ export function CreditShopSheet({ open, kind, onClose, onSuccess }: CreditShopSh
             >
               <motion.button
                 whileTap={{ scale: 0.985 }}
-                onClick={() => setCheckoutOpen(true)}
+                onClick={() => {
+                  if (!selected) return;
+                  onClose();
+                  navigate({
+                    to: "/checkout",
+                    search: {
+                      title: `${selected.quantity} ${kind === "boost" ? "Boosts" : "Super Likes"}`,
+                      subtitle: "Crédito instantâneo após confirmação",
+                      amount: selected.price,
+                      packId: selected.id,
+                    },
+                  });
+                  onSuccess?.();
+                }}
                 disabled={!selected}
                 className={`relative h-12 w-full overflow-hidden rounded-full bg-gradient-to-r ${accent} text-[15px] font-bold text-white disabled:opacity-50`}
                 style={{
@@ -316,22 +329,6 @@ export function CreditShopSheet({ open, kind, onClose, onSuccess }: CreditShopSh
             </div>
           </motion.div>
 
-          {selected && checkoutOpen && (
-            <DebitoCheckoutSheet
-              open={checkoutOpen}
-              onClose={() => setCheckoutOpen(false)}
-              title={`${selected.quantity} ${kind === "boost" ? "Boosts" : "Super Likes"}`}
-              subtitle="Crédito instantâneo após confirmação"
-              amountMzn={selected.price}
-              packId={selected.id}
-              onSuccess={async () => {
-                await reload();
-                setCheckoutOpen(false);
-                onSuccess?.();
-                onClose();
-              }}
-            />
-          )}
         </>
       )}
     </AnimatePresence>

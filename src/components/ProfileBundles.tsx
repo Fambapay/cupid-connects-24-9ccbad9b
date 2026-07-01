@@ -1,8 +1,7 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Zap, Star, Flame, Crown, Sparkles, Check, ChevronRight } from "lucide-react";
-import { Link } from "@tanstack/react-router";
-import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { hapticTap } from "@/hooks/useNativePlatform";
 import { getPack } from "@/lib/pricing";
 import { formatCountryPrice } from "@/lib/country/config";
@@ -61,7 +60,7 @@ const BUNDLES: Bundle[] = [
 ];
 
 export function ProfileBundles() {
-  const [active, setActive] = useState<{ bundle: Bundle; price: number } | null>(null);
+  const navigate = useNavigate();
   const { country } = useCountry();
 
   // Resolve each bundle's price from the country catalog at render time.
@@ -110,7 +109,16 @@ export function ProfileBundles() {
                 transition={{ delay: i * 0.05, duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
                 onClick={() => {
                   hapticTap();
-                  setActive({ bundle: b, price });
+                  navigate({
+                    to: "/checkout",
+                    search: {
+                      title: `${b.title} · ${b.subtitle}`,
+                      subtitle: "Crédito instantâneo após confirmação",
+                      amount: price,
+                      packId: b.packId,
+                      returnTo: "/profile",
+                    },
+                  });
                 }}
                 className="bundle-card relative shrink-0 snap-start w-[260px] text-left rounded-[20px] overflow-hidden border border-white/10 active:scale-[0.98] transition-transform"
                 style={{ background: b.gradient }}
@@ -200,16 +208,6 @@ export function ProfileBundles() {
         </div>
       </div>
 
-      {active && (
-        <DebitoCheckoutSheet
-          open={!!active}
-          onClose={() => setActive(null)}
-          title={`${active.bundle.title} · ${active.bundle.subtitle}`}
-          subtitle="Crédito instantâneo após confirmação"
-          amountMzn={active.price}
-          packId={active.bundle.packId}
-        />
-      )}
 
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }

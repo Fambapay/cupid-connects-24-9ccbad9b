@@ -18,7 +18,7 @@ import { z } from "zod";
 
 import { useCredits } from "@/hooks/useCredits";
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
-import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
+
 import { getPacks, type Pack, type PackKind } from "@/lib/pricing";
 import { formatCountryPrice, type CountryCode } from "@/lib/country/config";
 import { useCountry } from "@/lib/country/context";
@@ -321,7 +321,7 @@ function TrustTile({ icon, label }: { icon: React.ReactNode; label: string }) {
 }
 
 function PackCard({ pack, index, country }: { pack: Pack; index: number; country: CountryCode }) {
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const navigate = useNavigate();
   const accent =
     pack.kind === "boost"
       ? "from-fuchsia-500 to-indigo-500"
@@ -331,7 +331,17 @@ function PackCard({ pack, index, country }: { pack: Pack; index: number; country
   const unit = unitPrice(pack);
   const disc = discountPct(country, pack.kind, unit);
 
-  const handleBuy = () => setSheetOpen(true);
+  const handleBuy = () =>
+    navigate({
+      to: "/checkout",
+      search: {
+        title: `${pack.quantity} ${pack.kind === "boost" ? "Boosts" : "Super Likes"}`,
+        subtitle: "Crédito instantâneo após confirmação",
+        amount: pack.price,
+        packId: pack.id,
+        returnTo: "/shop",
+      },
+    });
 
   return (
     <motion.div
@@ -440,14 +450,6 @@ function PackCard({ pack, index, country }: { pack: Pack; index: number; country
           </motion.button>
         </div>
       </div>
-      <DebitoCheckoutSheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        title={`${pack.quantity} ${pack.kind === "boost" ? "Boosts" : "Super Likes"}`}
-        subtitle="Crédito instantâneo após confirmação"
-        amountMzn={pack.price}
-        packId={pack.id}
-      />
     </motion.div>
   );
 }
