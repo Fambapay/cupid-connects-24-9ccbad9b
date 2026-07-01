@@ -24,6 +24,12 @@ export interface Profile {
   interests: string[];
   latitude: number | null;
   longitude: number | null;
+  height_cm: number | null;
+  looking_for: string | null;
+  pets: string | null;
+  smoking: string | null;
+  drinking: string | null;
+  workout: string | null;
 }
 
 const profileCache = new Map<string, Profile>();
@@ -44,7 +50,7 @@ export function useProfile() {
     const [{ data }, { data: phoneData }, { data: locData }] = await Promise.all([
       supabase
         .from("profiles")
-        .select("id,name,age,city,country,bio,is_paused,is_incognito,is_verified,membership_tier,membership_status,membership_expires_at,onboarding_completed,onboarding_step,birthdate,gender,interested_in,interests")
+        .select("id,name,age,city,country,bio,is_paused,is_incognito,is_verified,membership_tier,membership_status,membership_expires_at,onboarding_completed,onboarding_step,birthdate,gender,interested_in,interests,height_cm,looking_for,pets,smoking,drinking,workout")
         .eq("id", user.id)
         .maybeSingle(),
       supabase.rpc("get_my_phone"),

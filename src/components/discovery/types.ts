@@ -12,6 +12,12 @@ export interface DiscoveryProfile {
   isOnline?: boolean;
   isVerified?: boolean;
   isPremium?: boolean;
+  heightCm?: number | null;
+  lookingFor?: string | null;
+  pets?: string | null;
+  smoking?: string | null;
+  drinking?: string | null;
+  workout?: string | null;
 }
 
 export interface DailyLimits {

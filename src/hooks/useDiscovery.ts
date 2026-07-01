@@ -28,6 +28,12 @@ export interface DiscoverProfile {
   isOnline: boolean;
   lastActiveAt: string | null;
   distance: number;
+  height_cm: number | null;
+  looking_for: string | null;
+  pets: string | null;
+  smoking: string | null;
+  drinking: string | null;
+  workout: string | null;
 }
 
 export interface DiscoveryOptions {
@@ -64,6 +70,12 @@ interface RawCandidate {
   last_active_at: string | null;
   distance_km: number | null;
   photos: string[] | null;
+  height_cm: number | null;
+  looking_for: string | null;
+  pets: string | null;
+  smoking: string | null;
+  drinking: string | null;
+  workout: string | null;
 }
 
 interface FeedResponse {
@@ -164,6 +176,12 @@ async function fetchDiscovery(
       isOnline: t > 0 && now - t <= ONLINE_WINDOW_MS,
       lastActiveAt: c.last_active_at,
       distance: c.distance_km ?? 0,
+      height_cm: c.height_cm ?? null,
+      looking_for: c.looking_for ?? null,
+      pets: c.pets ?? null,
+      smoking: c.smoking ?? null,
+      drinking: c.drinking ?? null,
+      workout: c.workout ?? null,
     };
   });
 
