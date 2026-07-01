@@ -1075,10 +1075,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                   <p
                     style={{
                       margin: 0,
-                      fontFamily: '"Instrument Serif", Georgia, serif',
-                      fontStyle: "italic",
-                      fontSize: 22,
-                      lineHeight: 1.4,
+                      fontSize: 15,
+                      lineHeight: 1.55,
                       color: "rgba(255,255,255,0.92)",
                       fontWeight: 400,
                     }}
