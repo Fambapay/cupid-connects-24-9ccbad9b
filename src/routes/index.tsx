@@ -21,6 +21,41 @@ import { faqData } from "@/components/landing/faqData";
 import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
 import { useForceDarkTheme } from "@/lib/theme";
 
+// Smooth anchor scroll with easeInOutCubic + brief highlight pulse on target.
+// Feels premium vs. the browser's default snap-jump.
+function smoothAnchorClick(e: React.MouseEvent<HTMLAnchorElement>) {
+  const href = e.currentTarget.getAttribute("href");
+  if (!href || !href.startsWith("#")) return;
+  const id = href.slice(1);
+  const target = document.getElementById(id);
+  if (!target) return;
+  e.preventDefault();
+
+  const navOffset = 96; // sticky nav + a little breathing room
+  const startY = window.scrollY;
+  const targetY = target.getBoundingClientRect().top + startY - navOffset;
+  const distance = targetY - startY;
+  if (Math.abs(distance) < 4) return;
+
+  const duration = Math.min(1100, Math.max(520, Math.abs(distance) * 0.55));
+  const startTime = performance.now();
+  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+  const step = (now: number) => {
+    const t = Math.min(1, (now - startTime) / duration);
+    window.scrollTo(0, startY + distance * ease(t));
+    if (t < 1) requestAnimationFrame(step);
+    else {
+      target.classList.add("ll-section-flash");
+      window.setTimeout(() => target.classList.remove("ll-section-flash"), 1100);
+      // Update hash without triggering a jump.
+      history.replaceState(null, "", `#${id}`);
+    }
+  };
+  requestAnimationFrame(step);
+}
+
+
 
 // SEO-01: Country-aware <head> resolved at SSR so crawlers (WhatsApp,
 // Twitter, Facebook, LinkedIn) get a real title/description/og:image when
@@ -319,10 +354,10 @@ function Landing() {
               <img src={hunieMarkTransparent.url} alt="Logótipo Hunie" className="ll-logo-img" />
             </Link>
             <div className="ll-nav-links">
-              <a className="ll-nav-link" href="#como-funciona">Como funciona</a>
-              <a className="ll-nav-link" href="#planos">Planos</a>
-              <a className="ll-nav-link" href="#cidades">Cidades</a>
-              <a className="ll-nav-link" href="#faq">FAQ</a>
+              <a className="ll-nav-link" href="#como-funciona" onClick={smoothAnchorClick}>Como funciona</a>
+              <a className="ll-nav-link" href="#planos" onClick={smoothAnchorClick}>Planos</a>
+              <a className="ll-nav-link" href="#cidades" onClick={smoothAnchorClick}>Cidades</a>
+              <a className="ll-nav-link" href="#faq" onClick={smoothAnchorClick}>FAQ</a>
               <Link to="/auth/login" className="ll-nav-link">Entrar</Link>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -341,10 +376,10 @@ function Landing() {
           </div>
           {menuOpen && (
             <div className="ll-nav-menu">
-              <a className="ll-nav-menu-link" href="#como-funciona" onClick={() => setMenuOpen(false)}>Como funciona</a>
-              <a className="ll-nav-menu-link" href="#planos" onClick={() => setMenuOpen(false)}>Planos</a>
-              <a className="ll-nav-menu-link" href="#cidades" onClick={() => setMenuOpen(false)}>Cidades</a>
-              <a className="ll-nav-menu-link" href="#faq" onClick={() => setMenuOpen(false)}>FAQ</a>
+              <a className="ll-nav-menu-link" href="#como-funciona" onClick={(e) => { smoothAnchorClick(e); setMenuOpen(false); }}>Como funciona</a>
+              <a className="ll-nav-menu-link" href="#planos" onClick={(e) => { smoothAnchorClick(e); setMenuOpen(false); }}>Planos</a>
+              <a className="ll-nav-menu-link" href="#cidades" onClick={(e) => { smoothAnchorClick(e); setMenuOpen(false); }}>Cidades</a>
+              <a className="ll-nav-menu-link" href="#faq" onClick={(e) => { smoothAnchorClick(e); setMenuOpen(false); }}>FAQ</a>
               <Link to="/auth/login" className="ll-nav-menu-link" onClick={() => setMenuOpen(false)}>Entrar</Link>
               <Link to="/auth/register" className="ll-nav-menu-link ll-nav-menu-cta" onClick={() => setMenuOpen(false)}>Criar conta</Link>
             </div>

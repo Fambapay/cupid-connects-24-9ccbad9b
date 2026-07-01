@@ -541,3 +541,16 @@
   .ll-reveal { opacity: 1; transform: none; transition: none; }
   .ll-kicker-dot { animation: none !important; }
 }
+
+/* Smooth-scroll target flash — subtle brand-tinted pulse when a nav link lands. */
+.ll-section-flash {
+  animation: ll-target-flash 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes ll-target-flash {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 79, 163, 0); }
+  22%  { box-shadow: 0 0 0 14px rgba(255, 79, 163, 0.18); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 79, 163, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ll-section-flash { animation: none; }
+}
