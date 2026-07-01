@@ -19,6 +19,7 @@ import { useDiscovery } from "@/hooks/useDiscovery";
 import { useCredits } from "@/hooks/useCredits";
 import { useBoost } from "@/hooks/useBoost";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import type { DiscoveryProfile, SwipeDirection } from "@/components/discovery/types";
@@ -48,8 +49,19 @@ function Discover() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isPremium, entitlements } = useSubscription();
+  const { profile } = useProfile();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
+  const [filtersInitialized, setFiltersInitialized] = useState(false);
+  useEffect(() => {
+    if (filtersInitialized || !profile?.interested_in) return;
+    const ii = profile.interested_in;
+    let gender: DiscoveryFilters['gender'] = 'todos';
+    if (ii.length === 1 && ii[0] === 'man') gender = 'masculino';
+    else if (ii.length === 1 && ii[0] === 'woman') gender = 'feminino';
+    setFilters((prev) => ({ ...prev, gender }));
+    setFiltersInitialized(true);
+  }, [profile?.interested_in, filtersInitialized]);
   const { items, loading, swipe, rewind, reload, dailyLimits } = useDiscovery({ filters });
   const { credits, reload: reloadCredits, syncCredits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
