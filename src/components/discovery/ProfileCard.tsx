@@ -16,6 +16,7 @@ import {
 } from "framer-motion";
 import { MapPin, ArrowUp, X, ChevronLeft, ChevronRight } from "lucide-react";
 import type { DiscoveryProfile, SwipeDirection } from "./types";
+import { setDiscoveryDetailOpen } from "@/lib/discoveryDetail";
 
 interface ProfileCardProps {
   profile: DiscoveryProfile;
