@@ -116,9 +116,9 @@ function usePaywallCopy(origin: PaywallSheetProps["origin"], subscription: Retur
       };
     }
     return {
-      icon: Heart,
-      text: "Versão free — capacidade limitada",
-      tone: "free" as const,
+      icon: Lock,
+      text: "Subscreve para continuar a usar o Hunie",
+      tone: "expired" as const,
     };
   }, [isTrialing, trialDaysLeft, isInGracePeriod, graceDaysLeft, hadTrial, hadPlus]);
 
@@ -214,8 +214,8 @@ export function PaywallSheet({
           ? "text-[#FF8ABF]"
           : "text-white/50";
 
-  const showLimitCounter = origin === "discover" || origin === "chat";
-  const freeLikes = NO_TIER_ENTITLEMENTS.dailyLikes;
+  // No free tier: only show the counter while the user is still in a live trial with visible remaining likes.
+  const showLimitCounter = (origin === "discover" || origin === "chat") && subscription.isTrialing && typeof likesRemaining === "number" && likesLimit > 0;
   const premiumLikes = PLUS.dailyLikes; // -1 = unlimited
 
   return (
@@ -284,7 +284,7 @@ export function PaywallSheet({
                       <span className="text-[13px] text-white/60">Likes hoje</span>
                     </div>
                     <span className="text-[13px] font-semibold tabular-nums text-white/80">
-                      {typeof likesRemaining === "number" ? likesRemaining : freeLikes}
+                      {typeof likesRemaining === "number" ? likesRemaining : 0}
                       <span className="mx-1 text-white/30">/</span>
                       {likesLimit}
                     </span>
@@ -296,7 +296,7 @@ export function PaywallSheet({
                         animate={{
                           width: `${Math.min(
                             100,
-                            (((typeof likesRemaining === "number" ? likesRemaining : freeLikes) / Math.max(1, likesLimit)) * 100),
+                            (((typeof likesRemaining === "number" ? likesRemaining : 0) / Math.max(1, likesLimit)) * 100),
                           )}%`,
                         }}
                         transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
