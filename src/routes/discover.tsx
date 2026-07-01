@@ -71,15 +71,6 @@ function Discover() {
     setIndex(0);
   }, [items.length]);
 
-  // Show banner after 3s if not premium
-  useEffect(() => {
-    if (isPremium) {
-      setBannerVisible(false);
-      return;
-    }
-    const t = setTimeout(() => setBannerVisible(true), 3000);
-    return () => clearTimeout(t);
-  }, [isPremium]);
 
   const openPaywall = () => {
     setBannerVisible(false);
