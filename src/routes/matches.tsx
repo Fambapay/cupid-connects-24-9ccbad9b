@@ -28,8 +28,10 @@ export const Route = createFileRoute("/matches")({
 
 function LikesPage() {
   const { likers, loading, error, reload } = useLikedMe();
-  const { entitlements } = useSubscription();
-  const isPremium = entitlements.canSeeWhoLiked;
+  const { entitlements, isTrialing } = useSubscription();
+  // Trial users get premium features globally, but "ver quem te deu like" is
+  // reserved for paying subscribers to preserve conversion incentive.
+  const isPremium = entitlements.canSeeWhoLiked && !isTrialing;
   const navigate = useNavigate();
   const isEmpty = !loading && !error && likers.length === 0;
 
