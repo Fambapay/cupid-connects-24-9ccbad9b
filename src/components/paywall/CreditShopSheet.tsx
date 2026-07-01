@@ -63,10 +63,10 @@ function unitPrice(p: Pack) {
 }
 
 export function CreditShopSheet({ open, kind, onClose, onSuccess }: CreditShopSheetProps) {
-  const { credits, reload } = useCredits();
+  const { credits, reload: _reload } = useCredits();
+  const navigate = useNavigate();
   const { country, config } = useCountry();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   const packs = useMemo(
     () =>
