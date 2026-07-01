@@ -8,8 +8,6 @@ import { AppleToast } from "@/components/notifications/AppleToast";
 import { LikeRevealToast } from "@/components/notifications/LikeRevealToast";
 import {
   scheduleLocalNotification,
-  isAppInBackground,
-  requestLocalNotificationPermission,
 } from "@/lib/native/localNotifications";
 
 type PeerInfo = { name: string; photo: string };

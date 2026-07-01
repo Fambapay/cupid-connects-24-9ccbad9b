@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/integrations/supabase/client.server'
+import type { Json } from '@/integrations/supabase/types'
 import { sendWebPush, type PushPayload } from './send.server'
 
 type NotifyKind = 'new_match' | 'new_message' | 'new_like' | 'promo'
@@ -239,13 +240,15 @@ async function reserveDelivery(
     : kind === 'new_like' ? ctx.swipe_id
     : ctx.url || null
 
+  const auditPayload = JSON.parse(JSON.stringify({ ctx, push: payload })) as Json
+
   const { error } = await supabaseAdmin.from('notification_deliveries').insert({
     event_key: eventKey,
     user_id: userId,
     kind,
     event_id: eventId,
     status: 'reserved',
-    payload: { ctx, push: payload },
+    payload: auditPayload,
   })
 
   // 23505 = unique violation. It means this exact notification event was
