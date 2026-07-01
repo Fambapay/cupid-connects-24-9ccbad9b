@@ -314,16 +314,38 @@
     min-height: 100lvh;
     background: var(--color-background);
   }
+  html {
+    /* iOS PWA: prevent auto text inflation on rotation & smooth momentum feel */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
   body {
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     overscroll-behavior-y: none;
+    /* Kill the iOS blue tap flash — feels much more native */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  /* GPU-composite the root so section transitions don't repaint the whole tree */
+  #root {
+    transform: translateZ(0);
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     font-weight: 800;
     letter-spacing: -0.03em;
+  }
+  /* Native-feel scrollers: momentum + no chain to body */
+  [data-scroller], .screen-scroll, .overflow-y-auto, .overflow-auto, .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  /* Cheap reset for buttons on iOS */
+  button {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
