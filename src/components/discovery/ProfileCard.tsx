@@ -900,7 +900,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               onClick={() => setDetailOpen(false)}
               style={{
                 position: "fixed",
-                top: 14,
+                top: "calc(env(safe-area-inset-top, 0px) + 12px)",
                 right: 16,
                 width: 42,
                 height: 42,
