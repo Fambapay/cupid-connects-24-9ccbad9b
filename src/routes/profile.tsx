@@ -35,7 +35,7 @@ function ProfilePage() {
   const navigate = useNavigate();
   const { profile, updateProfile, reload } = useProfile();
   const { photos, upload, remove } = usePhotoUpload();
-  const { isPremium, subscription } = useSubscription();
+  const { isPremium, isTrialing, subscription } = useSubscription();
   const { credits } = useCredits();
   const [editing, setEditing] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -51,6 +51,7 @@ function ProfilePage() {
       photos: photos.map((p) => p.url ?? '').filter(Boolean),
       isVerified: !!profile?.is_verified,
       isPremium,
+      isTrialing,
       tier: subscription.membershipTier,
       heightCm: profile?.height_cm ?? null,
       lookingFor: profile?.looking_for ?? null,
@@ -59,7 +60,7 @@ function ProfilePage() {
       drinking: profile?.drinking ?? null,
       workout: profile?.workout ?? null,
     }),
-    [profile, photos, isPremium, subscription.membershipTier],
+    [profile, photos, isPremium, isTrialing, subscription.membershipTier],
   );
 
   const handleAddFiles = async (files: File[]) => {
