@@ -56,88 +56,89 @@ type Benefit = {
 
 const BENEFITS_BY_TIER: Record<PlanTier, Benefit[]> = {
   select: [
-    { icon: InfinityIcon, label: "Likes ilimitados", highlight: true },
-    { icon: Eye, label: "Vê quem já gostou de ti" },
-    { icon: Star, label: "1 Super Like por dia" },
-    { icon: Rocket, label: "1 Boost na ativação" },
+    { icon: InfinityIcon, label: "Dá like sem contar os dias", highlight: true },
+    { icon: Eye, label: "Vê quem já reparou em ti" },
+    { icon: Star, label: "1 Super Like por dia — sê notado" },
+    { icon: Rocket, label: "Um Boost para começares em grande" },
   ],
   plus: [
-    { icon: MessageCircle, label: "Mensagens ilimitadas", highlight: true },
-    { icon: InfinityIcon, label: "Likes ilimitados", highlight: true },
-    { icon: Eye, label: "Vê quem já gostou de ti" },
-    { icon: Star, label: "5 Super Likes por dia" },
-    { icon: Rocket, label: "1 Boost por semana" },
-    { icon: SlidersHorizontal, label: "Filtros avançados" },
-    { icon: CheckCheck, label: "Confirmação de leitura" },
-    { icon: Undo2, label: "Voltar atrás no último swipe" },
-    { icon: Globe2, label: "Passport — outras cidades" },
+    { icon: Eye, label: "Descobre quem já te deu like", highlight: true },
+    { icon: MessageCircle, label: "Conversa sem limites", highlight: true },
+    { icon: InfinityIcon, label: "Likes ilimitados, todos os dias" },
+    { icon: Star, label: "5 Super Likes — mostra intenção" },
+    { icon: Rocket, label: "Um Boost por semana, mais olhares" },
+    { icon: SlidersHorizontal, label: "Filtros que fazem sentido para ti" },
+    { icon: CheckCheck, label: "Sabe quando as tuas mensagens são lidas" },
+    { icon: Undo2, label: "Muda de ideias — volta atrás" },
+    { icon: Globe2, label: "Conhece pessoas noutras cidades" },
   ],
   elite: [
-    { icon: Zap, label: "Prioridade absoluta no feed", highlight: true },
-    { icon: Crown, label: "Badge Elite no teu perfil" },
+    { icon: Zap, label: "O teu perfil aparece primeiro", highlight: true },
+    { icon: Crown, label: "Badge Elite — a diferença nota-se" },
     { icon: Star, label: "10 Super Likes por dia" },
-    { icon: Rocket, label: "1 Boost por dia" },
-    { icon: EyeOff, label: "Modo invisível" },
-    { icon: BarChart3, label: "Estatísticas do perfil" },
-    { icon: Sparkles, label: "Acesso antecipado a novidades" },
-    { icon: Headphones, label: "Suporte VIP prioritário" },
-    { icon: ShieldCheck, label: "Tudo do Plus incluído" },
+    { icon: Rocket, label: "Um Boost por dia, todos os dias" },
+    { icon: EyeOff, label: "Vê sem seres visto" },
+    { icon: BarChart3, label: "Percebe o que funciona no teu perfil" },
+    { icon: Sparkles, label: "Novidades antes de toda a gente" },
+    { icon: Headphones, label: "Suporte VIP — respondemos primeiro" },
+    { icon: ShieldCheck, label: "Tudo do Plus, e mais" },
   ],
 };
 
 function usePaywallCopy(origin: PaywallSheetProps["origin"], subscription: ReturnType<typeof useSubscription>) {
   const { isTrialing, trialDaysLeft, graceDaysLeft, isInGracePeriod, subscription: sub } = subscription;
 
-  // User seeing paywall has !hasPremiumAccess, but we still show relevant status
   const hadTrial = sub.membershipTier === "elite" && sub.membershipStatus === "expired";
   const hadPlus = sub.membershipTier === "plus" && sub.membershipStatus === "expired";
 
-  // Urgency banner copy
   const urgency = useMemo(() => {
     if (isTrialing && trialDaysLeft > 0) {
       return {
         icon: Clock,
-        text: `Faltam ${trialDaysLeft} dia${trialDaysLeft === 1 ? "" : "s"} no teu trial`,
+        text: trialDaysLeft === 1
+          ? "Último dia de acesso completo"
+          : `Faltam ${trialDaysLeft} dias — aproveita antes que feche`,
         tone: "trial" as const,
       };
     }
     if (isInGracePeriod && graceDaysLeft > 0) {
       return {
         icon: AlertCircle,
-        text: `Faltam ${graceDaysLeft} dia${graceDaysLeft === 1 ? "" : "s"} antes de perderes tudo`,
+        text: graceDaysLeft === 1
+          ? "Último dia antes de perderes os teus matches"
+          : `${graceDaysLeft} dias para não perderes o que já construíste`,
         tone: "warning" as const,
       };
     }
     if (hadTrial || hadPlus) {
       return {
         icon: Lock,
-        text: "O teu acesso Premium expirou. Recupera agora.",
+        text: "Os teus matches estão à espera. Volta agora.",
         tone: "expired" as const,
       };
     }
     return {
       icon: Lock,
-      text: "Subscreve para continuar a usar o Hunie",
+      text: "Só falta um passo para continuares",
       tone: "expired" as const,
     };
   }, [isTrialing, trialDaysLeft, isInGracePeriod, graceDaysLeft, hadTrial, hadPlus]);
 
-  // Contextual headline / subheadline
   const headline = useMemo(() => {
     switch (origin) {
       case "chat":
         return {
-          title: "Não deixes esta conversa perder-se",
-          subtitle: "Responde agora. O Premium desbloqueia mensagens ilimitadas, leitura de mensagens e prioridade no feed.",
+          title: "Alguém está à espera de ti",
+          subtitle: "Já deste o primeiro passo. Não deixes a conversa morrer aqui — desbloqueia e responde.",
         };
       case "discover":
         return {
-          title: "Não pares de fazer matches",
-          subtitle: "O Premium dá-te likes ilimitados, Super Likes e Boosts para seres visto primeiro.",
+          title: "A pessoa certa pode estar no próximo swipe",
+          subtitle: "Mas não a vais encontrar parado. Abre o feed inteiro e vê quem já reparou em ti.",
         };
       default:
         return {
-          title: "Conhece quem realmente quer",
+          title: "Encontra alguém que valha o teu tempo",
           subtitle: "Desbloqueia tudo o que precisas para fazer matches a sério.",
         };
     }
