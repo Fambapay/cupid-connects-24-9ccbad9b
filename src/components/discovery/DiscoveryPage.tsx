@@ -4,6 +4,7 @@ import { ProfileCard, type ProfileCardHandle } from "./ProfileCard";
 import { SwipeActions } from "./SwipeActions";
 import { DiscoverTopBar } from "./DiscoverTopBar";
 import { EmptyDiscovery } from "./EmptyDiscovery";
+import { useDiscoveryDetailOpen } from "@/lib/discoveryDetail";
 
 import type { DiscoveryProfile, SwipeDirection } from "./types";
 
@@ -37,6 +38,7 @@ export const DiscoveryPage = ({
 }: DiscoveryPageProps) => {
   const [index, setIndex] = useState(0);
   const [rewinding, setRewinding] = useState(false);
+  const detailOpen = useDiscoveryDetailOpen();
   // Local stack of past swipes so rewind can restore the previous card and
   // animate it back from the direction it flew off.
   const [history, setHistory] = useState<{ id: string; dir: SwipeDirection }[]>([]);
@@ -230,7 +232,7 @@ export const DiscoveryPage = ({
             </motion.div>
 
           </motion.div>
-          {showTopBar && (
+          {showTopBar && !detailOpen && (
             <motion.div variants={itemVariants}>
               <DiscoverTopBar
                 onOpenFilters={onOpenFilters}
