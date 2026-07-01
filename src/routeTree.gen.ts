@@ -19,6 +19,7 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as DiscoverRouteImport } from './routes/discover'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -104,6 +105,11 @@ const MatchesRoute = MatchesRouteImport.update({
 const DiscoverRoute = DiscoverRouteImport.update({
   id: '/discover',
   path: '/discover',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChatRoute = ChatRouteImport.update({
@@ -299,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/chat': typeof ChatRouteWithChildren
+  '/checkout': typeof CheckoutRoute
   '/discover': typeof DiscoverRoute
   '/matches': typeof MatchesRoute
   '/membership': typeof MembershipRoute
@@ -345,6 +352,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
   '/chat': typeof ChatRouteWithChildren
+  '/checkout': typeof CheckoutRoute
   '/discover': typeof DiscoverRoute
   '/matches': typeof MatchesRoute
   '/membership': typeof MembershipRoute
@@ -394,6 +402,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/chat': typeof ChatRouteWithChildren
+  '/checkout': typeof CheckoutRoute
   '/discover': typeof DiscoverRoute
   '/matches': typeof MatchesRoute
   '/membership': typeof MembershipRoute
@@ -443,6 +452,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/chat'
+    | '/checkout'
     | '/discover'
     | '/matches'
     | '/membership'
@@ -489,6 +499,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/chat'
+    | '/checkout'
     | '/discover'
     | '/matches'
     | '/membership'
@@ -537,6 +548,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/chat'
+    | '/checkout'
     | '/discover'
     | '/matches'
     | '/membership'
@@ -586,6 +598,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   ChatRoute: typeof ChatRouteWithChildren
+  CheckoutRoute: typeof CheckoutRoute
   DiscoverRoute: typeof DiscoverRoute
   MatchesRoute: typeof MatchesRoute
   MembershipRoute: typeof MembershipRoute
@@ -684,6 +697,13 @@ declare module '@tanstack/react-router' {
       path: '/discover'
       fullPath: '/discover'
       preLoaderRoute: typeof DiscoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chat': {
@@ -1033,6 +1053,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   ChatRoute: ChatRouteWithChildren,
+  CheckoutRoute: CheckoutRoute,
   DiscoverRoute: DiscoverRoute,
   MatchesRoute: MatchesRoute,
   MembershipRoute: MembershipRoute,

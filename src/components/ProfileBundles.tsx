@@ -1,8 +1,7 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Zap, Star, Flame, Crown, Sparkles, Check, ChevronRight } from "lucide-react";
-import { Link } from "@tanstack/react-router";
-import { DebitoCheckoutSheet } from "@/components/DebitoCheckoutSheet";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { hapticTap } from "@/hooks/useNativePlatform";
 import { getPack } from "@/lib/pricing";
 import { formatCountryPrice } from "@/lib/country/config";
