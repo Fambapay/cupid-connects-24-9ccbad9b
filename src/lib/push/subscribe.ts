@@ -2,6 +2,24 @@ import { supabase } from '@/integrations/supabase/client'
 import { VAPID_PUBLIC_KEY } from './config'
 
 const VAPID_KEY_STORAGE = 'hunie:vapid-public-key'
+const PUSH_CLIENT_ID_STORAGE = 'hunie:push-client-id'
+
+function getPushClientId(): string {
+  let existing = localStorage.getItem(PUSH_CLIENT_ID_STORAGE)
+  if (existing) return existing
+
+  existing = crypto.randomUUID()
+  localStorage.setItem(PUSH_CLIENT_ID_STORAGE, existing)
+  return existing
+}
+
+async function sha256Hex(value: string): Promise<string> {
+  const bytes = new TextEncoder().encode(value)
+  const digest = await crypto.subtle.digest('SHA-256', bytes)
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
@@ -91,6 +109,18 @@ export async function subscribeToPush(): Promise<{ ok: boolean; reason?: string 
 
   const p256dh = arrayBufferToBase64Url(sub.getKey('p256dh'))
   const auth = arrayBufferToBase64Url(sub.getKey('auth'))
+  const clientId = getPushClientId()
+  const deviceKey = await sha256Hex(`${clientId}:${navigator.userAgent}`)
+
+  // iOS/Safari can issue a fresh Apple Web Push endpoint after PWA reinstall,
+  // VAPID changes, or site-data refresh. Keep only one active endpoint per
+  // browser install, otherwise one message is delivered several times.
+  await supabase
+    .from('push_subscriptions')
+    .delete()
+    .eq('user_id', userData.user.id)
+    .eq('client_id', clientId)
+    .neq('endpoint', sub.endpoint)
 
   const { error } = await supabase.from('push_subscriptions').upsert(
     {
@@ -98,6 +128,8 @@ export async function subscribeToPush(): Promise<{ ok: boolean; reason?: string 
       endpoint: sub.endpoint,
       p256dh,
       auth,
+      client_id: clientId,
+      device_key: deviceKey,
       user_agent: navigator.userAgent,
       last_used_at: new Date().toISOString(),
     },

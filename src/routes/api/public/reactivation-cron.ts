@@ -148,8 +148,9 @@ async function sendPush(userId: string, daysInactive: number, name: string | nul
 
   const { data: subs } = await supabaseAdmin
     .from('push_subscriptions')
-    .select('id, endpoint, p256dh, auth')
+    .select('id, endpoint, p256dh, auth, client_id, device_key, user_agent')
     .eq('user_id', userId)
+    .order('last_used_at', { ascending: false })
   if (!subs?.length) return
 
   const who = name ? `${name}, ` : ''
@@ -162,8 +163,18 @@ async function sendPush(userId: string, daysInactive: number, name: string | nul
     : daysInactive >= 14 ? 'Os melhores matches são para quem está presente.'
     : 'Provavelmente já tens likes para ver.'
 
+  const seen = new Set<string>()
   for (const sub of subs) {
     if (!sub.p256dh || !sub.auth) continue
+    const key =
+      sub.device_key
+      || sub.client_id
+      || (sub.endpoint.startsWith('https://web.push.apple.com/')
+        ? `legacy-apple:${sub.user_agent || 'unknown'}`
+        : sub.endpoint)
+    if (seen.has(key)) continue
+    seen.add(key)
+
     const webSub = { id: sub.id, endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth }
     const res = await sendWebPush(webSub, { title, body, url: '/discover' })
     if (res.expired) {
