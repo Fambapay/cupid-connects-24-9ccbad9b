@@ -252,34 +252,57 @@ export function useNewMessageNotifier() {
           if (s.direction === "pass") return;
           if (currentPathRef.current === "/discover") return;
 
-          let revealName = "Alguém";
-          let avatar = "";
-          if (isPremium) {
-            const [{ data: prof }, { data: photo }] = await Promise.all([
-              supabase.from("profiles").select("name").eq("id", s.swiper_id).maybeSingle(),
-              supabase
-                .from("profile_photos")
-                .select("storage_path")
-                .eq("profile_id", s.swiper_id)
-                .order("position", { ascending: true })
-                .limit(1)
-                .maybeSingle(),
-            ]);
-            revealName = (prof?.name as string) || "Alguém";
-            if (photo?.storage_path) {
-              avatar = await signPhoto(photo.storage_path as string, 3600, {
+          const isSuper = s.direction === "super";
+
+          // Free users: no photo, no name — blurred silhouette + CTA to Select
+          if (!isPremium) {
+            void scheduleLocalNotification({
+              id: s.id.split('-').map(x => parseInt(x, 16)).reduce((a, b) => a + b, 0) % 2147483647,
+              title: isSuper ? "Super Like ⭐" : "Novo like 👀",
+              body: "Alguém mostrou interesse no teu perfil. Revela quem foi.",
+              extra: { type: 'like' },
+            });
+
+            toast.custom(
+              (t) => (
+                <LikeRevealToast
+                  toastId={t}
+                  isSuper={isSuper}
+                  onReveal={() => {
+                    toast.dismiss(t);
+                    navigate({ to: "/membership" });
+                  }}
+                  onDismiss={() => toast.dismiss(t)}
+                />
+              ),
+              { duration: 6000 },
+            );
+            return;
+          }
+
+          // Premium: full reveal with photo + name
+          const [{ data: prof }, { data: photo }] = await Promise.all([
+            supabase.from("profiles").select("name").eq("id", s.swiper_id).maybeSingle(),
+            supabase
+              .from("profile_photos")
+              .select("storage_path")
+              .eq("profile_id", s.swiper_id)
+              .order("position", { ascending: true })
+              .limit(1)
+              .maybeSingle(),
+          ]);
+          const revealName = (prof?.name as string) || "Alguém";
+          const avatar = photo?.storage_path
+            ? await signPhoto(photo.storage_path as string, 3600, {
                 width: 96,
                 height: 96,
                 resize: "cover",
                 quality: 70,
-              });
-            }
-          }
-
-          const isSuper = s.direction === "super";
+              })
+            : "";
 
           void scheduleLocalNotification({
-            id: s.id.split('-').map(s => parseInt(s, 16)).reduce((a, b) => a + b, 0) % 2147483647,
+            id: s.id.split('-').map(x => parseInt(x, 16)).reduce((a, b) => a + b, 0) % 2147483647,
             title: isSuper ? "Super Like ⭐" : "Novo like 👀",
             body: `${revealName} mostrou interesse no teu perfil.`,
             extra: { type: 'like', swiperId: s.swiper_id },
@@ -296,7 +319,7 @@ export function useNewMessageNotifier() {
                 timeLabel="agora"
                 onClick={() => {
                   toast.dismiss(t);
-                  navigate({ to: "/discover" });
+                  navigate({ to: "/matches" });
                 }}
                 onDismiss={() => toast.dismiss(t)}
               />
