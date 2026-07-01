@@ -687,6 +687,7 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
+          drinking: string | null
           gender: string | null
           height_cm: number | null
           id: string
@@ -699,15 +700,19 @@ export type Database = {
           last_active_at: string | null
           latitude: number | null
           longitude: number | null
+          looking_for: string | null
           membership_expires_at: string | null
           membership_status: string
           membership_tier: string
           name: string | null
           onboarding_completed: boolean
           onboarding_step: number
+          pets: string | null
           seed_active: boolean
+          smoking: string | null
           updated_at: string
           welcome_bonus_granted_at: string | null
+          workout: string | null
         }
         Insert: {
           age?: number | null
@@ -716,6 +721,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          drinking?: string | null
           gender?: string | null
           height_cm?: number | null
           id: string
@@ -728,15 +734,19 @@ export type Database = {
           last_active_at?: string | null
           latitude?: number | null
           longitude?: number | null
+          looking_for?: string | null
           membership_expires_at?: string | null
           membership_status?: string
           membership_tier?: string
           name?: string | null
           onboarding_completed?: boolean
           onboarding_step?: number
+          pets?: string | null
           seed_active?: boolean
+          smoking?: string | null
           updated_at?: string
           welcome_bonus_granted_at?: string | null
+          workout?: string | null
         }
         Update: {
           age?: number | null
@@ -745,6 +755,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          drinking?: string | null
           gender?: string | null
           height_cm?: number | null
           id?: string
@@ -757,15 +768,19 @@ export type Database = {
           last_active_at?: string | null
           latitude?: number | null
           longitude?: number | null
+          looking_for?: string | null
           membership_expires_at?: string | null
           membership_status?: string
           membership_tier?: string
           name?: string | null
           onboarding_completed?: boolean
           onboarding_step?: number
+          pets?: string | null
           seed_active?: boolean
+          smoking?: string | null
           updated_at?: string
           welcome_bonus_granted_at?: string | null
+          workout?: string | null
         }
         Relationships: []
       }

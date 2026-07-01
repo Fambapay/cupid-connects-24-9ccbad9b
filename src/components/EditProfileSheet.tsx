@@ -2,6 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Trash2, Camera, Star } from 'lucide-react';
 import type { ProfileViewData } from './ProfileView';
+import {
+  LOOKING_FOR_LABELS,
+  PETS_LABELS,
+  SMOKING_LABELS,
+  DRINKING_LABELS,
+  WORKOUT_LABELS,
+} from '@/lib/lifestyleLabels';
 
 const SUGGESTED_INTERESTS = [
   'Surf', 'Viagens', 'Design', 'Música', 'Fotografia', 'Café', 'Vinho',
@@ -308,6 +315,71 @@ export function EditProfileSheet({
                   })}
                 </div>
               </section>
+
+              {/* Altura */}
+              <section>
+                <SectionHeader title="Altura" hint={draft.heightCm ? `${draft.heightCm} cm` : 'Opcional'} />
+                <input
+                  type="range"
+                  min={140}
+                  max={210}
+                  step={1}
+                  value={draft.heightCm ?? 170}
+                  onChange={(e) =>
+                    setDraft((d) => ({ ...d, heightCm: Number(e.target.value) }))
+                  }
+                  className="w-full accent-[color:var(--brand-pink)]"
+                />
+                {draft.heightCm != null && (
+                  <button
+                    type="button"
+                    onClick={() => setDraft((d) => ({ ...d, heightCm: null }))}
+                    className="mt-2 text-[12px] font-medium"
+                    style={{ color: 'var(--edit-sheet-fg-dim)' }}
+                  >
+                    Não indicar
+                  </button>
+                )}
+              </section>
+
+              {/* À procura de */}
+              <section>
+                <SectionHeader title="À procura de" />
+                <OptionGrid
+                  value={draft.lookingFor ?? null}
+                  options={LOOKING_FOR_LABELS}
+                  onChange={(v) => setDraft((d) => ({ ...d, lookingFor: v }))}
+                />
+              </section>
+
+              {/* Estilo de vida */}
+              <section className="space-y-5">
+                <SectionHeader title="Estilo de vida" />
+                <LifestyleRow
+                  label="Animais"
+                  value={draft.pets ?? null}
+                  options={PETS_LABELS}
+                  onChange={(v) => setDraft((d) => ({ ...d, pets: v }))}
+                />
+                <LifestyleRow
+                  label="Fumo"
+                  value={draft.smoking ?? null}
+                  options={SMOKING_LABELS}
+                  onChange={(v) => setDraft((d) => ({ ...d, smoking: v }))}
+                />
+                <LifestyleRow
+                  label="Bebida"
+                  value={draft.drinking ?? null}
+                  options={DRINKING_LABELS}
+                  onChange={(v) => setDraft((d) => ({ ...d, drinking: v }))}
+                />
+                <LifestyleRow
+                  label="Treino"
+                  value={draft.workout ?? null}
+                  options={WORKOUT_LABELS}
+                  onChange={(v) => setDraft((d) => ({ ...d, workout: v }))}
+                />
+              </section>
             </div>
           </motion.section>
         </>
@@ -355,3 +427,102 @@ function Field({
     </label>
   );
 }
+
+function OptionGrid({
+  value,
+  options,
+  onChange,
+}: {
+  value: string | null;
+  options: Record<string, string>;
+  onChange: (v: string | null) => void;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {Object.entries(options).map(([key, label]) => {
+        const active = value === key;
+        return (
+          <button
+            key={key}
+            type="button"
+            onClick={() => onChange(active ? null : key)}
+            className="rounded-2xl px-3 py-2.5 text-[13px] font-semibold tracking-tight transition-all active:scale-[0.97]"
+            style={
+              active
+                ? {
+                    backgroundImage:
+                      'linear-gradient(135deg, #FF4FA3 0%, #B13CFF 100%)',
+                    color: '#fff',
+                    border: '1px solid transparent',
+                    boxShadow:
+                      '0 8px 18px -8px color-mix(in oklab, var(--brand-pink) 70%, transparent), inset 0 1px 0 rgba(255,255,255,0.22)',
+                  }
+                : {
+                    background: 'var(--edit-sheet-btn-bg)',
+                    color: 'var(--edit-sheet-fg)',
+                    border: '1px solid var(--edit-sheet-btn-border)',
+                    opacity: 0.9,
+                  }
+            }
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function LifestyleRow({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string | null;
+  options: Record<string, string>;
+  onChange: (v: string | null) => void;
+}) {
+  return (
+    <div>
+      <div
+        className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em]"
+        style={{ color: 'var(--edit-sheet-fg-muted)', opacity: 0.75 }}
+      >
+        {label}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {Object.entries(options).map(([key, l]) => {
+          const active = value === key;
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onChange(active ? null : key)}
+              className="rounded-full px-3.5 py-1.5 text-[13px] font-semibold tracking-tight transition-all active:scale-[0.96]"
+              style={
+                active
+                  ? {
+                      backgroundImage:
+                        'linear-gradient(135deg, #FF4FA3 0%, #B13CFF 100%)',
+                      color: '#fff',
+                      border: '1px solid transparent',
+                    }
+                  : {
+                      background: 'var(--edit-sheet-btn-bg)',
+                      color: 'var(--edit-sheet-fg)',
+                      border: '1px solid var(--edit-sheet-btn-border)',
+                      opacity: 0.85,
+                    }
+              }
+            >
+              {l}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
