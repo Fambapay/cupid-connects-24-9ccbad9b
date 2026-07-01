@@ -1001,7 +1001,6 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             </div>
 
             {/* panelActions intentionally not rendered — swipe actions hidden inside detail view */}
-            {void panelActions}
           </motion.div>
         )}
 
