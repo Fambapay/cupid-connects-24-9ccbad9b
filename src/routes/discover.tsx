@@ -73,7 +73,6 @@ function Discover() {
 
 
   const openPaywall = () => {
-    setBannerVisible(false);
     setPaywallOpen(true);
   };
 
