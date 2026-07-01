@@ -1000,20 +1000,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               )}
             </div>
 
-            {panelActions && (
-              <div
-                style={{
-                  position: "sticky",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  background:
-                    "linear-gradient(to top, #0a0a0a 70%, rgba(10,10,10,0))",
-                }}
-              >
-                {panelActions}
-              </div>
-            )}
+            {/* panelActions intentionally not rendered — swipe actions hidden inside detail view */}
+            {void panelActions}
           </motion.div>
         )}
 
