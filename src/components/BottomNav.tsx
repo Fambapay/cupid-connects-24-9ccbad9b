@@ -13,6 +13,7 @@ import { hapticTap } from "@/hooks/useNativePlatform";
 import { useLikesCount } from "@/hooks/useLikesCount";
 import { useUnreadChats } from "@/hooks/useUnreadChats";
 import NativeTabs, { nativeTabsAvailable } from "@/lib/native/nativeTabs";
+import { useDiscoveryDetailOpen } from "@/lib/discoveryDetail";
 
 type Tab = "discover" | "likes" | "chat" | "profile";
 
