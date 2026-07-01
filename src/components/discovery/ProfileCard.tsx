@@ -1172,29 +1172,29 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 </DetailSection>
               )}
 
-              {/* À procura de */}
+              {/* O que procuro */}
               {profile.lookingFor && LOOKING_FOR_LABELS[profile.lookingFor] && (
-                <DetailSection title="À procura de">
+                <DetailSection title="O que procuro">
                   <Pill label={LOOKING_FOR_LABELS[profile.lookingFor]} accent />
                 </DetailSection>
               )}
 
-              {/* Estilo de vida */}
+              {/* O meu dia a dia */}
               {(profile.pets || profile.smoking || profile.drinking || profile.workout) && (
-                <DetailSection title="Estilo de vida">
+                <DetailSection title="O meu dia a dia">
                   <FactGrid
                     items={[
                       profile.pets && PETS_LABELS[profile.pets]
                         ? { label: "Animais", value: PETS_LABELS[profile.pets] }
                         : null,
                       profile.smoking && SMOKING_LABELS[profile.smoking]
-                        ? { label: "Fumo", value: SMOKING_LABELS[profile.smoking] }
+                        ? { label: "Tabaco", value: SMOKING_LABELS[profile.smoking] }
                         : null,
                       profile.drinking && DRINKING_LABELS[profile.drinking]
-                        ? { label: "Bebida", value: DRINKING_LABELS[profile.drinking] }
+                        ? { label: "Álcool", value: DRINKING_LABELS[profile.drinking] }
                         : null,
                       profile.workout && WORKOUT_LABELS[profile.workout]
-                        ? { label: "Treino", value: WORKOUT_LABELS[profile.workout] }
+                        ? { label: "Exercício", value: WORKOUT_LABELS[profile.workout] }
                         : null,
                     ].filter(Boolean) as { label: string; value: string }[]}
                   />

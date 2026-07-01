@@ -272,7 +272,7 @@ export function EditProfileSheet({
                   value={draft.bio}
                   onChange={(e) => setDraft(d => ({ ...d, bio: e.target.value.slice(0, 500) }))}
                   rows={4}
-                  placeholder="Conta algo sobre ti..."
+                  placeholder="Diz-nos quem és, em poucas linhas."
                   className="hunie-input w-full resize-none p-4 text-[14px] leading-relaxed outline-none"
                   style={{
                     color: 'var(--edit-sheet-fg)',
@@ -342,9 +342,9 @@ export function EditProfileSheet({
                 )}
               </section>
 
-              {/* À procura de */}
+              {/* O que procuro */}
               <section>
-                <SectionHeader title="À procura de" />
+                <SectionHeader title="O que procuro" />
                 <OptionGrid
                   value={draft.lookingFor ?? null}
                   options={LOOKING_FOR_LABELS}
@@ -352,9 +352,9 @@ export function EditProfileSheet({
                 />
               </section>
 
-              {/* Estilo de vida */}
+              {/* O meu dia a dia */}
               <section className="space-y-5">
-                <SectionHeader title="Estilo de vida" />
+                <SectionHeader title="O meu dia a dia" />
                 <LifestyleRow
                   label="Animais"
                   value={draft.pets ?? null}
@@ -362,19 +362,19 @@ export function EditProfileSheet({
                   onChange={(v) => setDraft((d) => ({ ...d, pets: v }))}
                 />
                 <LifestyleRow
-                  label="Fumo"
+                  label="Tabaco"
                   value={draft.smoking ?? null}
                   options={SMOKING_LABELS}
                   onChange={(v) => setDraft((d) => ({ ...d, smoking: v }))}
                 />
                 <LifestyleRow
-                  label="Bebida"
+                  label="Álcool"
                   value={draft.drinking ?? null}
                   options={DRINKING_LABELS}
                   onChange={(v) => setDraft((d) => ({ ...d, drinking: v }))}
                 />
                 <LifestyleRow
-                  label="Treino"
+                  label="Exercício"
                   value={draft.workout ?? null}
                   options={WORKOUT_LABELS}
                   onChange={(v) => setDraft((d) => ({ ...d, workout: v }))}
