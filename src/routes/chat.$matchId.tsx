@@ -33,6 +33,7 @@ function ChatRoom() {
   const [peerLastReadAt, setPeerLastReadAt] = useState<string | null>(null);
   
   const [profileOpen, setProfileOpen] = useState(false);
+  const [paywallOpen, setPaywallOpen] = useState(false);
   const typingTimerRef = useRef<number | null>(null);
   const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const lastSentTypingRef = useRef(0);
