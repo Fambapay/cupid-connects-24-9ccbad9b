@@ -20,6 +20,12 @@ export interface ProfileViewData {
   isVerified: boolean;
   isPremium: boolean;
   tier?: 'free' | 'select' | 'plus' | 'elite';
+  heightCm?: number | null;
+  lookingFor?: string | null;
+  pets?: string | null;
+  smoking?: string | null;
+  drinking?: string | null;
+  workout?: string | null;
 }
 
 interface Props {

@@ -52,6 +52,12 @@ function ProfilePage() {
       isVerified: !!profile?.is_verified,
       isPremium,
       tier: subscription.membershipTier,
+      heightCm: profile?.height_cm ?? null,
+      lookingFor: profile?.looking_for ?? null,
+      pets: profile?.pets ?? null,
+      smoking: profile?.smoking ?? null,
+      drinking: profile?.drinking ?? null,
+      workout: profile?.workout ?? null,
     }),
     [profile, photos, isPremium, subscription.membershipTier],
   );
@@ -87,6 +93,12 @@ function ProfilePage() {
         city: next.city.trim() || null,
         bio: next.bio.trim() || null,
         interests: next.interests,
+        height_cm: next.heightCm ?? null,
+        looking_for: next.lookingFor ?? null,
+        pets: next.pets ?? null,
+        smoking: next.smoking ?? null,
+        drinking: next.drinking ?? null,
+        workout: next.workout ?? null,
       });
       toast.custom(
         (t) => (

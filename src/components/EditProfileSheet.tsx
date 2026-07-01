@@ -2,6 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Trash2, Camera, Star } from 'lucide-react';
 import type { ProfileViewData } from './ProfileView';
+import {
+  LOOKING_FOR_LABELS,
+  PETS_LABELS,
+  SMOKING_LABELS,
+  DRINKING_LABELS,
+  WORKOUT_LABELS,
+} from '@/lib/lifestyleLabels';
 
 const SUGGESTED_INTERESTS = [
   'Surf', 'Viagens', 'Design', 'Música', 'Fotografia', 'Café', 'Vinho',
