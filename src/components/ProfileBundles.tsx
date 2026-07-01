@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { motion } from "framer-motion";
 import { Zap, Star, Flame, Crown, Sparkles, Check, ChevronRight } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { hapticTap } from "@/hooks/useNativePlatform";
