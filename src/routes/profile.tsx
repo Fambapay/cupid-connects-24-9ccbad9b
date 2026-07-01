@@ -126,26 +126,36 @@ function ProfilePage() {
     });
   }, []);
 
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    // Defer non-critical query until after the entry animation settles.
+    const idle = (cb: () => void) =>
+      (window as any).requestIdleCallback?.(cb, { timeout: 800 }) ??
+      window.setTimeout(cb, 400);
+    const id = idle(() => {
+      supabase.from('admin_emails').select('email').maybeSingle().then(({ data }) => {
+        setIsAdmin(!!data);
+      });
+    });
+    return () => {
+      (window as any).cancelIdleCallback?.(id) ?? window.clearTimeout(id);
+    };
+  }, []);
+
   return (
     <AppShell className="bg-[var(--profile-bg)]">
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] as const }}
-        style={{ willChange: 'transform, opacity' }}
-      >
-        <ProfileView
-          profile={view}
-          superLikeBalance={credits.super_like_balance}
-          boostBalance={credits.boost_balance}
-          onAddFiles={handleAddFiles}
-          onEditProfile={() => setEditing(true)}
-          onVerify={() => setVerifying(true)}
-          onOpenSettings={() => navigate({ to: '/settings' })}
-          isAdmin={isAdmin}
-          onOpenAdmin={() => navigate({ to: '/admin' })}
-        />
-      </motion.div>
+      <ProfileView
+        profile={view}
+        superLikeBalance={credits.super_like_balance}
+        boostBalance={credits.boost_balance}
+        onAddFiles={handleAddFiles}
+        onEditProfile={() => setEditing(true)}
+        onVerify={() => setVerifying(true)}
+        onOpenSettings={() => navigate({ to: '/settings' })}
+        isAdmin={isAdmin}
+        onOpenAdmin={() => navigate({ to: '/admin' })}
+      />
+
       <EditProfileSheet
         open={editing}
         profile={view}
