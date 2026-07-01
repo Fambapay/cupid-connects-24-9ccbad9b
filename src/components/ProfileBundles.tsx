@@ -101,11 +101,8 @@ export function ProfileBundles() {
             const discount = original ? Math.round((1 - price / original) * 100) : 0;
             const BadgeIcon = b.badge?.icon;
             return (
-              <motion.button
+              <button
                 key={b.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05, duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
                 onClick={() => {
                   hapticTap();
                   navigate({
