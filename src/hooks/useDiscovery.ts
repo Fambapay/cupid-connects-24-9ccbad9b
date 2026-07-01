@@ -100,7 +100,7 @@ async function fetchDiscovery(
     if (filters.distance != null) filterPayload.distance = filters.distance;
     if (filters.hasBio != null) filterPayload.hasBio = filters.hasBio;
     if (filters.verifiedOnly != null) filterPayload.verifiedOnly = filters.verifiedOnly;
-    if (filters.onlineNow != null) filterPayload.onlineNow = filters.onlineNow;
+    
     if (filters.heightMin != null) filterPayload.heightMin = filters.heightMin;
     if (filters.heightMax != null) filterPayload.heightMax = filters.heightMax;
   }

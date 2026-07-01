@@ -171,13 +171,6 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
                     locked={!isPremium}
                   />
                   <ToggleRow
-                    icon={<Circle size={10} strokeWidth={0} fill="#30E37C" />}
-                    tint="#30E37C"
-                    label="Online agora"
-                    value={local.onlineNow}
-                    onChange={(v) => update('onlineNow', v)}
-                  />
-                  <ToggleRow
                     icon={<FileText size={16} strokeWidth={2.2} />}
                     tint="var(--brand-purple)"
                     label="Tem bio"
