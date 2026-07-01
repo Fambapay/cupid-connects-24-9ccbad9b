@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, Lock, X, BadgeCheck, Circle, FileText } from 'lucide-react';
+import { Check, Lock, X, BadgeCheck, FileText } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { hapticTap } from '@/hooks/useNativePlatform';
 
@@ -9,7 +9,6 @@ export interface DiscoveryFilters {
   ageMax: number;
   distance: number;
   verifiedOnly: boolean;
-  onlineNow: boolean;
   hasBio: boolean;
   withPhotos: boolean;
   heightMin: number;
@@ -30,7 +29,6 @@ export const DEFAULT_FILTERS: DiscoveryFilters = {
   ageMax: 55,
   distance: 50,
   verifiedOnly: false,
-  onlineNow: false,
   hasBio: false,
   withPhotos: true,
   heightMin: 150,
@@ -109,20 +107,23 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
             transition={{ type: 'spring', damping: 34, stiffness: 340, mass: 0.85 }}
           >
             {/* Header */}
-            <div className="grid grid-cols-3 items-center px-6 pb-2 pt-2">
+            <div
+              className="grid grid-cols-3 items-center px-6 pb-3 pt-5"
+              style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+            >
               <button
                 onClick={onClose}
-                className="text-left text-[15px] font-medium tracking-tight active:opacity-60"
-                style={{ color: 'rgba(255,255,255,0.55)' }}
+                className="text-left text-[15px] font-medium tracking-tight active:opacity-60 transition-opacity"
+                style={{ color: 'rgba(255,255,255,0.40)' }}
               >
                 Cancelar
               </button>
-              <h2 className="text-center text-[17px] font-semibold tracking-tight">
+              <h2 className="text-center text-[19px] font-bold tracking-tight">
                 Filtros
               </h2>
               <button
                 onClick={reset}
-                className="text-right text-[15px] font-medium active:opacity-60"
+                className="text-right text-[15px] font-semibold active:opacity-60 transition-opacity"
                 style={{ color: 'var(--brand-pink)' }}
               >
                 Repor
@@ -138,7 +139,6 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
                     { value: 'todos', label: 'Todos' },
                     { value: 'feminino', label: 'Mulheres' },
                     { value: 'masculino', label: 'Homens' },
-                    { value: 'nao_binario', label: 'Não-binário' },
                   ]}
                   value={local.gender}
                   onChange={(v) => update('gender', v as DiscoveryFilters['gender'])}
@@ -172,13 +172,6 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
                     value={isPremium && local.verifiedOnly}
                     onChange={(v) => { if (!isPremium) { onUpgrade?.(); return; } update('verifiedOnly', v); }}
                     locked={!isPremium}
-                  />
-                  <ToggleRow
-                    icon={<Circle size={10} strokeWidth={0} fill="#30E37C" />}
-                    tint="#30E37C"
-                    label="Online agora"
-                    value={local.onlineNow}
-                    onChange={(v) => update('onlineNow', v)}
                   />
                   <ToggleRow
                     icon={<FileText size={16} strokeWidth={2.2} />}
