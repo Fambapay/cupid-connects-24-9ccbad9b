@@ -930,18 +930,17 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               >
                 <h2
                   style={{
-                    fontFamily: '"Instrument Serif", Georgia, serif',
-                    fontStyle: "italic",
-                    fontSize: 52,
-                    lineHeight: 0.95,
+                    fontSize: 34,
+                    fontWeight: 800,
+                    lineHeight: 1.05,
                     margin: 0,
                     color: "#fff",
-                    letterSpacing: "-0.5px",
+                    letterSpacing: "-0.02em",
                     textShadow: "0 2px 24px rgba(0,0,0,0.35)",
                   }}
                 >
                   {profile.name.split(" ")[0]}
-                  <span style={{ opacity: 0.85 }}>, {profile.age}</span>
+                  <span style={{ opacity: 0.9, fontWeight: 700 }}>, {profile.age}</span>
                 </h2>
                 {profile.isOnline && (
                   <div
