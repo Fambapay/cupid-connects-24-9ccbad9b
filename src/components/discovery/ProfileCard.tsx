@@ -775,9 +775,14 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 380, damping: 36 }}
             style={{
-              position: "absolute",
-              inset: 0,
-              zIndex: 30,
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: "100lvh",
+              width: "100vw",
+              zIndex: 100,
               background: "#000",
               color: "#fff",
               overflowY: "auto",
@@ -788,6 +793,7 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               borderRadius: 0,
               touchAction: "pan-y",
             }}
+
           >
             {/* Hero photo carousel — 3/4 editorial portrait */}
             <div
