@@ -14,7 +14,7 @@ import {
   animate,
   type MotionValue,
 } from "framer-motion";
-import { MapPin, ArrowUp, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { MapPin, ArrowUp, ChevronLeft } from "lucide-react";
 import type { DiscoveryProfile, SwipeDirection } from "./types";
 import { setDiscoveryDetailOpen } from "@/lib/discoveryDetail";
 
