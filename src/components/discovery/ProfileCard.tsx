@@ -17,6 +17,14 @@ import {
 import { MapPin, ArrowUp, ChevronLeft } from "lucide-react";
 import type { DiscoveryProfile, SwipeDirection } from "./types";
 import { setDiscoveryDetailOpen } from "@/lib/discoveryDetail";
+import {
+  LOOKING_FOR_LABELS,
+  PETS_LABELS,
+  SMOKING_LABELS,
+  DRINKING_LABELS,
+  WORKOUT_LABELS,
+  formatHeight,
+} from "@/lib/lifestyleLabels";
 
 interface ProfileCardProps {
   profile: DiscoveryProfile;
@@ -1150,6 +1158,49 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                   </div>
                 </div>
               )}
+
+              {/* Essenciais */}
+              {(profile.heightCm || profile.city || profile.distance) && (
+                <DetailSection title="Essenciais">
+                  <FactGrid
+                    items={[
+                      profile.heightCm ? { label: "Altura", value: formatHeight(profile.heightCm) } : null,
+                      profile.city ? { label: "Cidade", value: profile.city } : null,
+                      profile.distance ? { label: "Distância", value: formatDistance(profile.distance) } : null,
+                    ].filter(Boolean) as { label: string; value: string }[]}
+                  />
+                </DetailSection>
+              )}
+
+              {/* À procura de */}
+              {profile.lookingFor && LOOKING_FOR_LABELS[profile.lookingFor] && (
+                <DetailSection title="À procura de">
+                  <Pill label={LOOKING_FOR_LABELS[profile.lookingFor]} accent />
+                </DetailSection>
+              )}
+
+              {/* Estilo de vida */}
+              {(profile.pets || profile.smoking || profile.drinking || profile.workout) && (
+                <DetailSection title="Estilo de vida">
+                  <FactGrid
+                    items={[
+                      profile.pets && PETS_LABELS[profile.pets]
+                        ? { label: "Animais", value: PETS_LABELS[profile.pets] }
+                        : null,
+                      profile.smoking && SMOKING_LABELS[profile.smoking]
+                        ? { label: "Fumo", value: SMOKING_LABELS[profile.smoking] }
+                        : null,
+                      profile.drinking && DRINKING_LABELS[profile.drinking]
+                        ? { label: "Bebida", value: DRINKING_LABELS[profile.drinking] }
+                        : null,
+                      profile.workout && WORKOUT_LABELS[profile.workout]
+                        ? { label: "Treino", value: WORKOUT_LABELS[profile.workout] }
+                        : null,
+                    ].filter(Boolean) as { label: string; value: string }[]}
+                  />
+                </DetailSection>
+              )}
+
 
               {/* Subtle end marker */}
               <div
