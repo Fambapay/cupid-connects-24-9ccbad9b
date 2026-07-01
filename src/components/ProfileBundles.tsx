@@ -198,7 +198,7 @@ export function ProfileBundles() {
                     </div>
                   </div>
                 </div>
-              </motion.button>
+              </button>
             );
           })}
         </div>
