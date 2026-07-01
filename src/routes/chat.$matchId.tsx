@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -11,6 +11,7 @@ import { ChatActionsMenu } from "@/components/chat/ChatActionsMenu";
 import { PeerProfileSheet } from "@/components/chat/PeerProfileSheet";
 import { getActivityStatus } from "@/lib/activityStatus";
 import { useSubscription } from "@/hooks/useSubscription";
+import { PaywallSheet } from "@/components/paywall/PaywallSheet";
 
 import { requireAuthAndOnboarding } from "@/lib/authGuard";
 
@@ -26,12 +27,13 @@ function ChatRoom() {
   const { matchId } = useParams({ from: "/chat/$matchId" });
   const { user } = useAuth();
   const { entitlements, hasPremiumAccess } = useSubscription();
-  const navigate = useNavigate();
+  
   const { messages, peer, loading, notFound, send } = useMessages(matchId);
   const [typing, setTyping] = useState(false);
   const [peerLastReadAt, setPeerLastReadAt] = useState<string | null>(null);
   
   const [profileOpen, setProfileOpen] = useState(false);
+  const [paywallOpen, setPaywallOpen] = useState(false);
   const typingTimerRef = useRef<number | null>(null);
   const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const lastSentTypingRef = useRef(0);
@@ -261,11 +263,7 @@ function ChatRoom() {
     if (!value) return;
     // Hard paywall: block chat send without premium access.
     if (!hasPremiumAccess) {
-      const { toast } = await import("sonner");
-      toast.error("Precisas de subscrição para enviar mensagens", {
-        description: "Ativa o Hunie Premium para continuar.",
-        action: { label: "Ver planos", onClick: () => navigate({ to: "/membership" }) },
-      });
+      setPaywallOpen(true);
       return;
     }
     if (input) input.value = "";
@@ -484,6 +482,12 @@ function ChatRoom() {
         userId={peer.id}
         fallbackName={peer.name}
         fallbackPhoto={peer.photo}
+      />
+
+      <PaywallSheet
+        open={paywallOpen}
+        onClose={() => setPaywallOpen(false)}
+        defaultTier="plus"
       />
     </motion.div>
   );
