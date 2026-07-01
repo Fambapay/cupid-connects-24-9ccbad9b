@@ -166,7 +166,7 @@ function Discover() {
     );
     if (res?.reason === "paywall_required") {
       setIndex((i) => Math.max(0, i - 1));
-      setPendingAction({ profileId: target.id, direction });
+      if (direction !== "pass") setPendingAction({ profileId: target.id, direction });
       openPaywall();
       return "blocked";
     }
