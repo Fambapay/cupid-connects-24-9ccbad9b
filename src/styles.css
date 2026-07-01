@@ -648,4 +648,10 @@ textarea:-webkit-autofill:active {
   .swipe-actions-row {
     padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px) + 88px) !important;
   }
+  /* Lift the checkout sheet above Safari's bottom URL bar so the pay
+     button stays reachable in the browser. PWA keeps its default. */
+  .checkout-sheet-panel {
+    max-height: 88dvh !important;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 120px) !important;
+  }
 }
