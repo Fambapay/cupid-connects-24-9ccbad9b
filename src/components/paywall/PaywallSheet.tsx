@@ -284,7 +284,7 @@ export function PaywallSheet({
                       <span className="text-[13px] text-white/60">Likes hoje</span>
                     </div>
                     <span className="text-[13px] font-semibold tabular-nums text-white/80">
-                      {typeof likesRemaining === "number" ? likesRemaining : freeLikes}
+                      {typeof likesRemaining === "number" ? likesRemaining : 0}
                       <span className="mx-1 text-white/30">/</span>
                       {likesLimit}
                     </span>
