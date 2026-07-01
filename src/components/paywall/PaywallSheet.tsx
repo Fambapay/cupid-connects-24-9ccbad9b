@@ -214,8 +214,8 @@ export function PaywallSheet({
           ? "text-[#FF8ABF]"
           : "text-white/50";
 
-  const showLimitCounter = origin === "discover" || origin === "chat";
-  const freeLikes = NO_TIER_ENTITLEMENTS.dailyLikes;
+  // No free tier: only show the counter while the user is still in a live trial with visible remaining likes.
+  const showLimitCounter = (origin === "discover" || origin === "chat") && isTrialing && typeof likesRemaining === "number" && likesLimit > 0;
   const premiumLikes = PLUS.dailyLikes; // -1 = unlimited
 
   return (
