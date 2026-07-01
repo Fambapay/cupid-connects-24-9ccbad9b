@@ -642,16 +642,6 @@ textarea:-webkit-autofill:active {
   caret-color: var(--color-foreground) !important;
 }
 
-/* Browser (non-PWA) only: lift the swipe action row above the
-   bottom nav + browser URL bar, and shift the info block up by the same
-   amount so chips never sit behind the buttons. Standalone PWA keeps
-   its tighter spacing. */
-@media not all and (display-mode: standalone) {
-  .swipe-actions-row {
-    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px) + 88px) !important;
-  }
-  .discover-info-block {
-    bottom: calc(96px + 88px) !important;
-  }
-}
+/* Browser (non-PWA): keep the same tight PWA layout — the bottom nav is
+   fixed and already accounts for the Safari URL bar via dvh/safe-area. */
 
