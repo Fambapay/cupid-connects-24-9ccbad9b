@@ -61,7 +61,18 @@ export function ReferralSection() {
       );
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      toast.error("Não foi possível copiar");
+      toast.custom(
+        (t) => (
+          <HunieToast
+            toastId={t}
+            type="error"
+            title="Erro"
+            body="Não foi possível copiar"
+            onDismiss={() => toast.dismiss(t)}
+          />
+        ),
+        { duration: 2200 },
+      );
     }
   }
 
