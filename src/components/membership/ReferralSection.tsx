@@ -97,7 +97,7 @@ export function ReferralSection() {
   const remaining = Math.max(0, max - completed);
 
   return (
-    <section className="mt-7">
+    <section>
       <h3 className="mb-3 flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-white/50">
         <Gift size={13} className="shrink-0" /> <span className="truncate">Convida amigos, ganha dias</span>
       </h3>
