@@ -54,7 +54,7 @@ export function useMessages(matchId: string | undefined) {
       // Corpo mascarado server-side para users sem premium (privacy hard-guard).
       supabase.rpc("get_match_messages", { _match_id: matchId }),
     ]);
-    const msgs = (Array.isArray(msgsJson) ? msgsJson : []) as ChatMessage[];
+    const msgs = (Array.isArray(msgsJson) ? msgsJson : []) as unknown as ChatMessage[];
 
     const photoUrl = photo?.storage_path
       ? await signPhoto(photo.storage_path as string, 3600, { width: 96, height: 96, resize: "cover", quality: 70 })
