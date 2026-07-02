@@ -178,10 +178,9 @@ export function ReferralSection() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-        className="relative overflow-hidden rounded-3xl border border-white/10 p-5 backdrop-blur-2xl"
+        className="relative overflow-hidden rounded-3xl border border-white/10 p-5"
         style={{ background: "linear-gradient(160deg, rgba(255,79,163,0.14), rgba(177,60,255,0.10))" }}
       >
-        <div aria-hidden className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-fuchsia-500/30 blur-3xl" />
         <div className="relative">
           <p className="text-sm text-white/80">
             Por cada amigo que subscreve, ganhas <strong className="text-white">+{daysPer} dias</strong> grátis
