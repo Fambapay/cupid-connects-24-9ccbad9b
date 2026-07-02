@@ -587,6 +587,107 @@ export type Database = {
         }
         Relationships: []
       }
+      offer_redemptions: {
+        Row: {
+          id: string
+          offer_id: string
+          paid_at: string | null
+          payment_ref: Json | null
+          redeemed_at: string
+          released_at: string | null
+          slug: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          offer_id: string
+          paid_at?: string | null
+          payment_ref?: Json | null
+          redeemed_at?: string
+          released_at?: string | null
+          slug: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          offer_id?: string
+          paid_at?: string | null
+          payment_ref?: Json | null
+          redeemed_at?: string
+          released_at?: string | null
+          slug?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offer_redemptions_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offers: {
+        Row: {
+          active: boolean
+          bullets: Json
+          created_at: string
+          currency: string
+          description: string
+          first_period_price_minor: number
+          id: string
+          is_discount: boolean
+          period_months: number
+          plan_tier: string
+          priority: number
+          regular_price_minor: number
+          slug: string
+          title: string
+          trigger: Database["public"]["Enums"]["offer_trigger"]
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          bullets?: Json
+          created_at?: string
+          currency?: string
+          description: string
+          first_period_price_minor: number
+          id?: string
+          is_discount?: boolean
+          period_months?: number
+          plan_tier?: string
+          priority?: number
+          regular_price_minor: number
+          slug: string
+          title: string
+          trigger: Database["public"]["Enums"]["offer_trigger"]
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          bullets?: Json
+          created_at?: string
+          currency?: string
+          description?: string
+          first_period_price_minor?: number
+          id?: string
+          is_discount?: boolean
+          period_months?: number
+          plan_tier?: string
+          priority?: number
+          regular_price_minor?: number
+          slug?: string
+          title?: string
+          trigger?: Database["public"]["Enums"]["offer_trigger"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_transactions: {
         Row: {
           amount_minor: number
@@ -649,6 +750,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      popup_impressions: {
+        Row: {
+          action: string
+          id: string
+          offer_id: string
+          shown_at: string
+          user_id: string
+        }
+        Insert: {
+          action?: string
+          id?: string
+          offer_id: string
+          shown_at?: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          id?: string
+          offer_id?: string
+          shown_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "popup_impressions_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profile_contact: {
         Row: {
@@ -1129,9 +1262,41 @@ export type Database = {
         }
         Relationships: []
       }
+      winback_pushes: {
+        Row: {
+          id: string
+          sent_at: string
+          slug: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          sent_at?: string
+          slug: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          sent_at?: string
+          slug?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      offer_funnel: {
+        Row: {
+          clicked: number | null
+          paid: number | null
+          redeemed: number | null
+          shown: number | null
+          slug: string | null
+          title: string | null
+          trigger: Database["public"]["Enums"]["offer_trigger"] | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       activate_membership_debito: {
@@ -1196,7 +1361,36 @@ export type Database = {
         }
         Returns: Json
       }
+      get_eligible_offer: {
+        Args: { _trigger: Database["public"]["Enums"]["offer_trigger"] }
+        Returns: {
+          active: boolean
+          bullets: Json
+          created_at: string
+          currency: string
+          description: string
+          first_period_price_minor: number
+          id: string
+          is_discount: boolean
+          period_months: number
+          plan_tier: string
+          priority: number
+          regular_price_minor: number
+          slug: string
+          title: string
+          trigger: Database["public"]["Enums"]["offer_trigger"]
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "offers"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_match_messages: { Args: { _match_id: string }; Returns: Json }
       get_match_summaries: { Args: never; Returns: Json }
+      get_message_preview: { Args: { _match_id: string }; Returns: Json }
       get_my_location: {
         Args: never
         Returns: {
@@ -1229,7 +1423,19 @@ export type Database = {
         Args: { _match_id: string; _user_id: string }
         Returns: boolean
       }
+      log_popup_impression: {
+        Args: { _action: string; _offer_id: string }
+        Returns: undefined
+      }
+      mark_offer_paid: {
+        Args: { _payment_ref: Json; _slug: string; _user_id: string }
+        Returns: undefined
+      }
       mark_referral_onboarding_complete: { Args: never; Returns: undefined }
+      mark_winback_sent: {
+        Args: { _slug: string; _user_id: string }
+        Returns: boolean
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -1247,14 +1453,27 @@ export type Database = {
           read_ct: number
         }[]
       }
+      redeem_offer: { Args: { _offer_id: string }; Returns: Json }
       refill_all_active_memberships: { Args: never; Returns: number }
       refill_membership_credits: { Args: { _user_id: string }; Returns: Json }
       refill_my_credits: { Args: never; Returns: Json }
+      release_offer_redemption: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
       rewind_last_swipe: { Args: never; Returns: Json }
       touch_last_active: { Args: never; Returns: undefined }
       transition_expired_memberships: { Args: never; Returns: Json }
     }
     Enums: {
+      offer_trigger:
+        | "trial_day_2"
+        | "trial_last_24h"
+        | "post_first_match"
+        | "likes_received"
+        | "winback_day_7"
+        | "winback_day_14"
+        | "always_on"
       swipe_direction: "like" | "pass" | "super"
     }
     CompositeTypes: {
@@ -1383,6 +1602,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      offer_trigger: [
+        "trial_day_2",
+        "trial_last_24h",
+        "post_first_match",
+        "likes_received",
+        "winback_day_7",
+        "winback_day_14",
+        "always_on",
+      ],
       swipe_direction: ["like", "pass", "super"],
     },
   },
