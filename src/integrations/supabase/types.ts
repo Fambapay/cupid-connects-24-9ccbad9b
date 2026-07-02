@@ -256,6 +256,7 @@ export type Database = {
       debito_payments: {
         Row: {
           amount: number
+          billing_period: string | null
           checkout_url: string | null
           completed_at: string | null
           created_at: string
@@ -272,6 +273,7 @@ export type Database = {
           payment_method: string
           phone_hash: string | null
           phone_last4: string | null
+          plan_days: number | null
           plan_tier: string | null
           raw_response: Json | null
           raw_webhook: Json | null
@@ -282,6 +284,7 @@ export type Database = {
         }
         Insert: {
           amount: number
+          billing_period?: string | null
           checkout_url?: string | null
           completed_at?: string | null
           created_at?: string
@@ -298,6 +301,7 @@ export type Database = {
           payment_method: string
           phone_hash?: string | null
           phone_last4?: string | null
+          plan_days?: number | null
           plan_tier?: string | null
           raw_response?: Json | null
           raw_webhook?: Json | null
@@ -308,6 +312,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          billing_period?: string | null
           checkout_url?: string | null
           completed_at?: string | null
           created_at?: string
@@ -324,6 +329,7 @@ export type Database = {
           payment_method?: string
           phone_hash?: string | null
           phone_last4?: string | null
+          plan_days?: number | null
           plan_tier?: string | null
           raw_response?: Json | null
           raw_webhook?: Json | null
