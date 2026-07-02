@@ -82,10 +82,33 @@ export function ReferralSection() {
     setRedeeming(true);
     const { data, error } = await supabase.rpc("apply_referral_code", { _code: redeemCode.trim() });
     setRedeeming(false);
-    if (error) { toast.error("Erro ao aplicar código"); return; }
+    if (error) {
+      toast.custom(
+        (t) => (
+          <AppleToast
+            toastId={t}
+            title="Erro"
+            body="Não foi possível aplicar o código. Tenta novamente."
+            onDismiss={() => toast.dismiss(t)}
+          />
+        ),
+        { duration: 2600 },
+      );
+      return;
+    }
     const res = data as { success: boolean; reason?: string } | null;
     if (res?.success) {
-      toast.success("Código aplicado! Quando ativares a subscrição, o teu amigo ganha dias grátis.");
+      toast.custom(
+        (t) => (
+          <AppleToast
+            toastId={t}
+            title="Código aplicado"
+            body="Quando ativares a subscrição, o teu amigo ganha dias grátis."
+            onDismiss={() => toast.dismiss(t)}
+          />
+        ),
+        { duration: 2600 },
+      );
       setAlreadyReferred(true);
       setRedeemCode("");
     } else {
@@ -95,7 +118,18 @@ export function ReferralSection() {
         already_referred: "Já aplicaste um código",
         invalid_code: "Código inválido",
       };
-      toast.error(map[res?.reason ?? ""] ?? "Não foi possível aplicar o código");
+      const msg = map[res?.reason ?? ""] ?? "Não foi possível aplicar o código";
+      toast.custom(
+        (t) => (
+          <AppleToast
+            toastId={t}
+            title="Ups"
+            body={msg}
+            onDismiss={() => toast.dismiss(t)}
+          />
+        ),
+        { duration: 2600 },
+      );
     }
   }
 
