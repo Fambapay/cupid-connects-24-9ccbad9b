@@ -235,9 +235,10 @@ export function ManageMembership() {
         {/* Benefits */}
         {currentPlan && hasPremiumAccess && (
           <section className="mt-6">
-            <h3 className="mb-3 text-sm font-extrabold uppercase tracking-wider text-white/50">
+            <h3 className="mb-3 text-[11px] font-extrabold uppercase tracking-wider text-white/50">
               O que tens incluído
             </h3>
+
             <ul className="space-y-2.5 rounded-2xl border border-white/8 bg-white/[0.03] p-4 backdrop-blur-xl">
               {currentPlan.highlights.map((h) => (
                 <li key={h.label} className="flex items-start gap-3 text-sm">
