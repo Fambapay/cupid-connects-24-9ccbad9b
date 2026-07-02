@@ -49,8 +49,9 @@ export function ReferralSection() {
       setCopied(true);
       toast.custom(
         (t) => (
-          <AppleToast
+          <HunieToast
             toastId={t}
+            type="success"
             title="Código copiado"
             body={`${summary.code} está pronto a partilhar.`}
             onDismiss={() => toast.dismiss(t)}
