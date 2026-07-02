@@ -42,6 +42,7 @@ import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPublicWinbackCronRouteImport } from './routes/api/public/winback-cron'
 import { Route as ApiPublicVapidKeyRouteImport } from './routes/api/public/vapid-key'
 import { Route as ApiPublicTrialEndingCronRouteImport } from './routes/api/public/trial-ending-cron'
 import { Route as ApiPublicReactivationCronRouteImport } from './routes/api/public/reactivation-cron'
@@ -222,6 +223,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicWinbackCronRoute = ApiPublicWinbackCronRouteImport.update({
+  id: '/api/public/winback-cron',
+  path: '/api/public/winback-cron',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicVapidKeyRoute = ApiPublicVapidKeyRouteImport.update({
   id: '/api/public/vapid-key',
   path: '/api/public/vapid-key',
@@ -349,6 +355,7 @@ export interface FileRoutesByFullPath {
   '/api/public/reactivation-cron': typeof ApiPublicReactivationCronRoute
   '/api/public/trial-ending-cron': typeof ApiPublicTrialEndingCronRoute
   '/api/public/vapid-key': typeof ApiPublicVapidKeyRoute
+  '/api/public/winback-cron': typeof ApiPublicWinbackCronRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -397,6 +404,7 @@ export interface FileRoutesByTo {
   '/api/public/reactivation-cron': typeof ApiPublicReactivationCronRoute
   '/api/public/trial-ending-cron': typeof ApiPublicTrialEndingCronRoute
   '/api/public/vapid-key': typeof ApiPublicVapidKeyRoute
+  '/api/public/winback-cron': typeof ApiPublicWinbackCronRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -448,6 +456,7 @@ export interface FileRoutesById {
   '/api/public/reactivation-cron': typeof ApiPublicReactivationCronRoute
   '/api/public/trial-ending-cron': typeof ApiPublicTrialEndingCronRoute
   '/api/public/vapid-key': typeof ApiPublicVapidKeyRoute
+  '/api/public/winback-cron': typeof ApiPublicWinbackCronRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -499,6 +508,7 @@ export interface FileRouteTypes {
     | '/api/public/reactivation-cron'
     | '/api/public/trial-ending-cron'
     | '/api/public/vapid-key'
+    | '/api/public/winback-cron'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -547,6 +557,7 @@ export interface FileRouteTypes {
     | '/api/public/reactivation-cron'
     | '/api/public/trial-ending-cron'
     | '/api/public/vapid-key'
+    | '/api/public/winback-cron'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -597,6 +608,7 @@ export interface FileRouteTypes {
     | '/api/public/reactivation-cron'
     | '/api/public/trial-ending-cron'
     | '/api/public/vapid-key'
+    | '/api/public/winback-cron'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -633,6 +645,7 @@ export interface RootRouteChildren {
   ApiPublicReactivationCronRoute: typeof ApiPublicReactivationCronRoute
   ApiPublicTrialEndingCronRoute: typeof ApiPublicTrialEndingCronRoute
   ApiPublicVapidKeyRoute: typeof ApiPublicVapidKeyRoute
+  ApiPublicWinbackCronRoute: typeof ApiPublicWinbackCronRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -874,6 +887,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/winback-cron': {
+      id: '/api/public/winback-cron'
+      path: '/api/public/winback-cron'
+      fullPath: '/api/public/winback-cron'
+      preLoaderRoute: typeof ApiPublicWinbackCronRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/vapid-key': {
       id: '/api/public/vapid-key'
       path: '/api/public/vapid-key'
@@ -1096,6 +1116,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicReactivationCronRoute: ApiPublicReactivationCronRoute,
   ApiPublicTrialEndingCronRoute: ApiPublicTrialEndingCronRoute,
   ApiPublicVapidKeyRoute: ApiPublicVapidKeyRoute,
+  ApiPublicWinbackCronRoute: ApiPublicWinbackCronRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
