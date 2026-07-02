@@ -55,6 +55,11 @@ function Discover() {
   const { user } = useAuth();
   const { isPremium, entitlements, subscription } = useSubscription();
   const offerEngine = useOfferEngine();
+  const likesCount = useLikesCount().count;
+  useEffect(() => {
+    if (likesCount >= 3) offerEngine.triggerLikesReceived();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [likesCount]);
   const { profile } = useProfile();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
