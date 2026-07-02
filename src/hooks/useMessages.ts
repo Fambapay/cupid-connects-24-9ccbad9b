@@ -42,7 +42,7 @@ export function useMessages(matchId: string | undefined) {
     }
     const otherId = (match.user_a === user.id ? match.user_b : match.user_a) as string;
 
-    const [{ data: prof }, { data: photo }, { data: msgs }] = await Promise.all([
+    const [{ data: prof }, { data: photo }, { data: msgsJson }] = await Promise.all([
       supabase.from("profiles").select("name,last_active_at").eq("id", otherId).maybeSingle(),
       supabase
         .from("profile_photos")
@@ -51,12 +51,10 @@ export function useMessages(matchId: string | undefined) {
         .order("position", { ascending: true })
         .limit(1)
         .maybeSingle(),
-      supabase
-        .from("messages")
-        .select("id,match_id,sender_id,content,created_at")
-        .eq("match_id", matchId)
-        .order("created_at", { ascending: true }),
+      // Corpo mascarado server-side para users sem premium (privacy hard-guard).
+      supabase.rpc("get_match_messages", { _match_id: matchId }),
     ]);
+    const msgs = (Array.isArray(msgsJson) ? msgsJson : []) as ChatMessage[];
 
     const photoUrl = photo?.storage_path
       ? await signPhoto(photo.storage_path as string, 3600, { width: 96, height: 96, resize: "cover", quality: 70 })
