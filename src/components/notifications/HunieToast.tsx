@@ -66,7 +66,7 @@ function HunieToastBase({
         onClick={onDismiss}
       >
         <div
-          className={`relative overflow-hidden rounded-2xl border border-white/8 bg-surface-1/80 backdrop-blur-xl ring-1 ${styles.ring} ${styles.glow}`}
+          className={`relative overflow-hidden rounded-2xl border border-white/8 bg-white/[0.06] backdrop-blur-xl ring-1 ${styles.ring} ${styles.glow}`}
         >
           {/* Top sheen */}
           <div
