@@ -364,10 +364,23 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
           _days: plan_days,
         });
       }
+      if (offer_slug) {
+        await supabaseAdmin.rpc("mark_offer_paid", {
+          _user_id: userId,
+          _slug: offer_slug,
+          _payment_ref: { payment_id: row.id, provider: "debito" } as never,
+        });
+      }
       await supabaseAdmin
         .from("debito_payments")
         .update({ completed_at: new Date().toISOString() })
         .eq("id", row.id);
+    }
+
+    if (!orchestratorOk || mappedStatus === "failed") {
+      if (offer_slug) {
+        await supabaseAdmin.rpc("release_offer_redemption", { _user_id: userId });
+      }
     }
 
     if (!orchestratorOk) {
