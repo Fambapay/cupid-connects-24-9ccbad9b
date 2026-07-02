@@ -220,6 +220,7 @@ export function OfferSheet({ offer, trialEndsAt, onDismiss, onClaim, onSuccess }
           amountMzn={amountForCheckout}
           planTier={(offer.plan_tier as "plus" | "select" | "elite") ?? "plus"}
           billingPeriod="monthly"
+          offerId={offer.is_discount ? offer.id : undefined}
           onSuccess={async () => {
             invalidateOnboardingCache();
             await reload();
