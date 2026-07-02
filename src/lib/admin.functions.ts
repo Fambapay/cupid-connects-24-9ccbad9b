@@ -640,3 +640,28 @@ export const moderatePhotoDismiss = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+
+// ─── Offer funnel ─────────────────────────────────────────────────────────
+export const getOfferFunnel = createServerFn({ method: "GET" })
+  .middleware([requireAdmin])
+  .handler(async ({ context }) => {
+    const sb = context.supabaseAdmin;
+    const { data, error } = await sb.rpc("admin_get_offer_funnel");
+    if (error) throw new Error(error.message);
+    return (data ?? []) as Array<{
+      offer_id: string;
+      slug: string;
+      trigger: string;
+      plan_tier: string;
+      first_period_price_minor: number;
+      regular_price_minor: number;
+      currency: string;
+      impressions_shown: number;
+      impressions_dismissed: number;
+      impressions_clicked_cta: number;
+      redemptions_started: number;
+      redemptions_paid: number;
+      ctr: number;
+      conversion_rate: number;
+    }>;
+  });
