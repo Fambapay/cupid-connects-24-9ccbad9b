@@ -1,108 +1,85 @@
-## Objectivo
 
-Transformar o Hunie (TanStack Start PWA) numa app Android nativa via Capacitor, mantendo a versão web intacta. No fim ficas com um projeto que abre no Android Studio e gera AAB para a Play Store.
+# Sistema de Ofertas & Conversão do Trial
 
-## Limitação importante do ambiente Lovable
+Adaptado ao Hunie existente: `profiles.membership_tier/status/expires_at`, `has_premium_access`, `useSubscription`, planos `free/select/plus/elite`. Sem tabela `subscriptions` nova — trial já vem de `membership_status='trialing'` no `handle_new_user`.
 
-O sandbox do Lovable **não tem Android SDK nem Android Studio**. Isso significa:
+## Nota sobre o prompt vs. realidade do código
 
-- Posso instalar Capacitor, criar `capacitor.config.ts`, scripts npm, plugins, código de bridge nativo, e preparar tudo no repo.
-- **Não posso correr `npx cap add android` aqui** (precisa de Java + Android SDK). Tu vais correr esse comando **uma vez** localmente no teu Mac/PC depois de clonar o repo do GitHub. A partir daí a pasta `android/` fica versionada e qualquer sync funciona.
-- Não posso gerar o AAB nem abrir Android Studio — esses passos são na tua máquina.
+- Não crio `subscriptions`, `payment_history`, `get_access_level`, `confirm_payment`, `mark_referral_onboarding_complete` — todos já existem sob outros nomes (`profiles`, `payment_transactions`+`debito_payments`+`get_my_payment_history`, `has_premium_access`).
+- O "Premium" das ofertas mapeia para `tier='plus'` (plano intermédio, com "ver quem te deu like"). Trimestral (`quarterly_499`) mapeia para `plus` com 3 meses.
+- Moeda: `MZN` como campo próprio na tabela `offers` (não mexo em `pricing.ts` EUR). O checkout Débito já lida com MZN.
+- "Locked" = `membership_status IN ('expired','inactive','cancelled')` OU `membership_tier='free'` (não é premium e não está em trial/grace).
 
-Vou deixar um `MOBILE.md` com o passo-a-passo exacto para correres localmente.
+## Fase 1 — Migração SQL (uma migração única)
 
-## O que vou fazer no repo
+**Tabelas novas** (com GRANTs + RLS + policies em ordem correta):
+- `offers` (catálogo, `slug`, `trigger` enum, `first_period_price_minor`, `regular_price_minor`, `currency='MZN'`, `plan_tier`, `period_months`, `is_discount`, `priority`, `active`)
+- `offer_redemptions` (UNIQUE `user_id` — 1 desconto por conta; FK opcional a `debito_payments`/`payment_transactions` via `payment_ref jsonb`)
+- `popup_impressions` (`user_id`, `offer_id`, `shown_at`, `action`)
+- `winback_pushes` (`user_id`, `slug`, `sent_at`, UNIQUE `(user_id, slug)`)
 
-### 1. Dependências e config Capacitor
-- `bun add @capacitor/core @capacitor/cli @capacitor/android @capacitor/app @capacitor/status-bar @capacitor/splash-screen @capacitor/keyboard @capacitor/haptics @capacitor/push-notifications @capacitor/camera @capacitor/preferences`
-- `capacitor.config.ts` na raiz:
-  - `appId: "com.hunie.app"`, `appName: "Hunie"`
-  - `webDir: "dist"` (output do build TanStack Start client)
-  - `server.androidScheme: "https"`, `server.url` apontando para `https://hunie.app` (modo produção a servir o site real — mais simples porque a app é SSR/server functions; descrito abaixo)
-  - StatusBar overlay, SplashScreen 1500ms, Keyboard `resize: "native"`
+**Enum** `offer_trigger`: `trial_day_2 | trial_last_24h | post_first_match | likes_received | winback_day_7 | winback_day_14 | always_on`.
 
-### 2. Estratégia web→nativo
-A app usa **TanStack Start com server functions**, que precisa de servidor Node. Há duas abordagens:
+**RPCs SECURITY DEFINER**:
+- `get_eligible_offer(_trigger)` — deriva `trial_day` de `profiles.created_at`; bloqueia se já resgatou; bloqueia se `has_premium_access(auth.uid())`; frequency cap 2/dia; 2 dismissals silenciam a oferta; devolve 1 linha da `offers` ativa.
+- `redeem_offer(_offer_id)` — valida activo + não-resgatado; INSERT em `offer_redemptions` (unique_violation → `already_redeemed`); devolve `{plan_tier, amount_minor, currency, period_months}` para o checkout Débito.
+- `release_offer_redemption(_user_id, _slug)` — service_role, chamada quando pagamento falha/expira (para reciclar o desconto).
+- `log_popup_impression(_offer_id, _action)` — insere linha.
+- `mark_winback_sent(_user_id, _slug)` — service_role, idempotente.
 
-**A. Hybrid remoto (recomendado, default):** o APK carrega `https://hunie.app` dentro do WebView Capacitor. Mantém auth, pagamentos, SSR, sem duplicar backend. Os plugins nativos (push FCM, câmera, haptics) funcionam normalmente via bridge.
+**Alteração RLS em `messages`** (crítica): substituir `messages_select_member` por:
+- Membros com premium access → veem `content` normal.
+- Membros locked → policy separada + **view `messages_safe`** com `WITH (security_invoker=on)` que devolve `content=NULL, has_content=true` quando o requerente é locked e a mensagem chegou depois de `locked_at` (usar `created_at > profiles.updated_at` quando status virou `expired`). Cliente passa a ler sempre `messages_safe` no chat.
+- Alternativa mais segura (a que vou implementar): manter policy única mas fazer o `select` do chat via RPC `get_match_messages(_match_id)` que devolve JSON mascarado. Menos disruptivo do que mexer numa view + policy `USING(false)` na base.
 
-**B. Fully bundled:** exigia portar tudo para SPA estática + chamar Supabase directamente. Trabalho enorme e regressão funcional. **Não recomendado.**
+**Analytics view** `offer_funnel` (só admins via `is_admin`).
 
-Vou implementar **A** com fallback: build script para variante "bundled web preview" caso queiras testar offline-ish.
+**Seed** das 7 ofertas em MZN (149/99/499 conforme prompt), mas usando `plan_tier='plus'` e amounts em minor units (14900/9900/49900) — coerente com o resto do sistema.
 
-### 3. Scripts npm
-```json
-"cap:sync": "cap sync android",
-"cap:open": "cap open android",
-"android": "cap sync android && cap open android",
-"android:build": "cd android && ./gradlew bundleRelease"
-```
+## Fase 2 — Backend TSS
 
-### 4. Camada de bridge (`src/lib/native/`)
-- `platform.ts` — `isNative()`, `getPlatform()`
-- `haptics.ts` — substitui o stub actual em `src/hooks/useNativePlatform.ts` por chamadas reais ao `@capacitor/haptics` quando nativo, no-op no web
-- `statusBar.ts` — edge-to-edge + cor dinâmica do tema escuro
-- `keyboard.ts` — listeners para ajustar viewport no chat
-- `push.ts` — registo FCM, envio do token para Supabase (`push_subscriptions` com novo campo `fcm_token` + `platform`)
-- `camera.ts` — wrap de `Camera.getPhoto` que devolve File compatível com `usePhotoUpload`
-- `deepLinks.ts` — listener `App.addListener('appUrlOpen')` → `router.navigate`
-- `init.ts` — bootstrap único chamado em `__root.tsx`
+- Novo `src/lib/offers.functions.ts`: `getEligibleOffer(trigger)`, `redeemOffer(offerId)`, `logImpression(offerId, action)` — todos `createServerFn` + `requireSupabaseAuth`.
+- `src/lib/offers/triggers.ts` (client-safe helpers de decisão).
+- Extender `debito.functions.ts` para aceitar `{ offer_id }`; ao iniciar o pagamento chama `redeem_offer` para trancar preço e guardar `offer_id` em `debito_payments.metadata`. Ao completar, `winback_pushes`/`offer_redemptions.payment_ref` atualizados. Ao falhar/expirar (cron reconciliação já existente) → `release_offer_redemption`.
+- Nova rota cron `src/routes/api/public/winback-cron.ts` (chamada 1x/dia por pg_cron novo): para cada user com `membership_status IN ('expired','cancelled')` calcula dias desde a última mudança de status; envia FCM dia 7 e dia 14 via `push/send.server.ts` já existente; grava `winback_pushes`. Deep link `hunie://offer/<slug>` (o `deepLinks.ts` faz push do path — vou aceitar `/discover?offer=<slug>`).
 
-### 5. Push notifications nativas
-- Migration: adicionar colunas `fcm_token text`, `platform text` em `push_subscriptions` (opcionais, não quebra Web Push existente)
-- Server function `registerFcmToken` (protegida) que faz upsert
-- No bridge: pedir permissão, registar, enviar token
-- O `send.server.ts` actual usa Web Push (VAPID). Para FCM vou adicionar um stub `sendFcmPush()` que precisa de `FCM_SERVER_KEY` — deixo TODO documentado porque exige criar projecto Firebase (passo manual teu).
+## Fase 3 — Frontend UI
 
-### 6. UI / safe areas
-- `styles.css`: já usas `env(safe-area-inset-*)`. Adicionar variantes para Android navigation bar (`env(safe-area-inset-bottom)` cobre).
-- `AppShell.tsx`: confirmar padding bottom respeita gesture nav.
-- Status bar transparente com conteúdo por baixo.
+- `src/hooks/useOfferEngine.ts` — hook central; consome `useSubscription`, `useProfile`; expõe `activeOffer`, `showOfferSheet(trigger)`, `dismissOffer`, `claimOffer`; fila de gatilhos com `enqueueTrigger`; guardas: nunca durante swipe (event flag global `window.__hunieSwipeActive`), teclado aberto (via Capacitor Keyboard existente), rota `/chat/$matchId` (via `useMatch`). Auto-dispara `trial_day_2` no mount do `/discover` e `trial_last_24h` quando faltam <24h.
+- `src/components/offers/OfferSheet.tsx` — bottom sheet Liquid Glass; preço destacado + riscado; 3 bullets; CTA `#FF4458` full-width; rodapé legal. Suporta variante `trial_last_24h` com countdown ao vivo interno.
+- `src/components/offers/TrialCountdownBanner.tsx` — banner topo overlay no `/discover`; atualiza por minuto; abre `OfferSheet` on tap.
+- Integração `/discover`: `<TrialCountdownBanner />` + engine.
+- Match: no `MatchOverlay.onClose` chama `engine.enqueueTrigger('post_first_match')`.
+- Likes: em `useLikedMe`/`useLikesCount`, quando `count >= 3` dispara `likes_received` (1x/dia por user, guardado em `localStorage`).
+- Locked blur:
+  - Chat list: mensagens novas com `content=null` → render "A {nome} respondeu-te — subscreve para ler" + tap → `/membership?required=1`.
+  - Likes screen: fotos com `blur-xl` já existente para users free; contador real.
+  - Chat aberto sem premium → banner fixo com CTA.
+- `/membership`: adicionar card `always_on` trimestral em destaque + card da oferta ativa (se houver) no topo. VIP como "Brevemente".
 
-### 7. Documentação `MOBILE.md`
-Passos locais que precisas correr **uma vez**:
-1. Instalar Android Studio + JDK 17
-2. `git pull` o repo com os ficheiros novos
-3. `bun install`
-4. `bun run build`
-5. `npx cap add android` (cria a pasta `android/`)
-6. `npx cap sync android`
-7. Configurar `android/app/src/main/res/` com icon e splash (gerar com `@capacitor/assets`)
-8. Em `AndroidManifest.xml`: permissões `INTERNET`, `CAMERA`, `READ_MEDIA_IMAGES`, `POST_NOTIFICATIONS`, `VIBRATE`
-9. Firebase: criar projecto, baixar `google-services.json` → `android/app/`
-10. Assinar release keystore
-11. `./gradlew bundleRelease` → `.aab` em `android/app/build/outputs/bundle/release/`
-12. Upload Play Console
+## Fase 4 — Copy pt-MZ
 
-### 8. Pagamentos
-Mantém arquitectura actual (KambaPay / e-Mola / Multicaixa via webhooks). Nada muda — Play Store permite payment processors externos para apps de dating em mercados específicos, mas vais precisar declarar isso no Play Console. O sistema de entitlement já existe (`profiles.membership_*` + `activate_membership_debito` RPC); a app nativa só consulta o mesmo backend.
+Ficheiro `src/lib/offers/copy.ts` com todos os textos exatos do prompt.
 
-### 9. Deep links
-- `capacitor.config.ts` + `AndroidManifest` intent filter para `https://hunie.app/*` e `hunie://`
-- Bridge `deepLinks.ts` mapeia para rotas TanStack
+## Fase 5 — Analytics & Verificação
 
-### 10. Segurança
-Nada de secrets no bundle Android. Tudo o que é sensível continua server-side (server functions / webhooks). `VITE_*` mantidas (publishable Supabase key é OK pública).
+- View `offer_funnel` visível em `/admin` (nova tab pequena).
+- Build passa, `bun run build`, smoke test manual dos 3 gatilhos principais.
 
-## O que **tu** tens de fazer depois
+## Critérios de aceitação (validados no fim)
 
-1. Clonar repo localmente, correr `npx cap add android` (one-time)
-2. Criar projecto Firebase + descarregar `google-services.json`
-3. Adicionar secret `FCM_SERVER_KEY` no Lovable Cloud (eu peço quando estiver na hora)
-4. Gerar icons/splash com `npx @capacitor/assets generate`
-5. Conta Google Play Console ($25)
-6. Build + upload AAB
+Todos os 11 pontos do prompt, com foco em:
+- Corpo das mensagens não chega ao cliente para users locked (verificar Network).
+- Pagamento com desconto: `amount=first_period_price`; `next_renewal_amount=regular_price`.
+- Frequency cap testado com impressões manuais.
+- Um utilizador que resgatou nunca mais vê pop-up de desconto.
 
-## Migrations DB
+## Fora de âmbito nesta iteração
 
-Uma migration: adicionar `fcm_token`, `platform` em `push_subscriptions` (nullable, idempotente).
+- Configuração dos SKUs no Google Play Console (só deixo TODO comentado em `google-play.server.ts` e mapeamento offer→`introductory_offer_id`).
+- Alterar `pricing.ts` EUR (as ofertas MZN vivem em `offers`; o resto do app EUR continua igual).
+- VIP tier real — só card "Brevemente".
 
-## Ficheiros criados/alterados
+## Tamanho estimado
 
-**Novos:** `capacitor.config.ts`, `MOBILE.md`, `src/lib/native/{platform,haptics,statusBar,keyboard,push,camera,deepLinks,init}.ts`
-**Alterados:** `package.json` (deps + scripts), `src/routes/__root.tsx` (init nativo), `src/hooks/useNativePlatform.ts` (real impl), `src/lib/haptics.ts` (delega para bridge), `src/hooks/usePhotoUpload.ts` (opção câmera nativa), `src/styles.css` (safe areas)
-
-## Confirmas?
-
-Avança e implemento tudo numa só passagem? Ou preferes começar só pelo Capacitor + config + bridge mínimo e fazer push/câmera num segundo turno?
+~1 migração grande (300–400 linhas SQL), ~8 ficheiros novos, ~6 edits. Vou pedir a migração primeiro (aprovação tua), e enquanto ela corre escrevo os ficheiros TS/React que não dependem dos tipos regenerados. Depois faço um edit final que usa `Database` types atualizados.
