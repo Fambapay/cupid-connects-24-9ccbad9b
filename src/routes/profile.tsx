@@ -155,6 +155,12 @@ function ProfilePage() {
         onOpenAdmin={() => navigate({ to: '/admin' })}
       />
 
+      <div className="px-5 pb-6">
+        <ReferralSection />
+      </div>
+
+
+
       <EditProfileSheet
         open={editing}
         profile={view}
