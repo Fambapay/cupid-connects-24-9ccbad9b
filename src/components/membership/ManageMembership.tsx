@@ -12,7 +12,7 @@ import { useCountry } from "@/lib/country/context";
 import { cancelMyMembership } from "@/lib/membership.functions";
 import { getMyPaymentHistory, restoreMyPurchases, type PaymentHistoryEntry } from "@/lib/payments.functions";
 import { PaywallFlow } from "@/components/paywall/PaywallFlow";
-import { ReferralSection } from "./ReferralSection";
+
 import { hapticTap } from "@/hooks/useNativePlatform";
 import { requiresExternalCheckout, getExternalCheckoutUrl, getBillingMode } from "@/lib/billing/platform";
 import { openInAppBrowser } from "@/lib/native/inAppBrowser";
