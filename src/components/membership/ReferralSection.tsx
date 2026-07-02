@@ -102,8 +102,9 @@ export function ReferralSection() {
     if (res?.success) {
       toast.custom(
         (t) => (
-          <AppleToast
+          <HunieToast
             toastId={t}
+            type="success"
             title="Código aplicado"
             body="Quando ativares a subscrição, o teu amigo ganha dias grátis."
             onDismiss={() => toast.dismiss(t)}
