@@ -53,7 +53,8 @@ function Discover() {
   useForceDarkTheme();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isPremium, entitlements } = useSubscription();
+  const { isPremium, entitlements, subscription } = useSubscription();
+  const offerEngine = useOfferEngine();
   const { profile } = useProfile();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
