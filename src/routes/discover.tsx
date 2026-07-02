@@ -428,7 +428,18 @@ function Discover() {
         onSend={handleSendFirstImpression}
       />
 
-      {!filtersOpen && !firstImpression && <BottomNav />}
+      <OfferSheet
+        offer={offerEngine.activeOffer}
+        trialEndsAt={subscription.expiresAt}
+        onDismiss={offerEngine.dismissOffer}
+        onClaim={offerEngine.claimOffer}
+        onSuccess={async () => {
+          offerEngine.closeAfterClaim();
+          await reload();
+        }}
+      />
+
+      {!filtersOpen && !firstImpression && !offerEngine.activeOffer && <BottomNav />}
     </div>
   );
 }
