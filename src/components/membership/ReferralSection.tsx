@@ -84,7 +84,18 @@ export function ReferralSection() {
     } else {
       try {
         await navigator.clipboard.writeText(text);
-        toast.success("Convite copiado!");
+        toast.custom(
+          (t) => (
+            <HunieToast
+              toastId={t}
+              type="success"
+              title="Convite copiado"
+              body="Mensagem de convite copiada para a área de transferência."
+              onDismiss={() => toast.dismiss(t)}
+            />
+          ),
+          { duration: 2200 },
+        );
       } catch { /* noop */ }
     }
   }
