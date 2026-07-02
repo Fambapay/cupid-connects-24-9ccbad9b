@@ -39,6 +39,7 @@ import { Route as AdminSeedsRouteImport } from './routes/admin.seeds'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminPhotosRouteImport } from './routes/admin.photos'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
+import { Route as AdminOffersRouteImport } from './routes/admin.offers'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
@@ -208,6 +209,11 @@ const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
   path: '/payments',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminOffersRoute = AdminOffersRouteImport.update({
+  id: '/offers',
+  path: '/offers',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAuditRoute = AdminAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -331,6 +337,7 @@ export interface FileRoutesByFullPath {
   '/welcome': typeof WelcomeRoute
   '/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/offers': typeof AdminOffersRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/photos': typeof AdminPhotosRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -380,6 +387,7 @@ export interface FileRoutesByTo {
   '/welcome': typeof WelcomeRoute
   '/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/offers': typeof AdminOffersRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/photos': typeof AdminPhotosRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -432,6 +440,7 @@ export interface FileRoutesById {
   '/welcome': typeof WelcomeRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/offers': typeof AdminOffersRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/photos': typeof AdminPhotosRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -484,6 +493,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/settings'
     | '/admin/audit'
+    | '/admin/offers'
     | '/admin/payments'
     | '/admin/photos'
     | '/admin/reports'
@@ -533,6 +543,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/settings'
     | '/admin/audit'
+    | '/admin/offers'
     | '/admin/payments'
     | '/admin/photos'
     | '/admin/reports'
@@ -584,6 +595,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/_authenticated/settings'
     | '/admin/audit'
+    | '/admin/offers'
     | '/admin/payments'
     | '/admin/photos'
     | '/admin/reports'
@@ -866,6 +878,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPaymentsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/offers': {
+      id: '/admin/offers'
+      path: '/offers'
+      fullPath: '/admin/offers'
+      preLoaderRoute: typeof AdminOffersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/audit': {
       id: '/admin/audit'
       path: '/audit'
@@ -1042,6 +1061,7 @@ const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
 
 interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
+  AdminOffersRoute: typeof AdminOffersRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminPhotosRoute: typeof AdminPhotosRoute
   AdminReportsRoute: typeof AdminReportsRoute
@@ -1052,6 +1072,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
+  AdminOffersRoute: AdminOffersRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminPhotosRoute: AdminPhotosRoute,
   AdminReportsRoute: AdminReportsRoute,
