@@ -56,7 +56,7 @@ function Discover() {
   const { user } = useAuth();
   const { isPremium, entitlements, subscription } = useSubscription();
   const offerEngine = useOfferEngine();
-  const likesCount = useLikesCount().count;
+  const likesCount = useLikesCount();
   useEffect(() => {
     if (likesCount >= 3) offerEngine.triggerLikesReceived();
     // eslint-disable-next-line react-hooks/exhaustive-deps
