@@ -178,6 +178,7 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
         phone_hash,
         phone_last4,
         customer_email: data.customer_email ?? null,
+        offer_slug,
         status: "pending",
       })
       .select("id, source_id")
