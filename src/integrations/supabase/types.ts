@@ -629,6 +629,13 @@ export type Database = {
             foreignKeyName: "offer_redemptions_offer_id_fkey"
             columns: ["offer_id"]
             isOneToOne: false
+            referencedRelation: "offer_funnel"
+            referencedColumns: ["offer_id"]
+          },
+          {
+            foreignKeyName: "offer_redemptions_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
             referencedRelation: "offers"
             referencedColumns: ["id"]
           },
@@ -777,6 +784,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "popup_impressions_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offer_funnel"
+            referencedColumns: ["offer_id"]
+          },
           {
             foreignKeyName: "popup_impressions_offer_id_fkey"
             columns: ["offer_id"]
@@ -1290,12 +1304,19 @@ export type Database = {
     Views: {
       offer_funnel: {
         Row: {
-          clicked: number | null
-          paid: number | null
-          redeemed: number | null
-          shown: number | null
+          conversion_rate: number | null
+          ctr: number | null
+          currency: string | null
+          first_period_price_minor: number | null
+          impressions_clicked_cta: number | null
+          impressions_dismissed: number | null
+          impressions_shown: number | null
+          offer_id: string | null
+          plan_tier: string | null
+          redemptions_paid: number | null
+          redemptions_started: number | null
+          regular_price_minor: number | null
           slug: string | null
-          title: string | null
           trigger: Database["public"]["Enums"]["offer_trigger"] | null
         }
         Relationships: []
@@ -1305,6 +1326,31 @@ export type Database = {
       activate_membership_debito: {
         Args: { _days: number; _plan_tier: string; _user_id: string }
         Returns: Json
+      }
+      admin_get_offer_funnel: {
+        Args: never
+        Returns: {
+          conversion_rate: number | null
+          ctr: number | null
+          currency: string | null
+          first_period_price_minor: number | null
+          impressions_clicked_cta: number | null
+          impressions_dismissed: number | null
+          impressions_shown: number | null
+          offer_id: string | null
+          plan_tier: string | null
+          redemptions_paid: number | null
+          redemptions_started: number | null
+          regular_price_minor: number | null
+          slug: string | null
+          trigger: Database["public"]["Enums"]["offer_trigger"] | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "offer_funnel"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       apply_referral_code: { Args: { _code: string }; Returns: Json }
       boost_entitlement_discrepancies: {
