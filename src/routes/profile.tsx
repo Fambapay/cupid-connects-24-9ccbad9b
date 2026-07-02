@@ -6,6 +6,8 @@ import { ProfileView, type ProfileViewData } from '@/components/ProfileView';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
 import { VerificationModal } from '@/components/VerificationModal';
 import { AppShell } from '@/components/AppShell';
+import { ReferralSection } from '@/components/membership/ReferralSection';
+
 import { useProfile } from '@/hooks/useProfile';
 import { usePhotoUpload } from '@/hooks/usePhotoUpload';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -152,6 +154,12 @@ function ProfilePage() {
         isAdmin={isAdmin}
         onOpenAdmin={() => navigate({ to: '/admin' })}
       />
+
+      <div className="px-5 pb-6">
+        <ReferralSection />
+      </div>
+
+
 
       <EditProfileSheet
         open={editing}
