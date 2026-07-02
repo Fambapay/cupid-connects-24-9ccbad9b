@@ -41,6 +41,7 @@ const InputSchema = z.object({
   customer_name: z.string().max(120).optional(),
   customer_email: z.string().email().optional(),
   country: z.enum(["MZ", "AO", "ZA", "PT"]).optional(),
+  offer_id: z.string().uuid().optional(),
 });
 
 async function sha256Hex(input: string): Promise<string> {
