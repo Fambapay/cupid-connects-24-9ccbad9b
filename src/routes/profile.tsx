@@ -127,10 +127,12 @@ function ProfilePage() {
     const idle = (cb: () => void) =>
       (window as any).requestIdleCallback?.(cb, { timeout: 800 }) ??
       window.setTimeout(cb, 400);
-    const id = idle(() => {
-      supabase.from('admin_emails').select('email').maybeSingle().then(({ data }) => {
-        setIsAdmin(!!data);
-      });
+    const id = idle(async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData?.user?.id;
+      if (!uid) return;
+      const { data } = await supabase.rpc('is_admin', { _uid: uid });
+      setIsAdmin(!!data);
     });
     return () => {
       (window as any).cancelIdleCallback?.(id) ?? window.clearTimeout(id);
