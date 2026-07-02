@@ -98,9 +98,10 @@ export function ReferralSection() {
 
   return (
     <section className="mt-7">
-      <h3 className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase tracking-wider text-white/50">
-        <Gift size={14} /> Convida amigos, ganha dias
+      <h3 className="mb-3 flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-white/50">
+        <Gift size={13} className="shrink-0" /> <span className="truncate">Convida amigos, ganha dias</span>
       </h3>
+
 
       <motion.div
         initial={{ opacity: 0, y: 8 }}
@@ -139,19 +140,20 @@ export function ReferralSection() {
 
           {/* Progress */}
           <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-            <div className="rounded-2xl bg-white/[0.04] px-2 py-3">
-              <div className="text-2xl font-black text-white">{completed}</div>
-              <div className="text-[10px] uppercase tracking-wider text-white/50">Concluídos</div>
+            <div className="rounded-2xl bg-white/[0.04] px-1.5 py-3">
+              <div className="text-2xl font-black text-white tabular-nums">{completed}</div>
+              <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-white/50">Concluídos</div>
             </div>
-            <div className="rounded-2xl bg-white/[0.04] px-2 py-3">
-              <div className="text-2xl font-black text-white">{remaining}</div>
-              <div className="text-[10px] uppercase tracking-wider text-white/50">Restantes</div>
+            <div className="rounded-2xl bg-white/[0.04] px-1.5 py-3">
+              <div className="text-2xl font-black text-white tabular-nums">{remaining}</div>
+              <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-white/50">Restantes</div>
             </div>
-            <div className="rounded-2xl bg-white/[0.04] px-2 py-3">
-              <div className="text-2xl font-black text-white">{daysEarned}</div>
-              <div className="text-[10px] uppercase tracking-wider text-white/50">Dias ganhos</div>
+            <div className="rounded-2xl bg-white/[0.04] px-1.5 py-3">
+              <div className="text-2xl font-black text-white tabular-nums">{daysEarned}</div>
+              <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-white/50">Dias ganhos</div>
             </div>
           </div>
+
         </div>
       </motion.div>
 

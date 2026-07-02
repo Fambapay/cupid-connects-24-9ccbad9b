@@ -132,21 +132,21 @@ export function ManageMembership() {
   return (
     <div className="min-h-[100dvh] bg-background text-foreground">
       {/* Header */}
-      <header className="sticky top-0 z-20 flex items-center gap-3 bg-background/80 px-4 pb-3 pt-[max(env(safe-area-inset-top),16px)] backdrop-blur-xl">
+      <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-white/[0.04] bg-background/85 px-4 pb-3 pt-[max(env(safe-area-inset-top),14px)] backdrop-blur-xl">
         <button
           onClick={() => {
             hapticTap();
             navigate({ to: "/profile" });
           }}
           aria-label="Voltar"
-          className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.06] active:scale-95"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/[0.06] active:scale-95"
         >
           <ArrowLeft size={18} />
         </button>
-        <h1 className="text-lg font-black">Gerir conta</h1>
+        <h1 className="min-w-0 truncate text-[17px] font-black tracking-tight">Gerir conta</h1>
       </header>
 
-      <div className="px-5 pb-[max(env(safe-area-inset-bottom),120px)] pt-2">
+      <div className="px-4 pb-[max(env(safe-area-inset-bottom),120px)] pt-4 sm:px-5">
         {/* Current plan card */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -167,7 +167,7 @@ export function ManageMembership() {
             />
           )}
           <div className="relative">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5">
               <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white/80">
                 Plano actual
               </span>
@@ -193,15 +193,15 @@ export function ManageMembership() {
               )}
             </div>
 
-            <div className="mt-3 flex items-center gap-2">
+            <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1.5">
               <h2
-                className="text-3xl uppercase text-white"
+                className="text-[28px] uppercase leading-none text-white sm:text-3xl"
                 style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900, letterSpacing: "-0.02em" }}
               >
                 HUNIE
               </h2>
               <span
-                className="rounded-full px-2.5 py-0.5 text-xs uppercase"
+                className="rounded-full px-2.5 py-0.5 text-[11px] uppercase"
                 style={{
                   fontFamily: "'Montserrat', sans-serif",
                   fontWeight: 900,
@@ -212,12 +212,12 @@ export function ManageMembership() {
               >
                 {hasPremiumAccess ? label : "Free"}
               </span>
-              {tier === "elite" && hasPremiumAccess && <Crown size={20} className="text-amber-300" />}
+              {tier === "elite" && hasPremiumAccess && <Crown size={18} className="text-amber-300" />}
             </div>
 
             {hasPremiumAccess && (
-              <div className="mt-4 flex items-center gap-2 text-sm text-white/70">
-                <Calendar size={14} />
+              <div className="mt-4 flex items-start gap-2 text-[13px] leading-snug text-white/70">
+                <Calendar size={14} className="mt-0.5 shrink-0" />
                 <span>
                   {isTrialing
                     ? <>Trial termina a <strong className="text-white">{formatDate(expiresAt)}</strong></>
@@ -235,9 +235,10 @@ export function ManageMembership() {
         {/* Benefits */}
         {currentPlan && hasPremiumAccess && (
           <section className="mt-6">
-            <h3 className="mb-3 text-sm font-extrabold uppercase tracking-wider text-white/50">
+            <h3 className="mb-3 text-[11px] font-extrabold uppercase tracking-wider text-white/50">
               O que tens incluído
             </h3>
+
             <ul className="space-y-2.5 rounded-2xl border border-white/8 bg-white/[0.03] p-4 backdrop-blur-xl">
               {currentPlan.highlights.map((h) => (
                 <li key={h.label} className="flex items-start gap-3 text-sm">
@@ -371,9 +372,10 @@ export function ManageMembership() {
 
         {/* Payment history */}
         <section className="mt-7">
-          <h3 className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase tracking-wider text-white/50">
-            <Receipt size={14} /> Histórico de pagamentos
+          <h3 className="mb-3 flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-white/50">
+            <Receipt size={13} className="shrink-0" /> <span className="truncate">Histórico de pagamentos</span>
           </h3>
+
           {history.length === 0 ? (
             <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 text-center text-sm text-white/50 backdrop-blur-xl">
               Ainda não tens pagamentos.
