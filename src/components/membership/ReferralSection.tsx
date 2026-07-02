@@ -118,10 +118,11 @@ export function ReferralSection() {
           </p>
 
           {/* Code */}
-          <div className="mt-4 flex items-center gap-2 rounded-2xl bg-black/30 p-2 pl-4">
-            <span className="flex-1 font-mono text-lg font-bold tracking-widest text-white">
+          <div className="mt-4 flex min-w-0 items-center gap-2 rounded-2xl bg-black/30 p-2 pl-4">
+            <span className="min-w-0 flex-1 truncate font-mono text-lg font-bold tracking-widest text-white">
               {summary?.code ?? "—"}
             </span>
+
             <button
               onClick={handleCopy}
               className="grid h-9 w-9 place-items-center rounded-xl bg-white/10 active:scale-95"
