@@ -541,7 +541,7 @@ function BubbleImpl({ msg, me, isFirstOfGroup, isLastOfGroup, avatar, name, show
               : { background: "var(--chat-peer-bg)", color: "var(--chat-peer-fg)", border: "1px solid var(--chat-peer-border)", fontWeight: 400 }
           }
         >
-          {msg.content}
+          {msg.content ?? <span className="italic opacity-60">🔒 Subscreve para ler</span>}
         </div>
         {me && showReadReceipt && isLastOfGroup && (
           <span className="mt-1 px-1 text-[11px]" style={{ color: "var(--chat-fg)", opacity: 0.45 }}>Lido</span>

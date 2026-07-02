@@ -7,7 +7,9 @@ export interface ChatMessage {
   id: string;
   match_id: string;
   sender_id: string;
-  content: string;
+  /** Nulo quando o utilizador não tem premium e a mensagem não é sua. */
+  content: string | null;
+  is_locked?: boolean;
   created_at: string;
 }
 
@@ -40,7 +42,7 @@ export function useMessages(matchId: string | undefined) {
     }
     const otherId = (match.user_a === user.id ? match.user_b : match.user_a) as string;
 
-    const [{ data: prof }, { data: photo }, { data: msgs }] = await Promise.all([
+    const [{ data: prof }, { data: photo }, { data: msgsJson }] = await Promise.all([
       supabase.from("profiles").select("name,last_active_at").eq("id", otherId).maybeSingle(),
       supabase
         .from("profile_photos")
@@ -49,12 +51,10 @@ export function useMessages(matchId: string | undefined) {
         .order("position", { ascending: true })
         .limit(1)
         .maybeSingle(),
-      supabase
-        .from("messages")
-        .select("id,match_id,sender_id,content,created_at")
-        .eq("match_id", matchId)
-        .order("created_at", { ascending: true }),
+      // Corpo mascarado server-side para users sem premium (privacy hard-guard).
+      supabase.rpc("get_match_messages", { _match_id: matchId }),
     ]);
+    const msgs = (Array.isArray(msgsJson) ? msgsJson : []) as unknown as ChatMessage[];
 
     const photoUrl = photo?.storage_path
       ? await signPhoto(photo.storage_path as string, 3600, { width: 96, height: 96, resize: "cover", quality: 70 })
@@ -65,7 +65,7 @@ export function useMessages(matchId: string | undefined) {
       photo: photoUrl,
       lastActiveAt: (prof?.last_active_at as string | null) ?? null,
     });
-    setMessages((msgs ?? []) as ChatMessage[]);
+    setMessages(msgs);
     setLoading(false);
   }, [user, matchId]);
 
@@ -73,7 +73,8 @@ export function useMessages(matchId: string | undefined) {
     load();
   }, [load]);
 
-  // Realtime subscription for new messages in this match
+  // Realtime: quando entra uma mensagem nova, refazemos o fetch via RPC para garantir
+  // que users sem premium recebem o corpo mascarado (nunca confiar em payload.new.content).
   useEffect(() => {
     if (!matchId) return;
     const ch = supabase
@@ -81,9 +82,11 @@ export function useMessages(matchId: string | undefined) {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "messages", filter: `match_id=eq.${matchId}` },
-        (payload) => {
-          const m = payload.new as ChatMessage;
-          setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, m]));
+        async () => {
+          const { data } = await supabase.rpc("get_match_messages", { _match_id: matchId });
+          if (Array.isArray(data)) {
+            setMessages(data as unknown as ChatMessage[]);
+          }
         },
       )
       .subscribe();

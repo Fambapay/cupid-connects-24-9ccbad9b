@@ -12,6 +12,11 @@ import { CreditShopSheet } from "@/components/paywall/CreditShopSheet";
 import type { PackKind } from "@/lib/pricing";
 import { FirstImpressionSheet } from "@/components/discovery/FirstImpressionSheet";
 import { FirstImpressionToast } from "@/components/discovery/FirstImpressionToast";
+import { OfferSheet } from "@/components/offers/OfferSheet";
+import { TrialCountdownBanner } from "@/components/offers/TrialCountdownBanner";
+import { useOfferEngine } from "@/hooks/useOfferEngine";
+
+
 
 
 import { useDiscoveryDetailOpen } from "@/lib/discoveryDetail";
@@ -48,7 +53,8 @@ function Discover() {
   useForceDarkTheme();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isPremium, entitlements } = useSubscription();
+  const { isPremium, entitlements, subscription } = useSubscription();
+  const offerEngine = useOfferEngine();
   const { profile } = useProfile();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
@@ -253,6 +259,12 @@ function Discover() {
   return (
     <div className="relative h-[100lvh] overflow-hidden bg-background text-foreground">
       <h1 className="sr-only">Descobrir matches verificados na Hunie</h1>
+      {subscription.expiresAt && (
+        <TrialCountdownBanner
+          trialEndsAt={subscription.expiresAt}
+          onTap={() => offerEngine.enqueueTrigger("trial_last_24h")}
+        />
+      )}
       <main
         className="relative w-full overflow-hidden"
         style={{
@@ -326,6 +338,8 @@ function Discover() {
         onClose={async () => {
           setMatched(null);
           await maybeRequestReview();
+          // Após fechar a celebração do 1º match: se elegível, mostra a oferta pós-match.
+          offerEngine.triggerPostFirstMatch();
         }}
         onSendMessage={async () => {
           if (!matched || !user) return;
@@ -414,7 +428,18 @@ function Discover() {
         onSend={handleSendFirstImpression}
       />
 
-      {!filtersOpen && !firstImpression && <BottomNav />}
+      <OfferSheet
+        offer={offerEngine.activeOffer}
+        trialEndsAt={subscription.expiresAt}
+        onDismiss={offerEngine.dismissOffer}
+        onClaim={offerEngine.claimOffer}
+        onSuccess={async () => {
+          offerEngine.closeAfterClaim();
+          await reload();
+        }}
+      />
+
+      {!filtersOpen && !firstImpression && !offerEngine.activeOffer && <BottomNav />}
     </div>
   );
 }
