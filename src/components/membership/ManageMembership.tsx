@@ -371,9 +371,10 @@ export function ManageMembership() {
 
         {/* Payment history */}
         <section className="mt-7">
-          <h3 className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase tracking-wider text-white/50">
-            <Receipt size={14} /> Histórico de pagamentos
+          <h3 className="mb-3 flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-white/50">
+            <Receipt size={13} className="shrink-0" /> <span className="truncate">Histórico de pagamentos</span>
           </h3>
+
           {history.length === 0 ? (
             <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 text-center text-sm text-white/50 backdrop-blur-xl">
               Ainda não tens pagamentos.
