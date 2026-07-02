@@ -118,10 +118,11 @@ export function ReferralSection() {
           </p>
 
           {/* Code */}
-          <div className="mt-4 flex items-center gap-2 rounded-2xl bg-black/30 p-2 pl-4">
-            <span className="flex-1 font-mono text-lg font-bold tracking-widest text-white">
+          <div className="mt-4 flex min-w-0 items-center gap-2 rounded-2xl bg-black/30 p-2 pl-4">
+            <span className="min-w-0 flex-1 truncate font-mono text-lg font-bold tracking-widest text-white">
               {summary?.code ?? "—"}
             </span>
+
             <button
               onClick={handleCopy}
               className="grid h-9 w-9 place-items-center rounded-xl bg-white/10 active:scale-95"
@@ -163,22 +164,23 @@ export function ReferralSection() {
           <div className="flex items-center gap-2 text-sm font-semibold text-white/80">
             <Sparkles size={14} /> Tens um código de amigo?
           </div>
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 flex w-full min-w-0 items-center gap-2">
             <input
               value={redeemCode}
               onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
               placeholder="CÓDIGO"
-              className="flex-1 rounded-xl bg-black/30 px-4 py-3 font-mono text-sm tracking-widest text-white placeholder-white/30 outline-none focus:ring-1 focus:ring-fuchsia-400/60"
+              className="min-w-0 flex-1 rounded-xl bg-black/30 px-3 py-3 font-mono text-sm tracking-widest text-white placeholder-white/30 outline-none focus:ring-1 focus:ring-fuchsia-400/60"
               maxLength={12}
             />
             <button
               disabled={redeeming || !redeemCode.trim()}
               onClick={handleRedeem}
-              className="rounded-xl bg-white/10 px-4 py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
+              className="shrink-0 rounded-xl bg-white/10 px-4 py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
             >
               {redeeming ? "..." : "Aplicar"}
             </button>
           </div>
+
         </div>
       )}
     </section>
