@@ -6,6 +6,8 @@ import { ProfileView, type ProfileViewData } from '@/components/ProfileView';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
 import { VerificationModal } from '@/components/VerificationModal';
 import { AppShell } from '@/components/AppShell';
+import { ReferralSection } from '@/components/membership/ReferralSection';
+
 import { useProfile } from '@/hooks/useProfile';
 import { usePhotoUpload } from '@/hooks/usePhotoUpload';
 import { useSubscription } from '@/hooks/useSubscription';
