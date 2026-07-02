@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, redirect, useLocation } from "@tanstack/
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { verifyAdminAccess } from "@/lib/admin.functions";
-import { LayoutDashboard, Users, CreditCard, ScrollText, ArrowLeft, Flag, Sparkles, ImageIcon } from "lucide-react";
+import { LayoutDashboard, Users, CreditCard, ScrollText, ArrowLeft, Flag, Sparkles, ImageIcon, TrendingUp } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
