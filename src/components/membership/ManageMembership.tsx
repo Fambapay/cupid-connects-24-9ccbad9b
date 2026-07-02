@@ -367,8 +367,8 @@ export function ManageMembership() {
           </motion.button>
         </section>
 
-        {/* Referrals */}
-        <ReferralSection />
+        {/* Referrals moved to /profile for visibility */}
+
 
         {/* Payment history */}
         <section className="mt-7">
