@@ -221,6 +221,7 @@ export function DebitoCheckoutSheet({
           plan_tier: planTier,
           billing_period: billingPeriod,
           country,
+          offer_id: offerId,
           return_url: isMobile
             ? undefined
             : `https://${config.defaultReturnHost}/app?subscription=success`,
