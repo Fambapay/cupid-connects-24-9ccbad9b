@@ -65,7 +65,7 @@ export function useMessages(matchId: string | undefined) {
       photo: photoUrl,
       lastActiveAt: (prof?.last_active_at as string | null) ?? null,
     });
-    setMessages((msgs ?? []) as ChatMessage[]);
+    setMessages(msgs);
     setLoading(false);
   }, [user, matchId]);
 
@@ -73,7 +73,8 @@ export function useMessages(matchId: string | undefined) {
     load();
   }, [load]);
 
-  // Realtime subscription for new messages in this match
+  // Realtime: quando entra uma mensagem nova, refazemos o fetch via RPC para garantir
+  // que users sem premium recebem o corpo mascarado (nunca confiar em payload.new.content).
   useEffect(() => {
     if (!matchId) return;
     const ch = supabase
@@ -81,9 +82,11 @@ export function useMessages(matchId: string | undefined) {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "messages", filter: `match_id=eq.${matchId}` },
-        (payload) => {
-          const m = payload.new as ChatMessage;
-          setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, m]));
+        async () => {
+          const { data } = await supabase.rpc("get_match_messages", { _match_id: matchId });
+          if (Array.isArray(data)) {
+            setMessages(data as unknown as ChatMessage[]);
+          }
         },
       )
       .subscribe();
