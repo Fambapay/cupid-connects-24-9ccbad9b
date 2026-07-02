@@ -92,15 +92,29 @@ export const Route = createFileRoute("/api/public/debito-webhook")({
 
         if (row.status !== "success" && newStatus === "success") {
           if (row.kind === "pack" && row.pack_kind && row.pack_quantity) {
-            await supabaseAdmin.rpc("credit_pack_debito", {
-              _user_id: row.user_id,
-              _pack_kind: row.pack_kind,
-              _quantity: row.pack_quantity,
-              _amount_minor: Math.round(Number(row.amount) * 100),
-              _currency: row.currency ?? "MZN",
-              _source_id: row.source_id,
-              _debito_payment_id: row.debito_payment_id ?? paymentId ?? "",
-            });
+            const { data: rpcData, error: rpcErr } = await supabaseAdmin.rpc(
+              "credit_pack_debito",
+              {
+                _user_id: row.user_id,
+                _pack_kind: row.pack_kind,
+                _quantity: row.pack_quantity,
+                _amount_minor: Math.round(Number(row.amount) * 100),
+                _currency: row.currency ?? "MZN",
+                _source_id: row.source_id,
+                _debito_payment_id: row.debito_payment_id ?? paymentId ?? "",
+              },
+            );
+            if (rpcErr) {
+              console.error("[debito-webhook] credit_pack_debito failed", {
+                source_id: row.source_id,
+                error: rpcErr,
+              });
+            } else {
+              console.log("[debito-webhook] credit_pack_debito ok", {
+                source_id: row.source_id,
+                result: rpcData,
+              });
+            }
           } else if (row.kind === "plan" && row.plan_tier) {
             let days = row.plan_days as number | null;
             if (!days) {
@@ -108,11 +122,17 @@ export const Route = createFileRoute("/api/public/debito-webhook")({
               const p = PLAN_PRICES[row.plan_tier as "select" | "plus" | "elite"];
               days = row.billing_period === "annual" ? p.annualDays : p.monthlyDays;
             }
-            await supabaseAdmin.rpc("activate_membership_debito", {
+            const { error: actErr } = await supabaseAdmin.rpc("activate_membership_debito", {
               _user_id: row.user_id,
               _plan_tier: row.plan_tier,
               _days: days,
             });
+            if (actErr) {
+              console.error("[debito-webhook] activate_membership_debito failed", {
+                source_id: row.source_id,
+                error: actErr,
+              });
+            }
             // Referral bonus (idempotent — first activation only)
             await supabaseAdmin.rpc("grant_referral_bonus", { _referred_id: row.user_id });
           }
