@@ -129,6 +129,16 @@ export const Route = createFileRoute("/api/public/kambapay-webhook")({
             // Referral bonus (idempotent — first activation only)
             await supabaseAdmin.rpc("grant_referral_bonus", { _referred_id: row.user_id });
           }
+          if ((row as { offer_slug?: string | null }).offer_slug) {
+            await supabaseAdmin.rpc("mark_offer_paid", {
+              _user_id: row.user_id,
+              _slug: (row as { offer_slug: string }).offer_slug,
+              _payment_ref: { payment_id: row.id, provider: "kambapay_webhook" } as never,
+            });
+          }
+        }
+        if (row.status !== "failed" && newStatus === "failed" && (row as { offer_slug?: string | null }).offer_slug) {
+          await supabaseAdmin.rpc("release_offer_redemption", { _user_id: row.user_id });
         }
 
         return new Response(JSON.stringify({ ok: true }), {

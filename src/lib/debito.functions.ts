@@ -41,6 +41,7 @@ const InputSchema = z.object({
   customer_name: z.string().max(120).optional(),
   customer_email: z.string().email().optional(),
   country: z.enum(["MZ", "AO", "ZA", "PT"]).optional(),
+  offer_id: z.string().uuid().optional(),
 });
 
 async function sha256Hex(input: string): Promise<string> {
@@ -101,6 +102,7 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
     let pack_quantity: number | null = null;
     let plan_days = 30;
     const period: BillingPeriod = (data.billing_period ?? "monthly") as BillingPeriod;
+    let offer_slug: string | null = null;
 
     if (kind === "plan") {
       const p = getPlanPrices(country)[data.plan_tier!];
@@ -115,6 +117,28 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
       pack_kind = pack.kind;
       pack_quantity = pack.quantity;
       amount = pack.price;
+    }
+
+    // ── Offer override: reserve the redemption and use its price/plan.
+    // Server never trusts client-supplied amount for offers.
+    if (data.offer_id && kind === "plan") {
+      const { supabaseAdmin: _admin } = await import("@/integrations/supabase/client.server");
+      const { data: redeem, error: redeemErr } = await _admin.rpc("redeem_offer", {
+        _offer_id: data.offer_id,
+      });
+      const r = (redeem ?? {}) as Record<string, unknown>;
+      if (redeemErr || r.ok !== true) {
+        return {
+          success: false,
+          error: "offer_unavailable",
+          message: "Esta oferta já não está disponível.",
+        } as const;
+      }
+      offer_slug = (r.slug as string) ?? null;
+      plan_tier = (r.plan_tier as string) ?? plan_tier;
+      amount = Number(r.amount_minor ?? 0) / 100;
+      const months = Number(r.period_months ?? 1);
+      plan_days = months >= 12 ? 365 : months >= 3 ? months * 30 : 30;
     }
 
     const method = data.payment_method as PaymentMethod;
@@ -154,6 +178,7 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
         phone_hash,
         phone_last4,
         customer_email: data.customer_email ?? null,
+        offer_slug,
         status: "pending",
       })
       .select("id, source_id")
@@ -339,10 +364,23 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
           _days: plan_days,
         });
       }
+      if (offer_slug) {
+        await supabaseAdmin.rpc("mark_offer_paid", {
+          _user_id: userId,
+          _slug: offer_slug,
+          _payment_ref: { payment_id: row.id, provider: "debito" } as never,
+        });
+      }
       await supabaseAdmin
         .from("debito_payments")
         .update({ completed_at: new Date().toISOString() })
         .eq("id", row.id);
+    }
+
+    if (!orchestratorOk || mappedStatus === "failed") {
+      if (offer_slug) {
+        await supabaseAdmin.rpc("release_offer_redemption", { _user_id: userId });
+      }
     }
 
     if (!orchestratorOk) {

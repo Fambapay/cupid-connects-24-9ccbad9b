@@ -26,6 +26,7 @@ import { useBoost } from "@/hooks/useBoost";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useLikesCount } from "@/hooks/useLikesCount";
 import { supabase } from "@/integrations/supabase/client";
 import type { DiscoveryProfile, SwipeDirection } from "@/components/discovery/types";
 
@@ -55,6 +56,11 @@ function Discover() {
   const { user } = useAuth();
   const { isPremium, entitlements, subscription } = useSubscription();
   const offerEngine = useOfferEngine();
+  const likesCount = useLikesCount();
+  useEffect(() => {
+    if (likesCount >= 3) offerEngine.triggerLikesReceived();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [likesCount]);
   const { profile } = useProfile();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);

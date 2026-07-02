@@ -29,6 +29,8 @@ export interface DebitoCheckoutSheetProps {
   packId?: string;
   planTier?: "select" | "plus" | "elite";
   billingPeriod?: BillingPeriod;
+  /** Optional offer reservation id — server re-computes amount/plan. */
+  offerId?: string;
   onSuccess?: () => void;
 }
 
@@ -58,6 +60,7 @@ export function DebitoCheckoutSheet({
   packId,
   planTier,
   billingPeriod,
+  offerId,
   onSuccess,
 }: DebitoCheckoutSheetProps) {
   const create = useServerFn(createDebitoPayment);
@@ -218,6 +221,7 @@ export function DebitoCheckoutSheet({
           plan_tier: planTier,
           billing_period: billingPeriod,
           country,
+          offer_id: offerId,
           return_url: isMobile
             ? undefined
             : `https://${config.defaultReturnHost}/app?subscription=success`,
