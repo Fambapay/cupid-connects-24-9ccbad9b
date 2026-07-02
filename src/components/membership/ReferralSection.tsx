@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Copy, Check, Gift, Share2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { AppleToast } from "@/components/notifications/AppleToast";
 import { supabase } from "@/integrations/supabase/client";
 
 type Summary = {
