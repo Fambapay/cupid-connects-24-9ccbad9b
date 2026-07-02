@@ -47,7 +47,17 @@ export function ReferralSection() {
     try {
       await navigator.clipboard.writeText(summary.code);
       setCopied(true);
-      toast.success("Código copiado!");
+      toast.custom(
+        (t) => (
+          <AppleToast
+            toastId={t}
+            title="Código copiado"
+            body={`${summary.code} está pronto a partilhar.`}
+            onDismiss={() => toast.dismiss(t)}
+          />
+        ),
+        { duration: 2200 },
+      );
       setTimeout(() => setCopied(false), 1500);
     } catch {
       toast.error("Não foi possível copiar");
