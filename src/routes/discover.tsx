@@ -338,6 +338,8 @@ function Discover() {
         onClose={async () => {
           setMatched(null);
           await maybeRequestReview();
+          // Após fechar a celebração do 1º match: se elegível, mostra a oferta pós-match.
+          offerEngine.triggerPostFirstMatch();
         }}
         onSendMessage={async () => {
           if (!matched || !user) return;
