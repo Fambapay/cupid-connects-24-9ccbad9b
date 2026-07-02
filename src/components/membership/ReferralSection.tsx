@@ -163,22 +163,23 @@ export function ReferralSection() {
           <div className="flex items-center gap-2 text-sm font-semibold text-white/80">
             <Sparkles size={14} /> Tens um código de amigo?
           </div>
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 flex w-full min-w-0 items-center gap-2">
             <input
               value={redeemCode}
               onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
               placeholder="CÓDIGO"
-              className="flex-1 rounded-xl bg-black/30 px-4 py-3 font-mono text-sm tracking-widest text-white placeholder-white/30 outline-none focus:ring-1 focus:ring-fuchsia-400/60"
+              className="min-w-0 flex-1 rounded-xl bg-black/30 px-3 py-3 font-mono text-sm tracking-widest text-white placeholder-white/30 outline-none focus:ring-1 focus:ring-fuchsia-400/60"
               maxLength={12}
             />
             <button
               disabled={redeeming || !redeemCode.trim()}
               onClick={handleRedeem}
-              className="rounded-xl bg-white/10 px-4 py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
+              className="shrink-0 rounded-xl bg-white/10 px-4 py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
             >
               {redeeming ? "..." : "Aplicar"}
             </button>
           </div>
+
         </div>
       )}
     </section>
