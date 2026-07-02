@@ -130,7 +130,7 @@ export function ManageMembership() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-background text-foreground">
+    <div className="min-h-[100dvh] overflow-x-hidden bg-background text-foreground">
       {/* Header */}
       <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-white/[0.04] bg-background/85 px-4 pb-3 pt-[max(env(safe-area-inset-top),14px)] backdrop-blur-xl">
         <button
