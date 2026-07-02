@@ -60,6 +60,7 @@ export function DebitoCheckoutSheet({
   packId,
   planTier,
   billingPeriod,
+  offerId,
   onSuccess,
 }: DebitoCheckoutSheetProps) {
   const create = useServerFn(createDebitoPayment);
