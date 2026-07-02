@@ -259,6 +259,12 @@ function Discover() {
   return (
     <div className="relative h-[100lvh] overflow-hidden bg-background text-foreground">
       <h1 className="sr-only">Descobrir matches verificados na Hunie</h1>
+      {subscription.expiresAt && (
+        <TrialCountdownBanner
+          trialEndsAt={subscription.expiresAt}
+          onTap={() => offerEngine.enqueueTrigger("trial_last_24h")}
+        />
+      )}
       <main
         className="relative w-full overflow-hidden"
         style={{
