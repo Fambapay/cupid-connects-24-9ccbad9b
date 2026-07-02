@@ -29,6 +29,8 @@ export interface DebitoCheckoutSheetProps {
   packId?: string;
   planTier?: "select" | "plus" | "elite";
   billingPeriod?: BillingPeriod;
+  /** Optional offer reservation id — server re-computes amount/plan. */
+  offerId?: string;
   onSuccess?: () => void;
 }
 
