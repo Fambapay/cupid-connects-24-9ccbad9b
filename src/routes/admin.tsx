@@ -37,6 +37,7 @@ function AdminLayout() {
     { to: "/admin/photos", label: "Fotos", icon: ImageIcon },
     { to: "/admin/seeds", label: "Seeds", icon: Sparkles },
     { to: "/admin/payments", label: "Pagamentos", icon: CreditCard },
+    { to: "/admin/offers", label: "Funil ofertas", icon: TrendingUp },
     { to: "/admin/audit", label: "Audit log", icon: ScrollText },
   ];
 
