@@ -368,7 +368,10 @@ export function ManageMembership() {
           </motion.button>
         </section>
 
+        <AlwaysOnQuarterlyCard />
+
         {/* Referrals moved to /profile for visibility */}
+
 
 
         {/* Payment history */}
