@@ -155,7 +155,7 @@ function ProfilePage() {
         onOpenAdmin={() => navigate({ to: '/admin' })}
       />
 
-      <div className="-mt-2 px-5 pb-4">
+      <div className="-mt-24 px-5 pb-32">
         <ReferralSection />
       </div>
 
