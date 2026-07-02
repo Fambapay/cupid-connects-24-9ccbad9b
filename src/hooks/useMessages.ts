@@ -7,7 +7,9 @@ export interface ChatMessage {
   id: string;
   match_id: string;
   sender_id: string;
-  content: string;
+  /** Nulo quando o utilizador não tem premium e a mensagem não é sua. */
+  content: string | null;
+  is_locked?: boolean;
   created_at: string;
 }
 
