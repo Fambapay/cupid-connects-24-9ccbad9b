@@ -267,6 +267,7 @@ export type Database = {
           debito_transaction_id: string | null
           id: string
           kind: string
+          offer_slug: string | null
           pack_id: string | null
           pack_kind: string | null
           pack_quantity: number | null
@@ -295,6 +296,7 @@ export type Database = {
           debito_transaction_id?: string | null
           id?: string
           kind?: string
+          offer_slug?: string | null
           pack_id?: string | null
           pack_kind?: string | null
           pack_quantity?: number | null
@@ -323,6 +325,7 @@ export type Database = {
           debito_transaction_id?: string | null
           id?: string
           kind?: string
+          offer_slug?: string | null
           pack_id?: string | null
           pack_kind?: string | null
           pack_quantity?: number | null
@@ -1464,6 +1467,12 @@ export type Database = {
       rewind_last_swipe: { Args: never; Returns: Json }
       touch_last_active: { Args: never; Returns: undefined }
       transition_expired_memberships: { Args: never; Returns: Json }
+      winback_candidates: {
+        Args: { _days: number; _slug: string }
+        Returns: {
+          user_id: string
+        }[]
+      }
     }
     Enums: {
       offer_trigger:
