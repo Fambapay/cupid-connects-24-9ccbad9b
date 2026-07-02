@@ -124,8 +124,9 @@ export function ReferralSection() {
       const msg = map[res?.reason ?? ""] ?? "Não foi possível aplicar o código";
       toast.custom(
         (t) => (
-          <AppleToast
+          <HunieToast
             toastId={t}
+            type="info"
             title="Ups"
             body={msg}
             onDismiss={() => toast.dismiss(t)}
