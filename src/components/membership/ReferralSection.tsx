@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Copy, Check, Gift, Share2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { AppleToast } from "@/components/notifications/AppleToast";
+import { HunieToast } from "@/components/notifications/HunieToast";
 import { supabase } from "@/integrations/supabase/client";
 
 type Summary = {
@@ -49,8 +49,9 @@ export function ReferralSection() {
       setCopied(true);
       toast.custom(
         (t) => (
-          <AppleToast
+          <HunieToast
             toastId={t}
+            type="success"
             title="Código copiado"
             body={`${summary.code} está pronto a partilhar.`}
             onDismiss={() => toast.dismiss(t)}
@@ -60,7 +61,18 @@ export function ReferralSection() {
       );
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      toast.error("Não foi possível copiar");
+      toast.custom(
+        (t) => (
+          <HunieToast
+            toastId={t}
+            type="error"
+            title="Erro"
+            body="Não foi possível copiar"
+            onDismiss={() => toast.dismiss(t)}
+          />
+        ),
+        { duration: 2200 },
+      );
     }
   }
 
@@ -72,7 +84,18 @@ export function ReferralSection() {
     } else {
       try {
         await navigator.clipboard.writeText(text);
-        toast.success("Convite copiado!");
+        toast.custom(
+          (t) => (
+            <HunieToast
+              toastId={t}
+              type="success"
+              title="Convite copiado"
+              body="Mensagem de convite copiada para a área de transferência."
+              onDismiss={() => toast.dismiss(t)}
+            />
+          ),
+          { duration: 2200 },
+        );
       } catch { /* noop */ }
     }
   }
@@ -85,8 +108,9 @@ export function ReferralSection() {
     if (error) {
       toast.custom(
         (t) => (
-          <AppleToast
+          <HunieToast
             toastId={t}
+            type="error"
             title="Erro"
             body="Não foi possível aplicar o código. Tenta novamente."
             onDismiss={() => toast.dismiss(t)}
@@ -100,8 +124,9 @@ export function ReferralSection() {
     if (res?.success) {
       toast.custom(
         (t) => (
-          <AppleToast
+          <HunieToast
             toastId={t}
+            type="success"
             title="Código aplicado"
             body="Quando ativares a subscrição, o teu amigo ganha dias grátis."
             onDismiss={() => toast.dismiss(t)}
@@ -121,8 +146,9 @@ export function ReferralSection() {
       const msg = map[res?.reason ?? ""] ?? "Não foi possível aplicar o código";
       toast.custom(
         (t) => (
-          <AppleToast
+          <HunieToast
             toastId={t}
+            type="info"
             title="Ups"
             body={msg}
             onDismiss={() => toast.dismiss(t)}
