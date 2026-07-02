@@ -86,8 +86,9 @@ export function ReferralSection() {
     if (error) {
       toast.custom(
         (t) => (
-          <AppleToast
+          <HunieToast
             toastId={t}
+            type="error"
             title="Erro"
             body="Não foi possível aplicar o código. Tenta novamente."
             onDismiss={() => toast.dismiss(t)}
