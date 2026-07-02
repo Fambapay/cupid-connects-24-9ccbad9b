@@ -12,6 +12,11 @@ import { CreditShopSheet } from "@/components/paywall/CreditShopSheet";
 import type { PackKind } from "@/lib/pricing";
 import { FirstImpressionSheet } from "@/components/discovery/FirstImpressionSheet";
 import { FirstImpressionToast } from "@/components/discovery/FirstImpressionToast";
+import { OfferSheet } from "@/components/offers/OfferSheet";
+import { TrialCountdownBanner } from "@/components/offers/TrialCountdownBanner";
+import { useOfferEngine } from "@/hooks/useOfferEngine";
+
+
 
 
 import { useDiscoveryDetailOpen } from "@/lib/discoveryDetail";
