@@ -219,7 +219,7 @@ export function OfferSheet({ offer, trialEndsAt, onDismiss, onClaim, onSuccess }
           subtitle={`${priceStr} no 1º ${offer.period_months === 1 ? "mês" : `${offer.period_months} meses`}`}
           amountMzn={amountForCheckout}
           planTier={(offer.plan_tier as "plus" | "select" | "elite") ?? "plus"}
-          billingPeriod={offer.period_months === 3 ? "quarterly" : "monthly"}
+          billingPeriod="monthly"
           onSuccess={async () => {
             invalidateOnboardingCache();
             await reload();
