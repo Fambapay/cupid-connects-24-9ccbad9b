@@ -146,6 +146,8 @@ export const createDebitoPayment = createServerFn({ method: "POST" })
         pack_id,
         pack_kind,
         pack_quantity,
+        billing_period: kind === "plan" ? period : null,
+        plan_days: kind === "plan" ? plan_days : null,
         payment_method: method,
         amount,
         currency,
