@@ -134,7 +134,7 @@ export const getOfferPreview = createServerFn({ method: "POST" })
       .from("offers")
       .select("*")
       .eq("trigger", data.trigger)
-      .eq("is_active", true)
+      .eq("active", true)
       .order("priority", { ascending: false })
       .limit(1);
     if (error) {
