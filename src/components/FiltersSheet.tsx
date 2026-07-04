@@ -189,6 +189,13 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
               <div className="mt-6">
                 <GroupedList>
                   <ToggleRow
+                    icon={<Zap size={16} strokeWidth={2.2} />}
+                    tint="var(--brand-purple)"
+                    label="Online agora"
+                    value={local.onlineNow}
+                    onChange={(v) => update('onlineNow', v)}
+                  />
+                  <ToggleRow
                     icon={<BadgeCheck size={16} strokeWidth={2.2} />}
                     tint="var(--brand-pink)"
                     label="Apenas verificados"
