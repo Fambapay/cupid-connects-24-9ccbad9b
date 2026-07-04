@@ -337,7 +337,21 @@ export function ManageMembership() {
                   await openInAppBrowser(getExternalCheckoutUrl("/membership"));
                   return;
                 }
-                setConfirmCancel(true);
+                // Step 1: try to show pause_50 offer before confirm dialog.
+                setLoadingOffer(true);
+                try {
+                  const offer = await fetchEligibleOffer({ data: { trigger: "cancel_flow" } });
+                  if (offer) {
+                    setPauseOffer(offer);
+                  } else {
+                    setConfirmCancel(true);
+                  }
+                } catch {
+                  setConfirmCancel(true);
+                } finally {
+                  setLoadingOffer(false);
+                }
+
               }}
               className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-left text-white/70 backdrop-blur-xl active:bg-white/[0.06]"
             >
