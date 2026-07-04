@@ -165,8 +165,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       sharedX,
       sharedY,
       actions,
-      panelActions,
       enterAnim = null,
+
     },
     ref,
   ) => {
