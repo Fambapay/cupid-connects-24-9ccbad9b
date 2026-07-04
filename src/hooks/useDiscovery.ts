@@ -133,39 +133,44 @@ async function fetchDiscovery(
     if (filters.verifiedOnly) filterPayload.verifiedOnly = true;
     if (filters.onlineNow) filterPayload.onlineNow = true;
     // Height slider full-range sentinels (140-210) also mean "no override".
-    if (filters.heightMin != null && filters.heightMin > 140) filterPayload.heightMin = filters.heightMin;
-    if (filters.heightMax != null && filters.heightMax < 210) filterPayload.heightMax = filters.heightMax;
+    // Premium-gated client-side too: skip entirely when not entitled so the
+    // payload doesn't rely on the server's ignore-when-not-premium branch.
+    if (isPremium) {
+      if (filters.heightMin != null && filters.heightMin > 140) filterPayload.heightMin = filters.heightMin;
+      if (filters.heightMax != null && filters.heightMax < 210) filterPayload.heightMax = filters.heightMax;
 
-    // Premium: interests / lifestyle. Server enforces the premium gate and
-    // ignores these when the caller is not on an active paid tier.
-    if (filters.interests && filters.interests.length > 0) {
-      filterPayload.interests = filters.interests;
-    }
-    // Lifestyle UI uses sim/nao/as_vezes; the DB stores richer values.
-    // Expand each choice into every matching DB value.
-    const SMOKE_MAP: Record<string, string[]> = {
-      sim: ["social", "regular"],
-      nao: ["never", "quitting"],
-      as_vezes: ["social"],
-    };
-    const DRINK_MAP: Record<string, string[]> = {
-      sim: ["social", "regular"],
-      nao: ["never", "sober"],
-      as_vezes: ["social"],
-    };
-    const WORKOUT_MAP: Record<string, string[]> = {
-      sim: ["often", "daily"],
-      nao: ["never"],
-      as_vezes: ["sometimes"],
-    };
-    if (filters.lifestyle?.smoke && SMOKE_MAP[filters.lifestyle.smoke]) {
-      filterPayload.smoking = SMOKE_MAP[filters.lifestyle.smoke];
-    }
-    if (filters.lifestyle?.drink && DRINK_MAP[filters.lifestyle.drink]) {
-      filterPayload.drinking = DRINK_MAP[filters.lifestyle.drink];
-    }
-    if (filters.lifestyle?.workout && WORKOUT_MAP[filters.lifestyle.workout]) {
-      filterPayload.workout = WORKOUT_MAP[filters.lifestyle.workout];
+      // Interests / lifestyle. Server also enforces the premium gate; keeping
+      // the client-side gate means a server regression won't silently start
+      // narrowing the feed for free users who fiddled with premium fields.
+      if (filters.interests && filters.interests.length > 0) {
+        filterPayload.interests = filters.interests;
+      }
+      // Lifestyle UI uses sim/nao/as_vezes; the DB stores richer values.
+      // Expand each choice into every matching DB value.
+      const SMOKE_MAP: Record<string, string[]> = {
+        sim: ["social", "regular"],
+        nao: ["never", "quitting"],
+        as_vezes: ["social"],
+      };
+      const DRINK_MAP: Record<string, string[]> = {
+        sim: ["social", "regular"],
+        nao: ["never", "sober"],
+        as_vezes: ["social"],
+      };
+      const WORKOUT_MAP: Record<string, string[]> = {
+        sim: ["often", "daily"],
+        nao: ["never"],
+        as_vezes: ["sometimes"],
+      };
+      if (filters.lifestyle?.smoke && SMOKE_MAP[filters.lifestyle.smoke]) {
+        filterPayload.smoking = SMOKE_MAP[filters.lifestyle.smoke];
+      }
+      if (filters.lifestyle?.drink && DRINK_MAP[filters.lifestyle.drink]) {
+        filterPayload.drinking = DRINK_MAP[filters.lifestyle.drink];
+      }
+      if (filters.lifestyle?.workout && WORKOUT_MAP[filters.lifestyle.workout]) {
+        filterPayload.workout = WORKOUT_MAP[filters.lifestyle.workout];
+      }
     }
   }
 
