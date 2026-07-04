@@ -122,6 +122,38 @@ async function fetchDiscovery(
     if (filters.verifiedOnly != null) filterPayload.verifiedOnly = filters.verifiedOnly;
     if (filters.heightMin != null) filterPayload.heightMin = filters.heightMin;
     if (filters.heightMax != null) filterPayload.heightMax = filters.heightMax;
+
+    // Premium: interests / lifestyle. Server enforces the premium gate and
+    // ignores these when the caller is not on an active paid tier.
+    if (filters.interests && filters.interests.length > 0) {
+      filterPayload.interests = filters.interests;
+    }
+    // Lifestyle UI uses sim/nao/as_vezes; the DB stores richer values.
+    // Expand each choice into every matching DB value.
+    const SMOKE_MAP: Record<string, string[]> = {
+      sim: ["social", "regular"],
+      nao: ["never", "quitting"],
+      as_vezes: ["social"],
+    };
+    const DRINK_MAP: Record<string, string[]> = {
+      sim: ["social", "regular"],
+      nao: ["never", "sober"],
+      as_vezes: ["social"],
+    };
+    const WORKOUT_MAP: Record<string, string[]> = {
+      sim: ["often", "daily"],
+      nao: ["never"],
+      as_vezes: ["sometimes"],
+    };
+    if (filters.lifestyle?.smoke && SMOKE_MAP[filters.lifestyle.smoke]) {
+      filterPayload.smoking = SMOKE_MAP[filters.lifestyle.smoke];
+    }
+    if (filters.lifestyle?.drink && DRINK_MAP[filters.lifestyle.drink]) {
+      filterPayload.drinking = DRINK_MAP[filters.lifestyle.drink];
+    }
+    if (filters.lifestyle?.workout && WORKOUT_MAP[filters.lifestyle.workout]) {
+      filterPayload.workout = WORKOUT_MAP[filters.lifestyle.workout];
+    }
   }
 
   const { data, error } = await (supabase.rpc as unknown as (
