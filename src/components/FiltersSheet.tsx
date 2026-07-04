@@ -48,13 +48,32 @@ interface Props {
   onUpgrade?: () => void;
 }
 
-const INTERESTS = [
-  '🎨 Arte', '✈️ Viagens', '🏋️ Fitness', '🎵 Música', '📚 Livros',
-  '🍷 Vinho', '🎬 Cinema', '🌱 Natureza', '🐶 Animais', '🍳 Cozinhar',
-  '🎮 Gaming', '📸 Fotografia', '⚽ Desporto', '☕ Café', '🧘 Yoga',
+// Each interest carries the emoji (UI only) and the plain label that matches
+// what onboarding writes to profiles.interests. Filter must send `label`, not
+// the emoji-prefixed display string, or the server-side overlap check fails.
+const INTERESTS: { emoji: string; label: string }[] = [
+  { emoji: '🎨', label: 'Arte' },
+  { emoji: '✈️', label: 'Viajar' },
+  { emoji: '🏋️', label: 'Ginásio' },
+  { emoji: '🎵', label: 'Música' },
+  { emoji: '📚', label: 'Livros' },
+  { emoji: '🍷', label: 'Vinho' },
+  { emoji: '🎬', label: 'Cinema' },
+  { emoji: '🌱', label: 'Natureza' },
+  { emoji: '🐶', label: 'Animais' },
+  { emoji: '🍳', label: 'Cozinhar' },
+  { emoji: '🎮', label: 'Gaming' },
+  { emoji: '📸', label: 'Fotografia' },
+  { emoji: '⚽', label: 'Desporto' },
+  { emoji: '☕', label: 'Café' },
+  { emoji: '🧘', label: 'Yoga' },
+  { emoji: '💃', label: 'Dançar' },
+  { emoji: '🏃', label: 'Correr' },
+  { emoji: '🥐', label: 'Brunch' },
+  { emoji: '🏖️', label: 'Praia' },
+  { emoji: '💻', label: 'Tecnologia' },
+  { emoji: '🥾', label: 'Caminhadas' },
 ];
-const ZODIAC = ['♈ Carneiro', '♉ Touro', '♊ Gémeos', '♋ Caranguejo', '♌ Leão', '♍ Virgem', '♎ Balança', '♏ Escorpião', '♐ Sagitário', '♑ Capricórnio', '♒ Aquário', '♓ Peixes'];
-const EDUCATION = ['Secundário', 'Licenciatura', 'Mestrado', 'Doutoramento'];
 
 export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false, onUpgrade }: Props) => {
   const [local, setLocal] = useState<DiscoveryFilters>(value);
@@ -199,7 +218,7 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
 
               <PremiumSection title="Interesses" locked={!isPremium}>
                 <ChipGrid
-                  options={INTERESTS}
+                  options={INTERESTS.map((i) => ({ value: i.label, display: `${i.emoji} ${i.label}` }))}
                   selected={local.interests}
                   onToggle={(o) => {
                     if (!isPremium) return;
@@ -219,37 +238,6 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
                 <LifestyleRow label="Treina" value={local.lifestyle.workout} onChange={(v) => update('lifestyle', { ...local.lifestyle, workout: v })} disabled={!isPremium} last />
               </PremiumSection>
 
-              <PremiumSection title="Signo" locked={!isPremium}>
-                <ChipGrid
-                  options={ZODIAC}
-                  selected={local.zodiac}
-                  onToggle={(o) => {
-                    if (!isPremium) return;
-                    hapticTap();
-                    setLocal((p) => ({
-                      ...p,
-                      zodiac: p.zodiac.includes(o) ? p.zodiac.filter((x) => x !== o) : [...p.zodiac, o],
-                    }));
-                  }}
-                  disabled={!isPremium}
-                />
-              </PremiumSection>
-
-              <PremiumSection title="Educação" locked={!isPremium}>
-                <ChipGrid
-                  options={EDUCATION}
-                  selected={local.education}
-                  onToggle={(o) => {
-                    if (!isPremium) return;
-                    hapticTap();
-                    setLocal((p) => ({
-                      ...p,
-                      education: p.education.includes(o) ? p.education.filter((x) => x !== o) : [...p.education, o],
-                    }));
-                  }}
-                  disabled={!isPremium}
-                />
-              </PremiumSection>
 
               <div className="h-6" />
             </div>
@@ -468,14 +456,17 @@ const RangeSlider = ({ min, max, valueMin, valueMax, onChange, disabled }: {
 
 /* ── Chips ── */
 
-const ChipGrid = ({ options, selected, onToggle, disabled }: { options: string[]; selected: string[]; onToggle: (v: string) => void; disabled?: boolean }) => (
+type ChipOption = string | { value: string; display: string };
+const ChipGrid = ({ options, selected, onToggle, disabled }: { options: ChipOption[]; selected: string[]; onToggle: (v: string) => void; disabled?: boolean }) => (
   <div className="flex flex-wrap gap-2">
-    {options.map((o) => {
-      const on = selected.includes(o);
+    {options.map((opt) => {
+      const value = typeof opt === 'string' ? opt : opt.value;
+      const display = typeof opt === 'string' ? opt : opt.display;
+      const on = selected.includes(value);
       return (
         <button
-          key={o}
-          onClick={() => onToggle(o)}
+          key={value}
+          onClick={() => onToggle(value)}
           disabled={disabled}
           className="rounded-full px-3.5 py-[7px] text-[13px] font-medium transition-all active:scale-[0.96]"
           style={{
@@ -485,7 +476,7 @@ const ChipGrid = ({ options, selected, onToggle, disabled }: { options: string[]
             boxShadow: on ? '0 6px 16px -6px color-mix(in oklab, var(--brand-pink) 50%, transparent)' : 'none',
           }}
         >
-          {o}
+          {display}
         </button>
       );
     })}
