@@ -223,6 +223,12 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
   const { user } = useAuth();
   const { filters, userCoords } = options;
 
+  // Offset-based pagination. When the client runs low on cards, `loadMore`
+  // fetches the next page and appends. Reset whenever filters/coords/user change.
+  const [pages, setPages] = useState<DiscoverProfile[][]>([]);
+  const [offset, setOffset] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   const queryKey = useMemo(
     () => ["discovery", user?.id ?? null, filters, userCoords] as const,
     [user?.id, filters, userCoords],
@@ -230,29 +236,67 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
 
   const { data, isLoading, refetch } = useQuery({
     queryKey,
-    queryFn: () => fetchDiscovery(filters, userCoords),
+    queryFn: () => fetchDiscovery(filters, userCoords, 0),
     enabled: !!user,
     staleTime: 0,
     gcTime: 60_000,
     refetchOnWindowFocus: false,
   });
 
-  // Filter locally-swiped IDs so back/forward navigation never resurrects a
-  // profile already actioned on this device, even if the server-side insert
-  // is still in flight or the cached feed is served first.
-  const rawItems: DiscoverProfile[] = data?.items ?? [];
+  // Reset accumulated pages when the base query changes (new filters/coords).
+  useEffect(() => {
+    setPages([]);
+    setOffset(0);
+  }, [queryKey]);
+
+  const baseItems = data?.items ?? [];
+  const rawItems: DiscoverProfile[] = useMemo(() => {
+    const seen = new Set<string>();
+    const merged: DiscoverProfile[] = [];
+    for (const list of [baseItems, ...pages]) {
+      for (const p of list) {
+        if (seen.has(p.id)) continue;
+        seen.add(p.id);
+        merged.push(p);
+      }
+    }
+    return merged;
+  }, [baseItems, pages]);
+
   const items: DiscoverProfile[] = useMemo(() => {
     const swiped = readSwiped(user?.id);
     if (!swiped.size) return rawItems;
     return rawItems.filter((p) => !swiped.has(p.id));
   }, [rawItems, user?.id]);
+
   const dailyLimits = data?.dailyLimits ?? DEFAULT_LIMITS;
   const needsLocation = !!data?.needsLocation;
+  const needsPreference = !!data?.needsPreference;
   const loading = !!user && isLoading;
 
   const reload = useCallback(async () => {
+    setPages([]);
+    setOffset(0);
     await refetch();
   }, [refetch]);
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore) return;
+    // Only paginate when the current page is full — a short page means the end.
+    const currentCount = baseItems.length + pages.reduce((n, p) => n + p.length, 0);
+    if (currentCount < PAGE_SIZE) return;
+    setLoadingMore(true);
+    try {
+      const nextOffset = offset + PAGE_SIZE;
+      const result = await fetchDiscovery(filters, userCoords, nextOffset);
+      if (result.items.length) {
+        setPages((prev) => [...prev, result.items]);
+        setOffset(nextOffset);
+      }
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loadingMore, baseItems.length, pages, offset, filters, userCoords]);
 
   const markSwipedLocal = useCallback(
     (targetId: string) => {
