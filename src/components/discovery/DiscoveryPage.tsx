@@ -224,6 +224,11 @@ export const DiscoveryPage = ({
                     onFirstImpression={() => onFirstImpression?.(current)}
                     onRewind={handleRewind}
                     canRewind={canRewind}
+                    isPremium={isPremium}
+                    superLikeBalance={superLikeBalance}
+                    firstImpressionBalance={firstImpressionBalance}
+                    boostActive={boostActive}
+                    dailyLimits={dailyLimits}
                     dragX={x}
                     dragY={y}
                   />
