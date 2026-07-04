@@ -37,6 +37,17 @@ function LikesPage() {
   const isPremium = entitlements.canSeeWhoLiked && !isTrialing;
   const navigate = useNavigate();
   const isEmpty = !loading && !error && likers.length === 0;
+  const offerEngine = useOfferEngine();
+
+  const handleBlurredTap = () => {
+    // Dispara oferta contextual; se não houver oferta elegível, cai no /membership.
+    offerEngine.triggerLikesTeaser();
+    // Pequeno atraso para dar prioridade à sheet quando aparece.
+    setTimeout(() => {
+      if (!offerEngine.activeOffer) navigate({ to: "/membership" });
+    }, 120);
+  };
+
 
   return (
     <AppShell className="bg-[var(--profile-bg)]">
