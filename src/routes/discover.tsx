@@ -118,7 +118,7 @@ function Discover() {
     setFiltersInitialized(true);
   }, [profile?.interested_in, filtersInitialized, user?.id]);
   const { coords: gpsCoords } = useGeolocation(true);
-  const { items, loading, swipe, rewind, reload, loadMore, dailyLimits, needsLocation, needsPreference } = useDiscovery({ filters, userCoords: gpsCoords });
+  const { items, loading, swipe, rewind, reload, loadMore, dailyLimits, needsLocation, needsPreference } = useDiscovery({ filters, userCoords: gpsCoords, isPremium });
   const { credits, reload: reloadCredits, syncCredits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
   const boost = useBoost(() => setCreditShop("boost"));
