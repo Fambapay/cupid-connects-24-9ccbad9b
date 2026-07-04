@@ -28,6 +28,7 @@ import { useBoost } from "@/hooks/useBoost";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useAccessLevel } from "@/hooks/useAccessLevel";
 import { useLikesCount } from "@/hooks/useLikesCount";
 import { supabase } from "@/integrations/supabase/client";
 import type { DiscoveryProfile, SwipeDirection } from "@/components/discovery/types";
