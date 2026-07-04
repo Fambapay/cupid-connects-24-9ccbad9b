@@ -245,13 +245,15 @@ function Discover() {
           return "blocked";
         }
       } else if (direction === "like") {
-        // Free: se já esgotou o quota diário, abre paywall com contador.
+        // Free: se já esgotou o quota diário, abre paywall com contador + oferta contextual.
         if (access.tier === "free" && access.likesRemainingToday === 0) {
           setPendingAction({ profileId: target.id, direction });
+          offerEngine.triggerOutOfLikes();
           openPaywall();
           return "blocked";
         }
       }
+
     }
 
     // Pass is free once inside premium access.
@@ -282,7 +284,9 @@ function Discover() {
         setPendingAction({ profileId: target.id, direction });
         openPaywall();
       } else if (res.reason === "daily_limit_reached") {
+        offerEngine.triggerOutOfLikes();
         toast.error("Atingiste o limite diário. Volta amanhã ou faz upgrade.");
+
       } else if (res.reason === "insert_failed") {
         toast.error("Falha de rede. Tenta novamente.");
       } else if (res.reason !== "insufficient_credits") {

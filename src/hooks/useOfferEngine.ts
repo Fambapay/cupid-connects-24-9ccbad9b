@@ -24,13 +24,17 @@ declare global {
   }
 }
 
-// Local guard "likes_received" 1x/dia por user.
-const LIKES_TRIGGER_KEY = "hunie:offer:likes_received:lastShown";
+// Local guards 1x/dia por user para triggers contextuais.
+const DAILY_GUARDS: Record<string, string> = {
+  likes_received: "hunie:offer:likes_received:lastShown",
+  out_of_likes: "hunie:offer:out_of_likes:lastShown",
+  likes_teaser: "hunie:offer:likes_teaser:lastShown",
+};
 
-function canTriggerLikesToday(): boolean {
+function canTriggerToday(key: string): boolean {
   if (typeof window === "undefined") return false;
   try {
-    const last = window.localStorage.getItem(LIKES_TRIGGER_KEY);
+    const last = window.localStorage.getItem(key);
     if (!last) return true;
     const lastDate = new Date(last);
     const today = new Date();
@@ -44,13 +48,14 @@ function canTriggerLikesToday(): boolean {
   }
 }
 
-function markLikesTriggered() {
+function markTriggeredToday(key: string) {
   try {
-    window.localStorage.setItem(LIKES_TRIGGER_KEY, new Date().toISOString());
+    window.localStorage.setItem(key, new Date().toISOString());
   } catch {
     // ignore
   }
 }
+
 
 function isSafeToShowNow(matchChat: unknown): boolean {
   if (typeof window === "undefined") return false;
@@ -176,10 +181,25 @@ export function useOfferEngine() {
   // "likes_received" — chamado quando temos ≥3 likes por ver.
   const triggerLikesReceived = useCallback(() => {
     if (isTrialing && trialDaysLeft >= 2) return;
-    if (!canTriggerLikesToday()) return;
-    markLikesTriggered();
+    if (!canTriggerToday(DAILY_GUARDS.likes_received)) return;
+    markTriggeredToday(DAILY_GUARDS.likes_received);
     enqueueTrigger("likes_received");
   }, [enqueueTrigger, isTrialing, trialDaysLeft]);
+
+  // "out_of_likes" — Free bateu no cap diário de likes.
+  const triggerOutOfLikes = useCallback(() => {
+    if (!canTriggerToday(DAILY_GUARDS.out_of_likes)) return;
+    markTriggeredToday(DAILY_GUARDS.out_of_likes);
+    enqueueTrigger("out_of_likes");
+  }, [enqueueTrigger]);
+
+  // "likes_teaser" — tocou num perfil borrado em "quem gostou de mim".
+  const triggerLikesTeaser = useCallback(() => {
+    if (!canTriggerToday(DAILY_GUARDS.likes_teaser)) return;
+    markTriggeredToday(DAILY_GUARDS.likes_teaser);
+    enqueueTrigger("likes_teaser");
+  }, [enqueueTrigger]);
+
 
   return {
     activeOffer,
@@ -190,6 +210,8 @@ export function useOfferEngine() {
     enqueueTrigger,
     triggerPostFirstMatch,
     triggerLikesReceived,
+    triggerOutOfLikes,
+    triggerLikesTeaser,
     forceShowOffer,
   };
 }

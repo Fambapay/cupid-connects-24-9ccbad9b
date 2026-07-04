@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { AppShell, TopBar } from "@/components/AppShell";
 import { useLikedMe } from "@/hooks/useLikedMe";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useOfferEngine } from "@/hooks/useOfferEngine";
+import { OfferSheet } from "@/components/offers/OfferSheet";
+
 
 import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
 
@@ -34,6 +37,17 @@ function LikesPage() {
   const isPremium = entitlements.canSeeWhoLiked && !isTrialing;
   const navigate = useNavigate();
   const isEmpty = !loading && !error && likers.length === 0;
+  const offerEngine = useOfferEngine();
+
+  const handleBlurredTap = () => {
+    // Dispara oferta contextual; se não houver oferta elegível, cai no /membership.
+    offerEngine.triggerLikesTeaser();
+    // Pequeno atraso para dar prioridade à sheet quando aparece.
+    setTimeout(() => {
+      if (!offerEngine.activeOffer) navigate({ to: "/membership" });
+    }, 120);
+  };
+
 
   return (
     <AppShell className="bg-[var(--profile-bg)]">
@@ -71,7 +85,7 @@ function LikesPage() {
               <button
                 key={p.id}
                 type="button"
-                onClick={() => !isPremium && navigate({ to: "/membership" })}
+                onClick={() => !isPremium && handleBlurredTap()}
                 className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-card text-left"
               >
                 {p.photo ? (
@@ -127,9 +141,20 @@ function LikesPage() {
           </div>
         )}
       </section>
+
+      <OfferSheet
+        offer={offerEngine.activeOffer}
+        onDismiss={offerEngine.dismissOffer}
+        onClaim={offerEngine.claimOffer}
+        onSuccess={() => {
+          offerEngine.closeAfterClaim();
+          reload();
+        }}
+      />
     </AppShell>
   );
 }
+
 
 function EmptyLikes({ onDiscover, onBoost }: { onDiscover: () => void; onBoost: () => void }) {
   return (
