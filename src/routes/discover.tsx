@@ -243,7 +243,14 @@ function Discover() {
     // Pass is free once inside premium access.
     if (direction === "pass") {
       setIndex((i) => i + 1);
-      await performSwipe({ id: target.id, name: target.name, photo: target.photos?.[0] }, "pass");
+      const passRes = await performSwipe({ id: target.id, name: target.name, photo: target.photos?.[0] }, "pass");
+      if (passRes?.reason) {
+        // Server rejected (rare — usually a stale target or network hiccup).
+        // Roll the stack back so the user can retry instead of silently losing the card.
+        setIndex((i) => Math.max(0, i - 1));
+        if (passRes.reason === "insert_failed") toast.error("Não foi possível registar. Tenta novamente.");
+        return "blocked";
+      }
       return;
     }
 
@@ -252,17 +259,26 @@ function Discover() {
       { id: target.id, name: target.name, photo: target.photos?.[0] },
       direction,
     );
-    if (res?.reason === "paywall_required") {
+    if (res?.reason) {
+      // Any non-success path rolls the stack back. Specific reasons already
+      // showed their own paywall / shop / toast in performSwipe; the generic
+      // ones surface a fallback toast here.
       setIndex((i) => Math.max(0, i - 1));
-      setPendingAction({ profileId: target.id, direction });
-      openPaywall();
-      return "blocked";
-    }
-    if (direction === "super" && res?.reason === "insufficient_credits") {
-      setIndex((i) => Math.max(0, i - 1));
+      if (res.reason === "paywall_required") {
+        setPendingAction({ profileId: target.id, direction });
+        openPaywall();
+      } else if (res.reason === "daily_limit_reached") {
+        toast.error("Atingiste o limite diário. Volta amanhã ou faz upgrade.");
+      } else if (res.reason === "insert_failed") {
+        toast.error("Falha de rede. Tenta novamente.");
+      } else if (res.reason !== "insufficient_credits") {
+        // insufficient_credits already handled by performSwipe (opens shop).
+        toast.error("Não foi possível registar o swipe.");
+      }
       return "blocked";
     }
   };
+
 
   const onRewind = async (): Promise<boolean> => {
     if (!isPremium) { openPaywall(); return false; }
