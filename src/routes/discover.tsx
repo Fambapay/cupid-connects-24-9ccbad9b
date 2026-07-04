@@ -233,13 +233,25 @@ function Discover() {
   ): Promise<void | "blocked"> => {
     const direction = dir === "right" ? "like" : dir === "up" ? "super" : "pass";
 
-    // Hard paywall: without premium access (trial/active/grace), block ALL swipes.
+    // Pass é sempre grátis para todos os tiers.
+    // Super Like: precisa de tier pago OU créditos de pack.
+    // Like: Free pode até ao limite diário (server enforça); tiers pagos ilimitados.
     if (!isPremium) {
-      if (direction !== "pass") {
-        setPendingAction({ profileId: target.id, direction });
+      if (direction === "super") {
+        // Free/Locked sem tier: se tiver créditos de pack, deixa passar (performSwipe trata);
+        // sem créditos, abre a shop de créditos.
+        if (credits.super_like_balance <= 0) {
+          setCreditShop("super_like");
+          return "blocked";
+        }
+      } else if (direction === "like") {
+        // Free: se já esgotou o quota diário, abre paywall com contador.
+        if (access.tier === "free" && access.likesRemainingToday === 0) {
+          setPendingAction({ profileId: target.id, direction });
+          openPaywall();
+          return "blocked";
+        }
       }
-      openPaywall();
-      return "blocked";
     }
 
     // Pass is free once inside premium access.
