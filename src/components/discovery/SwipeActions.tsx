@@ -444,11 +444,26 @@ export const SwipeActions = ({
       <button
         onClick={press(onFirstImpression)}
         aria-label={`First Impression${typeof firstImpressionBalance === "number" ? ` (${firstImpressionBalance} restantes)` : ""}`}
-        style={{ ...BTN_BASE, width: 48, height: 48 }}
+        style={{
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 48,
+          height: 48,
+          borderRadius: "50%",
+          border: "none",
+          cursor: "pointer",
+          background: "linear-gradient(135deg, #FF4FA3, #E935A0)",
+          boxShadow: "0 4px 14px rgba(255,79,163,0.45)",
+          WebkitTapHighlightColor: "transparent",
+          overflow: "visible",
+          willChange: "transform",
+        }}
       >
-        <MessageSquarePlus size={20} color="#FF6FA8" strokeWidth={2.4} />
+        <Send size={20} color="#FFFFFF" strokeWidth={2.4} className="translate-x-[1px]" />
         {typeof firstImpressionBalance === "number" && firstImpressionBalance > 0 && (
-          <Badge n={firstImpressionBalance} color="#FF6FA8" />
+          <Badge n={firstImpressionBalance} color="#FF4FA3" />
         )}
       </button>
 
