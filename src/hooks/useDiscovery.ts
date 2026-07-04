@@ -105,6 +105,7 @@ async function fetchDiscovery(
   filters: DiscoveryFilters | undefined,
   userCoords: { lat: number; lng: number } | null | undefined,
   offset = 0,
+  isPremium = false,
 ): Promise<DiscoveryResult> {
   // Resolve viewer coords: caller-provided (GPS) wins; server RPC falls back
   // to stored profile coords if the caller still doesn't have any.
