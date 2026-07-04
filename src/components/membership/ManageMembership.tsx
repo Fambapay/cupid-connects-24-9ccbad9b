@@ -327,6 +327,8 @@ export function ManageMembership() {
           {isActive && !isCancelled && (
             <motion.button
               whileTap={{ scale: 0.98 }}
+              disabled={loadingOffer}
+
               onClick={async () => {
                 hapticTap();
                 if (billingMode === "android-play") {
