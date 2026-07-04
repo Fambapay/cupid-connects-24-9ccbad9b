@@ -141,9 +141,20 @@ function LikesPage() {
           </div>
         )}
       </section>
+
+      <OfferSheet
+        offer={offerEngine.activeOffer}
+        onDismiss={offerEngine.dismissOffer}
+        onClaim={offerEngine.claimOffer}
+        onSuccess={() => {
+          offerEngine.closeAfterClaim();
+          reload();
+        }}
+      />
     </AppShell>
   );
 }
+
 
 function EmptyLikes({ onDiscover, onBoost }: { onDiscover: () => void; onBoost: () => void }) {
   return (
