@@ -58,7 +58,7 @@ function Discover() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isPremium, entitlements, subscription } = useSubscription();
-  const { access } = useAccessLevel();
+  const { access, reload: reloadAccess } = useAccessLevel();
   const offerEngine = useOfferEngine();
   const likesCount = useLikesCount();
   useEffect(() => {
