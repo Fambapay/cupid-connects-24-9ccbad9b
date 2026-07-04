@@ -86,17 +86,37 @@ function Discover() {
   }, []);
   const { profile } = useProfile();
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
-  const [filtersInitialized, setFiltersInitialized] = useState(false);
+  // Hydrate from localStorage on first mount so filters survive route
+  // remounts, tab switches, and reloads. `user?.id` scopes per account.
+  const [filters, setFiltersState] = useState<DiscoveryFilters>(() => loadFilters(user?.id) ?? DEFAULT_FILTERS);
+  const [filtersInitialized, setFiltersInitialized] = useState(() => loadFilters(user?.id) != null);
+  const setFilters = (next: DiscoveryFilters) => {
+    setFiltersState(next);
+    saveFilters(user?.id, next);
+    setFiltersInitialized(true);
+  };
+  // Re-hydrate when the signed-in user changes (login/logout in same session).
+  useEffect(() => {
+    const stored = loadFilters(user?.id);
+    if (stored) {
+      setFiltersState(stored);
+      setFiltersInitialized(true);
+    }
+  }, [user?.id]);
+  // Seed gender from onboarding preferences on first run only — if the user
+  // has already customised filters (stored copy exists), respect that.
   useEffect(() => {
     if (filtersInitialized || !profile?.interested_in) return;
     const ii = profile.interested_in;
     let gender: DiscoveryFilters['gender'] = 'todos';
     if (ii.length === 1 && ii[0] === 'man') gender = 'masculino';
     else if (ii.length === 1 && ii[0] === 'woman') gender = 'feminino';
-    setFilters((prev) => ({ ...prev, gender }));
+    else if (ii.length === 1 && ii[0] === 'nonbinary') gender = 'nao_binario';
+    const seeded = { ...DEFAULT_FILTERS, gender };
+    setFiltersState(seeded);
+    saveFilters(user?.id, seeded);
     setFiltersInitialized(true);
-  }, [profile?.interested_in, filtersInitialized]);
+  }, [profile?.interested_in, filtersInitialized, user?.id]);
   const { coords: gpsCoords } = useGeolocation(true);
   const { items, loading, swipe, rewind, reload, loadMore, dailyLimits, needsLocation, needsPreference } = useDiscovery({ filters, userCoords: gpsCoords });
   const { credits, reload: reloadCredits, syncCredits } = useCredits();
