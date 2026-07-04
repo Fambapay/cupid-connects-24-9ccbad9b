@@ -7,9 +7,10 @@ interface EmptyDiscoveryProps {
   loading?: boolean;
   onRefresh?: () => void;
   onOpenFilters?: () => void;
+  needsLocation?: boolean;
 }
 
-export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters }: EmptyDiscoveryProps) => {
+export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters, needsLocation = false }: EmptyDiscoveryProps) => {
   // Auto-iniciar a "procura" assim que a página abre, como se o utilizador
   // tivesse clicado em Atualizar — dá sensação imediata de que estamos a
   // buscar perfis novos.
