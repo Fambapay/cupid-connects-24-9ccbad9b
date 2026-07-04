@@ -97,6 +97,7 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
     setLocal((p) => ({ ...p, [k]: v }));
   };
 
+  const apply = () => { hapticTap(); onChange(local); onClose(); };
   // "Repor" applies immediately (parent + persistence) instead of quietly
   // dirtying local state and waiting for the user to press "Aplicar" — the
   // previous behaviour looked broken because the feed didn't change.
@@ -106,6 +107,7 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
     onChange(DEFAULT_FILTERS);
     toast.success('Filtros repostos');
   };
+
 
 
   return (
