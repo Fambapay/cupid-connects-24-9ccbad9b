@@ -218,7 +218,7 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
 
               <PremiumSection title="Interesses" locked={!isPremium}>
                 <ChipGrid
-                  options={INTERESTS}
+                  options={INTERESTS.map((i) => ({ value: i.label, display: `${i.emoji} ${i.label}` }))}
                   selected={local.interests}
                   onToggle={(o) => {
                     if (!isPremium) return;
@@ -238,37 +238,6 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
                 <LifestyleRow label="Treina" value={local.lifestyle.workout} onChange={(v) => update('lifestyle', { ...local.lifestyle, workout: v })} disabled={!isPremium} last />
               </PremiumSection>
 
-              <PremiumSection title="Signo" locked={!isPremium}>
-                <ChipGrid
-                  options={ZODIAC}
-                  selected={local.zodiac}
-                  onToggle={(o) => {
-                    if (!isPremium) return;
-                    hapticTap();
-                    setLocal((p) => ({
-                      ...p,
-                      zodiac: p.zodiac.includes(o) ? p.zodiac.filter((x) => x !== o) : [...p.zodiac, o],
-                    }));
-                  }}
-                  disabled={!isPremium}
-                />
-              </PremiumSection>
-
-              <PremiumSection title="Educação" locked={!isPremium}>
-                <ChipGrid
-                  options={EDUCATION}
-                  selected={local.education}
-                  onToggle={(o) => {
-                    if (!isPremium) return;
-                    hapticTap();
-                    setLocal((p) => ({
-                      ...p,
-                      education: p.education.includes(o) ? p.education.filter((x) => x !== o) : [...p.education, o],
-                    }));
-                  }}
-                  disabled={!isPremium}
-                />
-              </PremiumSection>
 
               <div className="h-6" />
             </div>
