@@ -83,6 +83,7 @@ interface RawCandidate {
 interface FeedResponse {
   candidates: RawCandidate[];
   needs_location?: boolean;
+  needs_preference?: boolean;
   daily_limits: {
     likes_used: number;
     likes_limit: number;
@@ -91,11 +92,15 @@ interface FeedResponse {
   };
 }
 
+const PAGE_SIZE = 100;
+
 async function fetchDiscovery(
   filters: DiscoveryFilters | undefined,
   userCoords: { lat: number; lng: number } | null | undefined,
+  offset = 0,
 ): Promise<DiscoveryResult> {
-  // Resolve viewer coords (server-side path if not provided by caller).
+  // Resolve viewer coords: caller-provided (GPS) wins; server RPC falls back
+  // to stored profile coords if the caller still doesn't have any.
   let coords = userCoords ?? null;
   if (!coords) {
     const { data: locData } = await (supabase.rpc as unknown as (
@@ -115,11 +120,9 @@ async function fetchDiscovery(
     if (filters.distance != null) filterPayload.distance = filters.distance;
     if (filters.hasBio != null) filterPayload.hasBio = filters.hasBio;
     if (filters.verifiedOnly != null) filterPayload.verifiedOnly = filters.verifiedOnly;
-    
     if (filters.heightMin != null) filterPayload.heightMin = filters.heightMin;
     if (filters.heightMax != null) filterPayload.heightMax = filters.heightMax;
   }
-
 
   const { data, error } = await (supabase.rpc as unknown as (
     fn: string,
@@ -128,14 +131,16 @@ async function fetchDiscovery(
     _filters: filterPayload,
     _viewer_lat: coords?.lat ?? null,
     _viewer_lng: coords?.lng ?? null,
-    _limit: 100,
+    _limit: PAGE_SIZE,
+    _offset: offset,
   });
   if (error) {
     console.error("get_discovery_feed failed", error);
-    return { items: [], dailyLimits: DEFAULT_LIMITS, needsLocation: false };
+    return { items: [], dailyLimits: DEFAULT_LIMITS, needsLocation: false, needsPreference: false };
   }
-  const resp = (data as FeedResponse | null) ?? { candidates: [], needs_location: false, daily_limits: { likes_used: 0, likes_limit: 5, super_used: 0, super_limit: 0 } };
+  const resp = (data as FeedResponse | null) ?? { candidates: [], needs_location: false, needs_preference: false, daily_limits: { likes_used: 0, likes_limit: 5, super_used: 0, super_limit: 0 } };
   const needsLocation = !!resp.needs_location;
+  const needsPreference = !!resp.needs_preference;
 
   const dl = resp.daily_limits;
   const likesRemaining = dl.likes_limit < 0 ? Infinity : Math.max(0, dl.likes_limit - dl.likes_used);
