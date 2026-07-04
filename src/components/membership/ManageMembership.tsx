@@ -77,11 +77,15 @@ export function ManageMembership() {
   const cancel = useServerFn(cancelMyMembership);
   const fetchHistory = useServerFn(getMyPaymentHistory);
   const restore = useServerFn(restoreMyPurchases);
+  const fetchEligibleOffer = useServerFn(getEligibleOffer);
 
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const [pauseOffer, setPauseOffer] = useState<OfferDTO | null>(null);
+  const [loadingOffer, setLoadingOffer] = useState(false);
+
   const externalOnly = requiresExternalCheckout();
   const billingMode = getBillingMode();
 
