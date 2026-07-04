@@ -420,6 +420,9 @@ function Discover() {
 
       <PaywallSheet
         open={paywallOpen}
+        origin="discover"
+        likesRemaining={access.likesRemainingToday >= 0 ? access.likesRemainingToday : undefined}
+        likesLimit={access.likesLimitToday > 0 ? access.likesLimitToday : 10}
         onClose={() => {
           setPaywallOpen(false);
           setPendingAction(null);
@@ -428,7 +431,7 @@ function Discover() {
           setPaywallOpen(false);
           const action = pendingAction;
           setPendingAction(null);
-          await reload();
+          await Promise.all([reload(), reloadAccess()]);
           if (action) {
             // Auto-record the like that triggered the paywall.
             const target = items.find((p) => p.id === action.profileId);
