@@ -39,6 +39,13 @@ export interface DiscoverProfile {
 export interface DiscoveryOptions {
   filters?: DiscoveryFilters;
   userCoords?: { lat: number; lng: number } | null;
+  /**
+   * When false, the client omits every premium-only filter from the RPC
+   * payload (height range, interests, lifestyle). The server also enforces
+   * this — the double gate keeps a premium filter from leaking into the
+   * request if the server-side check ever regresses.
+   */
+  isPremium?: boolean;
 }
 
 const ONLINE_WINDOW_MS = 90_000;
