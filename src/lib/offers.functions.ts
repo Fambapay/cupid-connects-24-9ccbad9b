@@ -120,3 +120,42 @@ export const logPopupImpression = createServerFn({ method: "POST" })
     if (error) console.error("[offers.logImpression]", error);
     return { ok: !error };
   });
+
+// Preview/debug: obtém a oferta ativa mais prioritária para um trigger,
+// ignorando elegibilidade. Só para testar visualmente o pop-up.
+export const getOfferPreview = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z.object({ trigger: triggerSchema }).parse(raw),
+  )
+  .handler(async ({ data, context }): Promise<OfferDTO | null> => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("offers")
+      .select("*")
+      .eq("trigger", data.trigger)
+      .eq("is_active", true)
+      .order("priority", { ascending: false })
+      .limit(1);
+    if (error) {
+      console.error("[offers.getOfferPreview]", error);
+      return null;
+    }
+    const row = Array.isArray(rows) ? rows[0] : null;
+    if (!row) return null;
+    return {
+      id: row.id as string,
+      slug: row.slug as string,
+      title: row.title as string,
+      description: (row.description as string) ?? "",
+      trigger: row.trigger as OfferTrigger,
+      plan_tier: row.plan_tier as string,
+      first_period_price_minor: row.first_period_price_minor as number,
+      regular_price_minor: row.regular_price_minor as number,
+      currency: row.currency as string,
+      period_months: row.period_months as number,
+      is_discount: row.is_discount as boolean,
+      priority: row.priority as number,
+      bullets: Array.isArray(row.bullets) ? (row.bullets as string[]) : [],
+    };
+  });
