@@ -1563,12 +1563,6 @@ export type Database = {
           trigger: Database["public"]["Enums"]["offer_trigger"]
           updated_at: string
         }[]
-        SetofOptions: {
-          from: "*"
-          to: "offers"
-          isOneToOne: false
-          isSetofReturn: true
-        }
       }
       get_match_messages: { Args: { _match_id: string }; Returns: Json }
       get_match_summaries: { Args: never; Returns: Json }
