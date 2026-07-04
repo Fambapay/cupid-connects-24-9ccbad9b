@@ -1,46 +1,33 @@
-import { useEffect, useState, useCallback } from "react";
-import {
-  getCurrentPosition,
-  checkLocationPermission,
-  requestLocationPermission,
-  type GeoPosition,
-} from "@/lib/native/geolocation";
+import { useEffect, useState } from "react";
 
-export type PermissionState = "granted" | "denied" | "prompt" | "unknown";
+export interface GeoCoords {
+  lat: number;
+  lng: number;
+}
 
-export function useGeolocation(autoRequest: boolean = false) {
-  const [permissionState, setPermissionState] = useState<PermissionState>("unknown");
-  const [loading, setLoading] = useState(false);
-  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-
-  const queryPermission = useCallback(async () => {
-    try {
-      const state = await checkLocationPermission();
-      setPermissionState(state as PermissionState);
-    } catch { /* noop */ }
-  }, []);
-
-  useEffect(() => { queryPermission(); }, [queryPermission]);
-
-  const requestPermission = useCallback(async () => {
-    setLoading(true);
-    try {
-      const state = await requestLocationPermission();
-      setPermissionState(state as PermissionState);
-      if (state === "granted") {
-        const pos = await getCurrentPosition({ enableHighAccuracy: true, timeout: 10000 });
-        setCoords({ lat: pos.latitude, lng: pos.longitude });
-      }
-    } catch {
-      setPermissionState("denied");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+/**
+ * Requests the browser's current position once on mount. Returns cached coords
+ * for up to 5 min. Safe in SSR (no-op when `navigator` is absent).
+ * Passing the fresh coords to the discovery feed avoids showing stale results
+ * for users who have moved since editing their profile location.
+ */
+export function useGeolocation() {
+  const [coords, setCoords] = useState<GeoCoords | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [requested, setRequested] = useState(false);
 
   useEffect(() => {
-    if (autoRequest) requestPermission();
-  }, [autoRequest, requestPermission]);
+    if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
+      setError("unsupported");
+      return;
+    }
+    setRequested(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      (err) => setError(err.code === err.PERMISSION_DENIED ? "denied" : "unavailable"),
+      { maximumAge: 5 * 60 * 1000, timeout: 10_000, enableHighAccuracy: false },
+    );
+  }, []);
 
-  return { permissionState, loading, coords, requestPermission };
+  return { coords, error, requested };
 }
