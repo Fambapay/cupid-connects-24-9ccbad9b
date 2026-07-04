@@ -373,7 +373,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     setLoadingMore(true);
     try {
       const nextOffset = offset + PAGE_SIZE;
-      const result = await fetchDiscovery(filters, userCoords, nextOffset);
+      const result = await fetchDiscovery(filters, userCoords, nextOffset, isPremium);
       if (result.items.length) {
         setPages((prev: DiscoverProfile[][]) => [...prev, result.items]);
         setOffset(nextOffset);
@@ -381,7 +381,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     } finally {
       setLoadingMore(false);
     }
-  }, [loadingMore, baseItems.length, pages, offset, filters, userCoords]);
+  }, [loadingMore, baseItems.length, pages, offset, filters, userCoords, isPremium]);
 
   const markSwipedLocal = useCallback(
     (targetId: string) => {
