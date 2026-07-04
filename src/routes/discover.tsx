@@ -7,6 +7,7 @@ import { DiscoveryPage } from "@/components/discovery/DiscoveryPage";
 import { EmptyDiscovery } from "@/components/discovery/EmptyDiscovery";
 import { MatchOverlay } from "@/components/discovery/MatchOverlay";
 import { FiltersSheet, DEFAULT_FILTERS, type DiscoveryFilters } from "@/components/FiltersSheet";
+import { loadFilters, saveFilters } from "@/lib/discoveryFilters";
 import { PaywallSheet } from "@/components/paywall/PaywallSheet";
 import { CreditShopSheet } from "@/components/paywall/CreditShopSheet";
 import type { PackKind } from "@/lib/pricing";
