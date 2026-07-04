@@ -108,10 +108,16 @@ function Discover() {
   useEffect(() => {
     if (filtersInitialized || !profile?.interested_in) return;
     const ii = profile.interested_in;
+    // Any DB gender value → the UI bucket that covers it. Anything mixed
+    // (bi, pan, "man+woman") falls back to "todos" so no cohort is hidden.
+    const NB_VALUES = new Set(['nonbinary', 'genderfluid', 'agender', 'other']);
     let gender: DiscoveryFilters['gender'] = 'todos';
-    if (ii.length === 1 && ii[0] === 'man') gender = 'masculino';
-    else if (ii.length === 1 && ii[0] === 'woman') gender = 'feminino';
-    else if (ii.length === 1 && ii[0] === 'nonbinary') gender = 'nao_binario';
+    if (ii.length === 1) {
+      const only = ii[0];
+      if (only === 'man' || only === 'transman') gender = 'masculino';
+      else if (only === 'woman' || only === 'transwoman') gender = 'feminino';
+      else if (NB_VALUES.has(only)) gender = 'nao_binario';
+    }
     const seeded = { ...DEFAULT_FILTERS, gender };
     setFiltersState(seeded);
     saveFilters(user?.id, seeded);
