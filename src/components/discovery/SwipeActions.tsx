@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 import type { MotionValue } from "framer-motion";
-import { RotateCcw, X, Star, Heart, Send } from "lucide-react";
+import { RotateCcw, X, Star, Heart, MessageCircleHeart, Lock } from "lucide-react";
 import type { SwipeDirection, DailyLimits } from "./types";
+import { hapticTap } from "@/hooks/useNativePlatform";
 
 interface SwipeActionsProps {
   onSwipe: (d: SwipeDirection) => void;
@@ -11,6 +12,12 @@ interface SwipeActionsProps {
   canRewind?: boolean;
   boostActive?: boolean;
   boostRemainingMinutes?: number;
+  /** Premium unlocks rewind. Free users still see the button (opens paywall). */
+  isPremium?: boolean;
+  /** Balance shown as small badge on the Super Like button. */
+  superLikeBalance?: number;
+  /** Balance shown as small badge on the First Impression button. */
+  firstImpressionBalance?: number;
   dragX?: MotionValue<number>;
   dragY?: MotionValue<number>;
 }
