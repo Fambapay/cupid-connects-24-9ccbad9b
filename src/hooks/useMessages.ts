@@ -121,9 +121,28 @@ export function useMessages(matchId: string | undefined) {
         // Roll back optimistic bubble
         setMessages((prev) => prev.filter((x) => x.id !== tempId));
         const { toast } = await import("sonner");
-        toast.error("Não foi possível enviar", {
-          description: error?.message ?? "Tenta novamente.",
-        });
+        // RLS bloqueia Free de iniciar conversa; mostra CTA em vez de erro cru.
+        const msg = (error?.message ?? "").toLowerCase();
+        const isPaywallBlock =
+          error?.code === "42501" ||
+          msg.includes("row-level security") ||
+          msg.includes("row level security") ||
+          msg.includes("violates");
+        if (isPaywallBlock) {
+          toast.error("Desbloqueia a conversa", {
+            description: "Precisas de um plano para iniciar. Vê os planos.",
+            action: {
+              label: "Ver planos",
+              onClick: () => {
+                window.location.assign("/membership?required=1");
+              },
+            },
+          });
+        } else {
+          toast.error("Não foi possível enviar", {
+            description: error?.message ?? "Tenta novamente.",
+          });
+        }
         return;
       }
 

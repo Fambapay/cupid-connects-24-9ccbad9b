@@ -143,18 +143,21 @@ export type Database = {
           expires_at: string
           id: string
           profile_id: string
+          source: string
         }
         Insert: {
           created_at?: string
           expires_at: string
           id?: string
           profile_id: string
+          source?: string
         }
         Update: {
           created_at?: string
           expires_at?: string
           id?: string
           profile_id?: string
+          source?: string
         }
         Relationships: []
       }
@@ -249,6 +252,45 @@ export type Database = {
           status?: string
           stripe_payment_intent?: string | null
           stripe_session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      daily_picks: {
+        Row: {
+          pick_date: string
+          picked_profile_ids: string[]
+          user_id: string
+        }
+        Insert: {
+          pick_date: string
+          picked_profile_ids: string[]
+          user_id: string
+        }
+        Update: {
+          pick_date?: string
+          picked_profile_ids?: string[]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      daily_usage: {
+        Row: {
+          likes_used: number
+          super_likes_used: number
+          usage_date: string
+          user_id: string
+        }
+        Insert: {
+          likes_used?: number
+          super_likes_used?: number
+          usage_date: string
+          user_id: string
+        }
+        Update: {
+          likes_used?: number
+          super_likes_used?: number
+          usage_date?: string
           user_id?: string
         }
         Relationships: []
@@ -656,6 +698,7 @@ export type Database = {
           priority: number
           regular_price_minor: number
           slug: string
+          target_tier: string
           title: string
           trigger: Database["public"]["Enums"]["offer_trigger"]
           updated_at: string
@@ -674,6 +717,7 @@ export type Database = {
           priority?: number
           regular_price_minor: number
           slug: string
+          target_tier?: string
           title: string
           trigger: Database["public"]["Enums"]["offer_trigger"]
           updated_at?: string
@@ -692,11 +736,48 @@ export type Database = {
           priority?: number
           regular_price_minor?: number
           slug?: string
+          target_tier?: string
           title?: string
           trigger?: Database["public"]["Enums"]["offer_trigger"]
           updated_at?: string
         }
         Relationships: []
+      }
+      offers_pricing: {
+        Row: {
+          currency: string
+          first_period_price: number
+          offer_id: string
+          regular_price: number
+        }
+        Insert: {
+          currency: string
+          first_period_price: number
+          offer_id: string
+          regular_price: number
+        }
+        Update: {
+          currency?: string
+          first_period_price?: number
+          offer_id?: string
+          regular_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offers_pricing_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offer_funnel"
+            referencedColumns: ["offer_id"]
+          },
+          {
+            foreignKeyName: "offers_pricing_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_transactions: {
         Row: {
@@ -885,6 +966,7 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
+          device_fingerprint: string | null
           drinking: string | null
           gender: string | null
           height_cm: number | null
@@ -905,10 +987,14 @@ export type Database = {
           name: string | null
           onboarding_completed: boolean
           onboarding_step: number
+          pause_used: boolean
           pets: string | null
           seed_active: boolean
+          show_day4_recap: boolean
           smoking: string | null
+          trial_ends_at: string | null
           updated_at: string
+          visibility_multiplier: number
           welcome_bonus_granted_at: string | null
           workout: string | null
         }
@@ -919,6 +1005,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          device_fingerprint?: string | null
           drinking?: string | null
           gender?: string | null
           height_cm?: number | null
@@ -939,10 +1026,14 @@ export type Database = {
           name?: string | null
           onboarding_completed?: boolean
           onboarding_step?: number
+          pause_used?: boolean
           pets?: string | null
           seed_active?: boolean
+          show_day4_recap?: boolean
           smoking?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
+          visibility_multiplier?: number
           welcome_bonus_granted_at?: string | null
           workout?: string | null
         }
@@ -953,6 +1044,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          device_fingerprint?: string | null
           drinking?: string | null
           gender?: string | null
           height_cm?: number | null
@@ -973,10 +1065,14 @@ export type Database = {
           name?: string | null
           onboarding_completed?: boolean
           onboarding_step?: number
+          pause_used?: boolean
           pets?: string | null
           seed_active?: boolean
+          show_day4_recap?: boolean
           smoking?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
+          visibility_multiplier?: number
           welcome_bonus_granted_at?: string | null
           workout?: string | null
         }
@@ -1168,6 +1264,24 @@ export type Database = {
         }
         Relationships: []
       }
+      tier_boost_usage: {
+        Row: {
+          period_key: string
+          used_at: string
+          user_id: string
+        }
+        Insert: {
+          period_key: string
+          used_at?: string
+          user_id: string
+        }
+        Update: {
+          period_key?: string
+          used_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_credits: {
         Row: {
           boost_balance: number
@@ -1179,6 +1293,7 @@ export type Database = {
           super_like_balance: number
           updated_at: string
           user_id: string
+          welcome_boost_used: boolean
         }
         Insert: {
           boost_balance?: number
@@ -1190,6 +1305,7 @@ export type Database = {
           super_like_balance?: number
           updated_at?: string
           user_id: string
+          welcome_boost_used?: boolean
         }
         Update: {
           boost_balance?: number
@@ -1201,6 +1317,7 @@ export type Database = {
           super_like_balance?: number
           updated_at?: string
           user_id?: string
+          welcome_boost_used?: boolean
         }
         Relationships: []
       }
@@ -1365,6 +1482,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      can_initiate_conversation: {
+        Args: { _match_id: string }
+        Returns: boolean
+      }
       compute_distances_km: {
         Args: { _ids: string[]; _viewer_lat: number; _viewer_lng: number }
         Returns: {
@@ -1437,6 +1558,7 @@ export type Database = {
           priority: number
           regular_price_minor: number
           slug: string
+          target_tier: string
           title: string
           trigger: Database["public"]["Enums"]["offer_trigger"]
           updated_at: string
@@ -1451,6 +1573,7 @@ export type Database = {
       get_match_messages: { Args: { _match_id: string }; Returns: Json }
       get_match_summaries: { Args: never; Returns: Json }
       get_message_preview: { Args: { _match_id: string }; Returns: Json }
+      get_my_access: { Args: never; Returns: Json }
       get_my_location: {
         Args: never
         Returns: {
@@ -1524,6 +1647,8 @@ export type Database = {
       rewind_last_swipe: { Args: never; Returns: Json }
       touch_last_active: { Args: never; Returns: undefined }
       transition_expired_memberships: { Args: never; Returns: Json }
+      use_pack_boost: { Args: never; Returns: Json }
+      use_tier_boost: { Args: never; Returns: Json }
       winback_candidates: {
         Args: { _days: number; _slug: string }
         Returns: {
@@ -1540,6 +1665,14 @@ export type Database = {
         | "winback_day_7"
         | "winback_day_14"
         | "always_on"
+        | "day4_recap"
+        | "locked_match"
+        | "blurred_message"
+        | "likes_teaser"
+        | "out_of_likes"
+        | "winback_day_60"
+        | "winback_day_90"
+        | "cancel_flow"
       swipe_direction: "like" | "pass" | "super"
     }
     CompositeTypes: {
@@ -1676,6 +1809,14 @@ export const Constants = {
         "winback_day_7",
         "winback_day_14",
         "always_on",
+        "day4_recap",
+        "locked_match",
+        "blurred_message",
+        "likes_teaser",
+        "out_of_likes",
+        "winback_day_60",
+        "winback_day_90",
+        "cancel_flow",
       ],
       swipe_direction: ["like", "pass", "super"],
     },
