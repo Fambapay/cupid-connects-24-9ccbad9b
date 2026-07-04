@@ -284,7 +284,9 @@ function Discover() {
         setPendingAction({ profileId: target.id, direction });
         openPaywall();
       } else if (res.reason === "daily_limit_reached") {
+        offerEngine.triggerOutOfLikes();
         toast.error("Atingiste o limite diário. Volta amanhã ou faz upgrade.");
+
       } else if (res.reason === "insert_failed") {
         toast.error("Falha de rede. Tenta novamente.");
       } else if (res.reason !== "insufficient_credits") {
