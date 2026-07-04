@@ -47,6 +47,7 @@ interface DiscoveryResult {
   items: DiscoverProfile[];
   dailyLimits: DailyLimits;
   needsLocation: boolean;
+  needsPreference: boolean;
 }
 
 const DEFAULT_LIMITS: DailyLimits = {
