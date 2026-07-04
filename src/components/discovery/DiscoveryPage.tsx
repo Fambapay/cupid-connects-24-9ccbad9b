@@ -30,6 +30,8 @@ export const DiscoveryPage = ({
   profiles,
   onSwipe,
   onOpenFilters,
+  activeFilters = 0,
+
   onBoost,
   onFirstImpression,
   onRewind,
