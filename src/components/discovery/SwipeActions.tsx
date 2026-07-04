@@ -67,6 +67,11 @@ export const SwipeActions = ({
   onRewind,
   onFirstImpression,
   canRewind = true,
+  isPremium = false,
+  superLikeBalance,
+  firstImpressionBalance,
+  boostActive = false,
+  dailyLimits,
   dragX,
   dragY,
 }: SwipeActionsProps) => {
