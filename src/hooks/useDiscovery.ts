@@ -277,6 +277,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       distance: filters.distance ?? null,
       hasBio: filters.hasBio ?? null,
       verifiedOnly: filters.verifiedOnly ?? null,
+      onlineNow: filters.onlineNow ?? null,
       heightMin: filters.heightMin ?? null,
       heightMax: filters.heightMax ?? null,
       interests: [...(filters.interests ?? [])].sort(),
