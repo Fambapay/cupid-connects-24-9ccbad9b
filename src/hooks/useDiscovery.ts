@@ -229,18 +229,46 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
   const [offset, setOffset] = useState(0);
   const [loadingMore, setLoadingMore] = useState(false);
 
+  // Normalize filters into a stable primitive shape so a new object identity
+  // on each render (e.g. `{}` literal) does NOT trigger a refetch.
+  const filtersKey = useMemo(() => {
+    if (!filters) return null;
+    const norm = {
+      gender: filters.gender ?? null,
+      ageMin: filters.ageMin ?? null,
+      ageMax: filters.ageMax ?? null,
+      distance: filters.distance ?? null,
+      hasBio: filters.hasBio ?? null,
+      verifiedOnly: filters.verifiedOnly ?? null,
+      heightMin: filters.heightMin ?? null,
+      heightMax: filters.heightMax ?? null,
+    };
+    return JSON.stringify(norm);
+  }, [filters]);
+
+  // Round coords to ~1km precision so tiny GPS jitter doesn't invalidate cache.
+  const coordsKey = useMemo(() => {
+    if (!userCoords) return null;
+    const round = (n: number) => Math.round(n * 100) / 100;
+    return `${round(userCoords.lat)},${round(userCoords.lng)}`;
+  }, [userCoords]);
+
   const queryKey = useMemo(
-    () => ["discovery", user?.id ?? null, filters, userCoords] as const,
-    [user?.id, filters, userCoords],
+    () => ["discovery", user?.id ?? null, filtersKey, coordsKey] as const,
+    [user?.id, filtersKey, coordsKey],
   );
 
   const { data, isLoading, refetch } = useQuery({
     queryKey,
     queryFn: () => fetchDiscovery(filters, userCoords, 0),
     enabled: !!user,
-    staleTime: 0,
-    gcTime: 60_000,
+    // Keep the feed fresh for 60s so remounts (tab switches, route
+    // navigations) don't trigger a new RPC on every mount.
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
     refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
   // Reset accumulated pages when the base query changes (new filters/coords).
