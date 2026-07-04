@@ -327,7 +327,7 @@ function Discover() {
           />
 
         ) : (
-          <EmptyDiscovery loading={loading} onRefresh={reload} onOpenFilters={onOpenFilters} needsLocation={needsLocation} />
+          <EmptyDiscovery loading={loading} onRefresh={reload} onOpenFilters={onOpenFilters} needsLocation={needsLocation} needsPreference={needsPreference} />
         )}
       </main>
 
