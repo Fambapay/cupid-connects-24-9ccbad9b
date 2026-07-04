@@ -245,13 +245,15 @@ function Discover() {
           return "blocked";
         }
       } else if (direction === "like") {
-        // Free: se já esgotou o quota diário, abre paywall com contador.
+        // Free: se já esgotou o quota diário, abre paywall com contador + oferta contextual.
         if (access.tier === "free" && access.likesRemainingToday === 0) {
           setPendingAction({ profileId: target.id, direction });
+          offerEngine.triggerOutOfLikes();
           openPaywall();
           return "blocked";
         }
       }
+
     }
 
     // Pass is free once inside premium access.
