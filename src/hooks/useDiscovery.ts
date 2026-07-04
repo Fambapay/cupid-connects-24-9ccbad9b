@@ -188,7 +188,7 @@ async function fetchDiscovery(
     };
   });
 
-  return { items, dailyLimits };
+  return { items, dailyLimits, needsLocation };
 }
 
 // Persist locally-swiped IDs so they don't reappear if the user navigates
