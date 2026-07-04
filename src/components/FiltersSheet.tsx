@@ -33,7 +33,7 @@ export const DEFAULT_FILTERS: DiscoveryFilters = {
   gender: 'todos',
   ageMin: 18,
   ageMax: 80,
-  distance: 200,
+  distance: 201, // 201 = "sem limite" sentinel; useDiscovery omits the field so the RPC falls back to user_settings.
   verifiedOnly: false,
   hasBio: false,
   onlineNow: false,
