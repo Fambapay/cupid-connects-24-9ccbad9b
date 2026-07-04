@@ -34,9 +34,9 @@ interface ProfileCardProps {
   sharedX?: MotionValue<number>;
   sharedY?: MotionValue<number>;
   actions?: ReactNode;
-  panelActions?: ReactNode;
   enterAnim?: "rewind-left" | "rewind-right" | "rewind-up" | null;
 }
+
 
 export interface ProfileCardHandle {
   flyLeft: () => void;
