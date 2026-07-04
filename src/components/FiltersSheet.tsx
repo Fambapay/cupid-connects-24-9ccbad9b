@@ -1,7 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Lock, X, BadgeCheck, FileText, Zap } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
+import { toast } from 'sonner';
 import { hapticTap } from '@/hooks/useNativePlatform';
+
 
 export interface DiscoveryFilters {
   gender: 'todos' | 'feminino' | 'masculino' | 'nao_binario';
