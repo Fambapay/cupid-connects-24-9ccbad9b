@@ -245,8 +245,10 @@ async function fetchDiscovery(
       smoking: c.smoking ?? null,
       drinking: c.drinking ?? null,
       workout: c.workout ?? null,
+      membership_tier: (c.membership_tier as DiscoverProfile["membership_tier"]) ?? null,
     };
   });
+
 
   return { items, dailyLimits, needsLocation, needsPreference };
 }
