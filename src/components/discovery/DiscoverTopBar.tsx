@@ -36,13 +36,13 @@ export const DiscoverTopBar = ({
     >
       <button
         onClick={onOpenFilters}
-        aria-label={activeFilters > 0 ? `Filtros (${activeFilters} ativos)` : "Filtros"}
+        aria-label="Filtros"
         style={{
           position: "relative",
           width: 42,
           height: 42,
           borderRadius: "50%",
-          border: activeFilters > 0 ? "1.5px solid rgba(255,79,163,0.9)" : "none",
+          border: "none",
           background: "rgba(0,0,0,0.45)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
@@ -52,7 +52,7 @@ export const DiscoverTopBar = ({
           justifyContent: "center",
           cursor: "pointer",
           pointerEvents: "auto",
-          boxShadow: activeFilters > 0 ? "0 0 16px rgba(255,79,163,0.45)" : "none",
+          boxShadow: "none",
           transition: "all 0.25s ease",
         }}
       >
