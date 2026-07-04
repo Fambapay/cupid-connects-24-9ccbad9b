@@ -215,8 +215,8 @@ export function PaywallSheet({
           ? "text-[#FF8ABF]"
           : "text-white/50";
 
-  // No free tier: only show the counter while the user is still in a live trial with visible remaining likes.
-  const showLimitCounter = (origin === "discover" || origin === "chat") && subscription.isTrialing && typeof likesRemaining === "number" && likesLimit > 0;
+  // Mostra contador quando temos likesRemaining explícito (Free a bater no limite ou trial ativo).
+  const showLimitCounter = (origin === "discover" || origin === "chat") && typeof likesRemaining === "number" && likesLimit > 0;
   const premiumLikes = PLUS.dailyLikes; // -1 = unlimited
 
   return (

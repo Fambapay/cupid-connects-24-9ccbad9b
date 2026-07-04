@@ -26,6 +26,7 @@ import { setLocalNotificationNavigator } from "@/lib/native/localNotifications";
 import { setupNativePush } from "@/lib/native/push";
 import { isNative } from "@/lib/native/platform";
 import { useSystemTheme } from "@/lib/theme";
+import { Day4RecapGate } from "@/components/membership/Day4RecapSheet";
 
 function ThemeSync() {
   useSystemTheme();
@@ -231,6 +232,7 @@ function RootComponent() {
         <AnimatedOutlet />
         <GlobalNotifiers />
         <PushPromptGate />
+        <Day4RecapGate />
         <Toaster
           position="top-center"
           richColors

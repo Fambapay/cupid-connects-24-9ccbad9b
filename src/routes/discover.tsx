@@ -28,6 +28,7 @@ import { useBoost } from "@/hooks/useBoost";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useAccessLevel } from "@/hooks/useAccessLevel";
 import { useLikesCount } from "@/hooks/useLikesCount";
 import { supabase } from "@/integrations/supabase/client";
 import type { DiscoveryProfile, SwipeDirection } from "@/components/discovery/types";
@@ -57,6 +58,7 @@ function Discover() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isPremium, entitlements, subscription } = useSubscription();
+  const { access, reload: reloadAccess } = useAccessLevel();
   const offerEngine = useOfferEngine();
   const likesCount = useLikesCount();
   useEffect(() => {
@@ -231,13 +233,25 @@ function Discover() {
   ): Promise<void | "blocked"> => {
     const direction = dir === "right" ? "like" : dir === "up" ? "super" : "pass";
 
-    // Hard paywall: without premium access (trial/active/grace), block ALL swipes.
+    // Pass é sempre grátis para todos os tiers.
+    // Super Like: precisa de tier pago OU créditos de pack.
+    // Like: Free pode até ao limite diário (server enforça); tiers pagos ilimitados.
     if (!isPremium) {
-      if (direction !== "pass") {
-        setPendingAction({ profileId: target.id, direction });
+      if (direction === "super") {
+        // Free/Locked sem tier: se tiver créditos de pack, deixa passar (performSwipe trata);
+        // sem créditos, abre a shop de créditos.
+        if (credits.super_like_balance <= 0) {
+          setCreditShop("super_like");
+          return "blocked";
+        }
+      } else if (direction === "like") {
+        // Free: se já esgotou o quota diário, abre paywall com contador.
+        if (access.tier === "free" && access.likesRemainingToday === 0) {
+          setPendingAction({ profileId: target.id, direction });
+          openPaywall();
+          return "blocked";
+        }
       }
-      openPaywall();
-      return "blocked";
     }
 
     // Pass is free once inside premium access.
@@ -406,6 +420,9 @@ function Discover() {
 
       <PaywallSheet
         open={paywallOpen}
+        origin="discover"
+        likesRemaining={access.likesRemainingToday >= 0 ? access.likesRemainingToday : undefined}
+        likesLimit={access.likesLimitToday > 0 ? access.likesLimitToday : 10}
         onClose={() => {
           setPaywallOpen(false);
           setPendingAction(null);
@@ -414,7 +431,7 @@ function Discover() {
           setPaywallOpen(false);
           const action = pendingAction;
           setPendingAction(null);
-          await reload();
+          await Promise.all([reload(), reloadAccess()]);
           if (action) {
             // Auto-record the like that triggered the paywall.
             const target = items.find((p) => p.id === action.profileId);
