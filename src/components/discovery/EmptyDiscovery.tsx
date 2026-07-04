@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { RefreshCw, SlidersHorizontal } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
 
 interface EmptyDiscoveryProps {
@@ -8,9 +9,10 @@ interface EmptyDiscoveryProps {
   onRefresh?: () => void;
   onOpenFilters?: () => void;
   needsLocation?: boolean;
+  needsPreference?: boolean;
 }
 
-export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters, needsLocation = false }: EmptyDiscoveryProps) => {
+export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters, needsLocation = false, needsPreference = false }: EmptyDiscoveryProps) => {
   // Auto-iniciar a "procura" assim que a página abre, como se o utilizador
   // tivesse clicado em Atualizar — dá sensação imediata de que estamos a
   // buscar perfis novos.
@@ -162,7 +164,13 @@ export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters, need
           color: "transparent",
         }}
       >
-        {needsLocation ? "Ativa a localização" : isSearching ? "À procura..." : "A colmeia está calma"}
+        {needsPreference
+          ? "Escolhe quem queres conhecer"
+          : needsLocation
+          ? "Ativa a localização"
+          : isSearching
+          ? "À procura..."
+          : "A colmeia está calma"}
       </motion.h2>
 
       <motion.p
@@ -171,12 +179,35 @@ export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters, need
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
       >
-        {needsLocation
+        {needsPreference
+          ? "Ainda não escolheste que género queres ver. Vai a Definições → Interessado em."
+          : needsLocation
           ? "Precisamos da tua localização para te mostrar pessoas por perto. Vai a Definições → Localização."
           : isSearching
           ? "A encontrar pessoas perto de ti."
           : "Voltamos já com novos perfis para descobrires."}
       </motion.p>
+
+      {(needsPreference || needsLocation) && (
+        <motion.div
+          className="relative mt-6"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <Link
+            to="/settings"
+            className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-semibold text-white"
+            style={{
+              backgroundImage: "linear-gradient(135deg, #FF4FA3 0%, #B13CFF 100%)",
+              boxShadow:
+                "0 10px 28px -10px color-mix(in oklab, var(--brand-pink) 70%, transparent), inset 0 1px 0 rgba(255,255,255,0.22)",
+            }}
+          >
+            Abrir definições
+          </Link>
+        </motion.div>
+      )}
 
       {/* Filters button — same position as DiscoverTopBar */}
       {onOpenFilters && (

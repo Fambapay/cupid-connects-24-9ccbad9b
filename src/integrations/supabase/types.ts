@@ -1401,15 +1401,26 @@ export type Database = {
         Returns: number
       }
       generate_referral_code: { Args: { _uid: string }; Returns: string }
-      get_discovery_feed: {
-        Args: {
-          _filters?: Json
-          _limit?: number
-          _viewer_lat?: number
-          _viewer_lng?: number
-        }
-        Returns: Json
-      }
+      get_discovery_feed:
+        | {
+            Args: {
+              _filters?: Json
+              _limit?: number
+              _viewer_lat?: number
+              _viewer_lng?: number
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _filters?: Json
+              _limit?: number
+              _offset?: number
+              _viewer_lat?: number
+              _viewer_lng?: number
+            }
+            Returns: Json
+          }
       get_eligible_offer: {
         Args: { _trigger: Database["public"]["Enums"]["offer_trigger"] }
         Returns: {

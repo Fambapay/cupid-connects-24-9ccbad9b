@@ -21,6 +21,7 @@ import { useOfferEngine } from "@/hooks/useOfferEngine";
 
 import { useDiscoveryDetailOpen } from "@/lib/discoveryDetail";
 import { useDiscovery } from "@/hooks/useDiscovery";
+import { useGeolocation } from "@/hooks/useGeolocation";
 import { useCredits } from "@/hooks/useCredits";
 import { useBoost } from "@/hooks/useBoost";
 import { useAuth } from "@/hooks/useAuth";
@@ -95,7 +96,8 @@ function Discover() {
     setFilters((prev) => ({ ...prev, gender }));
     setFiltersInitialized(true);
   }, [profile?.interested_in, filtersInitialized]);
-  const { items, loading, swipe, rewind, reload, dailyLimits, needsLocation } = useDiscovery({ filters });
+  const { coords: gpsCoords } = useGeolocation(true);
+  const { items, loading, swipe, rewind, reload, loadMore, dailyLimits, needsLocation, needsPreference } = useDiscovery({ filters, userCoords: gpsCoords });
   const { credits, reload: reloadCredits, syncCredits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
   const boost = useBoost(() => setCreditShop("boost"));
@@ -115,6 +117,14 @@ function Discover() {
   useEffect(() => {
     setIndex(0);
   }, [items.length]);
+
+  // Prefetch the next page when the user is 10 cards away from the end so
+  // the stack never runs dry for power-users.
+  useEffect(() => {
+    if (items.length - index <= 10 && items.length > 0) {
+      void loadMore();
+    }
+  }, [items.length, index, loadMore]);
 
 
   const openPaywall = () => {
@@ -317,7 +327,7 @@ function Discover() {
           />
 
         ) : (
-          <EmptyDiscovery loading={loading} onRefresh={reload} onOpenFilters={onOpenFilters} needsLocation={needsLocation} />
+          <EmptyDiscovery loading={loading} onRefresh={reload} onOpenFilters={onOpenFilters} needsLocation={needsLocation} needsPreference={needsPreference} />
         )}
       </main>
 

@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
@@ -47,6 +47,7 @@ interface DiscoveryResult {
   items: DiscoverProfile[];
   dailyLimits: DailyLimits;
   needsLocation: boolean;
+  needsPreference: boolean;
 }
 
 const DEFAULT_LIMITS: DailyLimits = {
@@ -82,6 +83,7 @@ interface RawCandidate {
 interface FeedResponse {
   candidates: RawCandidate[];
   needs_location?: boolean;
+  needs_preference?: boolean;
   daily_limits: {
     likes_used: number;
     likes_limit: number;
@@ -90,11 +92,15 @@ interface FeedResponse {
   };
 }
 
+const PAGE_SIZE = 100;
+
 async function fetchDiscovery(
   filters: DiscoveryFilters | undefined,
   userCoords: { lat: number; lng: number } | null | undefined,
+  offset = 0,
 ): Promise<DiscoveryResult> {
-  // Resolve viewer coords (server-side path if not provided by caller).
+  // Resolve viewer coords: caller-provided (GPS) wins; server RPC falls back
+  // to stored profile coords if the caller still doesn't have any.
   let coords = userCoords ?? null;
   if (!coords) {
     const { data: locData } = await (supabase.rpc as unknown as (
@@ -114,11 +120,9 @@ async function fetchDiscovery(
     if (filters.distance != null) filterPayload.distance = filters.distance;
     if (filters.hasBio != null) filterPayload.hasBio = filters.hasBio;
     if (filters.verifiedOnly != null) filterPayload.verifiedOnly = filters.verifiedOnly;
-    
     if (filters.heightMin != null) filterPayload.heightMin = filters.heightMin;
     if (filters.heightMax != null) filterPayload.heightMax = filters.heightMax;
   }
-
 
   const { data, error } = await (supabase.rpc as unknown as (
     fn: string,
@@ -127,14 +131,16 @@ async function fetchDiscovery(
     _filters: filterPayload,
     _viewer_lat: coords?.lat ?? null,
     _viewer_lng: coords?.lng ?? null,
-    _limit: 100,
+    _limit: PAGE_SIZE,
+    _offset: offset,
   });
   if (error) {
     console.error("get_discovery_feed failed", error);
-    return { items: [], dailyLimits: DEFAULT_LIMITS, needsLocation: false };
+    return { items: [], dailyLimits: DEFAULT_LIMITS, needsLocation: false, needsPreference: false };
   }
-  const resp = (data as FeedResponse | null) ?? { candidates: [], needs_location: false, daily_limits: { likes_used: 0, likes_limit: 5, super_used: 0, super_limit: 0 } };
+  const resp = (data as FeedResponse | null) ?? { candidates: [], needs_location: false, needs_preference: false, daily_limits: { likes_used: 0, likes_limit: 5, super_used: 0, super_limit: 0 } };
   const needsLocation = !!resp.needs_location;
+  const needsPreference = !!resp.needs_preference;
 
   const dl = resp.daily_limits;
   const likesRemaining = dl.likes_limit < 0 ? Infinity : Math.max(0, dl.likes_limit - dl.likes_used);
@@ -188,7 +194,7 @@ async function fetchDiscovery(
     };
   });
 
-  return { items, dailyLimits, needsLocation };
+  return { items, dailyLimits, needsLocation, needsPreference };
 }
 
 // Persist locally-swiped IDs so they don't reappear if the user navigates
@@ -217,6 +223,12 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
   const { user } = useAuth();
   const { filters, userCoords } = options;
 
+  // Offset-based pagination. When the client runs low on cards, `loadMore`
+  // fetches the next page and appends. Reset whenever filters/coords/user change.
+  const [pages, setPages] = useState<DiscoverProfile[][]>([]);
+  const [offset, setOffset] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   const queryKey = useMemo(
     () => ["discovery", user?.id ?? null, filters, userCoords] as const,
     [user?.id, filters, userCoords],
@@ -224,29 +236,67 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
 
   const { data, isLoading, refetch } = useQuery({
     queryKey,
-    queryFn: () => fetchDiscovery(filters, userCoords),
+    queryFn: () => fetchDiscovery(filters, userCoords, 0),
     enabled: !!user,
     staleTime: 0,
     gcTime: 60_000,
     refetchOnWindowFocus: false,
   });
 
-  // Filter locally-swiped IDs so back/forward navigation never resurrects a
-  // profile already actioned on this device, even if the server-side insert
-  // is still in flight or the cached feed is served first.
-  const rawItems: DiscoverProfile[] = data?.items ?? [];
+  // Reset accumulated pages when the base query changes (new filters/coords).
+  useEffect(() => {
+    setPages([]);
+    setOffset(0);
+  }, [queryKey]);
+
+  const baseItems = data?.items ?? [];
+  const rawItems: DiscoverProfile[] = useMemo(() => {
+    const seen = new Set<string>();
+    const merged: DiscoverProfile[] = [];
+    for (const list of [baseItems, ...pages]) {
+      for (const p of list) {
+        if (seen.has(p.id)) continue;
+        seen.add(p.id);
+        merged.push(p);
+      }
+    }
+    return merged;
+  }, [baseItems, pages]);
+
   const items: DiscoverProfile[] = useMemo(() => {
     const swiped = readSwiped(user?.id);
     if (!swiped.size) return rawItems;
     return rawItems.filter((p) => !swiped.has(p.id));
   }, [rawItems, user?.id]);
+
   const dailyLimits = data?.dailyLimits ?? DEFAULT_LIMITS;
   const needsLocation = !!data?.needsLocation;
+  const needsPreference = !!data?.needsPreference;
   const loading = !!user && isLoading;
 
   const reload = useCallback(async () => {
+    setPages([]);
+    setOffset(0);
     await refetch();
   }, [refetch]);
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore) return;
+    // Only paginate when the current page is full — a short page means the end.
+    const currentCount = baseItems.length + pages.reduce((n: number, p: DiscoverProfile[]) => n + p.length, 0);
+    if (currentCount < PAGE_SIZE) return;
+    setLoadingMore(true);
+    try {
+      const nextOffset = offset + PAGE_SIZE;
+      const result = await fetchDiscovery(filters, userCoords, nextOffset);
+      if (result.items.length) {
+        setPages((prev: DiscoverProfile[][]) => [...prev, result.items]);
+        setOffset(nextOffset);
+      }
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loadingMore, baseItems.length, pages, offset, filters, userCoords]);
 
   const markSwipedLocal = useCallback(
     (targetId: string) => {
@@ -340,5 +390,5 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     return { success: false, error: res?.error };
   }, [unmarkSwipedLocal]);
 
-  return { items, loading, swipe, rewind, reload, dailyLimits, needsLocation };
+  return { items, loading, swipe, rewind, reload, loadMore, loadingMore, dailyLimits, needsLocation, needsPreference };
 }
