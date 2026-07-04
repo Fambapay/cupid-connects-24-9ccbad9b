@@ -131,9 +131,10 @@ async function fetchDiscovery(
   });
   if (error) {
     console.error("get_discovery_feed failed", error);
-    return { items: [], dailyLimits: DEFAULT_LIMITS };
+    return { items: [], dailyLimits: DEFAULT_LIMITS, needsLocation: false };
   }
-  const resp = (data as FeedResponse | null) ?? { candidates: [], daily_limits: { likes_used: 0, likes_limit: 5, super_used: 0, super_limit: 0 } };
+  const resp = (data as FeedResponse | null) ?? { candidates: [], needs_location: false, daily_limits: { likes_used: 0, likes_limit: 5, super_used: 0, super_limit: 0 } };
+  const needsLocation = !!resp.needs_location;
 
   const dl = resp.daily_limits;
   const likesRemaining = dl.likes_limit < 0 ? Infinity : Math.max(0, dl.likes_limit - dl.likes_used);
