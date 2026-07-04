@@ -34,7 +34,9 @@ export interface DiscoverProfile {
   smoking: string | null;
   drinking: string | null;
   workout: string | null;
+  membership_tier: "select" | "plus" | "elite" | null;
 }
+
 
 export interface DiscoveryOptions {
   filters?: DiscoveryFilters;
