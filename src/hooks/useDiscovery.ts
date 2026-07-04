@@ -290,7 +290,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       const nextOffset = offset + PAGE_SIZE;
       const result = await fetchDiscovery(filters, userCoords, nextOffset);
       if (result.items.length) {
-        setPages((prev) => [...prev, result.items]);
+        setPages((prev: DiscoverProfile[][]) => [...prev, result.items]);
         setOffset(nextOffset);
       }
     } finally {
