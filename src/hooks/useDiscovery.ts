@@ -39,6 +39,13 @@ export interface DiscoverProfile {
 export interface DiscoveryOptions {
   filters?: DiscoveryFilters;
   userCoords?: { lat: number; lng: number } | null;
+  /**
+   * When false, the client omits every premium-only filter from the RPC
+   * payload (height range, interests, lifestyle). The server also enforces
+   * this — the double gate keeps a premium filter from leaking into the
+   * request if the server-side check ever regresses.
+   */
+  isPremium?: boolean;
 }
 
 const ONLINE_WINDOW_MS = 90_000;
@@ -98,6 +105,7 @@ async function fetchDiscovery(
   filters: DiscoveryFilters | undefined,
   userCoords: { lat: number; lng: number } | null | undefined,
   offset = 0,
+  isPremium = false,
 ): Promise<DiscoveryResult> {
   // Resolve viewer coords: caller-provided (GPS) wins; server RPC falls back
   // to stored profile coords if the caller still doesn't have any.
@@ -125,39 +133,44 @@ async function fetchDiscovery(
     if (filters.verifiedOnly) filterPayload.verifiedOnly = true;
     if (filters.onlineNow) filterPayload.onlineNow = true;
     // Height slider full-range sentinels (140-210) also mean "no override".
-    if (filters.heightMin != null && filters.heightMin > 140) filterPayload.heightMin = filters.heightMin;
-    if (filters.heightMax != null && filters.heightMax < 210) filterPayload.heightMax = filters.heightMax;
+    // Premium-gated client-side too: skip entirely when not entitled so the
+    // payload doesn't rely on the server's ignore-when-not-premium branch.
+    if (isPremium) {
+      if (filters.heightMin != null && filters.heightMin > 140) filterPayload.heightMin = filters.heightMin;
+      if (filters.heightMax != null && filters.heightMax < 210) filterPayload.heightMax = filters.heightMax;
 
-    // Premium: interests / lifestyle. Server enforces the premium gate and
-    // ignores these when the caller is not on an active paid tier.
-    if (filters.interests && filters.interests.length > 0) {
-      filterPayload.interests = filters.interests;
-    }
-    // Lifestyle UI uses sim/nao/as_vezes; the DB stores richer values.
-    // Expand each choice into every matching DB value.
-    const SMOKE_MAP: Record<string, string[]> = {
-      sim: ["social", "regular"],
-      nao: ["never", "quitting"],
-      as_vezes: ["social"],
-    };
-    const DRINK_MAP: Record<string, string[]> = {
-      sim: ["social", "regular"],
-      nao: ["never", "sober"],
-      as_vezes: ["social"],
-    };
-    const WORKOUT_MAP: Record<string, string[]> = {
-      sim: ["often", "daily"],
-      nao: ["never"],
-      as_vezes: ["sometimes"],
-    };
-    if (filters.lifestyle?.smoke && SMOKE_MAP[filters.lifestyle.smoke]) {
-      filterPayload.smoking = SMOKE_MAP[filters.lifestyle.smoke];
-    }
-    if (filters.lifestyle?.drink && DRINK_MAP[filters.lifestyle.drink]) {
-      filterPayload.drinking = DRINK_MAP[filters.lifestyle.drink];
-    }
-    if (filters.lifestyle?.workout && WORKOUT_MAP[filters.lifestyle.workout]) {
-      filterPayload.workout = WORKOUT_MAP[filters.lifestyle.workout];
+      // Interests / lifestyle. Server also enforces the premium gate; keeping
+      // the client-side gate means a server regression won't silently start
+      // narrowing the feed for free users who fiddled with premium fields.
+      if (filters.interests && filters.interests.length > 0) {
+        filterPayload.interests = filters.interests;
+      }
+      // Lifestyle UI uses sim/nao/as_vezes; the DB stores richer values.
+      // Expand each choice into every matching DB value.
+      const SMOKE_MAP: Record<string, string[]> = {
+        sim: ["social", "regular"],
+        nao: ["never", "quitting"],
+        as_vezes: ["social"],
+      };
+      const DRINK_MAP: Record<string, string[]> = {
+        sim: ["social", "regular"],
+        nao: ["never", "sober"],
+        as_vezes: ["social"],
+      };
+      const WORKOUT_MAP: Record<string, string[]> = {
+        sim: ["often", "daily"],
+        nao: ["never"],
+        as_vezes: ["sometimes"],
+      };
+      if (filters.lifestyle?.smoke && SMOKE_MAP[filters.lifestyle.smoke]) {
+        filterPayload.smoking = SMOKE_MAP[filters.lifestyle.smoke];
+      }
+      if (filters.lifestyle?.drink && DRINK_MAP[filters.lifestyle.drink]) {
+        filterPayload.drinking = DRINK_MAP[filters.lifestyle.drink];
+      }
+      if (filters.lifestyle?.workout && WORKOUT_MAP[filters.lifestyle.workout]) {
+        filterPayload.workout = WORKOUT_MAP[filters.lifestyle.workout];
+      }
     }
   }
 
@@ -258,7 +271,7 @@ function writeSwiped(uid: string | undefined, set: Set<string>) {
 
 export function useDiscovery(options: DiscoveryOptions = {}) {
   const { user } = useAuth();
-  const { filters, userCoords } = options;
+  const { filters, userCoords, isPremium = false } = options;
 
   // Offset-based pagination. When the client runs low on cards, `loadMore`
   // fetches the next page and appends. Reset whenever filters/coords/user change.
@@ -267,7 +280,9 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
   const [loadingMore, setLoadingMore] = useState(false);
 
   // Normalize filters into a stable primitive shape so a new object identity
-  // on each render (e.g. `{}` literal) does NOT trigger a refetch.
+  // on each render (e.g. `{}` literal) does NOT trigger a refetch. Premium-
+  // only fields are collapsed to null for non-premium so mexer neles não
+  // invalida o cache quando o servidor os ignoraria de qualquer forma.
   const filtersKey = useMemo(() => {
     if (!filters) return null;
     const norm = {
@@ -278,15 +293,15 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       hasBio: filters.hasBio ?? null,
       verifiedOnly: filters.verifiedOnly ?? null,
       onlineNow: filters.onlineNow ?? null,
-      heightMin: filters.heightMin ?? null,
-      heightMax: filters.heightMax ?? null,
-      interests: [...(filters.interests ?? [])].sort(),
-      smoke: filters.lifestyle?.smoke ?? null,
-      drink: filters.lifestyle?.drink ?? null,
-      workout: filters.lifestyle?.workout ?? null,
+      heightMin: isPremium ? (filters.heightMin ?? null) : null,
+      heightMax: isPremium ? (filters.heightMax ?? null) : null,
+      interests: isPremium ? [...(filters.interests ?? [])].sort() : [],
+      smoke: isPremium ? (filters.lifestyle?.smoke ?? null) : null,
+      drink: isPremium ? (filters.lifestyle?.drink ?? null) : null,
+      workout: isPremium ? (filters.lifestyle?.workout ?? null) : null,
     };
     return JSON.stringify(norm);
-  }, [filters]);
+  }, [filters, isPremium]);
 
   // Round coords to ~1km precision so tiny GPS jitter doesn't invalidate cache.
   const coordsKey = useMemo(() => {
@@ -302,7 +317,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
 
   const { data, isLoading, refetch } = useQuery({
     queryKey,
-    queryFn: () => fetchDiscovery(filters, userCoords, 0),
+    queryFn: () => fetchDiscovery(filters, userCoords, 0, isPremium),
     enabled: !!user,
     // Keep the feed fresh for 60s so remounts (tab switches, route
     // navigations) don't trigger a new RPC on every mount.
@@ -358,7 +373,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     setLoadingMore(true);
     try {
       const nextOffset = offset + PAGE_SIZE;
-      const result = await fetchDiscovery(filters, userCoords, nextOffset);
+      const result = await fetchDiscovery(filters, userCoords, nextOffset, isPremium);
       if (result.items.length) {
         setPages((prev: DiscoverProfile[][]) => [...prev, result.items]);
         setOffset(nextOffset);
@@ -366,7 +381,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     } finally {
       setLoadingMore(false);
     }
-  }, [loadingMore, baseItems.length, pages, offset, filters, userCoords]);
+  }, [loadingMore, baseItems.length, pages, offset, filters, userCoords, isPremium]);
 
   const markSwipedLocal = useCallback(
     (targetId: string) => {
