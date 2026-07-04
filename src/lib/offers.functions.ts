@@ -21,7 +21,9 @@ export type OfferTrigger =
   | "blurred_message"
   | "likes_teaser"
   | "out_of_likes"
-  | "cancel_flow";
+  | "cancel_flow"
+  | "superlike_zero"
+  | "boost_exhausted";
 
 export interface OfferDTO {
   id: string;
@@ -55,7 +57,10 @@ const TRIGGERS: OfferTrigger[] = [
   "likes_teaser",
   "out_of_likes",
   "cancel_flow",
+  "superlike_zero",
+  "boost_exhausted",
 ];
+
 
 const triggerSchema = z.enum(TRIGGERS as [OfferTrigger, ...OfferTrigger[]]);
 
