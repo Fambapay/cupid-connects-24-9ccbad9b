@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { AppShell, TopBar } from "@/components/AppShell";
 import { useLikedMe } from "@/hooks/useLikedMe";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useOfferEngine } from "@/hooks/useOfferEngine";
+import { OfferSheet } from "@/components/offers/OfferSheet";
+
 
 import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
 
