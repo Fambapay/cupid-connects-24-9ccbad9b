@@ -958,7 +958,13 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 >
                   {profile.name.split(" ")[0]}
                   <span style={{ opacity: 0.9, fontWeight: 700 }}>, {profile.age}</span>
+                  {profile.isPremium && (
+                    <span style={{ marginLeft: 8, display: "inline-flex", verticalAlign: "middle" }}>
+                      <EliteCrown size={20} />
+                    </span>
+                  )}
                 </h2>
+
                 {profile.isOnline && (
                   <div
                     style={{
