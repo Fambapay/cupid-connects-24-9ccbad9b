@@ -222,7 +222,6 @@ export const DiscoveryPage = ({
                 }
               />
 
-              />
             </motion.div>
 
           </motion.div>
