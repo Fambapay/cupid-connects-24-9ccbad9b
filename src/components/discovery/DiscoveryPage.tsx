@@ -15,6 +15,8 @@ interface DiscoveryPageProps {
     dir: SwipeDirection,
   ) => void | "blocked" | Promise<void | "blocked">;
   onOpenFilters?: () => void;
+  activeFilters?: number;
+
   onBoost?: () => void;
   onFirstImpression?: (profile: DiscoveryProfile) => void;
   onRewind?: () => boolean | Promise<boolean | unknown>;
