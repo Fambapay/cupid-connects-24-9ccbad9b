@@ -13,7 +13,15 @@ export type OfferTrigger =
   | "likes_received"
   | "winback_day_7"
   | "winback_day_14"
-  | "always_on";
+  | "winback_day_60"
+  | "winback_day_90"
+  | "always_on"
+  | "day4_recap"
+  | "locked_match"
+  | "blurred_message"
+  | "likes_teaser"
+  | "out_of_likes"
+  | "cancel_flow";
 
 export interface OfferDTO {
   id: string;
@@ -38,10 +46,19 @@ const TRIGGERS: OfferTrigger[] = [
   "likes_received",
   "winback_day_7",
   "winback_day_14",
+  "winback_day_60",
+  "winback_day_90",
   "always_on",
+  "day4_recap",
+  "locked_match",
+  "blurred_message",
+  "likes_teaser",
+  "out_of_likes",
+  "cancel_flow",
 ];
 
 const triggerSchema = z.enum(TRIGGERS as [OfferTrigger, ...OfferTrigger[]]);
+
 
 export const getEligibleOffer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
