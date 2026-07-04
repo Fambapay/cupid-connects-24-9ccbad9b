@@ -7,7 +7,7 @@ import { DiscoveryPage } from "@/components/discovery/DiscoveryPage";
 import { EmptyDiscovery } from "@/components/discovery/EmptyDiscovery";
 import { MatchOverlay } from "@/components/discovery/MatchOverlay";
 import { FiltersSheet, DEFAULT_FILTERS, type DiscoveryFilters } from "@/components/FiltersSheet";
-import { loadFilters, saveFilters } from "@/lib/discoveryFilters";
+import { loadFilters, saveFilters, sanitizeForNonPremium, countActiveFilters } from "@/lib/discoveryFilters";
 import { PaywallSheet } from "@/components/paywall/PaywallSheet";
 import { CreditShopSheet } from "@/components/paywall/CreditShopSheet";
 import type { PackKind } from "@/lib/pricing";
@@ -123,8 +123,20 @@ function Discover() {
     saveFilters(user?.id, seeded);
     setFiltersInitialized(true);
   }, [profile?.interested_in, filtersInitialized, user?.id]);
+  // If premium was cancelled, clear premium-only fields so they don't "revive"
+  // on a future resubscription. Runs whenever entitlement flips off.
+  useEffect(() => {
+    if (isPremium) return;
+    const sanitized = sanitizeForNonPremium(filters);
+    if (JSON.stringify(sanitized) === JSON.stringify(filters)) return;
+    setFiltersState(sanitized);
+    saveFilters(user?.id, sanitized);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPremium]);
+  const activeFilters = countActiveFilters(filters);
   const { coords: gpsCoords } = useGeolocation(true);
   const { items, loading, swipe, rewind, reload, loadMore, dailyLimits, needsLocation, needsPreference } = useDiscovery({ filters, userCoords: gpsCoords, isPremium });
+
   const { credits, reload: reloadCredits, syncCredits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
   const boost = useBoost(() => setCreditShop("boost"));
@@ -345,6 +357,8 @@ function Discover() {
             profiles={visible}
             onSwipe={handleSwipe}
             onOpenFilters={onOpenFilters}
+            activeFilters={activeFilters}
+
             onBoost={onBoost}
             onFirstImpression={onFirstImpression}
             onRewind={onRewind}

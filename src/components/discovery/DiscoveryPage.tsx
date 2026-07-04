@@ -15,6 +15,8 @@ interface DiscoveryPageProps {
     dir: SwipeDirection,
   ) => void | "blocked" | Promise<void | "blocked">;
   onOpenFilters?: () => void;
+  activeFilters?: number;
+
   onBoost?: () => void;
   onFirstImpression?: (profile: DiscoveryProfile) => void;
   onRewind?: () => boolean | Promise<boolean | unknown>;
@@ -28,6 +30,8 @@ export const DiscoveryPage = ({
   profiles,
   onSwipe,
   onOpenFilters,
+  activeFilters = 0,
+
   onBoost,
   onFirstImpression,
   onRewind,
@@ -236,6 +240,8 @@ export const DiscoveryPage = ({
             <motion.div variants={itemVariants}>
               <DiscoverTopBar
                 onOpenFilters={onOpenFilters}
+                activeFilters={activeFilters}
+
                 onBoost={onBoost}
                 boostActive={boostActive}
                 boostMultiplier={boostMultiplier}

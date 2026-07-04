@@ -6,6 +6,8 @@ interface DiscoverTopBarProps {
   logoSrc?: string;
   boostActive?: boolean;
   boostMultiplier?: number;
+  /** Number of filter groups narrowed away from defaults — drives the badge. */
+  activeFilters?: number;
 }
 
 export const DiscoverTopBar = ({
@@ -14,7 +16,9 @@ export const DiscoverTopBar = ({
   logoSrc,
   boostActive = false,
   boostMultiplier = 10,
+  activeFilters = 0,
 }: DiscoverTopBarProps) => {
+
   return (
     <div
       style={{
@@ -32,12 +36,13 @@ export const DiscoverTopBar = ({
     >
       <button
         onClick={onOpenFilters}
-        aria-label="Filtros"
+        aria-label={activeFilters > 0 ? `Filtros (${activeFilters} ativos)` : "Filtros"}
         style={{
+          position: "relative",
           width: 42,
           height: 42,
           borderRadius: "50%",
-          border: "none",
+          border: activeFilters > 0 ? "1.5px solid rgba(255,79,163,0.9)" : "none",
           background: "rgba(0,0,0,0.45)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
@@ -47,10 +52,37 @@ export const DiscoverTopBar = ({
           justifyContent: "center",
           cursor: "pointer",
           pointerEvents: "auto",
+          boxShadow: activeFilters > 0 ? "0 0 16px rgba(255,79,163,0.45)" : "none",
+          transition: "all 0.25s ease",
         }}
       >
         <SlidersHorizontal size={18} />
+        {activeFilters > 0 && (
+          <span
+            aria-hidden
+            style={{
+              position: "absolute",
+              top: -2,
+              right: -2,
+              minWidth: 18,
+              height: 18,
+              padding: "0 5px",
+              borderRadius: 999,
+              background: "linear-gradient(135deg, #FF4FA3, #B13CFF)",
+              color: "#fff",
+              fontSize: 10,
+              fontWeight: 800,
+              lineHeight: "18px",
+              textAlign: "center",
+              border: "1.5px solid rgba(14,12,20,0.95)",
+              letterSpacing: "-0.02em",
+            }}
+          >
+            {activeFilters}
+          </span>
+        )}
       </button>
+
 
       {logoSrc ? (
         <img src={logoSrc} alt="" style={{ height: 28, pointerEvents: "auto" }} />

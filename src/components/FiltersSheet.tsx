@@ -1,7 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Lock, X, BadgeCheck, FileText, Zap } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
+import { toast } from 'sonner';
 import { hapticTap } from '@/hooks/useNativePlatform';
+
 
 export interface DiscoveryFilters {
   gender: 'todos' | 'feminino' | 'masculino' | 'nao_binario';
@@ -96,7 +98,17 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
   };
 
   const apply = () => { hapticTap(); onChange(local); onClose(); };
-  const reset = () => { hapticTap(); setLocal(DEFAULT_FILTERS); };
+  // "Repor" applies immediately (parent + persistence) instead of quietly
+  // dirtying local state and waiting for the user to press "Aplicar" — the
+  // previous behaviour looked broken because the feed didn't change.
+  const reset = () => {
+    hapticTap();
+    setLocal(DEFAULT_FILTERS);
+    onChange(DEFAULT_FILTERS);
+    toast.success('Filtros repostos');
+  };
+
+
 
   return (
     <AnimatePresence>
@@ -200,7 +212,7 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
                     icon={<BadgeCheck size={16} strokeWidth={2.2} />}
                     tint="var(--brand-pink)"
                     label="Apenas verificados"
-                    value={isPremium && local.verifiedOnly}
+                    value={local.verifiedOnly}
                     onChange={(v) => { if (!isPremium) { onUpgrade?.(); return; } update('verifiedOnly', v); }}
                     locked={!isPremium}
                   />
@@ -208,11 +220,12 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
                     icon={<FileText size={16} strokeWidth={2.2} />}
                     tint="var(--brand-purple)"
                     label="Tem bio"
-                    value={isPremium && local.hasBio}
+                    value={local.hasBio}
                     onChange={(v) => { if (!isPremium) { onUpgrade?.(); return; } update('hasBio', v); }}
                     locked={!isPremium}
                     last
                   />
+
                 </GroupedList>
               </div>
 
