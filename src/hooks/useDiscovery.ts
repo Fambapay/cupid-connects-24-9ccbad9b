@@ -87,7 +87,9 @@ interface RawCandidate {
   smoking: string | null;
   drinking: string | null;
   workout: string | null;
+  membership_tier: string | null;
 }
+
 
 interface FeedResponse {
   candidates: RawCandidate[];
