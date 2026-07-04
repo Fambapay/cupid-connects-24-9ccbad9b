@@ -11,8 +11,11 @@ import { getPlanCards } from "@/lib/plans";
 import { useCountry } from "@/lib/country/context";
 import { cancelMyMembership } from "@/lib/membership.functions";
 import { getMyPaymentHistory, restoreMyPurchases, type PaymentHistoryEntry } from "@/lib/payments.functions";
+import { getEligibleOffer, type OfferDTO } from "@/lib/offers.functions";
 import { PaywallFlow } from "@/components/paywall/PaywallFlow";
+import { OfferSheet } from "@/components/offers/OfferSheet";
 import { AlwaysOnQuarterlyCard } from "@/components/membership/AlwaysOnQuarterlyCard";
+
 
 import { hapticTap } from "@/hooks/useNativePlatform";
 import { requiresExternalCheckout, getExternalCheckoutUrl, getBillingMode } from "@/lib/billing/platform";
