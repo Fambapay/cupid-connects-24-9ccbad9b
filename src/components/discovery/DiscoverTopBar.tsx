@@ -6,6 +6,8 @@ interface DiscoverTopBarProps {
   logoSrc?: string;
   boostActive?: boolean;
   boostMultiplier?: number;
+  /** Number of filter groups narrowed away from defaults — drives the badge. */
+  activeFilters?: number;
 }
 
 export const DiscoverTopBar = ({
@@ -14,7 +16,9 @@ export const DiscoverTopBar = ({
   logoSrc,
   boostActive = false,
   boostMultiplier = 10,
+  activeFilters = 0,
 }: DiscoverTopBarProps) => {
+
   return (
     <div
       style={{
