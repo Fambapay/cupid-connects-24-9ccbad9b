@@ -212,7 +212,7 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
                     icon={<BadgeCheck size={16} strokeWidth={2.2} />}
                     tint="var(--brand-pink)"
                     label="Apenas verificados"
-                    value={isPremium && local.verifiedOnly}
+                    value={local.verifiedOnly}
                     onChange={(v) => { if (!isPremium) { onUpgrade?.(); return; } update('verifiedOnly', v); }}
                     locked={!isPremium}
                   />
@@ -220,11 +220,12 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
                     icon={<FileText size={16} strokeWidth={2.2} />}
                     tint="var(--brand-purple)"
                     label="Tem bio"
-                    value={isPremium && local.hasBio}
+                    value={local.hasBio}
                     onChange={(v) => { if (!isPremium) { onUpgrade?.(); return; } update('hasBio', v); }}
                     locked={!isPremium}
                     last
                   />
+
                 </GroupedList>
               </div>
 
