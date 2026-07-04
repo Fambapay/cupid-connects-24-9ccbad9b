@@ -241,6 +241,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     return rawItems.filter((p) => !swiped.has(p.id));
   }, [rawItems, user?.id]);
   const dailyLimits = data?.dailyLimits ?? DEFAULT_LIMITS;
+  const needsLocation = !!data?.needsLocation;
   const loading = !!user && isLoading;
 
   const reload = useCallback(async () => {
