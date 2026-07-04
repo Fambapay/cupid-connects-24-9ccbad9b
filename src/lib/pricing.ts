@@ -36,16 +36,17 @@ export type Pack = {
 //  Per-country catalogs
 // ────────────────────────────────────────────────────────────
 
+// Fase 2: nova grelha de preços. Anual = 10x o mensal (2 meses grátis).
 const PLAN_PRICES_MZ: Record<PlanTier, PlanPrice> = {
-  select: { price: 199, annualPrice: 1590, monthlyDays: 30, annualDays: 365, label: "Select" },
-  plus:   { price: 599, annualPrice: 4790, monthlyDays: 30, annualDays: 365, label: "Plus" },
-  elite:  { price: 999, annualPrice: 7990, monthlyDays: 30, annualDays: 365, label: "Elite" },
+  select: { price: 199, annualPrice: 1990, monthlyDays: 30, annualDays: 365, label: "Select" },
+  plus:   { price: 349, annualPrice: 3490, monthlyDays: 30, annualDays: 365, label: "Plus" },
+  elite:  { price: 699, annualPrice: 6990, monthlyDays: 30, annualDays: 365, label: "Elite" },
 };
 
 const PLAN_PRICES_AO: Record<PlanTier, PlanPrice> = {
-  select: { price: 1500, annualPrice: 12000, monthlyDays: 30, annualDays: 365, label: "Select" },
-  plus:   { price: 4500, annualPrice: 36000, monthlyDays: 30, annualDays: 365, label: "Plus" },
-  elite:  { price: 7500, annualPrice: 60000, monthlyDays: 30, annualDays: 365, label: "Elite" },
+  select: { price: 1500, annualPrice: 15000, monthlyDays: 30, annualDays: 365, label: "Select" },
+  plus:   { price: 2600, annualPrice: 26000, monthlyDays: 30, annualDays: 365, label: "Plus" },
+  elite:  { price: 5200, annualPrice: 52000, monthlyDays: 30, annualDays: 365, label: "Elite" },
 };
 
 const PACKS_MZ: Record<string, Pack> = {
