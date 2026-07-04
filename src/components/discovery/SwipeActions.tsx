@@ -220,6 +220,7 @@ export const SwipeActions = ({
       if (busyRef.current) return;
       busyRef.current = true;
       window.setTimeout(() => { busyRef.current = false; }, cooldownMs);
+      hapticTap();
       const el = e.currentTarget;
       el.animate(
         [
@@ -230,11 +231,38 @@ export const SwipeActions = ({
         ],
         { duration: 380, easing: "cubic-bezier(0.32,0.72,0,1)" },
       );
-      // Drop focus so the button doesn't render in its hover/active state
-      // after the card flies off.
       el.blur();
       cb?.();
     };
+
+  // Small pill badge overlay used on Super Like and First Impression to
+  // surface remaining balance. Positioned top-right, inherits accent color.
+  const Badge = ({ n, color }: { n: number; color: string }) => (
+    <span
+      aria-hidden
+      style={{
+        position: "absolute",
+        top: -4,
+        right: -4,
+        minWidth: 18,
+        height: 18,
+        padding: "0 5px",
+        borderRadius: 9,
+        background: color,
+        color: "#0B0B0F",
+        fontSize: 10,
+        fontWeight: 700,
+        lineHeight: "18px",
+        textAlign: "center",
+        letterSpacing: "-0.02em",
+        border: "1.5px solid rgba(15,15,20,0.92)",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.5)",
+        pointerEvents: "none",
+      }}
+    >
+      {n > 99 ? "99+" : n}
+    </span>
+  );
 
 
 
