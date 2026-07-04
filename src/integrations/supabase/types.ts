@@ -1721,6 +1721,8 @@ export type Database = {
         | "winback_day_60"
         | "winback_day_90"
         | "cancel_flow"
+        | "superlike_zero"
+        | "boost_exhausted"
       swipe_direction: "like" | "pass" | "super"
     }
     CompositeTypes: {
@@ -1865,6 +1867,8 @@ export const Constants = {
         "winback_day_60",
         "winback_day_90",
         "cancel_flow",
+        "superlike_zero",
+        "boost_exhausted",
       ],
       swipe_direction: ["like", "pass", "super"],
     },
