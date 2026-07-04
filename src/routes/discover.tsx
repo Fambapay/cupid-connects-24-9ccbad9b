@@ -118,6 +118,14 @@ function Discover() {
     setIndex(0);
   }, [items.length]);
 
+  // Prefetch the next page when the user is 10 cards away from the end so
+  // the stack never runs dry for power-users.
+  useEffect(() => {
+    if (items.length - index <= 10 && items.length > 0) {
+      void loadMore();
+    }
+  }, [items.length, index, loadMore]);
+
 
   const openPaywall = () => {
     setPaywallOpen(true);
