@@ -57,30 +57,6 @@ export const DiscoverTopBar = ({
         }}
       >
         <SlidersHorizontal size={18} />
-        {activeFilters > 0 && (
-          <span
-            aria-hidden
-            style={{
-              position: "absolute",
-              top: -2,
-              right: -2,
-              minWidth: 18,
-              height: 18,
-              padding: "0 5px",
-              borderRadius: 999,
-              background: "linear-gradient(135deg, #FF4FA3, #B13CFF)",
-              color: "#fff",
-              fontSize: 10,
-              fontWeight: 800,
-              lineHeight: "18px",
-              textAlign: "center",
-              border: "1.5px solid rgba(14,12,20,0.95)",
-              letterSpacing: "-0.02em",
-            }}
-          >
-            {activeFilters}
-          </span>
-        )}
       </button>
 
 
