@@ -62,3 +62,47 @@ export function saveFilters(uid: string | null | undefined, filters: DiscoveryFi
     /* quota / private mode — ignore */
   }
 }
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Zero-out premium-gated fields so a cancelled subscription doesn't leave
+ * "ghost" filters ready to revive on the next upgrade. Called whenever
+ * `isPremium` flips to false.
+ */
+export function sanitizeForNonPremium(f: DiscoveryFilters): DiscoveryFilters {
+  return {
+    ...f,
+    verifiedOnly: false,
+    hasBio: false,
+    heightMin: DEFAULT_FILTERS.heightMin,
+    heightMax: DEFAULT_FILTERS.heightMax,
+    interests: [],
+    lifestyle: {},
+    zodiac: [],
+    education: [],
+  };
+}
+
+/**
+ * Count of filter groups diverging from wide-open defaults — used to badge
+ * the filters button so the user knows the feed is narrowed.
+ */
+export function countActiveFilters(f: DiscoveryFilters): number {
+  let n = 0;
+  if (f.gender !== DEFAULT_FILTERS.gender) n++;
+  if (f.ageMin !== DEFAULT_FILTERS.ageMin || f.ageMax !== DEFAULT_FILTERS.ageMax) n++;
+  if (f.distance !== DEFAULT_FILTERS.distance) n++;
+  if (f.onlineNow) n++;
+  if (f.verifiedOnly) n++;
+  if (f.hasBio) n++;
+  if (f.heightMin !== DEFAULT_FILTERS.heightMin || f.heightMax !== DEFAULT_FILTERS.heightMax) n++;
+  if (f.interests.length) n++;
+  if (f.lifestyle.smoke || f.lifestyle.drink || f.lifestyle.workout) n++;
+  if (f.zodiac.length) n++;
+  if (f.education.length) n++;
+  return n;
+}
+
