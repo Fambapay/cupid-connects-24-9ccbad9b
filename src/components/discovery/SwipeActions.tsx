@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 import type { MotionValue } from "framer-motion";
-import { RotateCcw, X, Star, Heart, Send } from "lucide-react";
+import { RotateCcw, X, Star, Heart, MessageCircleHeart, Lock } from "lucide-react";
 import type { SwipeDirection, DailyLimits } from "./types";
+import { hapticTap } from "@/hooks/useNativePlatform";
 
 interface SwipeActionsProps {
   onSwipe: (d: SwipeDirection) => void;
@@ -11,6 +12,12 @@ interface SwipeActionsProps {
   canRewind?: boolean;
   boostActive?: boolean;
   boostRemainingMinutes?: number;
+  /** Premium unlocks rewind. Free users still see the button (opens paywall). */
+  isPremium?: boolean;
+  /** Balance shown as small badge on the Super Like button. */
+  superLikeBalance?: number;
+  /** Balance shown as small badge on the First Impression button. */
+  firstImpressionBalance?: number;
   dragX?: MotionValue<number>;
   dragY?: MotionValue<number>;
 }
@@ -60,6 +67,11 @@ export const SwipeActions = ({
   onRewind,
   onFirstImpression,
   canRewind = true,
+  isPremium = false,
+  superLikeBalance,
+  firstImpressionBalance,
+  boostActive = false,
+  dailyLimits,
   dragX,
   dragY,
 }: SwipeActionsProps) => {
@@ -208,6 +220,7 @@ export const SwipeActions = ({
       if (busyRef.current) return;
       busyRef.current = true;
       window.setTimeout(() => { busyRef.current = false; }, cooldownMs);
+      hapticTap();
       const el = e.currentTarget;
       el.animate(
         [
@@ -218,11 +231,38 @@ export const SwipeActions = ({
         ],
         { duration: 380, easing: "cubic-bezier(0.32,0.72,0,1)" },
       );
-      // Drop focus so the button doesn't render in its hover/active state
-      // after the card flies off.
       el.blur();
       cb?.();
     };
+
+  // Small pill badge overlay used on Super Like and First Impression to
+  // surface remaining balance. Positioned top-right, inherits accent color.
+  const Badge = ({ n, color }: { n: number; color: string }) => (
+    <span
+      aria-hidden
+      style={{
+        position: "absolute",
+        top: -4,
+        right: -4,
+        minWidth: 18,
+        height: 18,
+        padding: "0 5px",
+        borderRadius: 9,
+        background: color,
+        color: "#0B0B0F",
+        fontSize: 10,
+        fontWeight: 700,
+        lineHeight: "18px",
+        textAlign: "center",
+        letterSpacing: "-0.02em",
+        border: "1.5px solid rgba(15,15,20,0.92)",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.5)",
+        pointerEvents: "none",
+      }}
+    >
+      {n > 99 ? "99+" : n}
+    </span>
+  );
 
 
 
@@ -315,11 +355,36 @@ export const SwipeActions = ({
     >
       <button
         onClick={press(onRewind)}
-        disabled={!canRewind}
-        aria-label="Rewind"
-        style={{ ...BTN_BASE, width: 48, height: 48, opacity: canRewind ? 1 : 0.45 }}
+        aria-label={isPremium ? "Rewind" : "Rewind (Premium)"}
+        style={{
+          ...BTN_BASE,
+          width: 48,
+          height: 48,
+          opacity: !isPremium ? 1 : canRewind ? 1 : 0.45,
+        }}
       >
         <RotateCcw size={20} color="#F4A23B" strokeWidth={2.6} />
+        {!isPremium && (
+          <span
+            aria-hidden
+            style={{
+              position: "absolute",
+              bottom: -3,
+              right: -3,
+              width: 18,
+              height: 18,
+              borderRadius: 9,
+              background: "linear-gradient(135deg,#FFD37A,#F4A23B)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              border: "1.5px solid rgba(15,15,20,0.92)",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.5)",
+            }}
+          >
+            <Lock size={10} color="#0B0B0F" strokeWidth={3} />
+          </span>
+        )}
       </button>
 
       <button
@@ -339,7 +404,7 @@ export const SwipeActions = ({
       <button
         ref={supRef}
         onClick={press(() => onSwipe("up"))}
-        aria-label="Super like"
+        aria-label={`Super like${typeof superLikeBalance === "number" ? ` (${superLikeBalance} restantes)` : ""}`}
         style={{ ...BTN_BASE, width: 56, height: 56 }}
       >
         {Glow(supGlowRef, TONES.sup.fill)}
@@ -348,13 +413,25 @@ export const SwipeActions = ({
         <ActiveIcon refEl={supIconRef}>
           <Star size={24} color="#FFFFFF" strokeWidth={2.2} fill="#FFFFFF" />
         </ActiveIcon>
+        {typeof superLikeBalance === "number" && superLikeBalance > 0 && (
+          <Badge n={superLikeBalance} color="#4FB8FF" />
+        )}
       </button>
 
       <button
         ref={likeRef}
         onClick={press(() => onSwipe("right"))}
-        aria-label="Like"
-        style={{ ...BTN_BASE, width: 62, height: 62 }}
+        aria-label={
+          dailyLimits && !boostActive
+            ? `Like (${Math.max(0, dailyLimits.likesLimit - dailyLimits.likesUsed)} restantes hoje)`
+            : "Like"
+        }
+        style={{
+          ...BTN_BASE,
+          width: 62,
+          height: 62,
+          animation: boostActive ? "hunieBoostPulse 1.6s ease-in-out infinite" : undefined,
+        }}
       >
         {Glow(likeGlowRef, TONES.like.fill)}
         {Fill(likeFillRef, TONES.like.fill)}
@@ -366,14 +443,20 @@ export const SwipeActions = ({
 
       <button
         onClick={press(onFirstImpression)}
-        aria-label="First Impression"
+        aria-label={`First Impression${typeof firstImpressionBalance === "number" ? ` (${firstImpressionBalance} restantes)` : ""}`}
         style={{ ...BTN_BASE, width: 48, height: 48 }}
       >
-        <Send size={20} color="#4FA8FF" strokeWidth={2.4} style={{ transform: "translateX(-1px)" }} />
+        <MessageCircleHeart size={20} color="#FF6FA8" strokeWidth={2.4} />
+        {typeof firstImpressionBalance === "number" && firstImpressionBalance > 0 && (
+          <Badge n={firstImpressionBalance} color="#FF6FA8" />
+        )}
       </button>
+
+      <style>{`@keyframes hunieBoostPulse {
+        0%, 100% { box-shadow: 0 12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 0 rgba(0,0,0,0.35), 0 0 0 0 rgba(255,79,163,0.55); }
+        50% { box-shadow: 0 12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 0 rgba(0,0,0,0.35), 0 0 0 10px rgba(255,79,163,0); }
+      }`}</style>
     </div>
   );
 };
 
-// Suppress unused param lint while keeping the prop in the API contract.
-void ({} as Pick<SwipeActionsProps, "dailyLimits" | "boostActive" | "boostRemainingMinutes">);
