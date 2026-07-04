@@ -95,7 +95,7 @@ function Discover() {
     setFilters((prev) => ({ ...prev, gender }));
     setFiltersInitialized(true);
   }, [profile?.interested_in, filtersInitialized]);
-  const { items, loading, swipe, rewind, reload, dailyLimits } = useDiscovery({ filters });
+  const { items, loading, swipe, rewind, reload, dailyLimits, needsLocation } = useDiscovery({ filters });
   const { credits, reload: reloadCredits, syncCredits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
   const boost = useBoost(() => setCreditShop("boost"));
@@ -317,7 +317,7 @@ function Discover() {
           />
 
         ) : (
-          <EmptyDiscovery loading={loading} onRefresh={reload} onOpenFilters={onOpenFilters} />
+          <EmptyDiscovery loading={loading} onRefresh={reload} onOpenFilters={onOpenFilters} needsLocation={needsLocation} />
         )}
       </main>
 

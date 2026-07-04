@@ -46,6 +46,7 @@ const ONLINE_WINDOW_MS = 90_000;
 interface DiscoveryResult {
   items: DiscoverProfile[];
   dailyLimits: DailyLimits;
+  needsLocation: boolean;
 }
 
 const DEFAULT_LIMITS: DailyLimits = {
@@ -80,6 +81,7 @@ interface RawCandidate {
 
 interface FeedResponse {
   candidates: RawCandidate[];
+  needs_location?: boolean;
   daily_limits: {
     likes_used: number;
     likes_limit: number;
@@ -129,9 +131,10 @@ async function fetchDiscovery(
   });
   if (error) {
     console.error("get_discovery_feed failed", error);
-    return { items: [], dailyLimits: DEFAULT_LIMITS };
+    return { items: [], dailyLimits: DEFAULT_LIMITS, needsLocation: false };
   }
-  const resp = (data as FeedResponse | null) ?? { candidates: [], daily_limits: { likes_used: 0, likes_limit: 5, super_used: 0, super_limit: 0 } };
+  const resp = (data as FeedResponse | null) ?? { candidates: [], needs_location: false, daily_limits: { likes_used: 0, likes_limit: 5, super_used: 0, super_limit: 0 } };
+  const needsLocation = !!resp.needs_location;
 
   const dl = resp.daily_limits;
   const likesRemaining = dl.likes_limit < 0 ? Infinity : Math.max(0, dl.likes_limit - dl.likes_used);
@@ -185,7 +188,7 @@ async function fetchDiscovery(
     };
   });
 
-  return { items, dailyLimits };
+  return { items, dailyLimits, needsLocation };
 }
 
 // Persist locally-swiped IDs so they don't reappear if the user navigates
@@ -238,6 +241,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     return rawItems.filter((p) => !swiped.has(p.id));
   }, [rawItems, user?.id]);
   const dailyLimits = data?.dailyLimits ?? DEFAULT_LIMITS;
+  const needsLocation = !!data?.needsLocation;
   const loading = !!user && isLoading;
 
   const reload = useCallback(async () => {
@@ -336,5 +340,5 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     return { success: false, error: res?.error };
   }, [unmarkSwipedLocal]);
 
-  return { items, loading, swipe, rewind, reload, dailyLimits };
+  return { items, loading, swipe, rewind, reload, dailyLimits, needsLocation };
 }

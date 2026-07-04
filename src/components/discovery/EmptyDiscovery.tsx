@@ -7,9 +7,10 @@ interface EmptyDiscoveryProps {
   loading?: boolean;
   onRefresh?: () => void;
   onOpenFilters?: () => void;
+  needsLocation?: boolean;
 }
 
-export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters }: EmptyDiscoveryProps) => {
+export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters, needsLocation = false }: EmptyDiscoveryProps) => {
   // Auto-iniciar a "procura" assim que a página abre, como se o utilizador
   // tivesse clicado em Atualizar — dá sensação imediata de que estamos a
   // buscar perfis novos.
@@ -161,7 +162,7 @@ export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters }: Em
           color: "transparent",
         }}
       >
-        {isSearching ? "À procura..." : "A colmeia está calma"}
+        {needsLocation ? "Ativa a localização" : isSearching ? "À procura..." : "A colmeia está calma"}
       </motion.h2>
 
       <motion.p
@@ -170,7 +171,9 @@ export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters }: Em
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
       >
-        {isSearching
+        {needsLocation
+          ? "Precisamos da tua localização para te mostrar pessoas por perto. Vai a Definições → Localização."
+          : isSearching
           ? "A encontrar pessoas perto de ti."
           : "Voltamos já com novos perfis para descobrires."}
       </motion.p>
