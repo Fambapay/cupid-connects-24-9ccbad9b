@@ -136,6 +136,15 @@ export function useOfferEngine() {
     setActiveOffer(null);
   }, []);
 
+  // Preview/debug: força mostrar o pop-up de uma oferta sem passar por elegibilidade.
+  const forceShowOffer = useCallback(
+    async (trigger: OfferTrigger) => {
+      const offer = await fetchOfferPreview({ data: { trigger } });
+      if (offer) setActiveOffer(offer);
+    },
+    [fetchOfferPreview],
+  );
+
   // Auto-triggers com base no estado do trial.
   useEffect(() => {
     if (hasPremiumAccess === false || !profile) return;
