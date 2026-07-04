@@ -190,5 +190,6 @@ export function useOfferEngine() {
     enqueueTrigger,
     triggerPostFirstMatch,
     triggerLikesReceived,
+    forceShowOffer,
   };
 }
