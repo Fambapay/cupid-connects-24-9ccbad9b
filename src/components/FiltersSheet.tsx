@@ -48,13 +48,32 @@ interface Props {
   onUpgrade?: () => void;
 }
 
-const INTERESTS = [
-  '🎨 Arte', '✈️ Viagens', '🏋️ Fitness', '🎵 Música', '📚 Livros',
-  '🍷 Vinho', '🎬 Cinema', '🌱 Natureza', '🐶 Animais', '🍳 Cozinhar',
-  '🎮 Gaming', '📸 Fotografia', '⚽ Desporto', '☕ Café', '🧘 Yoga',
+// Each interest carries the emoji (UI only) and the plain label that matches
+// what onboarding writes to profiles.interests. Filter must send `label`, not
+// the emoji-prefixed display string, or the server-side overlap check fails.
+const INTERESTS: { emoji: string; label: string }[] = [
+  { emoji: '🎨', label: 'Arte' },
+  { emoji: '✈️', label: 'Viajar' },
+  { emoji: '🏋️', label: 'Ginásio' },
+  { emoji: '🎵', label: 'Música' },
+  { emoji: '📚', label: 'Livros' },
+  { emoji: '🍷', label: 'Vinho' },
+  { emoji: '🎬', label: 'Cinema' },
+  { emoji: '🌱', label: 'Natureza' },
+  { emoji: '🐶', label: 'Animais' },
+  { emoji: '🍳', label: 'Cozinhar' },
+  { emoji: '🎮', label: 'Gaming' },
+  { emoji: '📸', label: 'Fotografia' },
+  { emoji: '⚽', label: 'Desporto' },
+  { emoji: '☕', label: 'Café' },
+  { emoji: '🧘', label: 'Yoga' },
+  { emoji: '💃', label: 'Dançar' },
+  { emoji: '🏃', label: 'Correr' },
+  { emoji: '🥐', label: 'Brunch' },
+  { emoji: '🏖️', label: 'Praia' },
+  { emoji: '💻', label: 'Tecnologia' },
+  { emoji: '🥾', label: 'Caminhadas' },
 ];
-const ZODIAC = ['♈ Carneiro', '♉ Touro', '♊ Gémeos', '♋ Caranguejo', '♌ Leão', '♍ Virgem', '♎ Balança', '♏ Escorpião', '♐ Sagitário', '♑ Capricórnio', '♒ Aquário', '♓ Peixes'];
-const EDUCATION = ['Secundário', 'Licenciatura', 'Mestrado', 'Doutoramento'];
 
 export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false, onUpgrade }: Props) => {
   const [local, setLocal] = useState<DiscoveryFilters>(value);
