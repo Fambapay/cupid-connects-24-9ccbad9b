@@ -181,10 +181,25 @@ export function useOfferEngine() {
   // "likes_received" — chamado quando temos ≥3 likes por ver.
   const triggerLikesReceived = useCallback(() => {
     if (isTrialing && trialDaysLeft >= 2) return;
-    if (!canTriggerLikesToday()) return;
-    markLikesTriggered();
+    if (!canTriggerToday(DAILY_GUARDS.likes_received)) return;
+    markTriggeredToday(DAILY_GUARDS.likes_received);
     enqueueTrigger("likes_received");
   }, [enqueueTrigger, isTrialing, trialDaysLeft]);
+
+  // "out_of_likes" — Free bateu no cap diário de likes.
+  const triggerOutOfLikes = useCallback(() => {
+    if (!canTriggerToday(DAILY_GUARDS.out_of_likes)) return;
+    markTriggeredToday(DAILY_GUARDS.out_of_likes);
+    enqueueTrigger("out_of_likes");
+  }, [enqueueTrigger]);
+
+  // "likes_teaser" — tocou num perfil borrado em "quem gostou de mim".
+  const triggerLikesTeaser = useCallback(() => {
+    if (!canTriggerToday(DAILY_GUARDS.likes_teaser)) return;
+    markTriggeredToday(DAILY_GUARDS.likes_teaser);
+    enqueueTrigger("likes_teaser");
+  }, [enqueueTrigger]);
+
 
   return {
     activeOffer,
