@@ -271,7 +271,7 @@ function writeSwiped(uid: string | undefined, set: Set<string>) {
 
 export function useDiscovery(options: DiscoveryOptions = {}) {
   const { user } = useAuth();
-  const { filters, userCoords } = options;
+  const { filters, userCoords, isPremium = false } = options;
 
   // Offset-based pagination. When the client runs low on cards, `loadMore`
   // fetches the next page and appends. Reset whenever filters/coords/user change.
@@ -280,7 +280,9 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
   const [loadingMore, setLoadingMore] = useState(false);
 
   // Normalize filters into a stable primitive shape so a new object identity
-  // on each render (e.g. `{}` literal) does NOT trigger a refetch.
+  // on each render (e.g. `{}` literal) does NOT trigger a refetch. Premium-
+  // only fields are collapsed to null for non-premium so mexer neles não
+  // invalida o cache quando o servidor os ignoraria de qualquer forma.
   const filtersKey = useMemo(() => {
     if (!filters) return null;
     const norm = {
@@ -291,15 +293,15 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       hasBio: filters.hasBio ?? null,
       verifiedOnly: filters.verifiedOnly ?? null,
       onlineNow: filters.onlineNow ?? null,
-      heightMin: filters.heightMin ?? null,
-      heightMax: filters.heightMax ?? null,
-      interests: [...(filters.interests ?? [])].sort(),
-      smoke: filters.lifestyle?.smoke ?? null,
-      drink: filters.lifestyle?.drink ?? null,
-      workout: filters.lifestyle?.workout ?? null,
+      heightMin: isPremium ? (filters.heightMin ?? null) : null,
+      heightMax: isPremium ? (filters.heightMax ?? null) : null,
+      interests: isPremium ? [...(filters.interests ?? [])].sort() : [],
+      smoke: isPremium ? (filters.lifestyle?.smoke ?? null) : null,
+      drink: isPremium ? (filters.lifestyle?.drink ?? null) : null,
+      workout: isPremium ? (filters.lifestyle?.workout ?? null) : null,
     };
     return JSON.stringify(norm);
-  }, [filters]);
+  }, [filters, isPremium]);
 
   // Round coords to ~1km precision so tiny GPS jitter doesn't invalidate cache.
   const coordsKey = useMemo(() => {
@@ -315,7 +317,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
 
   const { data, isLoading, refetch } = useQuery({
     queryKey,
-    queryFn: () => fetchDiscovery(filters, userCoords, 0),
+    queryFn: () => fetchDiscovery(filters, userCoords, 0, isPremium),
     enabled: !!user,
     // Keep the feed fresh for 60s so remounts (tab switches, route
     // navigations) don't trigger a new RPC on every mount.
