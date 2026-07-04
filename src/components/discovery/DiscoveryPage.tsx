@@ -240,6 +240,8 @@ export const DiscoveryPage = ({
             <motion.div variants={itemVariants}>
               <DiscoverTopBar
                 onOpenFilters={onOpenFilters}
+                activeFilters={activeFilters}
+
                 onBoost={onBoost}
                 boostActive={boostActive}
                 boostMultiplier={boostMultiplier}
