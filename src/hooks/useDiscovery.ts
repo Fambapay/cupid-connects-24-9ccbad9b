@@ -34,7 +34,9 @@ export interface DiscoverProfile {
   smoking: string | null;
   drinking: string | null;
   workout: string | null;
+  membership_tier: "select" | "plus" | "elite" | null;
 }
+
 
 export interface DiscoveryOptions {
   filters?: DiscoveryFilters;
@@ -85,7 +87,9 @@ interface RawCandidate {
   smoking: string | null;
   drinking: string | null;
   workout: string | null;
+  membership_tier: string | null;
 }
+
 
 interface FeedResponse {
   candidates: RawCandidate[];
@@ -241,8 +245,10 @@ async function fetchDiscovery(
       smoking: c.smoking ?? null,
       drinking: c.drinking ?? null,
       workout: c.workout ?? null,
+      membership_tier: (c.membership_tier as DiscoverProfile["membership_tier"]) ?? null,
     };
   });
+
 
   return { items, dailyLimits, needsLocation, needsPreference };
 }

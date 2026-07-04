@@ -183,6 +183,7 @@ function Discover() {
     interests: p.interests,
     isOnline: p.isOnline,
     isVerified: p.is_verified,
+    isPremium: p.membership_tier === "elite",
     heightCm: p.height_cm,
     lookingFor: p.looking_for,
     pets: p.pets,
@@ -190,6 +191,7 @@ function Discover() {
     drinking: p.drinking,
     workout: p.workout,
   }));
+
 
   // Free users browse the full feed; the daily-likes counter (5/day) gates the like action itself.
   const visible = mapped;

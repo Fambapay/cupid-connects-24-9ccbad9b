@@ -14,7 +14,7 @@ import {
   animate,
   type MotionValue,
 } from "framer-motion";
-import { MapPin, ArrowUp, ChevronLeft } from "lucide-react";
+import { MapPin, ArrowUp, ChevronLeft, Crown } from "lucide-react";
 import type { DiscoveryProfile, SwipeDirection } from "./types";
 import { setDiscoveryDetailOpen } from "@/lib/discoveryDetail";
 import {
@@ -646,6 +646,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
               <span style={{ fontSize: 30, fontWeight: 400, opacity: 0.95 }}>
                 {profile.age}
               </span>
+              {profile.isPremium && <EliteCrown size={22} />}
+
               {profile.isOnline && (
                 <span
                   style={{
@@ -956,7 +958,13 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 >
                   {profile.name.split(" ")[0]}
                   <span style={{ opacity: 0.9, fontWeight: 700 }}>, {profile.age}</span>
+                  {profile.isPremium && (
+                    <span style={{ marginLeft: 8, display: "inline-flex", verticalAlign: "middle" }}>
+                      <EliteCrown size={20} />
+                    </span>
+                  )}
                 </h2>
+
                 {profile.isOnline && (
                   <div
                     style={{
@@ -1347,4 +1355,32 @@ function Pill({ label, accent = false }: { label: string; accent?: boolean }) {
     </span>
   );
 }
+
+/** Golden Elite crown — signals tier on the discovery deck. */
+function EliteCrown({ size = 20 }: { size?: number }) {
+  return (
+    <span
+      aria-label="Elite"
+      title="Elite"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: size + 8,
+        height: size + 8,
+        borderRadius: "50%",
+        background: "linear-gradient(135deg, #FFD87A 0%, #E7A63C 55%, #B67A1A 100%)",
+        boxShadow:
+          "0 2px 10px rgba(231,166,60,0.55), inset 0 1px 0 rgba(255,255,255,0.6)",
+      }}
+    >
+      <Crown
+        size={size - 2}
+        strokeWidth={2.4}
+        style={{ color: "#4A2E00", filter: "drop-shadow(0 1px 0 rgba(255,255,255,0.4))" }}
+      />
+    </span>
+  );
+}
+
 
