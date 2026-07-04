@@ -220,19 +220,8 @@ export const DiscoveryPage = ({
                     dragY={y}
                   />
                 }
-                panelActions={
-                  <SwipeActions
-                    onSwipe={(d) => {
-                      if (d === "left") cardRef.current?.flyLeft();
-                      else if (d === "right") cardRef.current?.flyRight();
-                      else cardRef.current?.flyUp();
-                    }}
-                    onFirstImpression={() => onFirstImpression?.(current)}
-                    onRewind={handleRewind}
-                    canRewind={canRewind}
-                  />
-                }
               />
+
             </motion.div>
 
           </motion.div>

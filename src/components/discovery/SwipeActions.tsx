@@ -198,8 +198,16 @@ export const SwipeActions = ({
     };
   }, [dragX, dragY]);
 
+  // Debounce lock: after any action fires we ignore further taps for the
+  // duration of the fly-off animation (~450ms). Prevents double-swipes that
+  // would advance the stack twice and double-charge super-like / FI credits.
+  const busyRef = useRef(false);
   const press =
-    (cb?: () => void) => (e: React.MouseEvent<HTMLButtonElement>) => {
+    (cb?: () => void, cooldownMs = 500) =>
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (busyRef.current) return;
+      busyRef.current = true;
+      window.setTimeout(() => { busyRef.current = false; }, cooldownMs);
       const el = e.currentTarget;
       el.animate(
         [
@@ -215,6 +223,7 @@ export const SwipeActions = ({
       el.blur();
       cb?.();
     };
+
 
 
   const Fill = (
