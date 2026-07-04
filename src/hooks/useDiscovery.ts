@@ -274,6 +274,10 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       verifiedOnly: filters.verifiedOnly ?? null,
       heightMin: filters.heightMin ?? null,
       heightMax: filters.heightMax ?? null,
+      interests: [...(filters.interests ?? [])].sort(),
+      smoke: filters.lifestyle?.smoke ?? null,
+      drink: filters.lifestyle?.drink ?? null,
+      workout: filters.lifestyle?.workout ?? null,
     };
     return JSON.stringify(norm);
   }, [filters]);
