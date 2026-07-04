@@ -340,5 +340,5 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
     return { success: false, error: res?.error };
   }, [unmarkSwipedLocal]);
 
-  return { items, loading, swipe, rewind, reload, dailyLimits };
+  return { items, loading, swipe, rewind, reload, dailyLimits, needsLocation };
 }
