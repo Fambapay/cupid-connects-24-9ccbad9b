@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { MotionValue } from "framer-motion";
-import { RotateCcw, X, Star, Heart, MessageCircleHeart, Lock } from "lucide-react";
+import { RotateCcw, X, Star, Heart, MessageSquarePlus, Lock } from "lucide-react";
 import type { SwipeDirection, DailyLimits } from "./types";
 import { hapticTap } from "@/hooks/useNativePlatform";
 
