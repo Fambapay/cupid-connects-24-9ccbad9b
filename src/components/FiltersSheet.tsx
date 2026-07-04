@@ -456,14 +456,17 @@ const RangeSlider = ({ min, max, valueMin, valueMax, onChange, disabled }: {
 
 /* ── Chips ── */
 
-const ChipGrid = ({ options, selected, onToggle, disabled }: { options: string[]; selected: string[]; onToggle: (v: string) => void; disabled?: boolean }) => (
+type ChipOption = string | { value: string; display: string };
+const ChipGrid = ({ options, selected, onToggle, disabled }: { options: ChipOption[]; selected: string[]; onToggle: (v: string) => void; disabled?: boolean }) => (
   <div className="flex flex-wrap gap-2">
-    {options.map((o) => {
-      const on = selected.includes(o);
+    {options.map((opt) => {
+      const value = typeof opt === 'string' ? opt : opt.value;
+      const display = typeof opt === 'string' ? opt : opt.display;
+      const on = selected.includes(value);
       return (
         <button
-          key={o}
-          onClick={() => onToggle(o)}
+          key={value}
+          onClick={() => onToggle(value)}
           disabled={disabled}
           className="rounded-full px-3.5 py-[7px] text-[13px] font-medium transition-all active:scale-[0.96]"
           style={{
@@ -473,7 +476,7 @@ const ChipGrid = ({ options, selected, onToggle, disabled }: { options: string[]
             boxShadow: on ? '0 6px 16px -6px color-mix(in oklab, var(--brand-pink) 50%, transparent)' : 'none',
           }}
         >
-          {o}
+          {display}
         </button>
       );
     })}
