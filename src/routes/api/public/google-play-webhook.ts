@@ -134,7 +134,7 @@ export const Route = createFileRoute('/api/public/google-play-webhook')({
             product_id: productId,
             subscription_id: payload.subscriptionNotification?.subscriptionId ?? null,
             notification_type: notificationType,
-            raw_payload: payload as unknown as Record<string, unknown>,
+            raw_payload: payload as unknown as never,
             processing_status: 'pending_integration',
           })
 
