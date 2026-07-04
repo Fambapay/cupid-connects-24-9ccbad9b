@@ -10,6 +10,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useProfile } from "@/hooks/useProfile";
 import {
   getEligibleOffer,
+  getOfferPreview,
   logPopupImpression,
   type OfferDTO,
   type OfferTrigger,
