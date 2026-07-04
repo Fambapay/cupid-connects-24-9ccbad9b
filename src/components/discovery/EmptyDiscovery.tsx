@@ -162,7 +162,7 @@ export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters, need
           color: "transparent",
         }}
       >
-        {isSearching ? "À procura..." : "A colmeia está calma"}
+        {needsLocation ? "Ativa a localização" : isSearching ? "À procura..." : "A colmeia está calma"}
       </motion.h2>
 
       <motion.p
@@ -171,7 +171,9 @@ export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters, need
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
       >
-        {isSearching
+        {needsLocation
+          ? "Precisamos da tua localização para te mostrar pessoas por perto. Vai a Definições → Localização."
+          : isSearching
           ? "A encontrar pessoas perto de ti."
           : "Voltamos já com novos perfis para descobrires."}
       </motion.p>
