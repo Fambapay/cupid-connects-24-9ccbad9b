@@ -10,6 +10,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useProfile } from "@/hooks/useProfile";
 import {
   getEligibleOffer,
+  getOfferPreview,
   logPopupImpression,
   type OfferDTO,
   type OfferTrigger,
@@ -65,6 +66,7 @@ export function useOfferEngine() {
   const { profile } = useProfile();
   const fetchOffer = useServerFn(getEligibleOffer);
   const logImpression = useServerFn(logPopupImpression);
+  const fetchOfferPreview = useServerFn(getOfferPreview);
   const matchRoute = useMatchRoute();
   const insideChat = matchRoute({ to: "/chat/$matchId" });
 
@@ -134,6 +136,15 @@ export function useOfferEngine() {
     setActiveOffer(null);
   }, []);
 
+  // Preview/debug: força mostrar o pop-up de uma oferta sem passar por elegibilidade.
+  const forceShowOffer = useCallback(
+    async (trigger: OfferTrigger) => {
+      const offer = await fetchOfferPreview({ data: { trigger } });
+      if (offer) setActiveOffer(offer);
+    },
+    [fetchOfferPreview],
+  );
+
   // Auto-triggers com base no estado do trial.
   useEffect(() => {
     if (hasPremiumAccess === false || !profile) return;
@@ -179,5 +190,6 @@ export function useOfferEngine() {
     enqueueTrigger,
     triggerPostFirstMatch,
     triggerLikesReceived,
+    forceShowOffer,
   };
 }

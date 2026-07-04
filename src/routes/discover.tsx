@@ -61,6 +61,27 @@ function Discover() {
     if (likesCount >= 3) offerEngine.triggerLikesReceived();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [likesCount]);
+
+  // Preview/debug: ?offer=trial_last_24h força o pop-up.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get("offer");
+    if (!t) return;
+    const valid = [
+      "trial_day_2",
+      "trial_last_24h",
+      "post_first_match",
+      "likes_received",
+      "winback_day_7",
+      "winback_day_14",
+      "always_on",
+    ] as const;
+    if ((valid as readonly string[]).includes(t)) {
+      void offerEngine.forceShowOffer(t as (typeof valid)[number]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const { profile } = useProfile();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
