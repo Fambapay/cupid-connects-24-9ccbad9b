@@ -232,6 +232,7 @@ function RootComponent() {
         <AnimatedOutlet />
         <GlobalNotifiers />
         <PushPromptGate />
+        <Day4RecapGate />
         <Toaster
           position="top-center"
           richColors
