@@ -128,7 +128,7 @@ async function fetchDiscovery(
     // value when the user actually narrowed the range in the filters sheet.
     if (filters.ageMin != null && filters.ageMin > 18) filterPayload.ageMin = filters.ageMin;
     if (filters.ageMax != null && filters.ageMax < 80) filterPayload.ageMax = filters.ageMax;
-    if (filters.distance != null && filters.distance < 200) filterPayload.distance = filters.distance;
+    if (filters.distance != null && filters.distance < 201) filterPayload.distance = filters.distance;
     if (filters.hasBio) filterPayload.hasBio = true;
     if (filters.verifiedOnly) filterPayload.verifiedOnly = true;
     if (filters.onlineNow) filterPayload.onlineNow = true;
