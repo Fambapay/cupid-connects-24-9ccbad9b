@@ -48,7 +48,7 @@ export function useLikesCount() {
     load();
 
     const channel = supabase
-      .channel(`likes-count-${user.id}`)
+      .channel(`likes-count-${user.id}-${crypto.randomUUID()}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "swipes", filter: `swiped_id=eq.${user.id}` },
