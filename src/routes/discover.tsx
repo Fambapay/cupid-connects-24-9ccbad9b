@@ -96,7 +96,8 @@ function Discover() {
     setFilters((prev) => ({ ...prev, gender }));
     setFiltersInitialized(true);
   }, [profile?.interested_in, filtersInitialized]);
-  const { items, loading, swipe, rewind, reload, dailyLimits, needsLocation } = useDiscovery({ filters });
+  const { coords: gpsCoords } = useGeolocation(true);
+  const { items, loading, swipe, rewind, reload, loadMore, dailyLimits, needsLocation, needsPreference } = useDiscovery({ filters, userCoords: gpsCoords });
   const { credits, reload: reloadCredits, syncCredits } = useCredits();
   const goShop = () => navigate({ to: "/shop" });
   const boost = useBoost(() => setCreditShop("boost"));
