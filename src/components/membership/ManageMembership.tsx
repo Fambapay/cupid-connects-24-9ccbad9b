@@ -11,8 +11,11 @@ import { getPlanCards } from "@/lib/plans";
 import { useCountry } from "@/lib/country/context";
 import { cancelMyMembership } from "@/lib/membership.functions";
 import { getMyPaymentHistory, restoreMyPurchases, type PaymentHistoryEntry } from "@/lib/payments.functions";
+import { getEligibleOffer, type OfferDTO } from "@/lib/offers.functions";
 import { PaywallFlow } from "@/components/paywall/PaywallFlow";
+import { OfferSheet } from "@/components/offers/OfferSheet";
 import { AlwaysOnQuarterlyCard } from "@/components/membership/AlwaysOnQuarterlyCard";
+
 
 import { hapticTap } from "@/hooks/useNativePlatform";
 import { requiresExternalCheckout, getExternalCheckoutUrl, getBillingMode } from "@/lib/billing/platform";
@@ -74,11 +77,15 @@ export function ManageMembership() {
   const cancel = useServerFn(cancelMyMembership);
   const fetchHistory = useServerFn(getMyPaymentHistory);
   const restore = useServerFn(restoreMyPurchases);
+  const fetchEligibleOffer = useServerFn(getEligibleOffer);
 
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const [pauseOffer, setPauseOffer] = useState<OfferDTO | null>(null);
+  const [loadingOffer, setLoadingOffer] = useState(false);
+
   const externalOnly = requiresExternalCheckout();
   const billingMode = getBillingMode();
 
@@ -320,6 +327,8 @@ export function ManageMembership() {
           {isActive && !isCancelled && (
             <motion.button
               whileTap={{ scale: 0.98 }}
+              disabled={loadingOffer}
+
               onClick={async () => {
                 hapticTap();
                 if (billingMode === "android-play") {
@@ -330,7 +339,21 @@ export function ManageMembership() {
                   await openInAppBrowser(getExternalCheckoutUrl("/membership"));
                   return;
                 }
-                setConfirmCancel(true);
+                // Step 1: try to show pause_50 offer before confirm dialog.
+                setLoadingOffer(true);
+                try {
+                  const offer = await fetchEligibleOffer({ data: { trigger: "cancel_flow" } });
+                  if (offer) {
+                    setPauseOffer(offer);
+                  } else {
+                    setConfirmCancel(true);
+                  }
+                } catch {
+                  setConfirmCancel(true);
+                } finally {
+                  setLoadingOffer(false);
+                }
+
               }}
               className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-left text-white/70 backdrop-blur-xl active:bg-white/[0.06]"
             >
@@ -465,6 +488,25 @@ export function ManageMembership() {
           </motion.div>
         </div>
       )}
+
+      {/* Cancellation offer (step 1): pause_50 or similar retention offer.
+          Dismissing this drops the user into the confirm dialog (step 2). */}
+      {pauseOffer && (
+        <OfferSheet
+          offer={pauseOffer}
+          onDismiss={() => {
+            setPauseOffer(null);
+            setConfirmCancel(true);
+          }}
+          onClaim={() => {}}
+          onSuccess={async () => {
+            setPauseOffer(null);
+            await reload();
+            toast.success("Pausa ativada — obrigado por ficar!");
+          }}
+        />
+      )}
     </div>
   );
+
 }
