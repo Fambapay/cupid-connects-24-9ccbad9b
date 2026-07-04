@@ -391,6 +391,10 @@ function Discover() {
             onEnd={reload}
             boostActive={boost.active}
             boostMultiplier={10}
+            isPremium={isPremium}
+            superLikeBalance={credits.super_like_balance}
+            firstImpressionBalance={credits.first_impression_balance}
+            dailyLimits={dailyLimits}
           />
 
         ) : (
