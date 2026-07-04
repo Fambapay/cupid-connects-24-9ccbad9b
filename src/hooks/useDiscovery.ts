@@ -46,6 +46,7 @@ const ONLINE_WINDOW_MS = 90_000;
 interface DiscoveryResult {
   items: DiscoverProfile[];
   dailyLimits: DailyLimits;
+  needsLocation: boolean;
 }
 
 const DEFAULT_LIMITS: DailyLimits = {
@@ -80,6 +81,7 @@ interface RawCandidate {
 
 interface FeedResponse {
   candidates: RawCandidate[];
+  needs_location?: boolean;
   daily_limits: {
     likes_used: number;
     likes_limit: number;
