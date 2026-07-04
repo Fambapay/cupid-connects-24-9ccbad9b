@@ -357,6 +357,8 @@ function Discover() {
             profiles={visible}
             onSwipe={handleSwipe}
             onOpenFilters={onOpenFilters}
+            activeFilters={activeFilters}
+
             onBoost={onBoost}
             onFirstImpression={onFirstImpression}
             onRewind={onRewind}
