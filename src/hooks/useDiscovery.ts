@@ -283,7 +283,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
   const loadMore = useCallback(async () => {
     if (loadingMore) return;
     // Only paginate when the current page is full — a short page means the end.
-    const currentCount = baseItems.length + pages.reduce((n, p) => n + p.length, 0);
+    const currentCount = baseItems.length + pages.reduce((n: number, p: DiscoverProfile[]) => n + p.length, 0);
     if (currentCount < PAGE_SIZE) return;
     setLoadingMore(true);
     try {
