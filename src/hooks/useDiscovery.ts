@@ -115,13 +115,18 @@ async function fetchDiscovery(
   const filterPayload: Record<string, unknown> = {};
   if (filters) {
     if (filters.gender) filterPayload.gender = filters.gender;
-    if (filters.ageMin != null) filterPayload.ageMin = filters.ageMin;
-    if (filters.ageMax != null) filterPayload.ageMax = filters.ageMax;
-    if (filters.distance != null) filterPayload.distance = filters.distance;
-    if (filters.hasBio != null) filterPayload.hasBio = filters.hasBio;
-    if (filters.verifiedOnly != null) filterPayload.verifiedOnly = filters.verifiedOnly;
-    if (filters.heightMin != null) filterPayload.heightMin = filters.heightMin;
-    if (filters.heightMax != null) filterPayload.heightMax = filters.heightMax;
+    // Wide-open sentinels (18-80, 200 km) mean "no override": let the RPC
+    // fall back to user_settings from onboarding via COALESCE. Only send a
+    // value when the user actually narrowed the range in the filters sheet.
+    if (filters.ageMin != null && filters.ageMin > 18) filterPayload.ageMin = filters.ageMin;
+    if (filters.ageMax != null && filters.ageMax < 80) filterPayload.ageMax = filters.ageMax;
+    if (filters.distance != null && filters.distance < 200) filterPayload.distance = filters.distance;
+    if (filters.hasBio) filterPayload.hasBio = true;
+    if (filters.verifiedOnly) filterPayload.verifiedOnly = true;
+    if (filters.onlineNow) filterPayload.onlineNow = true;
+    // Height slider full-range sentinels (140-210) also mean "no override".
+    if (filters.heightMin != null && filters.heightMin > 140) filterPayload.heightMin = filters.heightMin;
+    if (filters.heightMax != null && filters.heightMax < 210) filterPayload.heightMax = filters.heightMax;
 
     // Premium: interests / lifestyle. Server enforces the premium gate and
     // ignores these when the caller is not on an active paid tier.
@@ -272,6 +277,7 @@ export function useDiscovery(options: DiscoveryOptions = {}) {
       distance: filters.distance ?? null,
       hasBio: filters.hasBio ?? null,
       verifiedOnly: filters.verifiedOnly ?? null,
+      onlineNow: filters.onlineNow ?? null,
       heightMin: filters.heightMin ?? null,
       heightMax: filters.heightMax ?? null,
       interests: [...(filters.interests ?? [])].sort(),

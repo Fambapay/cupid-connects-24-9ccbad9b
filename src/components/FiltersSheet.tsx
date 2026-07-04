@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, Lock, X, BadgeCheck, FileText } from 'lucide-react';
+import { Check, Lock, X, BadgeCheck, FileText, Zap } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { hapticTap } from '@/hooks/useNativePlatform';
 
@@ -10,7 +10,7 @@ export interface DiscoveryFilters {
   distance: number;
   verifiedOnly: boolean;
   hasBio: boolean;
-  withPhotos: boolean;
+  onlineNow: boolean;
   heightMin: number;
   heightMax: number;
   interests: string[];
@@ -23,16 +23,20 @@ export interface DiscoveryFilters {
   education: string[];
 }
 
+// Defaults are wide-open: any refinement should come from onboarding /
+// user_settings, or from the user actively narrowing here. Do NOT set
+// pre-baked narrow ranges like ageMax: 55 or distance: 50 — they overwrite
+// the values the user chose in onboarding.
 export const DEFAULT_FILTERS: DiscoveryFilters = {
   gender: 'todos',
   ageMin: 18,
-  ageMax: 55,
-  distance: 50,
+  ageMax: 80,
+  distance: 200,
   verifiedOnly: false,
   hasBio: false,
-  withPhotos: true,
-  heightMin: 150,
-  heightMax: 200,
+  onlineNow: false,
+  heightMin: 140,
+  heightMax: 210,
   interests: [],
   lifestyle: {},
   zodiac: [],
@@ -184,6 +188,13 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
               {/* Toggles list */}
               <div className="mt-6">
                 <GroupedList>
+                  <ToggleRow
+                    icon={<Zap size={16} strokeWidth={2.2} />}
+                    tint="var(--brand-purple)"
+                    label="Online agora"
+                    value={local.onlineNow}
+                    onChange={(v) => update('onlineNow', v)}
+                  />
                   <ToggleRow
                     icon={<BadgeCheck size={16} strokeWidth={2.2} />}
                     tint="var(--brand-pink)"
