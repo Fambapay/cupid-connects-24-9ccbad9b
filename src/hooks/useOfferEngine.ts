@@ -66,6 +66,7 @@ export function useOfferEngine() {
   const { profile } = useProfile();
   const fetchOffer = useServerFn(getEligibleOffer);
   const logImpression = useServerFn(logPopupImpression);
+  const fetchOfferPreview = useServerFn(getOfferPreview);
   const matchRoute = useMatchRoute();
   const insideChat = matchRoute({ to: "/chat/$matchId" });
 
