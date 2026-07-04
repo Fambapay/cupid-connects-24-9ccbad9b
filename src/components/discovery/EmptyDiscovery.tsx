@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { RefreshCw, SlidersHorizontal } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
 
 interface EmptyDiscoveryProps {
@@ -8,9 +9,10 @@ interface EmptyDiscoveryProps {
   onRefresh?: () => void;
   onOpenFilters?: () => void;
   needsLocation?: boolean;
+  needsPreference?: boolean;
 }
 
-export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters, needsLocation = false }: EmptyDiscoveryProps) => {
+export const EmptyDiscovery = ({ loading = false, onRefresh, onOpenFilters, needsLocation = false, needsPreference = false }: EmptyDiscoveryProps) => {
   // Auto-iniciar a "procura" assim que a página abre, como se o utilizador
   // tivesse clicado em Atualizar — dá sensação imediata de que estamos a
   // buscar perfis novos.
