@@ -85,7 +85,7 @@ function LikesPage() {
               <button
                 key={p.id}
                 type="button"
-                onClick={() => !isPremium && navigate({ to: "/membership" })}
+                onClick={() => !isPremium && handleBlurredTap()}
                 className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-card text-left"
               >
                 {p.photo ? (
