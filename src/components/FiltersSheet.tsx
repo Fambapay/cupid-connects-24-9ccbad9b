@@ -162,6 +162,7 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
                     { value: 'todos', label: 'Todos' },
                     { value: 'feminino', label: 'Mulheres' },
                     { value: 'masculino', label: 'Homens' },
+                    { value: 'nao_binario', label: 'Não-binário' },
                   ]}
                   value={local.gender}
                   onChange={(v) => update('gender', v as DiscoveryFilters['gender'])}
@@ -383,7 +384,7 @@ const SegmentedControl = <T extends string>({ options, value, onChange }: {
         <button
           key={opt.value}
           onClick={() => onChange(opt.value)}
-          className="relative flex-1 rounded-[10px] py-[7px] text-[13px] font-semibold transition-colors"
+          className="relative flex-1 rounded-[10px] py-[7px] text-[12px] font-semibold transition-colors whitespace-nowrap"
           style={{ color: active ? '#fff' : 'rgba(255,255,255,0.60)' }}
         >
           {active && (
