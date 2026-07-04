@@ -446,7 +446,7 @@ export const SwipeActions = ({
         aria-label={`First Impression${typeof firstImpressionBalance === "number" ? ` (${firstImpressionBalance} restantes)` : ""}`}
         style={{ ...BTN_BASE, width: 48, height: 48 }}
       >
-        <MessageCircleHeart size={20} color="#FF6FA8" strokeWidth={2.4} />
+        <MessageSquarePlus size={20} color="#FF6FA8" strokeWidth={2.4} />
         {typeof firstImpressionBalance === "number" && firstImpressionBalance > 0 && (
           <Badge n={firstImpressionBalance} color="#FF6FA8" />
         )}
