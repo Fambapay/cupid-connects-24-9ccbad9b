@@ -33,7 +33,7 @@ export const DEFAULT_FILTERS: DiscoveryFilters = {
   gender: 'todos',
   ageMin: 18,
   ageMax: 80,
-  distance: 200,
+  distance: 201, // 201 = "sem limite" sentinel; useDiscovery omits the field so the RPC falls back to user_settings.
   verifiedOnly: false,
   hasBio: false,
   onlineNow: false,
@@ -190,13 +190,14 @@ export const FiltersSheet = ({ open, onClose, value, onChange, isPremium = false
                 />
               </Section>
 
-              {/* Distance */}
-              <Section title="Distância máxima" trailing={`${local.distance} km`}>
+              {/* Distance — top of the slider (201) is the "sem limite" sentinel. */}
+              <Section title="Distância máxima" trailing={local.distance >= 201 ? 'Sem limite' : `${local.distance} km`}>
                 <SingleSlider
-                  min={1} max={200} value={local.distance}
+                  min={1} max={201} value={local.distance}
                   onChange={(v) => setLocal((p) => ({ ...p, distance: v }))}
                 />
               </Section>
+
 
               {/* Toggles list */}
               <div className="mt-6">
