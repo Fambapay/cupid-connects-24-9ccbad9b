@@ -1473,6 +1473,33 @@ export type Database = {
       }
     }
     Views: {
+      active_boosts: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string | null
+          profile_id: string | null
+          seconds_remaining: number | null
+          source: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string | null
+          profile_id?: string | null
+          seconds_remaining?: never
+          source?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string | null
+          profile_id?: string | null
+          seconds_remaining?: never
+          source?: string | null
+        }
+        Relationships: []
+      }
       offer_funnel: {
         Row: {
           conversion_rate: number | null
