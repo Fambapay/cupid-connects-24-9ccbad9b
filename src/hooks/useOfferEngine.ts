@@ -210,6 +210,8 @@ export function useOfferEngine() {
     enqueueTrigger,
     triggerPostFirstMatch,
     triggerLikesReceived,
+    triggerOutOfLikes,
+    triggerLikesTeaser,
     forceShowOffer,
   };
 }
