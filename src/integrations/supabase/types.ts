@@ -472,6 +472,60 @@ export type Database = {
         }
         Relationships: []
       }
+      google_play_events: {
+        Row: {
+          created_at: string
+          event_type: string | null
+          id: string
+          matched_user_id: string | null
+          message_id: string | null
+          notification_type: number | null
+          package_name: string | null
+          processing_error: string | null
+          processing_status: string
+          product_id: string | null
+          purchase_token: string | null
+          raw_payload: Json
+          received_at: string
+          subscription_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_type?: string | null
+          id?: string
+          matched_user_id?: string | null
+          message_id?: string | null
+          notification_type?: number | null
+          package_name?: string | null
+          processing_error?: string | null
+          processing_status?: string
+          product_id?: string | null
+          purchase_token?: string | null
+          raw_payload: Json
+          received_at?: string
+          subscription_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string | null
+          id?: string
+          matched_user_id?: string | null
+          message_id?: string | null
+          notification_type?: number | null
+          package_name?: string | null
+          processing_error?: string | null
+          processing_status?: string
+          product_id?: string | null
+          purchase_token?: string | null
+          raw_payload?: Json
+          received_at?: string
+          subscription_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       match_reads: {
         Row: {
           last_read_at: string

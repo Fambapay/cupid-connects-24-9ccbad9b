@@ -1,207 +1,162 @@
-/**
- * Google Play Real-Time Developer Notifications (RTDN) — Pub/Sub push endpoint.
- *
- * Configure in Play Console → Monetization setup → Real-time developer
- * notifications. Topic: projects/<gcp-project>/topics/hunie-play-rtdn.
- * Subscription type: push. Push endpoint:
- *   https://hunie.app/api/public/google-play-webhook?token=<verification-token>
- *
- * Secrets:
- *   GOOGLE_PLAY_PUBSUB_VERIFICATION_TOKEN — shared secret in the URL query
- *   GOOGLE_PLAY_PACKAGE_NAME
- *   GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
- *
- * Spec: https://developer.android.com/google/play/billing/rtdn-reference
- */
-import { createFileRoute } from "@tanstack/react-router";
+// Google Play RTDN (Real-time Developer Notifications) webhook — STUB.
+//
+// Estado: arquiva todos os eventos numa tabela de reconciliação
+// (`google_play_events`) com `processing_status = 'pending_integration'`.
+// Ainda NÃO credita membership nem packs. Antes de ligar ao Google Play
+// Billing "para valer" falta fazer:
+//
+//   1. Verificar assinatura do JWT (Pub/Sub push, header `Authorization: Bearer`
+//      com audience = URL desta rota) usando `google-auth-library` ou similar.
+//   2. Chamar `androidpublisher.purchases.subscriptionsv2.get` /
+//      `purchases.products.get` com um service account para revalidar o
+//      purchaseToken e obter o `linkedPurchaseToken`, expiryTime, autoRenew,
+//      countryCode, priceAmountMicros, etc.
+//   3. Mapear productId → { plan_tier, period_months } e o purchaseToken →
+//      user (via `obfuscatedExternalAccountId` que passamos no
+//      `BillingClient.launchBillingFlow`).
+//   4. Aplicar transição de membership atomically:
+//        - SUBSCRIPTION_PURCHASED / RECOVERED / RENEWED → premium_active + expires_at
+//        - SUBSCRIPTION_ON_HOLD / IN_GRACE_PERIOD      → grace + expires_at
+//        - SUBSCRIPTION_CANCELED (autoRenew=false)     → cancelled
+//        - SUBSCRIPTION_EXPIRED / REVOKED              → expired + revoke acesso
+//        - ONE_TIME_PRODUCT_PURCHASED (pack)           → credit_pack(pack_id)
+//   5. Marcar `processing_status = 'processed'` e `matched_user_id`.
+//
+// Enquanto o TODO acima não estiver feito, o evento fica arquivado —
+// permite reprocessar historicamente assim que a integração ficar viva.
 
-type PubSubPush = {
+import { createFileRoute } from '@tanstack/react-router'
+import { supabaseAdmin } from '@/integrations/supabase/client.server'
+
+// Google Pub/Sub push envelope — o Play envia sempre nesta forma.
+interface PubSubPushEnvelope {
   message?: {
-    data?: string; // base64-encoded JSON
-    messageId?: string;
-    publishTime?: string;
-  };
-  subscription?: string;
-};
+    messageId?: string
+    publishTime?: string
+    data?: string // base64
+    attributes?: Record<string, string>
+  }
+  subscription?: string
+}
 
-type RtdnPayload = {
-  version: string;
-  packageName: string;
-  eventTimeMillis: string;
+// Payload do Play (depois de decodificar base64 do message.data)
+// https://developer.android.com/google/play/billing/rtdn-reference
+interface RtdnPayload {
+  version?: string
+  packageName?: string
+  eventTimeMillis?: string
   subscriptionNotification?: {
-    version: string;
-    notificationType: number;
-    purchaseToken: string;
-    subscriptionId: string;
-  };
+    version?: string
+    notificationType?: number
+    purchaseToken?: string
+    subscriptionId?: string
+  }
+  oneTimeProductNotification?: {
+    version?: string
+    notificationType?: number
+    purchaseToken?: string
+    sku?: string
+  }
   voidedPurchaseNotification?: {
-    purchaseToken: string;
-    orderId: string;
-    productType: number;
-    refundType: number;
-  };
-  testNotification?: { version: string };
-};
+    purchaseToken?: string
+    productType?: number
+    refundType?: number
+  }
+  testNotification?: { version?: string }
+}
 
-// https://developer.android.com/google/play/billing/rtdn-reference#sub
-const ACTIVE_STATES = new Set([
-  1, // RECOVERED
-  2, // RENEWED
-  4, // PURCHASED
-  7, // RESTARTED
-  8, // PRICE_CHANGE_CONFIRMED
-]);
-const INACTIVE_STATES = new Set([
-  3, // CANCELED — user cancelled, may still have access until expiry
-  5, // ON_HOLD
-  6, // IN_GRACE_PERIOD — keep access
-  9, // DEFERRED
-  10, // PAUSED
-  12, // REVOKED
-  13, // EXPIRED
-]);
+function decodePayload(dataB64: string | undefined): RtdnPayload | null {
+  if (!dataB64) return null
+  try {
+    const raw = Buffer.from(dataB64, 'base64').toString('utf8')
+    return JSON.parse(raw) as RtdnPayload
+  } catch (err) {
+    console.error('[google-play-webhook] payload decode failed', err)
+    return null
+  }
+}
 
-export const Route = createFileRoute("/api/public/google-play-webhook")({
+function extractEventType(p: RtdnPayload): string {
+  if (p.subscriptionNotification) return 'subscription'
+  if (p.oneTimeProductNotification) return 'one_time'
+  if (p.voidedPurchaseNotification) return 'voided'
+  if (p.testNotification) return 'test'
+  return 'unknown'
+}
+
+export const Route = createFileRoute('/api/public/google-play-webhook')({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const expectedToken = process.env.GOOGLE_PLAY_PUBSUB_VERIFICATION_TOKEN;
-        if (!expectedToken) {
-          return new Response("Webhook not configured", { status: 503 });
-        }
-        const url = new URL(request.url);
-        const providedToken = url.searchParams.get("token");
-        if (!providedToken || providedToken !== expectedToken) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        // TODO(auth): validar Bearer JWT do Pub/Sub push com audience esperada.
+        //   const authz = request.headers.get('authorization') ?? ''
+        //   await verifyGoogleIdToken(authz, EXPECTED_AUDIENCE)
 
-        let push: PubSubPush;
+        let envelope: PubSubPushEnvelope
         try {
-          push = (await request.json()) as PubSubPush;
+          envelope = (await request.json()) as PubSubPushEnvelope
         } catch {
-          return new Response("Invalid JSON", { status: 400 });
+          return new Response('Invalid JSON', { status: 400 })
         }
 
-        if (!push.message?.data) {
-          // Pub/Sub control message — ack quickly.
-          return new Response("ok");
+        const msg = envelope.message
+        if (!msg) return new Response('Missing message', { status: 400 })
+
+        const payload = decodePayload(msg.data)
+        if (!payload) {
+          return new Response('Invalid payload', { status: 400 })
         }
 
-        let payload: RtdnPayload;
-        try {
-          const decoded = atob(push.message.data);
-          payload = JSON.parse(decoded) as RtdnPayload;
-        } catch {
-          return new Response("Invalid Pub/Sub data", { status: 400 });
+        const eventType = extractEventType(payload)
+        const purchaseToken =
+          payload.subscriptionNotification?.purchaseToken ??
+          payload.oneTimeProductNotification?.purchaseToken ??
+          payload.voidedPurchaseNotification?.purchaseToken ??
+          null
+        const productId =
+          payload.oneTimeProductNotification?.sku ??
+          payload.subscriptionNotification?.subscriptionId ??
+          null
+        const notificationType =
+          payload.subscriptionNotification?.notificationType ??
+          payload.oneTimeProductNotification?.notificationType ??
+          null
+
+        // Idempotência: se já registámos este messageId, devolvemos 200
+        // (o Pub/Sub retenta agressivamente).
+        const { error: insertError } = await supabaseAdmin
+          .from('google_play_events')
+          .insert({
+            message_id: msg.messageId ?? null,
+            package_name: payload.packageName ?? null,
+            event_type: eventType,
+            purchase_token: purchaseToken,
+            product_id: productId,
+            subscription_id: payload.subscriptionNotification?.subscriptionId ?? null,
+            notification_type: notificationType,
+            raw_payload: payload as unknown as never,
+            processing_status: 'pending_integration',
+          })
+
+        if (insertError && insertError.code !== '23505') {
+          // 23505 = duplicate message_id (esperado em retries do Pub/Sub)
+          console.error('[google-play-webhook] insert failed', insertError)
+          // Devolve 500 para o Pub/Sub retentar.
+          return new Response('Storage error', { status: 500 })
         }
 
-        // Test notification from Play Console — ack and ignore.
-        if (payload.testNotification) {
-          return new Response("ok");
-        }
+        // TODO(reconciliation): assim que a integração estiver pronta,
+        // chamar aqui `processGooglePlayEvent(payload)` que:
+        //   - resolve o user via obfuscatedExternalAccountId
+        //   - revalida com Play Developer API
+        //   - aplica membership/credit_pack transitions
+        //   - marca a linha como 'processed' ou 'error'
 
-        const sn = payload.subscriptionNotification;
-        if (!sn) {
-          // Voided / one-time / unknown — ack to prevent redelivery; extend later if we sell IAP packs via Play.
-          return new Response("ok");
-        }
-
-        try {
-          const { getSubscriptionV2, tierFromProductId } = await import(
-            "@/lib/billing/google-play.server"
-          );
-          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-          const tier = tierFromProductId(sn.subscriptionId);
-          if (!tier) {
-            console.warn("[play-webhook] unknown productId", sn.subscriptionId);
-            return new Response("ok"); // ack — unknown product, nothing to do
-          }
-
-          const sub = await getSubscriptionV2(sn.purchaseToken);
-
-          // Resolve user: prefer obfuscatedExternalAccountId (we set it at purchase),
-          // then fall back to an existing payment_transactions row matching the token.
-          let userId =
-            sub.externalAccountIdentifiers?.obfuscatedExternalAccountId ?? null;
-
-          if (!userId) {
-            const { data: existing } = await supabaseAdmin
-              .from("payment_transactions")
-              .select("user_id")
-              .eq("external_receipt", sn.purchaseToken)
-              .maybeSingle();
-            userId = existing?.user_id ?? null;
-          }
-
-          if (!userId) {
-            console.warn("[play-webhook] could not resolve user for token");
-            return new Response("ok"); // ack — we can't act, but don't loop redelivery
-          }
-
-          const lineItem =
-            sub.lineItems?.find((l) => l.productId === sn.subscriptionId) ?? sub.lineItems?.[0];
-          const expiry = lineItem?.expiryTime ? new Date(lineItem.expiryTime) : null;
-          const autoRenew = lineItem?.autoRenewingPlan?.autoRenewEnabled !== false;
-
-          await supabaseAdmin.from("payment_transactions").upsert(
-            {
-              user_id: userId,
-              provider: "google_play",
-              kind: "subscription",
-              plan_tier: tier,
-              amount_minor: 0,
-              currency: "USD",
-              status: ACTIVE_STATES.has(sn.notificationType) ? "paid" : "cancelled",
-              external_transaction_id: sub.latestOrderId ?? sn.purchaseToken,
-              external_receipt: sn.purchaseToken,
-              renewal_at: expiry?.toISOString() ?? null,
-              raw: JSON.parse(JSON.stringify({ notification: sn, subscription: sub })),
-              completed_at: new Date().toISOString(),
-            },
-            { onConflict: "external_receipt" },
-          );
-
-          // Update membership state.
-          if (ACTIVE_STATES.has(sn.notificationType) && expiry && expiry.getTime() > Date.now()) {
-            await supabaseAdmin
-              .from("profiles")
-              .update({
-                membership_tier: tier,
-                membership_status: autoRenew ? "active" : "cancelled",
-                membership_expires_at: expiry.toISOString(),
-              })
-              .eq("id", userId);
-          } else if (INACTIVE_STATES.has(sn.notificationType)) {
-            // CANCELED / IN_GRACE_PERIOD keep access until expiry; just mark status.
-            if (sn.notificationType === 3 || sn.notificationType === 6) {
-              await supabaseAdmin
-                .from("profiles")
-                .update({
-                  membership_status: "cancelled",
-                  membership_expires_at: expiry?.toISOString() ?? null,
-                })
-                .eq("id", userId);
-            } else {
-              // EXPIRED / REVOKED / ON_HOLD / PAUSED → revoke now.
-              await supabaseAdmin
-                .from("profiles")
-                .update({
-                  membership_tier: "free",
-                  membership_status: "inactive",
-                  membership_expires_at: null,
-                })
-                .eq("id", userId);
-            }
-          }
-
-          return new Response("ok");
-        } catch (e) {
-          console.error("[play-webhook] processing failed", e);
-          // 500 → Pub/Sub will retry with backoff.
-          return new Response("error", { status: 500 });
-        }
+        return new Response(JSON.stringify({ ok: true, archived: true }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        })
       },
     },
   },
-});
+})

@@ -1,15 +1,19 @@
 // Win-back push cron. Runs 1x/dia. Envia push aos users com membership
-// expirada/cancelada há exatamente 7 ou 14 dias, no máximo 1 vez por marco
-// (idempotente via `winback_pushes.unique(user_id, slug)`).
+// expirada/cancelada há exatamente 7, 14, 60 ou 90 dias, no máximo 1 vez por
+// marco (idempotente via `winback_pushes.unique(user_id, slug)`). Após o dia 90
+// entra em silêncio total — nunca mais envia.
 import { createFileRoute } from '@tanstack/react-router'
 import { timingSafeEqual } from 'crypto'
 import { supabaseAdmin } from '@/integrations/supabase/client.server'
 import { sendWebPush } from '@/lib/push/send.server'
 
 const MILESTONES = [
-  { days: 7,  slug: 'winback_day_7',  title: 'Voltas? 💔', body: 'A tua Elite espera-te. Reativa em 2 toques.' },
-  { days: 14, slug: 'winback_day_14', title: 'Última chance 🎁', body: '30% off no primeiro mês — só nesta semana.' },
+  { days: 7,  slug: 'winback_day_7',  title: 'Voltas? 💔',       body: 'A tua Elite espera-te. Reativa em 2 toques.' },
+  { days: 14, slug: 'winback_day_14', title: 'Última chance 🎁',  body: '30% off no primeiro mês — só nesta semana.' },
+  { days: 60, slug: 'winback_day_60', title: 'Ainda pensas em nós? 👀', body: 'Volta com uma oferta especial: 50% off no 1º mês.' },
+  { days: 90, slug: 'winback_day_90', title: 'Última chamada 🌙',  body: 'A tua conta continua guardada. Depois disto ficamos em silêncio.' },
 ] as const
+
 
 function safeEqual(a: string, b: string): boolean {
   const ab = Buffer.from(a); const bb = Buffer.from(b)
