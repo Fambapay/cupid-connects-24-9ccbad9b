@@ -306,6 +306,16 @@ function Discover() {
   };
 
   const onFirstImpression = (profile: DiscoveryProfile) => {
+    // Gate before opening the sheet so we don't ask the user to compose a
+    // message just to reject it. Non-premium → paywall; 0 balance → shop.
+    if (!entitlements.canSendFirstImpression) {
+      openPaywall();
+      return;
+    }
+    if (credits.first_impression_balance <= 0) {
+      toast.error("Sem First Impressions disponíveis este mês");
+      return;
+    }
     setFirstImpression(profile);
   };
 
