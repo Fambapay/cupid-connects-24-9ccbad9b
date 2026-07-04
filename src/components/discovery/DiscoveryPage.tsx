@@ -24,6 +24,10 @@ interface DiscoveryPageProps {
   showTopBar?: boolean;
   boostActive?: boolean;
   boostMultiplier?: number;
+  isPremium?: boolean;
+  superLikeBalance?: number;
+  firstImpressionBalance?: number;
+  dailyLimits?: import("./types").DailyLimits;
 }
 
 export const DiscoveryPage = ({
@@ -39,6 +43,10 @@ export const DiscoveryPage = ({
   showTopBar = true,
   boostActive = false,
   boostMultiplier = 10,
+  isPremium = false,
+  superLikeBalance,
+  firstImpressionBalance,
+  dailyLimits,
 }: DiscoveryPageProps) => {
   const [index, setIndex] = useState(0);
   const [rewinding, setRewinding] = useState(false);
