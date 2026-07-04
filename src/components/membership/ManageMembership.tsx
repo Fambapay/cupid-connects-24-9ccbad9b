@@ -488,6 +488,25 @@ export function ManageMembership() {
           </motion.div>
         </div>
       )}
+
+      {/* Cancellation offer (step 1): pause_50 or similar retention offer.
+          Dismissing this drops the user into the confirm dialog (step 2). */}
+      {pauseOffer && (
+        <OfferSheet
+          offer={pauseOffer}
+          onDismiss={() => {
+            setPauseOffer(null);
+            setConfirmCancel(true);
+          }}
+          onClaim={() => {}}
+          onSuccess={async () => {
+            setPauseOffer(null);
+            await reload();
+            toast.success("Pausa ativada — obrigado por ficar!");
+          }}
+        />
+      )}
     </div>
   );
+
 }
