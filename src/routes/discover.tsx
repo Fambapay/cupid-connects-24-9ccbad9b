@@ -21,6 +21,7 @@ import { useOfferEngine } from "@/hooks/useOfferEngine";
 
 import { useDiscoveryDetailOpen } from "@/lib/discoveryDetail";
 import { useDiscovery } from "@/hooks/useDiscovery";
+import { useGeolocation } from "@/hooks/useGeolocation";
 import { useCredits } from "@/hooks/useCredits";
 import { useBoost } from "@/hooks/useBoost";
 import { useAuth } from "@/hooks/useAuth";
