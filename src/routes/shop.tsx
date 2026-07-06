@@ -109,7 +109,11 @@ function ShopPage() {
     [tab, country],
   );
   const copy = TAB_COPY[tab];
-  const tabCount = tab === "boost" ? credits.boost_balance : credits.super_like_balance;
+  const tabCount = tab === "boost"
+    ? credits.boost_balance
+    : tab === "first_impression"
+      ? credits.first_impression_balance
+      : credits.super_like_balance;
 
   return (
     <div className="min-h-[100dvh] bg-background pb-28 text-foreground">
