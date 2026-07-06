@@ -10,6 +10,7 @@ import {
   Shield,
   Crown,
   Flame,
+  Send,
   Infinity as InfinityIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -44,10 +45,19 @@ const TAB_COPY: Record<PackKind, { hook: string; sub: string; benefits: { icon: 
       { icon: Eye, label: "Apareces primeiro" },
     ],
   },
+  first_impression: {
+    hook: "Fala primeiro.",
+    sub: "Envia uma mensagem já com o like. 5× mais probabilidade de match.",
+    benefits: [
+      { icon: Sparkles, label: "Chegas em destaque" },
+      { icon: Heart, label: "5× mais matches" },
+      { icon: TrendingUp, label: "Sem esperar" },
+    ],
+  },
 };
 
 const searchSchema = z.object({
-  tab: z.enum(["boost", "super_like"]).optional(),
+  tab: z.enum(["boost", "super_like", "first_impression"]).optional(),
 });
 
 export const Route = createFileRoute("/shop")({
@@ -99,7 +109,11 @@ function ShopPage() {
     [tab, country],
   );
   const copy = TAB_COPY[tab];
-  const tabCount = tab === "boost" ? credits.boost_balance : credits.super_like_balance;
+  const tabCount = tab === "boost"
+    ? credits.boost_balance
+    : tab === "first_impression"
+      ? credits.first_impression_balance
+      : credits.super_like_balance;
 
   return (
     <div className="min-h-[100dvh] bg-background pb-28 text-foreground">
@@ -151,7 +165,7 @@ function ShopPage() {
 
         {/* Tabs */}
         <div className="px-4 pb-3">
-          <div className="grid h-12 grid-cols-2 gap-1 rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-1">
+          <div className="grid h-12 grid-cols-3 gap-1 rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-1">
             <TabButton
               active={tab === "boost"}
               onClick={() => setTab("boost")}
@@ -167,6 +181,14 @@ function ShopPage() {
               label="Super Likes"
               count={credits.super_like_balance}
               gradient="from-sky-400 to-blue-500"
+            />
+            <TabButton
+              active={tab === "first_impression"}
+              onClick={() => setTab("first_impression")}
+              icon={<Send size={14} fill={tab === "first_impression" ? "#fff" : "transparent"} />}
+              label="1ª Impressão"
+              count={credits.first_impression_balance}
+              gradient="from-rose-500 to-pink-500"
             />
           </div>
         </div>
@@ -189,17 +211,21 @@ function ShopPage() {
                 background:
                   tab === "boost"
                     ? "linear-gradient(160deg, rgba(168,85,247,0.22), var(--card))"
-                    : "linear-gradient(160deg, rgba(56,189,248,0.22), var(--card))",
+                    : tab === "first_impression"
+                      ? "linear-gradient(160deg, rgba(244,63,94,0.22), var(--card))"
+                      : "linear-gradient(160deg, rgba(56,189,248,0.22), var(--card))",
               }}
             >
               <div
                 className="absolute -right-6 -top-6 h-32 w-32 rounded-full opacity-40 blur-3xl"
-                style={{ background: tab === "boost" ? "#A855F7" : "#38BDF8" }}
+                style={{ background: tab === "boost" ? "#A855F7" : tab === "first_impression" ? "#F43F5E" : "#38BDF8" }}
               />
               <div className="relative">
                 <div className="mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-[var(--surface-3)]">
                   {tab === "boost" ? (
                     <Zap size={24} fill="#C026D3" stroke="none" />
+                  ) : tab === "first_impression" ? (
+                    <Send size={22} fill="#F43F5E" stroke="none" />
                   ) : (
                     <Star size={24} fill="#38BDF8" stroke="none" />
                   )}
@@ -320,13 +346,24 @@ function TrustTile({ icon, label }: { icon: React.ReactNode; label: string }) {
   );
 }
 
+function packLabel(kind: PackKind, qty: number) {
+  if (kind === "boost") return "Boosts";
+  if (kind === "first_impression") return qty === 1 ? "1ª Impressão" : "1ªs Impressões";
+  return "Super Likes";
+}
+
 function PackCard({ pack, index, country }: { pack: Pack; index: number; country: CountryCode }) {
   const navigate = useNavigate();
   const accent =
     pack.kind === "boost"
       ? "from-fuchsia-500 to-indigo-500"
-      : "from-sky-400 to-blue-500";
-  const accentColor = pack.kind === "boost" ? "#A855F7" : "#38BDF8";
+      : pack.kind === "first_impression"
+        ? "from-rose-500 to-pink-500"
+        : "from-sky-400 to-blue-500";
+  const accentColor =
+    pack.kind === "boost" ? "#A855F7"
+    : pack.kind === "first_impression" ? "#F43F5E"
+    : "#38BDF8";
   const featured = pack.popular || pack.best;
   const unit = unitPrice(pack);
   const disc = discountPct(country, pack.kind, unit);
@@ -335,7 +372,7 @@ function PackCard({ pack, index, country }: { pack: Pack; index: number; country
     navigate({
       to: "/checkout",
       search: {
-        title: `${pack.quantity} ${pack.kind === "boost" ? "Boosts" : "Super Likes"}`,
+        title: `${pack.quantity} ${packLabel(pack.kind, pack.quantity)}`,
         subtitle: "Crédito instantâneo após confirmação",
         amount: pack.price,
         packId: pack.id,
@@ -399,6 +436,8 @@ function PackCard({ pack, index, country }: { pack: Pack; index: number; country
             >
               {pack.kind === "boost" ? (
                 <Zap size={26} fill={accentColor} stroke="none" />
+              ) : pack.kind === "first_impression" ? (
+                <Send size={22} fill={accentColor} stroke="none" />
               ) : (
                 <Star size={26} fill={accentColor} stroke="none" />
               )}
@@ -407,7 +446,7 @@ function PackCard({ pack, index, country }: { pack: Pack; index: number; country
               <div className="flex items-baseline gap-1.5">
                 <span className="text-[28px] font-extrabold leading-none">{pack.quantity}</span>
                 <span className="text-sm font-semibold text-[color:var(--fg-soft)]">
-                  {pack.kind === "boost" ? "Boosts" : "Super Likes"}
+                  {packLabel(pack.kind, pack.quantity)}
                 </span>
               </div>
               <div className="mt-1 text-[11px] text-muted-foreground">

@@ -12,7 +12,7 @@ import {
 } from "./country/config";
 
 export type PlanTier = "select" | "plus" | "elite";
-export type PackKind = "boost" | "super_like";
+export type PackKind = "boost" | "super_like" | "first_impression";
 export type BillingPeriod = "monthly" | "annual";
 
 export interface PlanPrice {
@@ -56,6 +56,9 @@ const PACKS_MZ: Record<string, Pack> = {
   super_like_1:  { id: "super_like_1",  kind: "super_like", quantity: 1,  price: 49 },
   super_like_5:  { id: "super_like_5",  kind: "super_like", quantity: 5,  price: 199,  popular: true },
   super_like_25: { id: "super_like_25", kind: "super_like", quantity: 25, price: 899,  best: true },
+  first_impression_1:  { id: "first_impression_1",  kind: "first_impression", quantity: 1,  price: 79 },
+  first_impression_3:  { id: "first_impression_3",  kind: "first_impression", quantity: 3,  price: 199, popular: true },
+  first_impression_10: { id: "first_impression_10", kind: "first_impression", quantity: 10, price: 599, best: true },
 };
 
 const PACKS_AO: Record<string, Pack> = {
@@ -65,6 +68,9 @@ const PACKS_AO: Record<string, Pack> = {
   super_like_1:  { id: "super_like_1",  kind: "super_like", quantity: 1,  price: 400 },
   super_like_5:  { id: "super_like_5",  kind: "super_like", quantity: 5,  price: 1500, popular: true },
   super_like_25: { id: "super_like_25", kind: "super_like", quantity: 25, price: 6800, best: true },
+  first_impression_1:  { id: "first_impression_1",  kind: "first_impression", quantity: 1,  price: 600 },
+  first_impression_3:  { id: "first_impression_3",  kind: "first_impression", quantity: 3,  price: 1500, popular: true },
+  first_impression_10: { id: "first_impression_10", kind: "first_impression", quantity: 10, price: 4500, best: true },
 };
 
 const PLAN_PRICES_BY_COUNTRY: Record<CountryCode, Record<PlanTier, PlanPrice>> = {

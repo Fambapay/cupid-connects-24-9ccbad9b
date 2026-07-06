@@ -29,6 +29,7 @@ import {
   AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { PaywallSheet } from '@/components/paywall/PaywallSheet';
+import { PassportSheet } from '@/components/PassportSheet';
 
 export const Route = createFileRoute('/_authenticated/settings')({
   head: () => ({
@@ -87,6 +88,7 @@ function SettingsPage() {
 
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [installOpen, setInstallOpen] = useState(false);
+  const [passportOpen, setPassportOpen] = useState(false);
   const goShop = (tab?: 'boost' | 'super_like') =>
     navigate({ to: '/shop', search: tab ? { tab } : {} });
   const goUpgrade = () => setPaywallOpen(true);
@@ -369,13 +371,24 @@ function SettingsPage() {
             </span>
             {profile?.is_incognito && <span className="text-[11px] text-brand-purple font-semibold">Ativo</span>}
           </motion.button>
-          <motion.button onClick={() => (isPremium ? soon() : goUpgrade())} className="hunie-card p-5 flex flex-col items-center gap-2" whileTap={{ scale: 0.97 }}>
+          <motion.button
+            onClick={() => {
+              const canUse = membershipTier === 'plus' || membershipTier === 'elite';
+              if (!canUse) return goUpgrade();
+              setPassportOpen(true);
+            }}
+            className="hunie-card p-5 flex flex-col items-center gap-2 relative"
+            whileTap={{ scale: 0.97 }}
+          >
             <div className="w-12 h-12 rounded-full bg-brand-purple/10 flex items-center justify-center">
               <Plane className="w-6 h-6 text-brand-purple" />
             </div>
             <span className="text-[14px] font-semibold text-foreground flex items-center gap-1">
-              Passport {!isPremium && <Crown className="w-3 h-3 text-brand-purple" />}
+              Passport {membershipTier !== 'plus' && membershipTier !== 'elite' && <Crown className="w-3 h-3 text-brand-purple" />}
             </span>
+            {profile?.passport_city && (
+              <span className="text-[11px] text-brand-purple font-semibold">{profile.passport_city}</span>
+            )}
           </motion.button>
         </motion.div>
 
@@ -752,6 +765,7 @@ function SettingsPage() {
       </Sheet>
       <PaywallSheet open={paywallOpen} onClose={() => setPaywallOpen(false)} />
       <InstallModal open={installOpen} onClose={() => setInstallOpen(false)} deferredPrompt={pwa.deferredPrompt} />
+      <PassportSheet open={passportOpen} onClose={() => setPassportOpen(false)} />
     </motion.div>
   );
 }
