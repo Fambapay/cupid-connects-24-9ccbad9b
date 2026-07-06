@@ -436,6 +436,8 @@ function PackCard({ pack, index, country }: { pack: Pack; index: number; country
             >
               {pack.kind === "boost" ? (
                 <Zap size={26} fill={accentColor} stroke="none" />
+              ) : pack.kind === "first_impression" ? (
+                <Send size={22} fill={accentColor} stroke="none" />
               ) : (
                 <Star size={26} fill={accentColor} stroke="none" />
               )}
@@ -444,7 +446,7 @@ function PackCard({ pack, index, country }: { pack: Pack; index: number; country
               <div className="flex items-baseline gap-1.5">
                 <span className="text-[28px] font-extrabold leading-none">{pack.quantity}</span>
                 <span className="text-sm font-semibold text-[color:var(--fg-soft)]">
-                  {pack.kind === "boost" ? "Boosts" : "Super Likes"}
+                  {packLabel(pack.kind, pack.quantity)}
                 </span>
               </div>
               <div className="mt-1 text-[11px] text-muted-foreground">
