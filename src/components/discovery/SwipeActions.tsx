@@ -347,7 +347,7 @@ export const SwipeActions = ({
         justifyContent: "space-between",
         alignItems: "center",
         gap: 10,
-        padding: "24px 22px 32px",
+        padding: "16px 22px 14px",
         background:
           "linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.18) 60%, rgba(0,0,0,0) 100%)",
         pointerEvents: "auto",
