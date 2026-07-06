@@ -35,6 +35,8 @@ interface ProfileCardProps {
   sharedY?: MotionValue<number>;
   actions?: ReactNode;
   enterAnim?: "rewind-left" | "rewind-right" | "rewind-up" | null;
+  onFirstImpression?: () => void;
+  firstImpressionBalance?: number;
 }
 
 
