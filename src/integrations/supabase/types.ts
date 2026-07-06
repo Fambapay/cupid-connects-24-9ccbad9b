@@ -1041,6 +1041,10 @@ export type Database = {
           name: string | null
           onboarding_completed: boolean
           onboarding_step: number
+          passport_city: string | null
+          passport_expires_at: string | null
+          passport_lat: number | null
+          passport_lng: number | null
           pause_used: boolean
           pets: string | null
           seed_active: boolean
@@ -1080,6 +1084,10 @@ export type Database = {
           name?: string | null
           onboarding_completed?: boolean
           onboarding_step?: number
+          passport_city?: string | null
+          passport_expires_at?: string | null
+          passport_lat?: number | null
+          passport_lng?: number | null
           pause_used?: boolean
           pets?: string | null
           seed_active?: boolean
@@ -1119,6 +1127,10 @@ export type Database = {
           name?: string | null
           onboarding_completed?: boolean
           onboarding_step?: number
+          passport_city?: string | null
+          passport_expires_at?: string | null
+          passport_lat?: number | null
+          passport_lng?: number | null
           pause_used?: boolean
           pets?: string | null
           seed_active?: boolean
@@ -1567,6 +1579,7 @@ export type Database = {
         Args: { _match_id: string }
         Returns: boolean
       }
+      clear_passport: { Args: never; Returns: Json }
       compute_distances_km: {
         Args: { _ids: string[]; _viewer_lat: number; _viewer_lng: number }
         Returns: {
@@ -1720,6 +1733,10 @@ export type Database = {
         Returns: undefined
       }
       rewind_last_swipe: { Args: never; Returns: Json }
+      set_passport: {
+        Args: { _city: string; _lat: number; _lng: number }
+        Returns: Json
+      }
       touch_last_active: { Args: never; Returns: undefined }
       transition_expired_memberships: { Args: never; Returns: Json }
       use_pack_boost: { Args: never; Returns: Json }
