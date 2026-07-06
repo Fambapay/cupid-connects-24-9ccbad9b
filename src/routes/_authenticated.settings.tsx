@@ -87,6 +87,7 @@ function SettingsPage() {
 
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [installOpen, setInstallOpen] = useState(false);
+  const [passportOpen, setPassportOpen] = useState(false);
   const goShop = (tab?: 'boost' | 'super_like') =>
     navigate({ to: '/shop', search: tab ? { tab } : {} });
   const goUpgrade = () => setPaywallOpen(true);
