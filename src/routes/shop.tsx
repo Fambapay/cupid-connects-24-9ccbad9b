@@ -346,13 +346,24 @@ function TrustTile({ icon, label }: { icon: React.ReactNode; label: string }) {
   );
 }
 
+function packLabel(kind: PackKind, qty: number) {
+  if (kind === "boost") return "Boosts";
+  if (kind === "first_impression") return qty === 1 ? "1ª Impressão" : "1ªs Impressões";
+  return "Super Likes";
+}
+
 function PackCard({ pack, index, country }: { pack: Pack; index: number; country: CountryCode }) {
   const navigate = useNavigate();
   const accent =
     pack.kind === "boost"
       ? "from-fuchsia-500 to-indigo-500"
-      : "from-sky-400 to-blue-500";
-  const accentColor = pack.kind === "boost" ? "#A855F7" : "#38BDF8";
+      : pack.kind === "first_impression"
+        ? "from-rose-500 to-pink-500"
+        : "from-sky-400 to-blue-500";
+  const accentColor =
+    pack.kind === "boost" ? "#A855F7"
+    : pack.kind === "first_impression" ? "#F43F5E"
+    : "#38BDF8";
   const featured = pack.popular || pack.best;
   const unit = unitPrice(pack);
   const disc = discountPct(country, pack.kind, unit);
@@ -361,7 +372,7 @@ function PackCard({ pack, index, country }: { pack: Pack; index: number; country
     navigate({
       to: "/checkout",
       search: {
-        title: `${pack.quantity} ${pack.kind === "boost" ? "Boosts" : "Super Likes"}`,
+        title: `${pack.quantity} ${packLabel(pack.kind, pack.quantity)}`,
         subtitle: "Crédito instantâneo após confirmação",
         amount: pack.price,
         packId: pack.id,
