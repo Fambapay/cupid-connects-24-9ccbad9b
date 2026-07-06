@@ -44,10 +44,19 @@ const TAB_COPY: Record<PackKind, { hook: string; sub: string; benefits: { icon: 
       { icon: Eye, label: "Apareces primeiro" },
     ],
   },
+  first_impression: {
+    hook: "Fala primeiro.",
+    sub: "Envia uma mensagem já com o like. 5× mais probabilidade de match.",
+    benefits: [
+      { icon: Sparkles, label: "Chegas em destaque" },
+      { icon: Heart, label: "5× mais matches" },
+      { icon: TrendingUp, label: "Sem esperar" },
+    ],
+  },
 };
 
 const searchSchema = z.object({
-  tab: z.enum(["boost", "super_like"]).optional(),
+  tab: z.enum(["boost", "super_like", "first_impression"]).optional(),
 });
 
 export const Route = createFileRoute("/shop")({
