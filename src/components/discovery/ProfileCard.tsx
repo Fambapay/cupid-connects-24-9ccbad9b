@@ -14,7 +14,7 @@ import {
   animate,
   type MotionValue,
 } from "framer-motion";
-import { MapPin, ArrowUp, ChevronLeft, Crown } from "lucide-react";
+import { MapPin, ArrowUp, ChevronLeft, Crown, Sparkles } from "lucide-react";
 import type { DiscoveryProfile, SwipeDirection } from "./types";
 import { setDiscoveryDetailOpen } from "@/lib/discoveryDetail";
 import {
@@ -35,6 +35,8 @@ interface ProfileCardProps {
   sharedY?: MotionValue<number>;
   actions?: ReactNode;
   enterAnim?: "rewind-left" | "rewind-right" | "rewind-up" | null;
+  onFirstImpression?: () => void;
+  firstImpressionBalance?: number;
 }
 
 
@@ -166,7 +168,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       sharedY,
       actions,
       enterAnim = null,
-
+      onFirstImpression,
+      firstImpressionBalance,
     },
     ref,
   ) => {
@@ -1209,6 +1212,68 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
                 </DetailSection>
               )}
 
+
+              {/* First Impression CTA — send a message before matching */}
+              {onFirstImpression && (
+                <div style={{ padding: "8px 20px 20px" }}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDetailOpen(false);
+                      onFirstImpression();
+                    }}
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 10,
+                      padding: "14px 18px",
+                      borderRadius: 999,
+                      border: "1px solid rgba(90,169,255,0.35)",
+                      background:
+                        "linear-gradient(135deg, rgba(90,169,255,0.18), rgba(124,91,255,0.18))",
+                      color: "#fff",
+                      fontSize: 15,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      backdropFilter: "blur(8px)",
+                    }}
+                  >
+                    <Sparkles size={18} strokeWidth={2.4} color="#5AA9FF" />
+                    <span>Enviar First Impression</span>
+                    {typeof firstImpressionBalance === "number" && (
+                      <span
+                        style={{
+                          marginLeft: 6,
+                          padding: "2px 8px",
+                          borderRadius: 999,
+                          fontSize: 12,
+                          fontWeight: 700,
+                          background:
+                            firstImpressionBalance > 0
+                              ? "rgba(90,169,255,0.25)"
+                              : "rgba(255,107,107,0.25)",
+                          color:
+                            firstImpressionBalance > 0 ? "#5AA9FF" : "#FF6B6B",
+                        }}
+                      >
+                        {firstImpressionBalance}
+                      </span>
+                    )}
+                  </button>
+                  <div
+                    style={{
+                      marginTop: 8,
+                      textAlign: "center",
+                      fontSize: 12,
+                      color: "rgba(255,255,255,0.5)",
+                    }}
+                  >
+                    Envia uma mensagem antes do match. Até 5x mais hipóteses.
+                  </div>
+                </div>
+              )}
 
               {/* Subtle end marker */}
               <div
