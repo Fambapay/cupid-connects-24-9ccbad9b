@@ -373,7 +373,7 @@ function SettingsPage() {
           </motion.button>
           <motion.button
             onClick={() => {
-              const canUse = membershipTier === 'plus' || membershipTier === 'elite';
+              const canUse = membershipTier === 'elite';
               if (!canUse) return goUpgrade();
               setPassportOpen(true);
             }}
@@ -384,7 +384,7 @@ function SettingsPage() {
               <Plane className="w-6 h-6 text-brand-purple" />
             </div>
             <span className="text-[14px] font-semibold text-foreground flex items-center gap-1">
-              Passport {membershipTier !== 'plus' && membershipTier !== 'elite' && <Crown className="w-3 h-3 text-brand-purple" />}
+              Passport {membershipTier !== 'elite' && <Crown className="w-3 h-3 text-brand-purple" />}
             </span>
             {profile?.passport_city && (
               <span className="text-[11px] text-brand-purple font-semibold">{profile.passport_city}</span>
