@@ -54,7 +54,7 @@ export function PassportSheet({ open, onClose }: Props) {
         });
         return;
       }
-      await refresh?.();
+      await reload?.();
       toast({ title: `Passport ativo em ${city.name}`, description: "Válido por 24 horas." });
       onClose();
     } catch {
@@ -68,7 +68,7 @@ export function PassportSheet({ open, onClose }: Props) {
     setSaving("__clear__");
     try {
       await doClear();
-      await refresh?.();
+      await reload?.();
       toast({ title: "Passport desativado", description: "Voltas a ver perfis à tua volta." });
       onClose();
     } finally {
