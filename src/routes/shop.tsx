@@ -10,6 +10,7 @@ import {
   Shield,
   Crown,
   Flame,
+  Send,
   Infinity as InfinityIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
