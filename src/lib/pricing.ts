@@ -12,7 +12,7 @@ import {
 } from "./country/config";
 
 export type PlanTier = "select" | "plus" | "elite";
-export type PackKind = "boost" | "super_like";
+export type PackKind = "boost" | "super_like" | "first_impression";
 export type BillingPeriod = "monthly" | "annual";
 
 export interface PlanPrice {
