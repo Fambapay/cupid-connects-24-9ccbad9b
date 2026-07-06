@@ -240,26 +240,10 @@ function SettingsPage() {
     } finally { setDeleting(false); }
   };
 
-  if (loading) {
-    return (
-      <motion.div
-        className="flex-1 bg-background pt-12"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
-      >
-        <SettingsListSkeleton count={8} />
-      </motion.div>
-    );
-  }
-
   return (
-    <motion.div
+    <div
       className="h-[100dvh] overflow-y-auto overflow-x-hidden overscroll-y-contain"
       style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y', background: 'var(--profile-bg)' }}
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
     >
       {/* Header */}
       <div
@@ -766,6 +750,6 @@ function SettingsPage() {
       <PaywallSheet open={paywallOpen} onClose={() => setPaywallOpen(false)} />
       <InstallModal open={installOpen} onClose={() => setInstallOpen(false)} deferredPrompt={pwa.deferredPrompt} />
       <PassportSheet open={passportOpen} onClose={() => setPassportOpen(false)} />
-    </motion.div>
+    </div>
   );
 }
