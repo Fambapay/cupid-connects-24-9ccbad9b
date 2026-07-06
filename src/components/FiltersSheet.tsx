@@ -465,13 +465,13 @@ const RangeSlider = ({ min, max, valueMin, valueMax, onChange, disabled }: {
         />
         <input
           type="range" min={min} max={max} value={valueMin} disabled={disabled}
-          onChange={(e) => onChange(Math.min(Number(e.target.value), valueMax - 1), valueMax)}
+          onChange={(e) => onChange(Math.min(Number(e.target.value), valueMax - 4), valueMax)}
           className="absolute inset-0 w-full appearance-none bg-transparent slider-ios pointer-events-auto"
           style={{ zIndex: 2 }}
         />
         <input
           type="range" min={min} max={max} value={valueMax} disabled={disabled}
-          onChange={(e) => onChange(valueMin, Math.max(Number(e.target.value), valueMin + 1))}
+          onChange={(e) => onChange(valueMin, Math.max(Number(e.target.value), valueMin + 4))}
           className="absolute inset-0 w-full appearance-none bg-transparent slider-ios pointer-events-auto"
           style={{ zIndex: 3 }}
         />
