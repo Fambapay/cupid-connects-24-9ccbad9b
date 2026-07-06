@@ -87,9 +87,14 @@ export function CreditShopSheet({ open, kind, onClose, onSuccess }: CreditShopSh
     [kind, country],
   );
   const copy = COPY[kind];
-  const accent = kind === "boost" ? "from-fuchsia-500 to-indigo-500" : "from-sky-400 to-blue-500";
-  const accentColor = kind === "boost" ? "#A855F7" : "#38BDF8";
-  const balance = kind === "boost" ? credits.boost_balance : credits.super_like_balance;
+  const accent =
+    kind === "boost" ? "from-fuchsia-500 to-indigo-500"
+    : kind === "first_impression" ? "from-rose-500 to-pink-500"
+    : "from-sky-400 to-blue-500";
+  const accentColor = kind === "boost" ? "#A855F7" : kind === "first_impression" ? "#F43F5E" : "#38BDF8";
+  const balance = kind === "boost" ? credits.boost_balance
+    : kind === "first_impression" ? credits.first_impression_balance
+    : credits.super_like_balance;
 
   useEffect(() => {
     if (open) {
