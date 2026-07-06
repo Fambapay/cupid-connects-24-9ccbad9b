@@ -30,6 +30,10 @@ export interface Profile {
   smoking: string | null;
   drinking: string | null;
   workout: string | null;
+  passport_city?: string | null;
+  passport_lat?: number | null;
+  passport_lng?: number | null;
+  passport_expires_at?: string | null;
 }
 
 const profileCache = new Map<string, Profile>();
