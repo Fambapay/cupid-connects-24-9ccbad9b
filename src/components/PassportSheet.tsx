@@ -31,7 +31,7 @@ interface Props {
 
 export function PassportSheet({ open, onClose }: Props) {
   const { toast } = useToast();
-  const { profile, refresh } = useProfile();
+  const { profile, reload } = useProfile();
   const doSet = useServerFn(setPassport);
   const doClear = useServerFn(clearPassport);
   const [saving, setSaving] = useState<string | null>(null);
