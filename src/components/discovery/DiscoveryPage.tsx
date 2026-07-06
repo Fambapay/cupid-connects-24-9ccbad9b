@@ -214,6 +214,10 @@ export const DiscoveryPage = ({
                 sharedX={x}
                 sharedY={y}
                 enterAnim={enterAnim}
+                onFirstImpression={
+                  onFirstImpression ? () => onFirstImpression(current) : undefined
+                }
+                firstImpressionBalance={firstImpressionBalance}
                 actions={
                   <SwipeActions
                     onSwipe={(d) => {
