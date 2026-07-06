@@ -165,7 +165,7 @@ function ShopPage() {
 
         {/* Tabs */}
         <div className="px-4 pb-3">
-          <div className="grid h-12 grid-cols-2 gap-1 rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-1">
+          <div className="grid h-12 grid-cols-3 gap-1 rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-2)] p-1">
             <TabButton
               active={tab === "boost"}
               onClick={() => setTab("boost")}
@@ -181,6 +181,14 @@ function ShopPage() {
               label="Super Likes"
               count={credits.super_like_balance}
               gradient="from-sky-400 to-blue-500"
+            />
+            <TabButton
+              active={tab === "first_impression"}
+              onClick={() => setTab("first_impression")}
+              icon={<Send size={14} fill={tab === "first_impression" ? "#fff" : "transparent"} />}
+              label="1ª Impressão"
+              count={credits.first_impression_balance}
+              gradient="from-rose-500 to-pink-500"
             />
           </div>
         </div>
@@ -203,17 +211,21 @@ function ShopPage() {
                 background:
                   tab === "boost"
                     ? "linear-gradient(160deg, rgba(168,85,247,0.22), var(--card))"
-                    : "linear-gradient(160deg, rgba(56,189,248,0.22), var(--card))",
+                    : tab === "first_impression"
+                      ? "linear-gradient(160deg, rgba(244,63,94,0.22), var(--card))"
+                      : "linear-gradient(160deg, rgba(56,189,248,0.22), var(--card))",
               }}
             >
               <div
                 className="absolute -right-6 -top-6 h-32 w-32 rounded-full opacity-40 blur-3xl"
-                style={{ background: tab === "boost" ? "#A855F7" : "#38BDF8" }}
+                style={{ background: tab === "boost" ? "#A855F7" : tab === "first_impression" ? "#F43F5E" : "#38BDF8" }}
               />
               <div className="relative">
                 <div className="mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-[var(--surface-3)]">
                   {tab === "boost" ? (
                     <Zap size={24} fill="#C026D3" stroke="none" />
+                  ) : tab === "first_impression" ? (
+                    <Send size={22} fill="#F43F5E" stroke="none" />
                   ) : (
                     <Star size={24} fill="#38BDF8" stroke="none" />
                   )}
