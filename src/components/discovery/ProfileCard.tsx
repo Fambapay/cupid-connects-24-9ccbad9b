@@ -168,7 +168,8 @@ export const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(
       sharedY,
       actions,
       enterAnim = null,
-
+      onFirstImpression,
+      firstImpressionBalance,
     },
     ref,
   ) => {
