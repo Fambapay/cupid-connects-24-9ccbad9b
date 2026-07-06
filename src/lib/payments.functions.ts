@@ -7,7 +7,7 @@ export type PaymentHistoryEntry = {
   kind: "subscription" | "credit_pack" | "one_time";
   plan_tier: "select" | "plus" | "elite" | null;
   pack_id: string | null;
-  pack_kind: "boost" | "super_like" | null;
+  pack_kind: "boost" | "super_like" | "first_impression" | null;
   pack_quantity: number | null;
   amount_minor: number;
   currency: string;
