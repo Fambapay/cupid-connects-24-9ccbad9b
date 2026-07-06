@@ -49,6 +49,17 @@ const COPY: Record<
       { icon: Heart, label: "Mais matches" },
     ],
   },
+  first_impression: {
+    eyebrow: "Hunie Store",
+    title: "Fala primeiro.",
+    titleAccent: "Sem esperar pelo match.",
+    sub: "Envia uma mensagem com o like — 5× mais probabilidade de match.",
+    benefits: [
+      { icon: Sparkles, label: "Chegas em destaque" },
+      { icon: Heart, label: "5× mais matches" },
+      { icon: TrendingUp, label: "Sem ficar no vazio" },
+    ],
+  },
 };
 
 export interface CreditShopSheetProps {
