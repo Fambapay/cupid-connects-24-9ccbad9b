@@ -54,7 +54,7 @@ export function useProfile() {
     const [{ data }, { data: phoneData }, { data: locData }] = await Promise.all([
       supabase
         .from("profiles")
-        .select("id,name,age,city,country,bio,is_paused,is_incognito,is_verified,membership_tier,membership_status,membership_expires_at,onboarding_completed,onboarding_step,birthdate,gender,interested_in,interests,height_cm,looking_for,pets,smoking,drinking,workout")
+        .select("id,name,age,city,country,bio,is_paused,is_incognito,is_verified,membership_tier,membership_status,membership_expires_at,onboarding_completed,onboarding_step,birthdate,gender,interested_in,interests,height_cm,looking_for,pets,smoking,drinking,workout,passport_city,passport_lat,passport_lng,passport_expires_at")
         .eq("id", user.id)
         .maybeSingle(),
       supabase.rpc("get_my_phone"),
