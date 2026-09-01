@@ -20,6 +20,7 @@ import { CountrySwitcher } from "@/components/CountrySwitcher";
 import { faqData } from "@/components/landing/faqData";
 import hunieMarkTransparent from "@/assets/hunie-mark-transparent.png.asset.json";
 import { useForceDarkTheme } from "@/lib/theme";
+import { HunieOpening } from "@/components/landing/HunieOpening";
 
 // Smooth anchor scroll with easeInOutCubic + brief highlight pulse on target.
 // Feels premium vs. the browser's default snap-jump.
@@ -191,19 +192,11 @@ function LandingGate() {
     return () => { cancelled = true; };
   }, [navigate]);
 
-
-  if (!ready) return <Splash />;
-  return <Landing />;
-}
-
-function Splash() {
   return (
-    <div style={{ display: "grid", placeItems: "center", minHeight: "100dvh", background: "#07060a" }}>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-        <img src={hunieMarkTransparent.url} alt="Logótipo Hunie" style={{ width: 56, height: 56, display: "block" }} />
-        <span style={{ color: "#fff", fontWeight: 700, fontSize: 22, letterSpacing: "-0.02em" }}>Hunie</span>
-      </div>
-    </div>
+    <>
+      {ready ? <Landing /> : null}
+      <HunieOpening canReveal={ready} />
+    </>
   );
 }
 
@@ -628,5 +621,4 @@ function Landing() {
     </div>
   );
 }
-
 
